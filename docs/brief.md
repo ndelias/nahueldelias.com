@@ -22,8 +22,9 @@ The site is also itself a portfolio piece. It will be read as evidence of craft,
 ## 2. Information architecture
 
 ```
-/                     Home — identity, the two case studies at full weight,
-                      everything else as a lighter tail, build log, contact
+/                     Home — one-screen filmstrip of every entry, landing on
+                      W01; (Index) toggles a numbered list (§7.5)
+/about                Everything about Nahuel (design pending)
 /work/[slug]          Case studies (full template)
 /work/vers1ons        + /licensing /distribution /drops sub-studies
 /studies/[slug]       Product studies — consumer reasoning, labeled concepts
@@ -31,7 +32,7 @@ The site is also itself a portfolio piece. It will be read as evidence of craft,
 /play                 Creative work: p5.js sketches, the toy, paper projects
 /writing              Essay index
 /writing/[slug]       Essays
-/log                  Dated build log (also excerpted on home)
+/log                  Dated build log (linked from the homepage frame)
 /404                  Easter-egg toy (see §10)
 ```
 
@@ -174,18 +175,18 @@ Images: modern formats, explicit dimensions, lazy below the fold, eager for the 
 
 ### 7.2 The key observation about the inspiration set
 
-Nahuel's inspiration folder (15 references, mostly fashion and visual-studio sites) is almost entirely built for many things of equal weight: carousels, rings, grids, piles. That's the opposite of this homepage's job, which is to make two things unmistakably dominant. So the references are used for the frame, the tail, and secondary pages. The top of the homepage — the two weight-1 entries — is designed on its own terms (§7.5), not borrowed.
+Nahuel's inspiration folder (15 references, mostly fashion and visual-studio sites) is almost entirely built for many things of equal weight: carousels, rings, grids, piles. That works against the brief's rule that two things must be unmistakably dominant. Since the 2026-09-24 revision the homepage is one of these patterns (the Rue filmstrip), so the hierarchy is carried by explicit rules instead of layout: see "How the hierarchy survives the filmstrip" in §7.5.
 
 ### 7.3 Named borrowings
 
 | Reference | What's taken | Where it goes |
 | --- | --- | --- |
-| Rue Studio (cream page, filmstrip) | Warm off-white ground; small uppercase mono labels pinned to the four corners as the page frame | Site-wide shell |
-| Directors index (D001…D017) | Numbered text list; hovering a row reveals a strip of stills/recordings | Homepage tail (everything below the two), section indexes |
+| Rue Studio (cream page, filmstrip) | Warm off-white ground; small uppercase mono labels pinned to the four corners as the page frame; the horizontal filmstrip with one enlarged, focused item | Site-wide shell; the homepage filmstrip (§7.5) |
+| Directors index (D001…D017) | Numbered text list; hovering a row reveals a strip of stills/recordings | The homepage (Index) view (also the no-JS / reduced-motion fallback), section indexes |
 | Gramatica grid | Right-aligned year column | Same numbered list |
-| every : second (isometric stacks) | Tag list with superscript counts — Work², Studies³ | Primary nav. A zero-count section simply isn't listed, which enforces "render only when populated" visually |
+| every : second (isometric stacks) | Tag list with superscript counts — Work², Studies³ | Section nav on /work and the section index pages (the homepage frame uses Work / About / Log). A zero-count section simply isn't listed, which enforces "render only when populated" visually |
 | every : second, second borrowing | Stacked frames riffled by scroll | Provenance stack on case-study pages: v1 → v3 frames from `versions`. One of the two budgeted motion moments |
-| Max Pratt | Large identity line, small caption beside it, "Last updated" date | Homepage hero. The date is the latest /log entry, linked — proof the site is maintained |
+| Max Pratt | Large identity line, small caption beside it, "Last updated" date | /about header, not the homepage (the filmstrip has no headline). The "Last updated" date, linked to the latest /log entry, can sit in the homepage frame if space allows |
 | 4:00pm time-use sim | Data rendered as live, labeled clusters rather than static charts | Signature treatment for /data headers — not the homepage |
 | Gem Quest (org-tree lines) | Thin connector lines between related items | /work/vers1ons, linking the licensing / distribution / drops sub-studies |
 | Lukas Schneeberger (tilted pile) | Scattered, hand-placed pile of objects | /play index for paper projects |
@@ -193,7 +194,7 @@ Nahuel's inspiration folder (15 references, mostly fashion and visual-studio sit
 
 ### 7.4 Explicitly rejected, and why
 
-- **Curved 3D carousel, Music TV carousel as homepage patterns** — motion demos that hide items, flatten weight, and would blow the 100KB JS budget.
+- **Curved 3D carousel, Music TV carousel as homepage patterns** — 3D perspective motion demos that would blow the 100KB JS budget. The homepage filmstrip is deliberately the flat, 2D Rue version: CSS transforms only, with explicit hierarchy rules so it doesn't flatten weight.
 - **gather° selection tray, frosted-glass phone feed** — strong microinteraction references, but for the consumer studies (Bespoke, the social club), not the container. Filed with those projects.
 - **Painterly gradient project cards** — read as a Dribbble template; undercuts "precision, not polish."
 - **Avatar network graph** — belongs in a data project if one calls for it, not the site.
@@ -215,7 +216,7 @@ Nahuel's inspiration folder (15 references, mostly fashion and visual-studio sit
 
 **Performance note.** The strip is the one hydrated island on /: plain CSS transforms, one `<video>` element swapped into the focused frame, posters as images. Budget it at ~10KB JS; videos load only on focus, never autoplay with sound.
 
-**Motion budget.** (a) The homepage filmstrip focus: grow, still → video, meta rising in. (b) The provenance stack on case-study pages. Everything else is instant. Both respect `prefers-reduced-motion` (stack becomes a static strip; hover becomes a plain thumbnail).
+**Motion budget.** (a) The homepage filmstrip focus: grow, still → video, meta rising in. (b) The provenance stack on case-study pages. Everything else is instant. Both respect `prefers-reduced-motion` (the provenance stack becomes a static strip; the filmstrip is replaced by the (Index) list).
 
 ### 7.6 Red flags — must not appear
 
@@ -225,7 +226,7 @@ An About Me section with a photo and hobbies, a skills grid with framework logos
 
 Astro with islands + MDX, deployed on Vercel. Decided 2026-09-24; do not revisit.
 
-**Reasoning:** the design in §7 is text-first — a mono index, a type-led hero, static frames — so most pages need close to zero JavaScript, and Astro ships none by default. That makes the §6 budget (< 100KB JS on /, LCP < 1.2s) straightforward rather than a fight. The heavy interactive surface — charts, dashboards, p5 sketches, the provenance stack — becomes client islands, loaded only where used (`client:visible`). MDX in Astro still embeds React components inline, so nothing in §5 is lost. Content collections with a Zod schema map directly onto §3, and the three compile-time constraints become schema refinements plus one collection-level check.
+**Reasoning:** the design in §7 is mostly static — a mono frame, a server-rendered index, MDX case studies — so most pages need close to zero JavaScript; the homepage filmstrip is one small island on top of the server-rendered list, and Astro ships none by default. That makes the §6 budget (< 100KB JS on /, LCP < 1.2s) straightforward rather than a fight. The heavy interactive surface — charts, dashboards, p5 sketches, the provenance stack — becomes client islands, loaded only where used (`client:visible`). MDX in Astro still embeds React components inline, so nothing in §5 is lost. Content collections with a Zod schema map directly onto §3, and the three compile-time constraints become schema refinements plus one collection-level check.
 
 **Trade-off accepted:** Astro is less familiar to startup reviewers than Next. Offset by the repo itself — a clean, budget-gated Astro repo reads as a deliberate choice, and the case can be made in one log entry.
 
@@ -240,7 +241,7 @@ The repo should be public from the first commit. It's part of the provenance arg
 1. Repo, deploy pipeline, domain, CI with the performance budget wired in from the first commit
 2. Content model and MDX pipeline; one dummy entry rendering end to end before any styling
 3. Design tokens: color for both themes, type scale, spacing scale, layout primitives
-4. Homepage with real hierarchy and placeholder content — get the two-versus-everything-else relationship right before filling anything in
+4. Homepage with real hierarchy and placeholder content: the server-rendered (Index) list first, then the filmstrip island (§7.5). Get the two-versus-everything-else rules right before filling anything in
 5. The case study template. This is the page that has to be genuinely good; everything else can be plain.
 6. Ship it with one real entry and the build log started
 
@@ -259,12 +260,12 @@ The repo should be public from the first commit. It's part of the provenance arg
 | Domain | Decided | nahueldelias.com — already owned |
 | Stack | Decided | Astro + islands + MDX on Vercel (§8) |
 | Theme | Decided | Light-first; dark is a separately designed warm near-black palette, not an inversion |
-| Name treatment | Decided | Full name, small, in mono, top-left corner of the frame. The identity line is the headline, not the name |
+| Name treatment | Decided | Full name + "Product engineer", small, in mono, top-left corner of the frame. There is no headline on the homepage (§7.5) |
 | Type | Decided | Instrument Sans + DM Mono (§7.5) |
 | Toy location | Decided | Both: the p5 toy lives at /play; the 404 gets the Satto-style ring of the site's own entries, doubling as navigation back in |
 | Identity line wording | Open | Must be tailored to Nahuel specifically, not a generic product-engineer line. Designs use the placeholder below until it's written |
 
-**Identity line:** must not lead with music. Music is evidence, not identity — a music-first line filters into a small market. Something closer to "Product engineer. I build products in domains where the rules are complicated and the interface can't be." The work below it then says music licensing marketplace, agent governance, consumer marketplace — and the reader concludes range.
+**Identity line:** no longer on the homepage. It's used for the /about header, the site's meta description and the default OG image. It must not lead with music. Music is evidence, not identity — a music-first line filters into a small market. Something closer to "Product engineer. I build products in domains where the rules are complicated and the interface can't be." The filmstrip then shows music licensing marketplace, agent governance, consumer marketplace — and the reader concludes range.
 
 Still needed: the final identity line. It doesn't block the first commit; the placeholder ships until it's written.
 
