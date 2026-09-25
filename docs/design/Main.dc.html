@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Homepage, filmstrip</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&amp;family=DM+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0;font-family:"Instrument Sans",system-ui,sans-serif}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+button:focus-visible,a:focus-visible{outline:2px solid #2447F0;outline-offset:3px}
+@keyframes pf-pan{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+@keyframes pf-prog{0%{width:0%}100%{width:100%}}
+.pf-vid{background-image:linear-gradient(110deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.22) 18%,rgba(255,255,255,0) 36%,rgba(0,0,0,.08) 60%,rgba(255,255,255,0) 80%);background-size:200% 100%;animation:pf-pan 5s linear infinite}
+.pf-prog{animation:pf-prog 9s linear infinite}
+@media (prefers-reduced-motion: reduce){.pf-vid,.pf-prog{animation:none}}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; position: relative; overflow: hidden; background: {{t.bg}}; color: {{t.ink}}; font-family: 'Instrument Sans', system-ui, sans-serif;">
+
+  <header style="position: absolute; left: 32px; right: 32px; top: 28px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: baseline; font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;">
+    <a href="#top" style="color: {{t.ink}};">Nahuel [Last name]<span style="color: {{t.muted}};"> · Product engineer</span></a>
+    <button onClick="{{toggleView}}" aria-pressed="{{isList}}" style="justify-self: center; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;">({{viewLabel}})</button>
+    <nav aria-label="Primary" style="justify-self: end; display: flex; gap: 24px;">
+      <a href="#top" style="color: {{t.ink}};">Work</a>
+      <a href="#top" style="color: {{t.muted}};">About</a>
+      <a href="#top" style="color: {{t.muted}};">Log</a>
+    </nav>
+  </header>
+
+  <sc-if value="{{isStrip}}" hint-placeholder-val="{{true}}">
+    <div style="position: absolute; left: 460px; top: 128px; width: 520px; height: 140px;">
+      <sc-for list="{{items}}" as="item" hint-placeholder-count="8">
+        <div aria-hidden="{{item.hidden}}" style="position: absolute; left: 0; bottom: 0; width: 100%; display: flex; flex-direction: column; gap: 10px; opacity: {{item.metaOpacity}}; transform: translateY({{item.metaY}}px); transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1); pointer-events: {{item.pe}};">
+          <div style="display: flex; gap: 12px; align-items: center; font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: {{t.muted}};">
+            <span style="color: {{t.ink}};">({{item.no}})</span>
+            <span>{{item.section}} · {{item.year}}</span>
+            <span style="padding: 2px 6px; border: 1px {{item.badgeLine}} {{item.badgeColor}}; border-radius: 2px; color: {{item.badgeColor}};">{{item.status}}</span>
+          </div>
+          <h2 style="margin: 0; font-size: 40px; line-height: 1.04; font-weight: 500; letter-spacing: -0.022em;">{{item.title}}</h2>
+          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 24px;">
+            <p style="margin: 0; font-size: 15px; line-height: 1.45; max-width: 42ch; color: {{t.ink}};">{{item.tagline}}</p>
+            <a href="#top" tabindex="{{item.tab}}" style="flex-shrink: 0; font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: {{accent}};">Open →</a>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="position: absolute; left: 0; right: 0; top: 288px; height: 325px; -webkit-mask-image: linear-gradient(to right, transparent 0, #000 9%, #000 91%, transparent 100%); mask-image: linear-gradient(to right, transparent 0, #000 9%, #000 91%, transparent 100%)">
+      <div role="list" aria-label="Projects" style="display: flex; align-items: center; gap: 14px; height: 325px; transform: translateX({{tx}}px); transition: {{stripTrans}};">
+        <sc-for list="{{strip}}" as="item" hint-placeholder-count="24">
+          <button role="listitem" aria-label="{{item.title}}, {{item.section}}" aria-current="{{item.isActive}}" aria-hidden="{{item.dup}}" tabindex="{{item.tab}}" onMouseEnter="{{item.select}}" onFocus="{{item.select}}" onClick="{{item.select}}" style="flex-shrink: 0; position: relative; overflow: hidden; width: {{item.w}}px; height: {{item.h}}px; background: {{item.tone}}; transition: {{item.trans}}; filter: {{item.filter}};">
+            <div class="pf-vid" style="position: absolute; inset: 0; opacity: {{item.vidOpacity}}; transition: opacity 0.5s ease 0.25s;"></div>
+            <span style="position: absolute; left: 8px; top: 7px; font-family: 'DM Mono', ui-monospace, monospace; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: {{t.ink}}; opacity: 0.7;">{{item.no}}</span>
+            <div style="position: absolute; left: 12px; right: 12px; bottom: 10px; display: flex; flex-direction: column; gap: 8px; opacity: {{item.vidOpacity}}; transition: opacity 0.4s ease 0.3s;">
+              <div style="display: flex; justify-content: space-between; font-family: 'DM Mono', ui-monospace, monospace; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: {{t.ink}};">
+                <span>● Playing · muted</span>
+                <span>[Screen recording]</span>
+              </div>
+              <div style="height: 2px; background: {{t.track}};"><div class="pf-prog" style="height: 2px; background: {{t.ink}}; width: 0%;"></div></div>
+            </div>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="position: absolute; left: 460px; top: 633px; width: 520px; display: flex; justify-content: space-between; font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: {{t.muted}};">
+      <span>Still → video on focus</span>
+      <span>{{activeIncludes}}</span>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{isList}}" hint-placeholder-val="{{false}}">
+    <div style="position: absolute; left: 32px; right: 32px; top: 150px; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px;">
+      <div role="list" aria-label="Projects" style="grid-column: span 8; display: flex; flex-direction: column;">
+        <sc-for list="{{items}}" as="item" hint-placeholder-count="8">
+          <button role="listitem" onMouseEnter="{{item.select}}" onFocus="{{item.select}}" onClick="{{item.select}}" style="display: grid; grid-template-columns: 56px minmax(0, 3fr) minmax(0, 5fr) 72px 104px 64px; column-gap: 16px; align-items: baseline; text-align: left; padding: 14px 0; border-top: 1px solid {{t.line}}; opacity: {{item.rowOpacity}}; transition: opacity 0.25s ease;">
+            <span style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; color: {{item.noColor}};">{{item.no}}</span>
+            <span style="font-size: 20px; font-weight: 500; letter-spacing: -0.01em;">{{item.title}}</span>
+            <span style="font-size: 14px; color: {{t.muted}};">{{item.tagline}}</span>
+            <span style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: {{t.muted}};">{{item.section}}</span>
+            <span><span style="padding: 2px 6px; border: 1px {{item.badgeLine}} {{item.badgeColor}}; border-radius: 2px; font-family: 'DM Mono', ui-monospace, monospace; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: {{item.badgeColor}};">{{item.status}}</span></span>
+            <span style="text-align: right; font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; color: {{t.muted}}; font-variant-numeric: tabular-nums;">{{item.year}}</span>
+          </button>
+        </sc-for>
+      </div>
+      <div style="grid-column: 10 / span 3; display: flex; flex-direction: column; gap: 10px;">
+        <div style="position: relative; overflow: hidden; aspect-ratio: 16 / 10; width: 100%; background: {{activeTone}}; transition: background 0.3s ease;">
+          <div class="pf-vid" style="position: absolute; inset: 0;"></div>
+        </div>
+        <span style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: {{t.muted}};">({{activeNo}}) Preview</span>
+      </div>
+    </div>
+  </sc-if>
+
+  <footer style="position: absolute; left: 32px; right: 32px; bottom: 28px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: baseline; font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;">
+    <span style="font-variant-numeric: tabular-nums; color: {{t.ink}};">{{counter}} <span style="color: {{t.muted}};">/ {{total}}</span></span>
+    <div style="justify-self: center; display: flex; gap: 20px;">
+      <button onClick="{{prev}}" aria-label="Previous project" style="font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; min-height: 44px;">(← Prev)</button>
+      <button onClick="{{next}}" aria-label="Next project" style="font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; min-height: 44px;">(Next →)</button>
+    </div>
+    <a href="#top" style="justify-self: end; color: {{t.ink}};">Contact ↗</a>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"accent":{"editor":"color","default":"","options":["#2447F0","#1B1A18","#C2410C"]},"$preview":{"width":1440,"height":900}}'>
+var PF_DATA = [
+  { no: 'W01', title: 'vers1ons', section: 'Work', year: '[Years]', status: 'Shipped', weight: 1, tagline: 'Music remix licensing and distribution platform. [Tagline.]', includes: 'Includes licensing · distribution · drops' },
+  { no: 'W02', title: 'Blast Radius', section: 'Work', year: '2026', status: 'In progress', weight: 1, tagline: 'Lets non-engineers ship code safely, inside engineering guardrails.', includes: 'Connects GitHub · Slack · Figma · Notion' },
+  { no: 'S01', title: 'Bespoke', section: 'Study', year: '2026', status: 'Concept', weight: 2, tagline: 'A marketplace for one-of-one work where makers earn on every resale.', includes: '' },
+  { no: 'S02', title: 'City social club', section: 'Study', year: '2026', status: 'Concept', weight: 2, tagline: 'Invite-only discovery built with the city’s restaurants, bars and galleries.', includes: 'Three flows · invite · discover · book' },
+  { no: 'S03', title: '[App teardown]', section: 'Study', year: '2026', status: 'Concept', weight: 2, tagline: '[An existing app, and the change you would make to it.]', includes: '' },
+  { no: 'D01', title: '[Data project]', section: 'Data', year: '2026', status: 'In progress', weight: 2, tagline: '[Claim tested, in one line.] Source data and notebook linked.', includes: '' },
+  { no: 'P01', title: 'Sketches', section: 'Play', year: '2026', status: 'Shipped', weight: 3, tagline: 'p5.js studies.', includes: '' },
+  { no: 'P02', title: 'Paper projects', section: 'Play', year: '[Year]', status: 'Shipped', weight: 3, tagline: '[One line.]', includes: '' }
+];
+var PF_TONES_L = ['#CFC9BE', '#C3C8CF', '#D6CCBF', '#C8CDC2', '#D0CDD6', '#CBC3B8', '#C2C9D3', '#D7D0C3'];
+var PF_TONES_D = ['#34302A', '#2C3037', '#3A332B', '#2E332C', '#322F38', '#37312A', '#2B313A', '#39342C'];
+class Component extends DCLogic {
+  componentDidUpdate() { this.recentre(); }
+  componentWillUnmount() { clearTimeout(this._t1); clearTimeout(this._t2); }
+  recentre() {
+    var n = PF_DATA.length, COPIES = 5, self = this;
+    var pos = this.getPos();
+    if ((pos >= n && pos < (COPIES - 1) * n) || this._pending) { return; }
+    this._pending = true;
+    clearTimeout(this._t1);
+    this._t1 = setTimeout(function () {
+      var cur = self.getPos();
+      var mid = 2 * n + (((cur % n) + n) % n);
+      self.setState({ pos: mid, noAnim: true });
+      self._t2 = setTimeout(function () { self._pending = false; self.setState({ noAnim: false }); }, 60);
+    }, 700);
+  }
+  getPos() {
+    var n = PF_DATA.length;
+    return (this.state && typeof this.state.pos === 'number') ? this.state.pos : 2 * n;
+  }
+  renderVals() {
+    var self = this;
+    var dark = this.props.dark === true;
+    var t = dark
+      ? { bg: '#161513', ink: '#EDEBE6', muted: '#9A968E', line: '#34312C', track: 'rgba(237,235,230,0.25)' }
+      : { bg: '#F2F1ED', ink: '#1B1A18', muted: '#67645E', line: '#D3D0C8', track: 'rgba(27,26,24,0.2)' };
+    var accent = this.props.accent || (dark ? '#7D93FF' : '#2447F0');
+    var tones = dark ? PF_TONES_D : PF_TONES_L;
+    var n = PF_DATA.length, COPIES = 5;
+    var pos = this.getPos();
+    var active = ((pos % n) + n) % n;
+    var view = (this.state && this.state.view) || 'strip';
+    var noAnim = !!(this.state && this.state.noAnim);
+    var ease = 'cubic-bezier(0.2, 0.7, 0.2, 1)';
+    var A = { w: 520, h: 325 }, W1 = { w: 168, h: 105 }, W = { w: 124, h: 78 }, gap = 14;
+    function goTo(p) { if (p !== self.getPos()) { self.setState({ pos: p }); } }
+    function badgeColor(d) { return d.status === 'Concept' ? accent : (d.status === 'In progress' ? t.muted : t.ink); }
+    var items = PF_DATA.map(function (d, i) {
+      var on = i === active;
+      return {
+        no: d.no, title: d.title, section: d.section, year: d.year, status: d.status, tagline: d.tagline,
+        isActive: on, hidden: !on, tab: on ? 0 : -1, pe: on ? 'auto' : 'none',
+        metaOpacity: on ? 1 : 0, metaY: on ? 0 : 12,
+        rowOpacity: on ? 1 : 0.45, noColor: on ? accent : t.muted,
+        badgeColor: badgeColor(d), badgeLine: d.status === 'In progress' ? 'dashed' : 'solid',
+        select: function () { goTo(pos - active + i); }
+      };
+    });
+    var x = 0, strip = [];
+    for (var j = 0; j < COPIES * n; j++) {
+      var i = j % n, d = PF_DATA[i], on = j === pos;
+      var size = on ? A : (d.weight === 1 ? W1 : W);
+      if (j < pos) { x += size.w + gap; }
+      var mid = j >= 2 * n && j < 3 * n;
+      strip.push({
+        no: d.no, title: d.title, section: d.section,
+        w: size.w, h: size.h, tone: tones[i % tones.length],
+        isActive: on, dup: !mid, tab: mid ? 0 : -1,
+        vidOpacity: on ? 1 : 0, filter: on ? 'none' : 'saturate(0.6)',
+        trans: noAnim ? 'none' : 'width 0.6s ' + ease + ', height 0.6s ' + ease + ', filter 0.4s ease',
+        select: (function (p) { return function () { goTo(p); }; })(j)
+      });
+    }
+    var tx = 720 - (x + A.w / 2);
+    function pad(v) { return (v < 10 ? '0' : '') + v; }
+    return {
+      t: t, accent: accent, items: items, strip: strip, tx: tx,
+      stripTrans: noAnim ? 'none' : 'transform 0.65s ' + ease,
+      isStrip: view === 'strip', isList: view === 'list',
+      viewLabel: view === 'strip' ? 'Index' : 'Strip',
+      toggleView: function () { self.setState({ view: view === 'strip' ? 'list' : 'strip' }); },
+      prev: function () { goTo(pos - 1); },
+      next: function () { goTo(pos + 1); },
+      counter: pad(active + 1), total: pad(n),
+      activeIncludes: PF_DATA[active].includes,
+      activeTone: tones[active % tones.length], activeNo: PF_DATA[active].no
+    };
+  }
+}
+</script>
+</body>
+</html>

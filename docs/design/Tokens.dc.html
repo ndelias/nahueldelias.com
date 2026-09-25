@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Design tokens</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&amp;family=DM+Mono:wght@400;500&amp;display=swap">
+<style>body{margin:0;font-family:"Instrument Sans",system-ui,sans-serif}</style>
+</helmet>
+<div style="width: 1440px; height: 1120px; box-sizing: border-box; padding: 48px; display: flex; flex-direction: column; gap: 48px; background: #F2F1ED; color: #1B1A18; font-family: 'Instrument Sans', system-ui, sans-serif;">
+
+  <header style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #1B1A18; padding-bottom: 16px;">
+    <h1 style="margin: 0; font-size: 44px; font-weight: 500; letter-spacing: -0.022em;">Tokens</h1>
+    <span style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #67645E;">nahueldelias.com · v0.1 · 24.09.2026</span>
+  </header>
+
+  <div style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px; row-gap: 48px;">
+
+    <section style="grid-column: span 7; display: flex; flex-direction: column; gap: 16px;">
+      <span style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #67645E;">Color · light</span>
+      <div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px;">
+        <div style="display: flex; flex-direction: column; gap: 8px;"><div style="height: 88px; background: #F2F1ED; border: 1px solid #D3D0C8;"></div><span style="font-size: 14px; font-weight: 500;">bg</span><span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #67645E;">#F2F1ED</span></div>
+        <div style="display: flex; flex-direction: column; gap: 8px;"><div style="height: 88px; background: #E8E6E0;"></div><span style="font-size: 14px; font-weight: 500;">surface</span><span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #67645E;">#E8E6E0</span></div>
+        <div style="display: flex; flex-direction: column; gap: 8px;"><div style="height: 88px; background: #D3D0C8;"></div><span style="font-size: 14px; font-weight: 500;">line</span><span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #67645E;">#D3D0C8</span></div>
+        <div style="display: flex; flex-direction: column; gap: 8px;"><div style="height: 88px; background: #67645E;"></div><span style="font-size: 14px; font-weight: 500;">muted</span><span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #67645E;">#67645E · 5.3:1</span></div>
+        <div style="display: flex; flex-direction: column; gap: 8px;"><div style="height: 88px; background: #1B1A18;"></div><span style="font-size: 14px; font-weight: 500;">ink</span><span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #67645E;">#1B1A18</span></div>
+        <div style="display: flex; flex-direction: column; gap: 8px;"><div style="height: 88px; background: #2447F0;"></div><span style="font-size: 14px; font-weight: 500;">accent</span><span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #67645E;">#2447F0</span></div>
+      </div>
+      <span style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #67645E; padding-top: 16px;">Color · dark</span>
+      <div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; background: #161513; padding: 16px; color: #EDEBE6;">
+        <div style="display: flex; flex-direction: column; gap: 8px;"><div style="height: 72px; background: #161513; border: 1px solid #34312C;"></div><span style="font-size: 14px; font-weight: 500;">bg</span><span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #9A968E;">#161513</span></div>
+        <div style="display: flex; flex-direction: column; gap: 8px;"><div style="height: 72px; background: #211F1C;"></div><span style="font-size: 14px; font-weight: 500;">surface</span><span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #9A968E;">#211F1C</span></div>
+        <div style="display: flex; flex-direction: column; gap: 8px;"><div style="height: 72px; background: #34312C;"></div><span style="font-size: 14px; font-weight: 500;">line</span><span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #9A968E;">#34312C</span></div>
+        <div style="display: flex; flex-direction: column; gap: 8px;"><div style="height: 72px; background: #9A968E;"></div><span style="font-size: 14px; font-weight: 500;">muted</span><span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #9A968E;">#9A968E</span></div>
+        <div style="display: flex; flex-direction: column; gap: 8px;"><div style="height: 72px; background: #EDEBE6;"></div><span style="font-size: 14px; font-weight: 500;">ink</span><span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #9A968E;">#EDEBE6</span></div>
+        <div style="display: flex; flex-direction: column; gap: 8px;"><div style="height: 72px; background: #7D93FF;"></div><span style="font-size: 14px; font-weight: 500;">accent</span><span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #9A968E;">#7D93FF</span></div>
+      </div>
+      <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #67645E; max-width: 60ch;">Neutrals lean warm, never pure grey. Accent is for links, focus rings and the Concept badge only. Dark is its own palette with a lighter blue, not an inversion.</p>
+    </section>
+
+    <section style="grid-column: 9 / span 4; display: flex; flex-direction: column; gap: 16px;">
+      <span style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #67645E;">Type · Instrument Sans + DM Mono</span>
+      <div style="display: flex; flex-direction: column;">
+        <div style="display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; align-items: baseline; padding: 10px 0; border-top: 1px solid #D3D0C8;"><span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #67645E;">display 72</span><span style="font-size: 56px; line-height: 1; font-weight: 500; letter-spacing: -0.028em;">Aa</span></div>
+        <div style="display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; align-items: baseline; padding: 10px 0; border-top: 1px solid #D3D0C8;"><span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #67645E;">h2 44</span><span style="font-size: 36px; line-height: 1.04; font-weight: 500; letter-spacing: -0.022em;">vers1ons</span></div>
+        <div style="display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; align-items: baseline; padding: 10px 0; border-top: 1px solid #D3D0C8;"><span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #67645E;">title 22</span><span style="font-size: 22px; font-weight: 500; letter-spacing: -0.01em;">Index entry</span></div>
+        <div style="display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; align-items: baseline; padding: 10px 0; border-top: 1px solid #D3D0C8;"><span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #67645E;">lead 18</span><span style="font-size: 18px; line-height: 1.5;">Tagline and lead text</span></div>
+        <div style="display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; align-items: baseline; padding: 10px 0; border-top: 1px solid #D3D0C8;"><span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #67645E;">body 16</span><span style="font-size: 16px; line-height: 1.6;">Running text at 65ch</span></div>
+        <div style="display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; align-items: baseline; padding: 10px 0; border-top: 1px solid #D3D0C8;"><span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #67645E;">small 14</span><span style="font-size: 14px; line-height: 1.5;">Captions and notes</span></div>
+        <div style="display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; align-items: baseline; padding: 10px 0; border-top: 1px solid #D3D0C8; border-bottom: 1px solid #D3D0C8;"><span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #67645E;">mono 11–12</span><span style="font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase;">W01 · Work · 2026</span></div>
+      </div>
+    </section>
+
+    <section style="grid-column: span 7; display: flex; flex-direction: column; gap: 16px;">
+      <span style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #67645E;">Spacing · 4px base</span>
+      <div style="display: flex; align-items: flex-end; gap: 20px;">
+        <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-start;"><div style="width: 4px; height: 4px; background: #1B1A18;"></div><span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #67645E;">4</span></div>
+        <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-start;"><div style="width: 8px; height: 8px; background: #1B1A18;"></div><span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #67645E;">8</span></div>
+        <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-start;"><div style="width: 12px; height: 12px; background: #1B1A18;"></div><span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #67645E;">12</span></div>
+        <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-start;"><div style="width: 16px; height: 16px; background: #1B1A18;"></div><span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #67645E;">16</span></div>
+        <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-start;"><div style="width: 24px; height: 24px; background: #1B1A18;"></div><span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #67645E;">24</span></div>
+        <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-start;"><div style="width: 32px; height: 32px; background: #1B1A18;"></div><span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #67645E;">32</span></div>
+        <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-start;"><div style="width: 48px; height: 48px; background: #1B1A18;"></div><span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #67645E;">48</span></div>
+        <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-start;"><div style="width: 64px; height: 64px; background: #1B1A18;"></div><span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #67645E;">64</span></div>
+        <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-start;"><div style="width: 96px; height: 96px; background: #1B1A18;"></div><span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #67645E;">96</span></div>
+        <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-start;"><div style="width: 160px; height: 96px; background: #D3D0C8;"></div><span style="font-family: 'DM Mono', monospace; font-size: 11px; color: #67645E;">160 · section break</span></div>
+      </div>
+      <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #67645E;">Grid: 12 columns, 24px gutter, 48px margin at 1440. Phone: 1 column, 16px margin.</p>
+    </section>
+
+    <section style="grid-column: 9 / span 4; display: flex; flex-direction: column; gap: 16px;">
+      <span style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #67645E;">Status badges · automatic</span>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+        <span style="padding: 3px 7px; border: 1px solid #1B1A18; border-radius: 2px; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;">Shipped</span>
+        <span style="padding: 3px 7px; border: 1px solid #2447F0; border-radius: 2px; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #2447F0;">Concept</span>
+        <span style="padding: 3px 7px; border: 1px dashed #67645E; border-radius: 2px; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #67645E;">In progress</span>
+        <span style="padding: 3px 7px; border: 1px solid #D3D0C8; border-radius: 2px; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #67645E; text-decoration: line-through;">Archived</span>
+      </div>
+      <span style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #67645E; padding-top: 8px;">Decision block</span>
+      <div style="display: flex; flex-direction: column; gap: 6px; padding-left: 14px; border-left: 2px solid #2447F0;">
+        <span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #67645E;">Decision</span>
+        <span style="font-size: 15px; line-height: 1.5;">[Chose X over Y.] <span style="color: #67645E;">Cost: [the trade-off.]</span></span>
+      </div>
+      <span style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #67645E; padding-top: 8px;">Links</span>
+      <div style="display: flex; gap: 24px; font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase;">
+        <a href="#top" style="color: #2447F0; text-decoration: none;">Primary →</a>
+        <a href="#top" style="color: #1B1A18; text-decoration: none;">External ↗</a>
+        <a href="#top" style="color: #1B1A18; text-decoration: none; outline: 2px solid #2447F0; outline-offset: 3px;">Focus</a>
+      </div>
+    </section>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1120}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
