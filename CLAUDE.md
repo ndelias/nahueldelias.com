@@ -4,9 +4,12 @@ Product engineering portfolio for Nahuel. The site is itself a portfolio piece:
 read as evidence of craft, performance sense and taste.
 
 - Full spec: docs/brief.md (sections referenced as §N below)
-- Design reference: docs/design/*.dc.html. Colors, type sizes, frame sizes,
-  spacing and easing in these files are exact. They are design mocks at a fixed
-  1440px width, not production code: port the values, not the markup.
+- Design reference: docs/design/reference/home.html opens standalone in any
+  browser (URL options in reference/README.md). Baseline screenshots for
+  Playwright comparisons are in docs/design/reference/screens/. The
+  docs/design/*.dc.html files are the canvas sources and hold the exact
+  values in their script blocks. All of these are fixed-1440px design mocks:
+  port the values and behavior, not the markup.
 
 ## Stack
 - Astro + MDX, content collections, deployed on Vercel.
@@ -24,6 +27,9 @@ read as evidence of craft, performance sense and taste.
 - Sections render only when they have entries. No empty states, no "coming soon".
 - Fonts: Instrument Sans 400/500 + DM Mono 400. Self-hosted, Latin subset,
   font-display: swap, preloaded. No other families.
+- Symbols (← → ↗ ●) are not in the subset font files. Draw them as inline SVG
+  (currentColor, sized to the text) rather than relying on a fallback font.
+  The reference mock uses the system fallback; don't copy that.
 - Respect prefers-reduced-motion everywhere. Visible focus states everywhere.
 - No preloaders, no page transitions that delay content, no autoplaying sound.
 - Ask before adding any dependency. Say what it's for and what it costs in KB.
@@ -39,5 +45,8 @@ Easing for strip motion: cubic-bezier(0.2, 0.7, 0.2, 1).
 - After each working step: run the build and CI checks locally, commit with a
   clear message, and add a dated MDX entry in src/content/log/.
 - Verify UI against docs/design with Playwright screenshots, not by eye.
+- Playwright comparisons load pages over HTTP (a local static server), never
+  file://. Allow ~0.5% pixel difference: text-edge anti-aliasing alone
+  differs by ~0.25% from the baselines.
 - Never commit placeholder copy as if it were real: bracketed text like
   [Tagline] stays bracketed until Nahuel supplies it.

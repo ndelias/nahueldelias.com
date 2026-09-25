@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1440">
+<title>Homepage reference (filmstrip)</title>
+<!--
+  Standalone reference for docs/design/Main.dc.html. No runtime needed.
+  Design mock at a fixed 1440×900 frame: port the VALUES (tokens, sizes, easing,
+  timings, behavior), not this markup. Not production code.
+  URL options: ?theme=dark  ?view=index  ?active=0..7  ?still=1 (freeze animations for screenshots)
+-->
+<style>
+@font-face{font-family:"Instrument Sans";font-weight:400;font-display:swap;src:url(fonts/instrument-sans-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:"Instrument Sans";font-weight:500;font-display:swap;src:url(fonts/instrument-sans-latin-500-normal.woff2) format("woff2")}
+@font-face{font-family:"DM Mono";font-weight:400;font-display:swap;src:url(fonts/dm-mono-latin-400-normal.woff2) format("woff2")}
+:root{
+  --bg:#F2F1ED;--surface:#E8E6E0;--line:#D3D0C8;--muted:#67645E;--ink:#1B1A18;--accent:#2447F0;--track:rgba(27,26,24,.2);
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --mono:"DM Mono",ui-monospace,Menlo,monospace;--sans:"Instrument Sans",system-ui,sans-serif;
+}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#161513;--surface:#211F1C;--line:#34312C;--muted:#9A968E;--ink:#EDEBE6;--accent:#7D93FF;--track:rgba(237,235,230,.25)}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans)}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.mono{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+.frame{width:1440px;height:900px;position:relative;overflow:hidden;background:var(--bg)}
+.corner{position:absolute;left:32px;right:32px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:baseline}
+.top{top:28px}.bottom{bottom:28px}
+.muted{color:var(--muted)}
+.center{justify-self:center}.end{justify-self:end}
+nav{display:flex;gap:24px}
+.meta-wrap{position:absolute;left:460px;top:128px;width:520px;height:140px}
+.meta{position:absolute;left:0;bottom:0;width:100%;display:flex;flex-direction:column;gap:10px;opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity .35s ease,transform .45s var(--ease)}
+.meta.on{opacity:1;transform:none;pointer-events:auto}
+.meta .row1{display:flex;gap:12px;align-items:center;color:var(--muted)}
+.meta .row1 .no{color:var(--ink)}
+.meta h2{margin:0;font-size:40px;line-height:1.04;font-weight:500;letter-spacing:-.022em}
+.meta .row3{display:flex;justify-content:space-between;align-items:baseline;gap:24px}
+.meta p{margin:0;font-size:15px;line-height:1.45;max-width:42ch}
+.meta .open{flex-shrink:0;color:var(--accent)}
+.badge{padding:2px 6px;border:1px solid currentColor;border-radius:2px}
+.badge.concept{color:var(--accent)}.badge.wip{color:var(--muted);border-style:dashed}.badge.shipped{color:var(--ink)}
+.viewport{position:absolute;left:0;right:0;top:288px;height:325px;-webkit-mask-image:linear-gradient(to right,transparent 0,#000 9%,#000 91%,transparent 100%);mask-image:linear-gradient(to right,transparent 0,#000 9%,#000 91%,transparent 100%)}
+.strip{display:flex;align-items:center;gap:14px;height:325px;transition:transform .65s var(--ease)}
+.thumb{flex-shrink:0;position:relative;overflow:hidden;transition:width .6s var(--ease),height .6s var(--ease),filter .4s ease;filter:saturate(.6)}
+.thumb.on{filter:none}
+.thumb .no{position:absolute;left:8px;top:7px;font-size:10px;opacity:.7}
+.vid{position:absolute;inset:0;opacity:0;transition:opacity .5s ease .25s;background-image:linear-gradient(110deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.22) 18%,rgba(255,255,255,0) 36%,rgba(0,0,0,.08) 60%,rgba(255,255,255,0) 80%);background-size:200% 100%;animation:pan 5s linear infinite}
+.hud{position:absolute;left:12px;right:12px;bottom:10px;display:flex;flex-direction:column;gap:8px;opacity:0;transition:opacity .4s ease .3s}
+.hud .l{display:flex;justify-content:space-between;font-size:10px}
+.track{height:2px;background:var(--track)}.prog{height:2px;background:var(--ink);width:0;animation:prog 9s linear infinite}
+.thumb.on .vid,.thumb.on .hud{opacity:1}
+.noanim,.noanim *{transition:none!important}
+@keyframes pan{to{background-position:200% 50%}}
+@keyframes prog{to{width:100%}}
+.below{position:absolute;left:460px;top:633px;width:520px;display:flex;justify-content:space-between;color:var(--muted)}
+.list{position:absolute;left:32px;right:32px;top:150px;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:24px}
+.rows{grid-column:span 8;display:flex;flex-direction:column}
+.rowb{display:grid;grid-template-columns:56px minmax(0,3fr) minmax(0,5fr) 72px 104px 64px;column-gap:16px;align-items:baseline;text-align:left;padding:14px 0;border-top:1px solid var(--line);opacity:.45;transition:opacity .25s ease}
+.rowb.on{opacity:1}.rowb.on .rno{color:var(--accent)}
+.rno{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--muted)}
+.rt{font-size:20px;font-weight:500;letter-spacing:-.01em}
+.rd{font-size:14px;color:var(--muted)}
+.ry{text-align:right;font-family:var(--mono);font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.preview{grid-column:10/span 3;display:flex;flex-direction:column;gap:10px}
+.pbox{position:relative;overflow:hidden;aspect-ratio:16/10;width:100%;transition:background .3s ease}
+.pbox .vid{opacity:1}
+[hidden]{display:none!important}
+.still .vid,.still .prog{animation:none}.still .prog{width:40%}
+@media (prefers-reduced-motion:reduce){.vid,.prog{animation:none}}
+</style>
+</head>
+<body>
+<div class="frame" id="frame">
+  <header class="corner top mono">
+    <a href="#">Nahuel [Last name]<span class="muted"> · Product engineer</span></a>
+    <button class="mono center" id="toggle" aria-pressed="false">(Index)</button>
+    <nav class="end" aria-label="Primary"><a href="#">Work</a><a href="#" class="muted">About</a><a href="#" class="muted">Log</a></nav>
+  </header>
+
+  <section id="stripView">
+    <div class="meta-wrap" id="metas"></div>
+    <div class="viewport"><div class="strip" id="strip" role="list" aria-label="Projects"></div></div>
+    <div class="below mono"><span>Still → video on focus</span><span id="includes"></span></div>
+  </section>
+
+  <section id="listView" hidden>
+    <div class="list">
+      <div class="rows" id="rows" role="list" aria-label="Projects"></div>
+      <div class="preview"><div class="pbox" id="pbox"><div class="vid"></div></div><span class="mono muted" id="pno"></span></div>
+    </div>
+  </section>
+
+  <footer class="corner bottom mono">
+    <span style="font-variant-numeric:tabular-nums"><span id="count">01</span> <span class="muted">/ <span id="total">08</span></span></span>
+    <div class="center" style="display:flex;gap:20px"><button class="mono" id="prev" aria-label="Previous project" style="min-height:44px">(← Prev)</button><button class="mono" id="next" aria-label="Next project" style="min-height:44px">(Next →)</button></div>
+    <a class="end" href="#">Contact ↗</a>
+  </footer>
+</div>
+
+<script>
+var DATA = [
+  { no: 'W01', title: 'vers1ons', section: 'Work', year: '[Years]', status: 'Shipped', weight: 1, tagline: 'Music remix licensing and distribution platform. [Tagline.]', includes: 'Includes licensing · distribution · drops' },
+  { no: 'W02', title: 'Blast Radius', section: 'Work', year: '2026', status: 'In progress', weight: 1, tagline: 'Lets non-engineers ship code safely, inside engineering guardrails.', includes: 'Connects GitHub · Slack · Figma · Notion' },
+  { no: 'S01', title: 'Bespoke', section: 'Study', year: '2026', status: 'Concept', weight: 2, tagline: 'A marketplace for one-of-one work where makers earn on every resale.', includes: '' },
+  { no: 'S02', title: 'City social club', section: 'Study', year: '2026', status: 'Concept', weight: 2, tagline: 'Invite-only discovery built with the city’s restaurants, bars and galleries.', includes: 'Three flows · invite · discover · book' },
+  { no: 'S03', title: '[App teardown]', section: 'Study', year: '2026', status: 'Concept', weight: 2, tagline: '[An existing app, and the change you would make to it.]', includes: '' },
+  { no: 'D01', title: '[Data project]', section: 'Data', year: '2026', status: 'In progress', weight: 2, tagline: '[Claim tested, in one line.] Source data and notebook linked.', includes: '' },
+  { no: 'P01', title: 'Sketches', section: 'Play', year: '2026', status: 'Shipped', weight: 3, tagline: 'p5.js studies.', includes: '' },
+  { no: 'P02', title: 'Paper projects', section: 'Play', year: '[Year]', status: 'Shipped', weight: 3, tagline: '[One line.]', includes: '' }
+];
+var TONES = { light: ['#CFC9BE','#C3C8CF','#D6CCBF','#C8CDC2','#D0CDD6','#CBC3B8','#C2C9D3','#D7D0C3'], dark: ['#34302A','#2C3037','#3A332B','#2E332C','#322F38','#37312A','#2B313A','#39342C'] };
+var SIZE = { active: [520, 325], w1: [168, 105], other: [124, 78] }, GAP = 14, COPIES = 5, CENTER = 720;
+var q = new URLSearchParams(location.search);
+var theme = q.get('theme') === 'dark' ? 'dark' : 'light';
+document.documentElement.dataset.theme = theme;
+if (q.get('still')) document.getElementById('frame').classList.add('still');
+var n = DATA.length, tones = TONES[theme];
+var pos = 2 * n + (parseInt(q.get('active') || '0', 10) % n);
+var strip = document.getElementById('strip'), metas = document.getElementById('metas'), rows = document.getElementById('rows');
+function badgeClass(s) { return s === 'Concept' ? 'concept' : s === 'In progress' ? 'wip' : 'shipped'; }
+function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+
+DATA.forEach(function (d, i) {
+  var m = el('div', 'meta');
+  m.innerHTML = '<div class="row1 mono"><span class="no">(' + d.no + ')</span><span>' + d.section + ' · ' + d.year + '</span><span class="badge ' + badgeClass(d.status) + '">' + d.status + '</span></div>' +
+    '<h2>' + d.title + '</h2><div class="row3"><p>' + d.tagline + '</p><a class="open mono" href="#">Open →</a></div>';
+  metas.appendChild(m);
+  var r = el('button', 'rowb'); r.setAttribute('role', 'listitem');
+  r.innerHTML = '<span class="rno">' + d.no + '</span><span class="rt">' + d.title + '</span><span class="rd">' + d.tagline + '</span><span class="mono muted" style="font-size:10px">' + d.section + '</span><span><span class="badge mono ' + badgeClass(d.status) + '" style="font-size:10px">' + d.status + '</span></span><span class="ry">' + d.year + '</span>';
+  ['mouseenter', 'focus', 'click'].forEach(function (ev) { r.addEventListener(ev, function () { go(pos - (((pos % n) + n) % n) + i); }); });
+  rows.appendChild(r);
+});
+for (var j = 0; j < COPIES * n; j++) (function (j) {
+  var d = DATA[j % n], mid = j >= 2 * n && j < 3 * n;
+  var b = el('button', 'thumb'); b.setAttribute('role', 'listitem'); b.setAttribute('aria-label', d.title + ', ' + d.section);
+  if (!mid) { b.setAttribute('aria-hidden', 'true'); b.tabIndex = -1; }
+  b.style.background = tones[j % n];
+  b.innerHTML = '<div class="vid"></div><span class="no mono">' + d.no + '</span><div class="hud"><div class="l mono"><span>● Playing · muted</span><span>[Screen recording]</span></div><div class="track"><div class="prog"></div></div></div>';
+  ['mouseenter', 'focus', 'click'].forEach(function (ev) { b.addEventListener(ev, function () { go(j); }); });
+  strip.appendChild(b);
+})(j);
+
+var timer = null;
+function sizeOf(j) { return j === pos ? SIZE.active : (DATA[j % n].weight === 1 ? SIZE.w1 : SIZE.other); }
+function render() {
+  var active = ((pos % n) + n) % n, x = 0;
+  Array.prototype.forEach.call(strip.children, function (b, j) {
+    var s = sizeOf(j); b.style.width = s[0] + 'px'; b.style.height = s[1] + 'px';
+    b.classList.toggle('on', j === pos); b.setAttribute('aria-current', j === pos ? 'true' : 'false');
+    if (j < pos) x += s[0] + GAP;
+  });
+  strip.style.transform = 'translateX(' + (CENTER - (x + SIZE.active[0] / 2)) + 'px)';
+  Array.prototype.forEach.call(metas.children, function (m, i) { m.classList.toggle('on', i === active); m.setAttribute('aria-hidden', i === active ? 'false' : 'true'); });
+  Array.prototype.forEach.call(rows.children, function (r, i) { r.classList.toggle('on', i === active); });
+  document.getElementById('includes').textContent = DATA[active].includes;
+  document.getElementById('count').textContent = ('0' + (active + 1)).slice(-2);
+  document.getElementById('total').textContent = ('0' + n).slice(-2);
+  document.getElementById('pbox').style.background = tones[active];
+  document.getElementById('pno').textContent = '(' + DATA[active].no + ') Preview';
+}
+function go(p) {
+  if (p === pos) return; pos = p; render();
+  clearTimeout(timer);
+  if (pos < n || pos >= (COPIES - 1) * n) {
+    // Silent recentre once motion has settled: jump to the same item in the middle copy with transitions off.
+    timer = setTimeout(function () {
+      strip.parentNode.classList.add('noanim');
+      pos = 2 * n + (((pos % n) + n) % n); render();
+      strip.offsetWidth; strip.parentNode.classList.remove('noanim');
+    }, 700);
+  }
+}
+document.getElementById('prev').onclick = function () { go(pos - 1); };
+document.getElementById('next').onclick = function () { go(pos + 1); };
+document.addEventListener('keydown', function (e) { if (e.key === 'ArrowLeft') go(pos - 1); if (e.key === 'ArrowRight') go(pos + 1); });
+var toggle = document.getElementById('toggle');
+function setView(v) {
+  var list = v === 'index';
+  document.getElementById('stripView').hidden = list; document.getElementById('listView').hidden = !list;
+  toggle.textContent = list ? '(Strip)' : '(Index)'; toggle.setAttribute('aria-pressed', String(list));
+}
+toggle.onclick = function () { setView(document.getElementById('listView').hidden ? 'index' : 'strip'); };
+strip.parentNode.classList.add('noanim'); render(); strip.offsetWidth; strip.parentNode.classList.remove('noanim');
+setView(q.get('view') === 'index' ? 'index' : 'strip');
+</script>
+</body>
+</html>
