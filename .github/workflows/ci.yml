@@ -78,9 +78,6 @@ jobs:
     environment:
       name: ${{ github.event_name == 'push' && 'production' || 'preview' }}
       url: ${{ steps.deploy.outputs.url }}
-    env:
-      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
-      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -89,14 +86,11 @@ jobs:
       - uses: actions/download-artifact@v8
         with:
           name: dist
-          path: .vercel/output/static
-      - name: Package as Vercel Build Output
-        run: echo '{"version":3}' > .vercel/output/config.json
+          path: dist
+      # REST API, not the Vercel CLI: the CLI can't use a project-scoped token.
       - id: deploy
-        name: Deploy
-        run: |
-          url=$(npx --yes vercel@48.0.3 deploy --prebuilt ${{ github.event_name == 'push' && '--prod' || '' }} --token="$VERCEL_TOKEN")
-          echo "url=$url" >> "$GITHUB_OUTPUT"
-          echo "Deployed: $url" >> "$GITHUB_STEP_SUMMARY"
+        run: node scripts/deploy.mjs dist ${{ github.event_name == 'push' && '--prod' || '' }}
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
