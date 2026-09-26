@@ -1,0 +1,14 @@
+---
+date: 2026-09-25
+---
+
+The repo starts with its constraints. Before there's a design or a single entry, every push runs the build and then two budget gates, and nothing deploys unless both pass.
+
+- **JS on `/` under 100KB compressed.** A small script walks everything the page loads without user action (script tags, module preloads, island URLs, and their static imports) and gzips it. Gzip, because it's the larger of the two numbers Vercel could serve.
+- **Lighthouse on a throttled phone.** Median of three runs, mobile emulation, simulated slow 4G with a 4× CPU slowdown. At least 95 in all four categories, LCP under 1.2s, CLS under 0.05, and zero contrast failures.
+
+To check the gates actually bite, I pushed 136KB of incompressible JavaScript to `/`. Both failed ([run 36210913631](https://github.com/ndelias/nahueldelias.com/actions/runs/36210913631)): the size check at 135.7KB, and Lighthouse on LCP at 1.65s, because the extra script cost load time too. The deploy never ran. The revert went green again. The first attempt at this proof passed when it shouldn't have: the minifier had folded the string's length into a constant and dropped the string. Worth knowing the test was testing something.
+
+Deploys come from CI, not from Vercel watching the repo, and they ship the exact files the budgets measured. The deploy token can touch this one project and nothing else. The Vercel CLI can't use a token that narrow, so a short script talks to the REST API instead.
+
+The placeholder page scores 100 across the board with an LCP of 0.75s. That's the easy part. Every page from here has to stay inside the same lines.
