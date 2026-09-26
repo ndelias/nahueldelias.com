@@ -1,0 +1,23 @@
+{
+  "name": "nahueldelias.com",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check:js": "node scripts/check-js-budget.mjs",
+    "check:lh": "lhci autorun",
+    "ci": "npm run build && npm run check:js && npm run check:lh"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "8.0.2",
+    "astro": "7.3.5"
+  },
+  "devDependencies": {
+    "@lhci/cli": "0.15.1"
+  }
+}

@@ -2,3 +2,9 @@
 
 # Third-party reference images, local only
 inspo/
+
+node_modules/
+dist/
+.astro/
+.vercel/
+.lighthouseci/
