@@ -1,0 +1,18 @@
+---
+// Page header for any entry page. The status badge is part of the header, not
+// something a page opts into.
+import type { Entry } from '../lib/entries';
+import StatusBadge from './StatusBadge.astro';
+
+interface Props {
+  entry: Entry;
+}
+
+const { entry } = Astro.props;
+const { title, tagline } = entry.data;
+---
+<header>
+  <p>{entry.collection} <StatusBadge entry={entry} /></p>
+  <h1>{title}</h1>
+  <p>{tagline}</p>
+</header>

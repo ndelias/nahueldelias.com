@@ -1,0 +1,57 @@
+---
+// /work/[slug]: §9 step 2 renders every field end to end, unstyled. The case
+// study template proper is §9 step 5.
+import type { GetStaticPaths } from 'astro';
+import { Image } from 'astro:assets';
+import { render } from 'astro:content';
+import EntryHeader from '../../components/EntryHeader.astro';
+import Base from '../../layouts/Base.astro';
+import { entriesIn } from '../../lib/entries';
+
+export const getStaticPaths = (() =>
+  entriesIn('work').map((entry) => ({ params: { slug: entry.id }, props: { entry } }))) satisfies GetStaticPaths;
+
+const { entry } = Astro.props;
+const { data } = entry;
+const { Content } = await render(entry);
+const links = Object.entries(data.links).filter(([, href]) => href);
+---
+<Base title={`${data.title} — Nahuel D'Elias`} description={data.tagline} noindex={data.fixture}>
+  <main>
+    {data.fixture && <p><strong>Fixture.</strong> A test entry for the content pipeline, not real work.</p>}
+    <EntryHeader entry={entry} />
+
+    <Image src={data.cover.src} alt={data.cover.alt} loading="eager" />
+
+    <dl>
+      <dt>Role</dt>
+      <dd>{data.role}</dd>
+      <dt>Dates</dt>
+      <dd>{data.dates.start}–{data.dates.end ?? 'present'}</dd>
+      <dt>Stack</dt>
+      <dd>{data.stack.join(', ')}</dd>
+    </dl>
+
+    {links.length > 0 && (
+      <ul>
+        {links.map(([name, href]) => <li><a href={href}>{name}</a></li>)}
+      </ul>
+    )}
+
+    {data.decision && (
+      <section>
+        <h2>Decision</h2>
+        <dl>
+          <dt>Chose</dt>
+          <dd>{data.decision.chose}</dd>
+          <dt>Rejected</dt>
+          <dd>{data.decision.rejected}</dd>
+          <dt>Cost</dt>
+          <dd>{data.decision.cost}</dd>
+        </dl>
+      </section>
+    )}
+
+    <Content />
+  </main>
+</Base>

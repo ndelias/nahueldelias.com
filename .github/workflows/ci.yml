@@ -1,6 +1,7 @@
-# Build, enforce the §6 budgets, then deploy. Deploys depend on every budget
-# job, so a failed budget blocks the deploy rather than just reporting on it.
-# The deployed files are the exact dist/ the budgets measured.
+# Prove the §3 content rules still bite, build, enforce the §6 budgets, then
+# deploy. Deploys depend on every budget job, so a failed budget blocks the
+# deploy rather than just reporting on it. The deployed files are the exact
+# dist/ the budgets measured.
 name: CI
 
 on:
@@ -15,7 +16,21 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  # Each §3 rule gets a bad entry that must fail a throwaway build. Runs first:
+  # a build that passes while the rules are broken proves nothing.
+  content-rules:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm test
+
   build:
+    needs: content-rules
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7

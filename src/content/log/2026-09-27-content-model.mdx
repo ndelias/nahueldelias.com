@@ -1,0 +1,14 @@
+---
+date: 2026-09-27
+---
+
+The content model is in, and the rules that keep the site from flattening now fail the build instead of relying on me to remember them.
+
+- **At most two entries carry `weight: 1`.** A third one fails the build, and the error lists every `weight: 1` file so it's obvious which one to demote. This rule spans all five sections, so it can't sit in a per-entry schema. It runs in the one module every page uses to read entries.
+- **Weight 1 and 2 need a `decision`:** what I chose, what I rejected, what it cost. Leave it out and the build names the file and the missing field.
+- **Data entries need a `hypothesis`:** claim, evidence, outcome.
+- **Status renders itself.** The badge takes the entry, not a status string, and it's built into the page header. A concept entry has no way to render without saying so.
+
+Each rule has a test that builds a throwaway copy of the site with a bad entry and checks the build fails with the right message. CI runs these before it builds anything. To check the tests test something, I switched each rule off in turn. Each time, that rule's test and no other went red.
+
+One fixture entry renders end to end at `/work/fixture`, unstyled and noindexed. It holds a `weight: 1` slot on purpose, so it can't quietly outlive the real work entries: the second real one fails the build until the fixture is gone.

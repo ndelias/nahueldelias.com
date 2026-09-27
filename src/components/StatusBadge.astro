@@ -1,0 +1,22 @@
+---
+// §3 rule 3: status always renders a visible label. Takes the entry rather
+// than a status string, so the badge can't disagree with the entry or be
+// passed something optional. Every index, card and page header that shows an
+// entry renders one.
+import type { Entry } from '../lib/entries';
+import type { Status } from '../lib/model';
+
+interface Props {
+  entry: Entry;
+}
+
+const LABELS: Record<Status, string> = {
+  shipped: 'Shipped',
+  concept: 'Concept',
+  wip: 'In progress',
+  archived: 'Archived',
+};
+
+const { status } = Astro.props.entry.data;
+---
+<span class="status-badge" data-status={status}>{LABELS[status]}</span>
