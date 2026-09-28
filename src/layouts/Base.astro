@@ -1,21 +1,34 @@
 ---
-// Minimal document shell until the design tokens land in §9 step 3.
+// Document shell: tokens, fonts, theme. Every page renders through this.
+import '../styles/base.css';
+import mono400 from '../assets/fonts/dm-mono-latin-400-normal.woff2?url';
+import sans400 from '../assets/fonts/instrument-sans-latin-400-normal.woff2?url';
+import sans500 from '../assets/fonts/instrument-sans-latin-500-normal.woff2?url';
+
+const FACES = { 'sans-400': sans400, 'sans-500': sans500, 'mono-400': mono400 };
+export type Face = keyof typeof FACES;
+
 interface Props {
   title: string;
   description: string;
   noindex?: boolean;
+  /** Faces used above the fold. Only these are preloaded; the rest load on use. */
+  preload?: Face[];
 }
 
-const { title, description, noindex = false } = Astro.props;
+const { title, description, noindex = false, preload = ['sans-400', 'sans-500'] } = Astro.props;
 ---
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {/* A saved theme choice applies before first paint. Must stay tiny and inline. */}
+    <script is:inline>try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
     <title>{title}</title>
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex" />}
+    {preload.map((face) => <link rel="preload" href={FACES[face]} as="font" type="font/woff2" crossorigin />)}
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   </head>
   <body>

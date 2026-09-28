@@ -1,0 +1,46 @@
+---
+// ← → ↗ ●, drawn as inline SVG because the subset fonts don't carry them.
+// Sized to the surrounding text (1em) and colored with currentColor. Next to a
+// text label it's decoration and hidden from assistive tech (the default).
+// Standing alone, pass `label` and it's announced as an image.
+type Name = 'arrow-left' | 'arrow-right' | 'arrow-up-right' | 'dot';
+
+interface Props {
+  name: Name;
+  label?: string;
+}
+
+const { name, label } = Astro.props;
+
+// 16-unit grid; the 1.25 stroke is close to DM Mono 400's stem at any size.
+const ARROWS: Record<Exclude<Name, 'dot'>, string> = {
+  'arrow-left': 'M14 8H2.5M7 3.5 2.5 8 7 12.5',
+  'arrow-right': 'M2 8h11.5M9 3.5 13.5 8 9 12.5',
+  'arrow-up-right': 'M4 12 12 4M5.5 4H12v6.5',
+};
+---
+<svg
+  class="icon"
+  viewBox="0 0 16 16"
+  width="16"
+  height="16"
+  {...label ? { role: 'img', 'aria-label': label } : { 'aria-hidden': 'true' }}
+>
+  {name === 'dot' ? <circle cx="8" cy="8" r="4.5" fill="currentColor" stroke="none" /> : <path d={ARROWS[name]} />}
+</svg>
+
+<style>
+  .icon {
+    /* Width and height attributes are a fallback if CSS fails; this sizes it. */
+    width: 1em;
+    height: 1em;
+    /* Centers on the cap height of the text beside it. */
+    vertical-align: -0.14em;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.25;
+    stroke-linecap: square;
+    stroke-linejoin: miter;
+    flex-shrink: 0;
+  }
+</style>

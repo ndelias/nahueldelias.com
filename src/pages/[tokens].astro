@@ -1,0 +1,385 @@
+---
+// /_tokens: every design token in both themes, the type scale in the real
+// fonts, and the icons, for checking against docs/design/Tokens.dc.html.
+// Internal: noindexed, linked from nowhere, not in the Lighthouse run.
+//
+// A dynamic route only because Astro skips files whose names start with "_".
+import type { GetStaticPaths } from 'astro';
+import Icon from '../components/Icon.astro';
+import ThemeToggle from '../components/ThemeToggle.astro';
+import Base from '../layouts/Base.astro';
+import { checkPairs, parseColorTokens } from '../lib/contrast.mjs';
+import tokensCss from '../styles/tokens.css?raw';
+
+export const getStaticPaths = (() => [{ params: { tokens: '_tokens' } }]) satisfies GetStaticPaths;
+
+const colors = parseColorTokens(tokensCss);
+const pairs = checkPairs(colors);
+
+// Every custom property in :root, in file order, for the full listing.
+const root = tokensCss.replace(/\/\*[\s\S]*?\*\//g, '').match(/:root\s*\{([\s\S]*?)\}/)?.[1] ?? '';
+const all = [...root.matchAll(/--([\w-]+)\s*:\s*([^;]+);/g)].map(([, name, value]) => ({ name, value: value.trim() }));
+const phone = [...(tokensCss.match(/@media[^{]*\{\s*:root\s*\{([\s\S]*?)\}/)?.[1] ?? '').matchAll(/--([\w-]+)\s*:\s*([^;]+);/g)].map(
+  ([, name, value]) => ({ name, value: value.trim() }),
+);
+
+const type = [
+  { token: 'display', px: 72, sample: 'Aa vers1ons' },
+  { token: 'h2', px: 44, sample: 'vers1ons' },
+  { token: 'title', px: 22, sample: 'Index entry' },
+  { token: 'lead', px: 18, sample: 'Tagline and lead text' },
+  { token: 'body', px: 16, sample: 'Running text at 65ch. The quick brown fox jumps over the lazy dog, 0123456789.' },
+  { token: 'small', px: 14, sample: 'Captions and notes' },
+];
+const spaces = [4, 8, 12, 16, 24, 32, 48, 64, 96, 160];
+const themes = ['light', 'dark'] as const;
+---
+<Base title="Tokens — internal" description="Design tokens for nahueldelias.com." noindex preload={['sans-400', 'sans-500', 'mono-400']}>
+  <main class="container">
+    <header class="head">
+      <h1>Tokens</h1>
+      <span class="mono muted">Internal · noindex · {colors.size} colors · {all.length} tokens</span>
+      <ThemeToggle />
+    </header>
+
+    <div class="panels grid">
+      {themes.map((theme) => (
+        <section class="panel" style={`color-scheme: ${theme}`} aria-labelledby={`panel-${theme}`}>
+          <h2 class="mono muted" id={`panel-${theme}`}>Theme · {theme}</h2>
+
+          <h3 class="mono muted">Color</h3>
+          <ul class="swatches" role="list">
+            {[...colors].map(([name, hex]) => (
+              <li>
+                <span class="chip" style={`background: var(--${name})`} />
+                <span class="name">{name}</span>
+                <span class="mono muted">{hex[theme]}</span>
+              </li>
+            ))}
+          </ul>
+
+          <h3 class="mono muted">Contrast · WCAG AA</h3>
+          <table class="pairs">
+            <thead class="mono muted">
+              <tr><th scope="col">Pair</th><th scope="col">Used for</th><th scope="col">Ratio</th></tr>
+            </thead>
+            <tbody>
+              {pairs.filter((p) => p.theme === theme).map((p) => (
+                <tr>
+                  <td>
+                    <span class="pair" style={`color: var(--${p.fg}); background: var(--${p.bg})`}>{p.fg} on {p.bg}</span>
+                  </td>
+                  <td class="muted">{p.use}</td>
+                  <td class="mono">{p.ratio.toFixed(2)}:1 {p.pass ? 'pass' : 'FAIL'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <h3 class="mono muted">Type · Instrument Sans + DM Mono</h3>
+          <div class="scale">
+            {type.map((t) => (
+              <div class="row">
+                <span class="mono muted">{t.token} {t.px}</span>
+                <span class={`sample t-${t.token}`}>{t.sample}</span>
+              </div>
+            ))}
+            <div class="row">
+              <span class="mono muted">mono 12</span>
+              <span class="mono sample mono-lg">W01 · Work · 2026</span>
+            </div>
+            <div class="row">
+              <span class="mono muted">mono 11</span>
+              <span class="mono sample">01 / 08 · Shipped · In progress</span>
+            </div>
+          </div>
+
+          <h3 class="mono muted">Icons · currentColor, 1em</h3>
+          <div class="icons">
+            <p class="mono">
+              <span>(<Icon name="arrow-left" /> Prev)</span>
+              <span>(Next <Icon name="arrow-right" />)</span>
+              <span>Contact <Icon name="arrow-up-right" /></span>
+              <span><Icon name="dot" /> Playing · muted</span>
+            </p>
+            <p class="mono mono-lg">
+              <a href="#">Primary <Icon name="arrow-right" /></a>
+              <a href="#" class="ink">External <Icon name="arrow-up-right" /></a>
+            </p>
+            <p class="t-title">
+              <Icon name="arrow-left" /> <Icon name="arrow-right" /> <Icon name="arrow-up-right" /> <Icon name="dot" /> Title 22
+            </p>
+            <p class="t-h2">
+              <Icon name="arrow-left" /> <Icon name="arrow-right" /> <Icon name="arrow-up-right" /> <Icon name="dot" /> Hh
+            </p>
+          </div>
+
+          <h3 class="mono muted">Focus</h3>
+          <p class="mono mono-lg">
+            <span class="focus-demo">Focus ring</span>
+            <span class="muted">2px accent, 3px offset. Tab through this page to see it live.</span>
+          </p>
+        </section>
+      ))}
+    </div>
+
+    <section class="block" aria-labelledby="spacing">
+      <h2 class="mono muted" id="spacing">Spacing · 4px base</h2>
+      <ul class="spaces" role="list">
+        {spaces.map((s) => (
+          <li>
+            <span class={s === 160 ? 'sq break' : 'sq'} style={`width: var(--space-${s}); height: ${Math.min(s, 96)}px`} />
+            <span class="mono muted">{s}{s === 160 && ' · section break'}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="block" aria-labelledby="grid">
+      <h2 class="mono muted" id="grid">Grid · 12 columns, 24px gutter, 48px margin; phone 1 column, 16px margin</h2>
+      <div class="grid cols" aria-hidden="true">
+        {Array.from({ length: 12 }, (_, i) => <span class="mono">{i + 1}</span>)}
+      </div>
+    </section>
+
+    <section class="block" aria-labelledby="all">
+      <h2 class="mono muted" id="all">All tokens · src/styles/tokens.css</h2>
+      <table class="all">
+        <tbody>
+          {all.map((t) => (
+            <tr><th scope="row" class="code">--{t.name}</th><td class="code muted">{t.value}</td></tr>
+          ))}
+          {phone.map((t) => (
+            <tr><th scope="row" class="code">--{t.name}</th><td class="code muted">{t.value} below 640px</td></tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
+  </main>
+</Base>
+
+<style>
+  main {
+    padding-block: var(--space-48) var(--space-96);
+  }
+  h1,
+  h2,
+  h3,
+  p {
+    margin: 0;
+  }
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-8) var(--space-24);
+    padding-bottom: var(--space-16);
+    border-bottom: 1px solid var(--ink);
+  }
+  .head h1 {
+    font-size: var(--text-h2);
+    line-height: var(--leading-h2);
+    letter-spacing: var(--tracking-h2);
+    margin-right: auto;
+  }
+  h2.mono,
+  h3.mono {
+    font-weight: var(--weight-regular);
+  }
+
+  .panels {
+    row-gap: var(--grid-gutter);
+    margin-top: var(--space-48);
+  }
+  .panel {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-16);
+    padding: var(--space-24);
+    background: var(--bg);
+    color: var(--ink);
+    border: 1px solid var(--line);
+  }
+  @media (min-width: 1024px) {
+    .panel {
+      grid-column: span 6;
+    }
+  }
+  .panel h3 {
+    margin-top: var(--space-16);
+  }
+
+  .swatches {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+    gap: var(--space-12);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .swatches li {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+  }
+  .chip {
+    height: 72px;
+    border: 1px solid var(--line);
+  }
+  .name {
+    font-size: var(--text-small);
+    font-weight: var(--weight-medium);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-small);
+  }
+  th {
+    font-weight: var(--weight-regular);
+    text-align: left;
+  }
+  .pairs td,
+  .pairs th,
+  .all td,
+  .all th {
+    padding: var(--space-8) var(--space-12) var(--space-8) 0;
+    border-top: 1px solid var(--line);
+    vertical-align: baseline;
+  }
+  /* Token names and values keep their case, unlike .mono metadata. */
+  .code {
+    font-family: var(--font-mono);
+    font-size: var(--text-mono-lg);
+  }
+  .pair {
+    display: inline-block;
+    padding: var(--space-4) var(--space-8);
+    border: 1px solid var(--line);
+  }
+
+  .scale .row {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: var(--space-12);
+    align-items: baseline;
+    padding-block: 10px;
+    border-top: 1px solid var(--line);
+  }
+  /* Phones: label above sample. Display 72 is wider than a 320px screen, so an
+     oversized sample scrolls inside its row rather than widening the page. */
+  @media (max-width: 639.98px) {
+    .scale .row {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-4);
+    }
+    .sample {
+      overflow-x: auto;
+    }
+  }
+  .scale .row:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+  .t-display {
+    font-size: var(--text-display);
+    line-height: var(--leading-display);
+    letter-spacing: var(--tracking-display);
+    font-weight: var(--weight-medium);
+  }
+  .t-h2 {
+    font-size: var(--text-h2);
+    line-height: var(--leading-h2);
+    letter-spacing: var(--tracking-h2);
+    font-weight: var(--weight-medium);
+  }
+  .t-title {
+    font-size: var(--text-title);
+    line-height: var(--leading-title);
+    letter-spacing: var(--tracking-title);
+    font-weight: var(--weight-medium);
+  }
+  .t-lead {
+    font-size: var(--text-lead);
+    line-height: var(--leading-lead);
+  }
+  .t-body {
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
+    max-width: var(--measure);
+  }
+  .t-small {
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+  }
+  .mono-lg {
+    font-size: var(--text-mono-lg);
+  }
+  .sample.mono {
+    color: var(--ink);
+  }
+
+  .icons {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-12);
+  }
+  .icons p {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-8) var(--space-24);
+    align-items: baseline;
+  }
+  .icons a {
+    text-decoration: none;
+  }
+  .icons a.ink {
+    color: var(--ink);
+  }
+
+  .focus-demo {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-offset);
+    margin-right: var(--space-24);
+  }
+
+  .block {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-16);
+    margin-top: var(--space-64);
+  }
+  .spaces {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--space-24);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .spaces li {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .sq {
+    background: var(--ink);
+  }
+  .sq.break {
+    background: var(--line);
+  }
+  .cols span {
+    height: 96px;
+    padding: var(--space-8);
+    background: var(--surface);
+    color: var(--muted);
+  }
+  /* One column on phones: show only the first. */
+  @media (max-width: 639.98px) {
+    .cols span + span {
+      display: none;
+    }
+  }
+</style>
