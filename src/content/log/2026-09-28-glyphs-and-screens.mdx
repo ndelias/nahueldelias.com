@@ -1,0 +1,11 @@
+---
+date: 2026-09-28
+---
+
+Three follow-ups to the homepage.
+
+- **No dimming.** The design dims inactive rows to 45% opacity, which drops them below AA contrast. Now the active row has an ink title and an accent number, and the others are muted, a color that passes on its own. The first row is active by default; hovering or focusing another row makes that one active. There's no opacity on any text.
+- **The homepage aligns to its frame.** It's a single frame, so its content sits at the frame inset. Content pages keep the 48px grid margin.
+- **A test for missing characters.** The fonts are subset now, so a character outside the subset would quietly render in a fallback font. After every build, a test opens each page in Chrome and checks every character against the face that sets it: visually hidden text, hidden labels and uppercase-transformed labels included. I planted a "ç", an arrow in hidden text and a button without the site font. It reported all three, each with its code point, page and element. On the real pages it found nothing.
+
+The design screenshots are now captured in CI, in the same environment the comparison runs in, and each run checks they still reproduce byte for byte. They do. Against them, the homepage differs by 1.74% in light and 3.60% in dark, over the 0.5% tolerance. Every differing pixel is in a known place: the dimmed rows (1.5%), the corner labels the filmstrip will add (0.2%), and in dark mode the preview's video shimmer (2%). The first row and everything outside those regions match exactly.
