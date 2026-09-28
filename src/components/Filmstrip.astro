@@ -395,7 +395,7 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
     --u: min(1px, (100vw - 96px) / 520);
     /* The strip is centred in the screen, as in the mock at 900px tall, and
        never climbs into the meta's room under the header. */
-    --strip-top: max(calc(50% - 162px), 250px);
+    --strip-top: max(round(calc(50% - 162px), 1px), 250px);
     position: absolute;
     inset: 0;
     /* The layer spans the frame; only its parts take the pointer. */
@@ -472,7 +472,7 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
     right: 0;
     /* 6px of room above and below the frames for the focus ring. */
     top: calc(var(--strip-top) - 6px);
-    height: calc(325 * var(--u) + 12px);
+    height: round(calc(325 * var(--u) + 12px), 1px);
     overflow: clip;
     -webkit-mask-image: linear-gradient(to right, transparent 0, #000 9%, #000 91%, transparent 100%);
     mask-image: linear-gradient(to right, transparent 0, #000 9%, #000 91%, transparent 100%);
@@ -486,17 +486,22 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
     padding: 0;
     list-style: none;
   }
+  /* Every edge on a whole pixel at rest. A frame centred with top: 50% and
+     translateY(-50%) lands there in two fractional steps (168.5px, then
+     -52.5px) that the compositor can round differently from run to run,
+     so its edge row changed between identical screenshots. */
   .frame {
     position: absolute;
-    left: 50%;
-    top: 50%;
-    width: calc(var(--w) * var(--u));
-    height: calc(var(--h) * var(--u));
-    transform: translate(calc(var(--x) * var(--u)), -50%);
+    left: round(50%, 1px);
+    top: round(calc((100% - var(--h) * var(--u)) / 2), 1px);
+    width: round(calc(var(--w) * var(--u)), 1px);
+    height: round(calc(var(--h) * var(--u)), 1px);
+    transform: translateX(round(calc(var(--x) * var(--u)), 1px));
     transition:
       transform 0.65s var(--ease),
       width 0.6s var(--ease),
-      height 0.6s var(--ease);
+      height 0.6s var(--ease),
+      top 0.6s var(--ease);
   }
   .frame:global(.jump) {
     transition: none;
@@ -568,33 +573,28 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
     opacity: 1;
   }
 
-  /* Phone: the strip flows under the header, centred in what's left of the
-     screen, with the controls under it. */
+  /* Phone: the strip sits under the header, in what's left of the screen,
+     with the controls under it. Same structure as desktop (the meta
+     above a strip placed on a whole pixel), just in the flow. */
   @media (max-width: 639.98px) {
     .filmstrip {
       position: relative;
       inset: auto;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 20px;
-      /* The screen less the header (104px) and the controls row (60px). */
-      min-height: calc(100svh - 164px);
-      padding-block: var(--space-16);
+      /* The screen less the header (104px) and the controls row (76px),
+         never too short for the meta and the strip. */
+      height: max(calc(100svh - 180px), 440px);
+      /* A little below the middle: the meta above is taller than the
+         strip below. */
+      --strip-top: max(round(calc(50% - 12px), 1px), 220px);
     }
     .metas {
-      position: static;
+      left: var(--frame-inset);
+      right: var(--frame-inset);
       width: auto;
-      margin-inline: var(--frame-inset);
     }
     .row3 {
       flex-direction: column;
       gap: 10px;
-    }
-    .viewport {
-      position: relative;
-      top: auto;
-      flex-shrink: 0;
     }
   }
 </style>
