@@ -1,4 +1,4 @@
-# Prove the §3 content rules still bite, build, enforce the §6 budgets, then
+# Prove the §3 content rules still bite and the code typechecks, build, enforce the §6 budgets, then
 # deploy. Deploys depend on every budget job, so a failed budget blocks the
 # deploy rather than just reporting on it. The deployed files are the exact
 # dist/ the budgets measured.
@@ -29,8 +29,21 @@ jobs:
       - run: npm ci
       - run: npm test
 
+  # astro check: TypeScript in .ts and .astro files, against the generated
+  # content collection types.
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+
   build:
-    needs: content-rules
+    needs: [content-rules, typecheck]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7

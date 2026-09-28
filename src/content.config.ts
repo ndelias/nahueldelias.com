@@ -1,9 +1,9 @@
 import { defineCollection, type SchemaContext } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
-import { STATUSES, type Section } from './lib/model';
+import { ESSAY_STATUSES, STATUSES, type Section } from './lib/model';
 
-// §3 content model. Each section is its own collection; the section is the
+// §3 content model. Each entry section is its own collection; the section is the
 // collection name and the slug is the filename, so neither is repeated in
 // frontmatter. Two of the three compile-time rules are enforced here, per
 // entry. The third (at most two weight: 1 entries) spans collections and lives
@@ -65,6 +65,25 @@ const entrySchema = ({ image }: SchemaContext) => {
 
 const entries = (name: Section) => glob({ pattern: '**/*.mdx', base: `./src/content/${name}` });
 
+// Every essay commits to a position a reader can disagree with.
+const THESIS_REQUIRED = 'Required for essays (§3). State the position a reader could disagree with.';
+
+// §3 Essay. Not an Entry: no weight, decision or section. Drafts are filtered
+// out of production builds in src/lib/essays.ts.
+const writing = defineCollection({
+  loader: glob({ pattern: '**/*.mdx', base: './src/content/writing' }),
+  schema: z.object({
+    title: z.string().min(1),
+    dek: z.string().min(1).max(99, 'Deks are one line: under 100 characters.'),
+    thesis: z
+      .string({ error: THESIS_REQUIRED })
+      .min(1, THESIS_REQUIRED),
+    date: z.coerce.date(),
+    updated: z.coerce.date().optional(),
+    status: z.enum(ESSAY_STATUSES),
+  }),
+});
+
 // §3 LogEntry.
 const log = defineCollection({
   loader: glob({ pattern: '**/*.mdx', base: './src/content/log' }),
@@ -92,6 +111,6 @@ export const collections = {
       }),
   }),
   play: defineCollection({ loader: entries('play'), schema: entrySchema }),
-  writing: defineCollection({ loader: entries('writing'), schema: entrySchema }),
+  writing,
   log,
 };

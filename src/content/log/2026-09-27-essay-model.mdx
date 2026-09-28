@@ -1,0 +1,9 @@
+---
+date: 2026-09-27
+---
+
+Writing has left the entry model. An essay isn't weighted and doesn't carry a decision, so fitting one into the entry schema meant making up a weight and a decision just to pass the rules. Essays now have their own schema: title, a one-line dek, date, an optional updated date, and a draft or published status. They also need a `thesis`, because every essay commits to a position a reader can disagree with. An essay without one fails the build, and there's a test for that. I made the field optional and confirmed that test, and no other, went red.
+
+Drafts render in dev and never in production builds.
+
+CI also typechecks now. `astro check` runs next to the content-rule tests, and the build waits for both. It found nothing to fix.

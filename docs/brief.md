@@ -55,7 +55,7 @@ Content lives as MDX files in the repo (Astro content collections — see §8). 
 ```ts
 type Weight = 1 | 2 | 3   // 1 = case study, 2 = study, 3 = small thing
 type Status = 'shipped' | 'concept' | 'wip' | 'archived'
-type Section = 'work' | 'studies' | 'data' | 'play' | 'writing'
+type Section = 'work' | 'studies' | 'data' | 'play'   // writing is not an Entry; see Essay below
 
 interface Entry {
   slug: string
@@ -93,6 +93,22 @@ Three constraints the build should enforce at compile time:
 1. **At most two entries may have `weight: 1`.** Throw at build time if a third appears. This is the anti-flattening mechanism and it should be impossible to bypass casually.
 2. **`decision` is required for `weight <= 2`.** A study without a defensible decision is a screenshot gallery; the schema should refuse to render one.
 3. **`status` renders a visible label automatically.** A concept entry carries a concept badge everywhere it appears — index, card, page header, OG image. Not opt-in.
+
+Writing has its own model. An essay isn't weighted, carries no decision and doesn't sit in a section, so rules 1 and 2 don't apply to it:
+
+```ts
+interface Essay {
+  slug: string
+  title: string
+  dek: string              // one line, <100 chars, shown in the essay index
+  thesis: string           // REQUIRED — build fails without it
+  date: string
+  updated?: string
+  status: 'draft' | 'published'   // drafts never render in production builds
+}
+```
+
+`thesis` is required because every essay commits to a position a reader can disagree with.
 
 Separately:
 

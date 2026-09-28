@@ -35,6 +35,16 @@ const entry = (overrides = {}) => ({
   ...overrides,
 });
 
+// A valid essay. Writing has its own schema: no weight, decision or section.
+const essay = (overrides = {}) => ({
+  title: 'Test essay',
+  dek: 'A test dek.',
+  thesis: 'A position a reader can disagree with.',
+  date: '2026-09-01',
+  status: 'published',
+  ...overrides,
+});
+
 /** Build a copy of the site with exactly these entries: { 'work/a': {...} }. */
 async function build(files) {
   const dir = await mkdtemp(join(tmpdir(), 'content-rules-'));
@@ -80,6 +90,7 @@ test('control: valid content builds, and a concept entry renders its badge in th
     'work/second': entry({ weight: 1, decision: DECISION, status: 'concept' }),
     'play/small': entry({ weight: 3 }), // weight 3: no decision needed
     'data/analysis': entry({ weight: 2, decision: DECISION, hypothesis: HYPOTHESIS }),
+    'writing/essay': essay(), // no weight or decision: writing is outside rules 1 and 2
   });
   try {
     assert.equal(result.code, 0, `Build should have passed:\n${result.output}`);
@@ -108,9 +119,9 @@ test('rule 1: a third weight: 1 entry fails the build and names every weight: 1 
 
 test('rule 2: a weight <= 2 entry without decision fails the build and names the file', async () => {
   const result = await build({
-    'writing/essay': entry({ weight: 2 }),
+    'studies/study': entry({ weight: 2 }),
   });
-  await assertFails(result, 'writing → essay', 'decision: Required for weight 2 entries (§3 rule 2)', 'src/content/writing/essay.mdx');
+  await assertFails(result, 'studies → study', 'decision: Required for weight 2 entries (§3 rule 2)', 'src/content/studies/study.mdx');
 });
 
 test('rule 3: a data entry without hypothesis fails the build and names the file', async () => {
@@ -118,4 +129,12 @@ test('rule 3: a data entry without hypothesis fails the build and names the file
     'data/analysis': entry({ weight: 3 }),
   });
   await assertFails(result, 'data → analysis', 'hypothesis: Required for data entries (§4)', 'src/content/data/analysis.mdx');
+});
+
+test('essay: a writing entry without thesis fails the build and names the file', async () => {
+  const { thesis, ...noThesis } = essay();
+  const result = await build({
+    'writing/essay': noThesis,
+  });
+  await assertFails(result, 'writing → essay', 'thesis: Required for essays (§3)', 'src/content/writing/essay.mdx');
 });
