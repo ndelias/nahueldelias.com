@@ -23,13 +23,15 @@ const phone = [...(tokensCss.match(/@media[^{]*\{\s*:root\s*\{([\s\S]*?)\}/)?.[1
   ([, name, value]) => ({ name, value: value.trim() }),
 );
 
+// px: fixed size, or the 320px–1440px range for the fluid steps.
 const type = [
-  { token: 'display', px: 72, sample: 'Aa vers1ons' },
-  { token: 'h2', px: 44, sample: 'vers1ons' },
-  { token: 'title', px: 22, sample: 'Index entry' },
-  { token: 'lead', px: 18, sample: 'Tagline and lead text' },
-  { token: 'body', px: 16, sample: 'Running text at 65ch. The quick brown fox jumps over the lazy dog, 0123456789.' },
-  { token: 'small', px: 14, sample: 'Captions and notes' },
+  { token: 'display', px: '40–72', sample: 'Aa vers1ons' },
+  { token: 'h2', px: '30–44', sample: 'vers1ons' },
+  { token: 'meta-title', px: '28–40', sample: 'Blast Radius' },
+  { token: 'title', px: '22', sample: 'Index entry' },
+  { token: 'lead', px: '18', sample: 'Tagline and lead text' },
+  { token: 'body', px: '16', sample: 'Running text at 65ch. The quick brown fox jumps over the lazy dog, 0123456789.' },
+  { token: 'small', px: '14', sample: 'Captions and notes' },
 ];
 const spaces = [4, 8, 12, 16, 24, 32, 48, 64, 96, 160];
 const themes = ['light', 'dark'] as const;
@@ -268,15 +270,11 @@ const themes = ['light', 'dark'] as const;
     padding-block: 10px;
     border-top: 1px solid var(--line);
   }
-  /* Phones: label above sample. Display 72 is wider than a 320px screen, so an
-     oversized sample scrolls inside its row rather than widening the page. */
+  /* Phones: label above sample, so samples get the panel's full width. */
   @media (max-width: 639.98px) {
     .scale .row {
       grid-template-columns: minmax(0, 1fr);
       gap: var(--space-4);
-    }
-    .sample {
-      overflow-x: auto;
     }
   }
   .scale .row:last-child {
@@ -292,6 +290,12 @@ const themes = ['light', 'dark'] as const;
     font-size: var(--text-h2);
     line-height: var(--leading-h2);
     letter-spacing: var(--tracking-h2);
+    font-weight: var(--weight-medium);
+  }
+  .t-meta-title {
+    font-size: var(--text-meta-title);
+    line-height: var(--leading-meta-title);
+    letter-spacing: var(--tracking-meta-title);
     font-weight: var(--weight-medium);
   }
   .t-title {

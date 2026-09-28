@@ -3,9 +3,11 @@
  *
  * Fonts are the Latin subsets from @fontsource (OFL). Base.astro preloads the
  * faces a page uses above the fold; it imports the same files, so the preload
- * and these URLs resolve to the same hashed asset.
+ * and these URLs resolve to the same hashed asset. Until they arrive, text
+ * sets in the metric-matched fallbacks from fallbacks.css.
  */
 @import "./tokens.css";
+@import "./fallbacks.css";
 
 @font-face {
   font-family: "Instrument Sans";
