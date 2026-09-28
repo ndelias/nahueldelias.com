@@ -94,21 +94,21 @@ Three constraints the build should enforce at compile time:
 2. **`decision` is required for `weight <= 2`.** A study without a defensible decision is a screenshot gallery; the schema should refuse to render one.
 3. **`status` renders a visible label automatically.** A concept entry carries a concept badge everywhere it appears — index, card, page header, OG image. Not opt-in.
 
-Writing has its own model. An essay isn't weighted, carries no decision and doesn't sit in a section, so rules 1 and 2 don't apply to it:
+**Writing has its own schema (decided 2026-09-27).** Essays don't have a chose/rejected/cost decision, and they don't compete for weight, so they don't use `Entry`:
 
 ```ts
 interface Essay {
   slug: string
   title: string
-  dek: string              // one line, <100 chars, shown in the essay index
-  thesis: string           // REQUIRED — build fails without it
+  dek: string              // one line, <100 chars, shown in the index
+  thesis: string           // REQUIRED: the one claim the essay defends
   date: string
   updated?: string
-  status: 'draft' | 'published'   // drafts never render in production builds
+  status: 'draft' | 'published'   // drafts never render in production
 }
 ```
 
-`thesis` is required because every essay commits to a position a reader can disagree with.
+`thesis` keeps the spirit of principle 3: every essay commits to a position a reader can disagree with.
 
 Separately:
 
