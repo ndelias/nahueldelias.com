@@ -10,7 +10,13 @@ import { ESSAY_STATUSES, STATUSES, type Section } from './lib/model';
 // in src/lib/entries.ts.
 
 // Month precision: "2025-03". YAML leaves this as a string, unquoted.
-const month = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, 'Use a YYYY-MM month, e.g. "2025-03".');
+const MONTH = /^\d{4}-(0[1-9]|1[0-2])$/;
+// Fixtures may hold a bracketed placeholder ("[Years]") instead, so an unknown
+// date renders as visibly unknown rather than as a made-up one.
+const PLACEHOLDER = /^\[.+\]$/;
+const month = z
+  .string()
+  .refine((v) => MONTH.test(v) || PLACEHOLDER.test(v), 'Use a YYYY-MM month, e.g. "2025-03".');
 
 const entrySchema = ({ image }: SchemaContext) => {
   const imageRef = z.object({ src: image(), alt: z.string().min(1) });
@@ -52,6 +58,16 @@ const entrySchema = ({ image }: SchemaContext) => {
       fixture: z.boolean().default(false),
     })
     .superRefine((entry, ctx) => {
+      for (const key of ['start', 'end'] as const) {
+        const value = entry.dates[key];
+        if (value && PLACEHOLDER.test(value) && !entry.fixture) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['dates', key],
+            message: `"${value}" is a placeholder. Only fixture entries may use one; use a YYYY-MM month.`,
+          });
+        }
+      }
       // Rule 2: a weight 1 or 2 entry without a decision is a screenshot gallery.
       if (entry.weight <= 2 && !entry.decision) {
         ctx.addIssue({
