@@ -53,6 +53,12 @@ const entrySchema = ({ image }: SchemaContext) => {
         .optional(),
       versions: z.array(imageRef).optional(),
       cover: imageRef,
+      // The homepage strip's still, 16:10, at least 1040×650 (2x the focused
+      // frame). Optionally a dark-theme variant. Falls back to the cover.
+      poster: z.object({ src: image(), dark: image().optional() }).optional(),
+      // Muted screen recording that replaces the poster once the entry is
+      // focused on the homepage strip. A path under public/ or a URL.
+      video: z.string().min(1).optional(),
       order: z.number().int(),
       // Test and scaffolding entries. Rendered, but noindexed and labeled.
       fixture: z.boolean().default(false),
