@@ -1,7 +1,8 @@
 /*
  * Fonts, element defaults and layout primitives. Tokens live in tokens.css.
  *
- * Fonts are the Latin subsets from @fontsource (OFL). Base.astro preloads the
+ * Fonts are @fontsource's Latin files (OFL), subset further by
+ * scripts/subset-fonts.py; unicode-range lists the same set. Base.astro preloads the
  * faces a page uses above the fold; it imports the same files, so the preload
  * and these URLs resolve to the same hashed asset. Until they arrive, text
  * sets in the metric-matched fallbacks from fallbacks.css.
@@ -87,6 +88,37 @@ a {
 
 .muted {
   color: var(--muted);
+}
+
+/* §3 rule 3 status badge (StatusBadge.astro). Global, not scoped, so the
+   badge markup stays exactly what the content-rule tests assert. Size comes
+   from the context; padding scales with it. */
+.status-badge {
+  /* Inline, so its padding and border overflow the line without making the
+     line taller; nowrap keeps it from breaking. */
+  display: inline;
+  padding: 0.2em 0.6em;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  letter-spacing: var(--tracking-mono);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.status-badge[data-status="shipped"] {
+  color: var(--ink);
+}
+.status-badge[data-status="concept"] {
+  color: var(--accent);
+}
+.status-badge[data-status="wip"] {
+  color: var(--muted);
+  border-style: dashed;
+}
+.status-badge[data-status="archived"] {
+  color: var(--muted);
+  border-color: var(--line);
+  text-decoration: line-through;
 }
 
 /* Page container: the grid's outer margin. */

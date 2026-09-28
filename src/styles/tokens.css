@@ -43,6 +43,10 @@
   --leading-meta-title: 1.04;
   --tracking-meta-title: -0.022em;
 
+  /* Titles in the homepage Index list. */
+  --text-row-title: 1.25rem; /* 20 */
+  --tracking-row-title: -0.01em;
+
   --text-title: 1.375rem; /* 22 */
   --leading-title: 1.25;
   --tracking-title: -0.01em;
@@ -57,6 +61,7 @@
   --text-small: 0.875rem; /* 14 */
   --leading-small: 1.5;
 
+  --text-mono-sm: 0.625rem; /* 10: section and badge in the Index list */
   --text-mono: 0.6875rem; /* 11 */
   --text-mono-lg: 0.75rem; /* 12 */
   --tracking-mono: 0.06em;
@@ -82,8 +87,9 @@
   --grid-margin: 48px;
 
   /* The four-corner frame sits outside the grid: its labels are inset from
-     the viewport edge by this, not by the grid margin. */
+     the viewport edge by these, not by the grid margin. */
   --frame-inset: 32px;
+  --frame-inset-block: 28px;
 
   /* Focus and motion. */
   --focus-ring: 2px solid var(--accent);
@@ -105,5 +111,7 @@
   :root {
     --grid-columns: 1;
     --grid-margin: 16px;
+    --frame-inset: 16px;
+    --frame-inset-block: 16px;
   }
 }

@@ -23,8 +23,9 @@ const { title, description, noindex = false, preload = ['sans-400', 'sans-500'] 
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    {/* A saved theme choice applies before first paint. Must stay tiny and inline. */}
-    <script is:inline>try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+    {/* Before first paint: mark that JS runs (controls that need it show only
+        then) and apply a saved theme choice. Must stay tiny and inline. */}
+    <script is:inline>var d=document.documentElement;d.classList.add("js");try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")d.dataset.theme=t}catch(e){}</script>
     <title>{title}</title>
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex" />}
