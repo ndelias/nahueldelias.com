@@ -221,6 +221,12 @@ Nahuel's inspiration folder (15 references, mostly fashion and visual-studio sit
 
 **Type.** Instrument Sans for headlines and body; DM Mono for all metadata (corner labels, list numbers, years, counts, status badges). The mono carries the "index" feel; the grotesk carries reading. Both free (OFL) — self-host, subset to Latin, `font-display: swap`, preload. Weights: Instrument Sans 400/500 (+600 only if a real need appears), DM Mono 400 only. Target ≈60KB total. Use `font-variant-numeric: tabular-nums` on every number/year column. Chosen over Hanken + IBM Plex Mono (Plex reads generic dev-portfolio), Schibsted + Martian Mono (wide mono crowds corners on phones) and Geist + Geist Mono (the default Vercel look).
 
+**Type sizes.** Display, h2 and the strip's meta title are fluid between a 320px and a 1440px viewport: display 40px → 72px, h2 30px → 44px, meta title 28px → 40px. The other steps are fixed at every width: title 22, lead 18, body 16, small 14, mono 11–12.
+
+**Frame vs grid.** The four-corner frame and the content grid are separate systems. Frame labels are inset 32px from the viewport edge (`--frame-inset`). Content sits on the 12-column grid: 24px gutter, 48px margin at desktop; one column and a 16px margin on phones.
+
+**Theme toggle:** top-right nav after Log, mono text button (Dark)/(Light), same position on every page.
+
 **Homepage: filmstrip (revised 2026-09-24).** The first homepage (hero line, two stacked frames, numbered list) was rejected as not creative enough and not showing interaction design. The homepage is now one screen, straight to the projects, with no identity headline:
 
 - Four-corner mono frame (Rue): name + "Product engineer" top-left, (Index) toggle top-center, Work / About / Log top-right, counter 01 / 08 bottom-left, Prev / Next bottom-center, Contact bottom-right.

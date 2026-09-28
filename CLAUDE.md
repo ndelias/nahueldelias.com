@@ -33,6 +33,7 @@ read as evidence of craft, performance sense and taste.
 - Respect prefers-reduced-motion everywhere. Visible focus states everywhere.
 - No preloaders, no page transitions that delay content, no autoplaying sound.
 - Ask before adding any dependency. Say what it's for and what it costs in KB.
+- The sitemap (when added) excludes /_tokens and any fixture entries.
 
 ## Tokens (light / dark)
 bg #F2F1ED / #161513 · surface #E8E6E0 / #211F1C · line #D3D0C8 / #34312C
