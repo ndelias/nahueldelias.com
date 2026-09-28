@@ -9,14 +9,17 @@ interface Props {
   src: ImageMetadata;
   alt: string;
   loading?: 'eager' | 'lazy';
+  class?: string;
 }
 
-const { src, alt, loading = 'lazy' } = Astro.props;
+// `class` carries the parent's scoped-style class, as it does for <Image>,
+// so the parent's `img` rules still apply.
+const { src, alt, loading = 'lazy', class: className } = Astro.props;
 // Read from a clone: reading the import itself marks the original as used.
 const { format, width, height } = (src as ImageMetadata & { clone?: ImageMetadata }).clone ?? src;
 ---
 {format === 'svg' ? (
-  <img src={src.src} width={width} height={height} alt={alt} loading={loading} decoding="async" />
+  <img src={src.src} width={width} height={height} alt={alt} loading={loading} decoding="async" class={className} />
 ) : (
-  <Image src={src} alt={alt} loading={loading} />
+  <Image src={src} alt={alt} loading={loading} class={className} />
 )}

@@ -79,12 +79,14 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
                 {poster.dark?.webp && <source type="image/webp" {...src('srcset', poster.dark.webp)} media="(prefers-color-scheme: dark)" data-dark />}
                 {poster.light.avif && <source type="image/avif" {...src('srcset', poster.light.avif)} />}
                 <img
-                  {...src('src', poster.light.src)}
-                  {...(poster.light.webp && src('srcset', poster.light.webp))}
+                  {...{
+                    ...src('src', poster.light.src),
+                    ...(poster.light.webp && src('srcset', poster.light.webp)),
+                    ...(on ? { fetchpriority: 'high' } : { loading: 'lazy', decoding: 'async' }),
+                  }}
                   width={POSTER.width}
                   height={POSTER.height}
                   alt=""
-                  {...(on ? { fetchpriority: 'high' } : { loading: 'lazy', decoding: 'async' })}
                 />
               </picture>
               <span class="label mono" aria-hidden="true">{number}</span>
