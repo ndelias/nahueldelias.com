@@ -92,13 +92,21 @@ jobs:
           path: dist
       - run: npm run test:dist
 
-  # Design reference screenshots, captured and compared in this environment
-  # (ubuntu-latest, the runner's Google Chrome). A report, not a gate: the
-  # page differs from the mock on purpose in places. To refresh the committed
-  # baselines, see docs/design/reference/README.md.
+  # Screenshots, in this environment (ubuntu-latest, the runner's Google
+  # Chrome). Two parts:
+  # - The site against its own committed baselines (tests/screens/): a gate.
+  #   A change to how / renders fails here until the baselines are
+  #   regenerated with `npm run screens:update` and committed, so it shows in
+  #   the PR diff.
+  # - The site against the design mock: a report, posted as a PR comment,
+  #   since the page differs from the mock on purpose in places.
+  # The mock's own screenshots are re-captured too, to prove they reproduce.
   screens:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -111,12 +119,33 @@ jobs:
           name: dist
           path: dist
       - run: node scripts/screens.mjs capture .screens/captured
-      - name: Do the committed baselines reproduce?
+      - name: Do the committed mock screenshots reproduce?
         run: |
           for f in docs/design/reference/screens/*.png; do
             if cmp -s "$f" ".screens/captured/$(basename "$f")"; then echo "same     $(basename "$f")"; else echo "DIFFERS  $(basename "$f")"; fi
           done | tee -a "$GITHUB_STEP_SUMMARY"
-      - run: node scripts/screens.mjs compare .screens/compare
+      - run: node scripts/screens.mjs mock .screens/mock
+      # One comment per PR, updated in place. Fork PRs get a read-only token,
+      # so the comment is skipped there (the report is in the job summary).
+      - name: Post the mock report on the PR
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          id=$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR/comments" --paginate --jq '.[] | select(.body | startswith("<!-- screens-mock -->")) | .id' | head -n1)
+          if [ -n "$id" ]; then
+            gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$id" -F body=@.screens/mock/report.md > /dev/null
+          else
+            gh api "repos/$GITHUB_REPOSITORY/issues/$PR/comments" -F body=@.screens/mock/report.md > /dev/null
+          fi
+      - name: The site against its baselines (gate)
+        run: node scripts/screens.mjs check .screens/site
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: site-screens
+          path: .screens/site
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -125,8 +154,8 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: screens-compare
-          path: .screens/compare
+          name: screens-mock
+          path: .screens/mock
 
   lighthouse:
     needs: build
@@ -151,7 +180,7 @@ jobs:
           include-hidden-files: true
 
   deploy:
-    needs: [js-budget, lighthouse, dist-tests]
+    needs: [js-budget, lighthouse, dist-tests, screens]
     # Production from main, previews from same-repo PRs (fork PRs have no secrets).
     if: >-
       (github.event_name == 'push' && github.ref == 'refs/heads/main') ||

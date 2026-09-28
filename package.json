@@ -14,6 +14,8 @@
     "test:dist": "node --test 'tests/dist/*.test.mjs'",
     "check:js": "node scripts/check-js-budget.mjs",
     "check:lh": "lhci autorun",
+    "screens": "node scripts/screens.mjs check",
+    "screens:update": "node scripts/screens-update.mjs",
     "ci": "npm run typecheck && npm test && npm run build && npm run test:dist && npm run check:js && npm run check:lh"
   },
   "dependencies": {
