@@ -59,6 +59,7 @@ jobs:
           path: dist
           include-hidden-files: true
 
+  # Budgets on the built files: JS on /, what ships, poster sizes.
   js-budget:
     needs: build
     runs-on: ubuntu-latest
@@ -71,8 +72,12 @@ jobs:
         with:
           name: dist
           path: dist
-      # Dependency-free script, no npm ci needed.
+      # Dependency-free scripts, no npm ci needed.
       - run: node scripts/check-js-budget.mjs
+      # Nothing ships that no page references (source images, strays).
+      - run: node scripts/check-dist.mjs
+      # Strip posters: AVIF under 40KB at 1x, 80KB at 2x.
+      - run: node scripts/check-posters.mjs
 
   # Checks against the built pages in Chrome (the runner's Google Chrome,
   # the same one Lighthouse uses): every character is in its subset font.
@@ -94,10 +99,10 @@ jobs:
 
   # Screenshots, in this environment (ubuntu-latest, the runner's Google
   # Chrome). Two parts:
-  # - The site against its own committed baselines (tests/screens/): a gate.
-  #   A change to how / renders fails here until the baselines are
-  #   regenerated with `npm run screens:update` and committed, so it shows in
-  #   the PR diff.
+  # - The site against its own committed baselines (tests/screens/): a gate,
+  #   exact to the pixel (CI captures are deterministic). A change to how /
+  #   renders fails here until the baselines are regenerated with
+  #   `npm run screens:update` and committed, so it shows in the PR diff.
   # - The site against the design mock: a report, posted as a PR comment,
   #   since the page differs from the mock on purpose in places.
   # The mock's own screenshots are re-captured too, to prove they reproduce.

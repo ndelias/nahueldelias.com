@@ -50,7 +50,8 @@ Easing for strip motion: cubic-bezier(0.2, 0.7, 0.2, 1).
 - Playwright comparisons load pages over HTTP (a local static server), never
   file://. Allow ~0.5% pixel difference: text-edge anti-aliasing alone
   differs by ~0.25% from the baselines.
-- The site's own screenshots in tests/screens/ are a CI gate (0.5%). When a
+- The site's own screenshots in tests/screens/ are a CI gate, exact to the
+  pixel (the ~0.5% allowance is for comparisons with docs/design). When a
   render change is intended, push, run `npm run screens:update` and commit
   the new baselines with the change.
 - Never commit placeholder copy as if it were real: bracketed text like

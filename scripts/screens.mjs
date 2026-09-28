@@ -8,9 +8,11 @@
 //   node scripts/screens.mjs site [outDir]
 //     Captures the built / (dist/) into outDir (default .screens/site).
 //   node scripts/screens.mjs check [outDir]
-//     Captures, then compares each shot with its baseline. Exits 1 when any
-//     differs by more than the tolerance, or has no baseline yet. Diff images
-//     go next to the captures.
+//     Captures, then compares each shot with its baseline, pixel for pixel.
+//     Exits 1 when any pixel differs in any channel, or a shot has no
+//     baseline yet. CI renders deterministically (the same Chrome, fonts and
+//     page every run), so there's no tolerance. Diff images go next to the
+//     captures.
 //   npm run screens:update
 //     Regenerates the baselines from CI (scripts/screens-update.mjs).
 //
@@ -25,8 +27,9 @@
 //     Compares the built / with the mock's screenshots. Writes captures, diff
 //     images and report.md (a markdown table) to outDir (default .screens/mock).
 //
-// All at 1x. A pixel differs when any channel differs by more than 24 (of
-// 255), which ignores sub-perceptual rounding.
+// All at 1x. For the mock report, a pixel differs when any channel differs
+// by more than 24 (of 255), which ignores sub-perceptual rounding, and 0.5%
+// of pixels is the mark it's read against.
 
 import { mkdir, readFile, writeFile, appendFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
@@ -39,8 +42,12 @@ const MOCK_BASELINES = join(REFERENCE, 'screens');
 const SITE_BASELINES = join(ROOT, 'tests/screens');
 const DESKTOP = { width: 1440, height: 900 };
 const PHONE = { width: 390, height: 844 };
-const TOLERANCE = 0.5; // percent of pixels
-const CHANNEL = 24;
+// The site gate: exact.
+const SITE_CHANNEL = 0;
+const SITE_TOLERANCE = 0; // pixels
+// The mock report.
+const MOCK_TOLERANCE = 0.5; // percent of pixels
+const MOCK_CHANNEL = 24;
 
 // Mock baseline name → home.html URL options (see reference/README.md).
 const CAPTURES = {
@@ -224,16 +231,16 @@ try {
         lines.push(`MISSING ${name}: no baseline in tests/screens/`);
         continue;
       }
-      const r = await differ.evaluate(diffInPage, [png.toString('base64'), (await readFile(file)).toString('base64'), CHANNEL, []]);
+      const r = await differ.evaluate(diffInPage, [png.toString('base64'), (await readFile(file)).toString('base64'), SITE_CHANNEL, []]);
       if (r.error) {
         fail = true;
         lines.push(`OVER    ${name}: ${r.error}`);
         continue;
       }
       await writeFile(join(out, `${name}.diff.png`), Buffer.from(r.png, 'base64'));
-      const p = (r.differ / r.total) * 100;
-      fail ||= p > TOLERANCE;
-      lines.push(`${p <= TOLERANCE ? 'within ' : 'OVER   '} ${name}: ${pct(r.differ, r.total)} differ (${r.differ} px), tolerance ${TOLERANCE}%`);
+      const ok = r.differ <= SITE_TOLERANCE;
+      fail ||= !ok;
+      lines.push(`${ok ? 'same   ' : 'DIFFERS'} ${name}: ${r.differ} px differ (${pct(r.differ, r.total)})`);
     }
     if (fail) lines.push('', 'The page renders differently from its committed baselines. If the change is intended, run `npm run screens:update` and commit tests/screens/.');
     console.log(lines.join('\n'));
@@ -250,7 +257,7 @@ try {
       const png = await shoot(browser, server.origin, { viewport: DESKTOP, ...m });
       await writeFile(join(out, `${m.baseline}.actual.png`), png);
       const base = await readFile(join(MOCK_BASELINES, `${m.baseline}.png`));
-      const r = await differ.evaluate(diffInPage, [png.toString('base64'), base.toString('base64'), CHANNEL, REGIONS[m.view]]);
+      const r = await differ.evaluate(diffInPage, [png.toString('base64'), base.toString('base64'), MOCK_CHANNEL, REGIONS[m.view]]);
       if (r.error) throw new Error(`${m.baseline}: ${r.error}`);
       await writeFile(join(out, `${m.baseline}.diff.png`), Buffer.from(r.png, 'base64'));
       rows.push(`| ${m.baseline} | ${pct(r.differ, r.total)} | ${r.differ} |`);
@@ -264,7 +271,7 @@ try {
       '<!-- screens-mock -->',
       '### Homepage vs design reference (report, not a gate)',
       '',
-      `Built \`/\` at 1440×900 against \`docs/design/reference/screens/\`. The page differs from the mock on purpose in places; the regions say where. The gate is the site baselines in \`tests/screens/\` (${TOLERANCE}%).`,
+      `Built \`/\` at 1440×900 against \`docs/design/reference/screens/\`. The page differs from the mock on purpose in places; the regions say where. Read against ${MOCK_TOLERANCE}% (a pixel counts when a channel differs by more than ${MOCK_CHANNEL}). The gate is the site's own baselines in \`tests/screens/\`, exact to the pixel.`,
       '',
       '| Mock screen | Differs | Pixels |',
       '| --- | ---: | ---: |',

@@ -30,7 +30,7 @@ The same job compares the built homepage against these screenshots, per region (
 node scripts/screens.mjs mock .screens/mock
 ```
 
-The gate is the site's own baselines in `tests/screens/` (`/` at 1440×900 and 390×844, both themes, both views), captured in the same job. Any shot that differs from its baseline by more than 0.5% fails CI. When a change is intended, push, then regenerate them from that CI run and commit them, so the change shows in the PR diff:
+The gate is the site's own baselines in `tests/screens/` (`/` at 1440×900 and 390×844, both themes, both views), captured in the same job. Any shot that differs from its baseline by a single pixel fails CI: captures in CI are deterministic, so there's no tolerance. When a change is intended, push, then regenerate them from that CI run and commit them, so the change shows in the PR diff:
 
 ```sh
 npm run screens:update
