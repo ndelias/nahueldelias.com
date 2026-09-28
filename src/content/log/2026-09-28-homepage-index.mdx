@@ -1,0 +1,15 @@
+---
+date: 2026-09-28
+---
+
+The homepage exists now, without JavaScript: the four-corner frame and the numbered Index list, rendered on the server from the content collections. For anyone without JavaScript or with reduced motion, this is the whole page. The filmstrip comes next and builds on top of it.
+
+- **Eight fixture entries** stand in for the real ones, with the placeholder copy from the design, brackets and all. An unknown date stays visibly unknown ("[Years]") rather than becoming a made-up one, and only a fixture may do that. A `SHIP=1` build fails while any fixture remains and lists every one of them. The launch build will run with it.
+- **The two that matter come first.** Weight 1 sorts above everything else, then the `order` field decides.
+- **No dead links.** Work rows link to their pages. The other sections don't have pages yet, so their rows aren't links. About, Log and Contact stay out of the frame until they have somewhere to go.
+- **The preview works without a script.** CSS swaps it to whichever row is hovered or focused. On phones there's no preview, and the whole row is the tap target.
+- **The theme switch says what it does.** It reads "(Dark)" in light mode. CSS picks the label, so it's right at first paint, and without JavaScript it doesn't appear at all.
+
+The first version failed the LCP budget by 4ms: 1.203s against 1.199s. Taking things out one at a time showed that any third request before the largest paint cost about 150ms in the simulated run, whether it was the mono font or the preview image. Phones don't show the preview, so it no longer loads there. And the fonts are cut down to the characters the site sets: Basic Latin, typographic punctuation, and Spanish letters. They went from 48.9KB to 29.5KB, and LCP is back to 1.05s. A script rebuilds them from the originals.
+
+Against the design screens, the page differs by 3.4% in light and 5.4% in dark. Most of that is on purpose: every row is at full strength, where the design dims all but one to a contrast that fails AA. The rest is the grid margin, the real name, the preview's video shimmer, and the corners that the filmstrip will fill. For scale, the design's own page, rendered on this machine, differs from its screenshot by 1.3%: the screenshots were taken with subpixel text rendering.
