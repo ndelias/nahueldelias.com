@@ -218,18 +218,23 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
     new MutationObserver(syncTheme).observe(html, { attributes: true, attributeFilter: ['data-theme'] });
 
     // One <video>, moved into the focused frame once focus settles. Only for
-    // entries that have one; the rest stay on their poster.
+    // entries that have one; the rest stay on their poster. Muted and
+    // inline, never with sound. Leaving the frame pauses and detaches it and
+    // drops its source, so it stops downloading; a clip that fails to load
+    // detaches too, and the poster stays.
     let player: HTMLVideoElement | undefined;
     let timer = 0;
+    function detach() {
+      if (!player) return;
+      player.pause();
+      player.closest('[data-frame]')?.classList.remove('playing');
+      player.removeAttribute('src');
+      player.load();
+      player.remove();
+    }
     function play() {
       clearTimeout(timer);
-      if (player) {
-        player.pause();
-        player.closest('[data-frame]')?.classList.remove('playing');
-        player.removeAttribute('src');
-        player.load();
-        player.remove();
-      }
+      detach();
       const src = originals[active()].dataset.video;
       if (!src || html.dataset.homeView === 'index') return;
       timer = window.setTimeout(() => {
@@ -241,6 +246,7 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
           player.loop = true;
           player.setAttribute('aria-hidden', 'true');
           player.addEventListener('playing', () => player!.closest('[data-frame]')?.classList.add('playing'));
+          player.addEventListener('error', () => player!.hasAttribute('src') && detach());
           player.addEventListener('timeupdate', () => {
             const f = player!.closest<HTMLElement>('[data-frame]');
             f?.style.setProperty('--progress', String(player!.currentTime / (player!.duration || 1)));
