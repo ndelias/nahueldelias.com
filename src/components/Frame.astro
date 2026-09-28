@@ -1,7 +1,7 @@
 ---
 // The four-corner mono frame (§7.5), inset by --frame-inset, outside the grid.
-// Server-rendered corners only: the counter, Prev / Next and the
-// (Index)/(Strip) switch belong to the strip island (§9 step 4b).
+// Pages fill the other corners through slots: top-center, bottom-start and
+// bottom-center (the homepage puts the strip's controls there).
 //
 // Nav items and Contact render only once they have somewhere to go, the same
 // rule as sections: no dead links.
@@ -22,10 +22,12 @@ const NAV = [
 
 const here = Astro.url.pathname.replace(/\/$/, '') || '/';
 const current = (href: string) => (href === here ? 'page' : undefined);
+const bottom = Astro.slots.has('bottom-start') || Astro.slots.has('bottom-center');
 ---
 <div class="frame">
   <header class="corner top mono">
     <a class="name" href="/" aria-current={current('/')}>Nahuel D'Elias<span class="role muted"> · Product engineer</span></a>
+    {Astro.slots.has('top-center') && <div class="center"><slot name="top-center" /></div>}
     <div class="end">
       <nav aria-label="Primary">
         {NAV.map((item) => <a href={item.href} aria-current={current(item.href)}>{item.label}</a>)}
@@ -36,9 +38,11 @@ const current = (href: string) => (href === here ? 'page' : undefined);
 
   <slot />
 
-  {CONTACT && (
+  {(CONTACT || bottom) && (
     <footer class="corner bottom mono">
-      <a class="contact" href={CONTACT}>Contact <Icon name="arrow-up-right" /></a>
+      {Astro.slots.has('bottom-start') && <div class="start"><slot name="bottom-start" /></div>}
+      {Astro.slots.has('bottom-center') && <div class="center"><slot name="bottom-center" /></div>}
+      {CONTACT && <a class="contact" href={CONTACT}>Contact <Icon name="arrow-up-right" /></a>}
     </footer>
   )}
 </div>
@@ -72,6 +76,13 @@ const current = (href: string) => (href === here ? 'page' : undefined);
   .bottom {
     bottom: var(--frame-inset-block);
   }
+  .start {
+    grid-column: 1;
+  }
+  .center {
+    grid-column: 2;
+    justify-self: center;
+  }
   .end,
   .contact {
     grid-column: 3;
@@ -100,7 +111,7 @@ const current = (href: string) => (href === here ? 'page' : undefined);
     }
     .top {
       grid-template-columns: minmax(0, 1fr) auto;
-      grid-template-areas: 'name toggle' 'nav nav';
+      grid-template-areas: 'name toggle' 'nav view';
       align-items: start;
     }
     .name {
@@ -112,6 +123,10 @@ const current = (href: string) => (href === here ? 'page' : undefined);
     }
     .role {
       display: block;
+    }
+    .top .center {
+      grid-area: view;
+      justify-self: end;
     }
     .end {
       display: contents;
@@ -135,8 +150,13 @@ const current = (href: string) => (href === here ? 'page' : undefined);
     }
     .bottom {
       display: flex;
+      align-items: center;
       justify-content: flex-end;
+      gap: var(--space-24);
       padding-bottom: var(--frame-inset-block);
+    }
+    .bottom .start {
+      margin-right: auto;
     }
   }
 </style>

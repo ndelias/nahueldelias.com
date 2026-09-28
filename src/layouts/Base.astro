@@ -4,6 +4,7 @@ import '../styles/base.css';
 import mono400 from '../assets/fonts/dm-mono-latin-400-normal.woff2?url';
 import sans400 from '../assets/fonts/instrument-sans-latin-400-normal.woff2?url';
 import sans500 from '../assets/fonts/instrument-sans-latin-500-normal.woff2?url';
+import faviconSvg from '../../public/favicon.svg?raw';
 
 const FACES = { 'sans-400': sans400, 'sans-500': sans500, 'mono-400': mono400 };
 export type Face = keyof typeof FACES;
@@ -17,6 +18,11 @@ interface Props {
 }
 
 const { title, description, noindex = false, preload = ['sans-400', 'sans-500'] } = Astro.props;
+
+// Inline, as a data URI: a favicon request in flight before the largest
+// paint counts toward LCP under simulated 4G (~150ms on /). /favicon.svg
+// stays in public/ for anything that asks for it directly.
+const favicon = `data:image/svg+xml,${encodeURIComponent(faviconSvg.trim())}`;
 ---
 <!doctype html>
 <html lang="en">
@@ -30,7 +36,8 @@ const { title, description, noindex = false, preload = ['sans-400', 'sans-500'] 
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex" />}
     {preload.map((face) => <link rel="preload" href={FACES[face]} as="font" type="font/woff2" crossorigin />)}
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href={favicon} type="image/svg+xml" />
+    <slot name="head" />
   </head>
   <body>
     <slot />

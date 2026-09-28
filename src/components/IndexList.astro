@@ -5,7 +5,9 @@
 //
 // The preview needs no script: CSS swaps it to the hovered or focused row, and
 // shows the first entry otherwise. Linked rows are one big target (the title's
-// link is stretched over the row).
+// link is stretched over the row). With the filmstrip island running, the
+// active row is the strip's focused entry instead (data-active, set on rows
+// of a data-synced list), so the two views agree.
 import { Image } from 'astro:assets';
 import { SECTION_LABELS, entryHref, entryNumber, entryYears, homepageEntries } from '../lib/entries';
 import StatusBadge from './StatusBadge.astro';
@@ -23,12 +25,14 @@ const rows = homepageEntries().map((entry) => ({
 const previewRules =
   '.pv{visibility:hidden}.pv:first-child{visibility:visible}' +
   '.index:has(.row:is(:hover,:focus-within)) .pv{visibility:hidden}' +
-  rows.map((_, i) => `.index:has(.row:nth-child(${i + 1}):is(:hover,:focus-within)) .pv:nth-child(${i + 1}){visibility:visible}`).join('');
+  rows.map((_, i) => `.index:has(.row:nth-child(${i + 1}):is(:hover,:focus-within)) .pv:nth-child(${i + 1}){visibility:visible}`).join('') +
+  '.index:has([data-synced]) .pv{visibility:hidden}' +
+  rows.map((_, i) => `.index:has(.row:nth-child(${i + 1})[data-active]) .pv:nth-child(${i + 1}){visibility:visible}`).join('');
 ---
 <div class="index">
   <ol class="rows" aria-label="Projects">
     {rows.map(({ entry, number, href, years }) => (
-      <li class="row">
+      <li class="row" data-row>
         <span class="no mono">{number}</span>
         <h2 class="title">{href ? <a href={href}>{entry.data.title}</a> : entry.data.title}</h2>
         <p class="tagline">{entry.data.tagline}</p>
@@ -100,6 +104,18 @@ const previewRules =
     color: var(--ink);
   }
   .row:is(:hover, :focus-within) .no {
+    color: var(--accent);
+  }
+  .rows[data-synced] .row:first-child:not([data-active]) .title {
+    color: var(--muted);
+  }
+  .rows[data-synced] .row:first-child:not([data-active]) .no {
+    color: var(--muted);
+  }
+  .rows[data-synced] .row[data-active] .title {
+    color: var(--ink);
+  }
+  .rows[data-synced] .row[data-active] .no {
     color: var(--accent);
   }
   .title {

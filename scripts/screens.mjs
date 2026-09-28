@@ -58,6 +58,11 @@ const SITE = [
   { name: 'home-index-1440-dark', viewport: DESKTOP, colorScheme: 'dark', view: 'index' },
   { name: 'home-index-390-light', viewport: PHONE, colorScheme: 'light', view: 'index' },
   { name: 'home-index-390-dark', viewport: PHONE, colorScheme: 'dark', view: 'index' },
+  // W01 focused, at rest. There's no video yet, so the frame is already a still.
+  { name: 'home-strip-1440-light', viewport: DESKTOP, colorScheme: 'light', view: 'strip' },
+  { name: 'home-strip-1440-dark', viewport: DESKTOP, colorScheme: 'dark', view: 'strip' },
+  { name: 'home-strip-390-light', viewport: PHONE, colorScheme: 'light', view: 'strip' },
+  { name: 'home-strip-390-dark', viewport: PHONE, colorScheme: 'dark', view: 'strip' },
 ];
 
 // Regions of the 1440×900 mock, for the report's breakdown. A pixel counts
@@ -78,6 +83,9 @@ const REGIONS = {
   ],
 };
 const MOCK = [
+  { baseline: 'home-light-w01', colorScheme: 'light', view: 'strip' },
+  { baseline: 'home-dark-w01', colorScheme: 'dark', view: 'strip' },
+  { baseline: 'home-light-s02', colorScheme: 'light', view: 'strip', next: 3 },
   { baseline: 'home-light-index', colorScheme: 'light', view: 'index' },
   { baseline: 'home-dark-index', colorScheme: 'dark', view: 'index' },
 ];
