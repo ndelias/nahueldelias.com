@@ -78,6 +78,30 @@ const previewRules =
   .no {
     color: var(--muted);
   }
+  /* The active row: the first by default, else the hovered or focused one.
+     Its title is ink and its number accent; the rest stay muted. No opacity
+     anywhere, so every row keeps AA contrast. */
+  .title {
+    color: var(--muted);
+  }
+  .row:first-child .title {
+    color: var(--ink);
+  }
+  .row:first-child .no {
+    color: var(--accent);
+  }
+  .rows:has(.row:is(:hover, :focus-within)) .row:first-child:not(:hover, :focus-within) .title {
+    color: var(--muted);
+  }
+  .rows:has(.row:is(:hover, :focus-within)) .row:first-child:not(:hover, :focus-within) .no {
+    color: var(--muted);
+  }
+  .row:is(:hover, :focus-within) .title {
+    color: var(--ink);
+  }
+  .row:is(:hover, :focus-within) .no {
+    color: var(--accent);
+  }
   .title {
     margin: 0;
     font-size: var(--text-row-title);
@@ -100,9 +124,6 @@ const previewRules =
   .title a:focus-visible::after {
     outline: var(--focus-ring);
     outline-offset: -2px;
-  }
-  .row:has(a:is(:hover, :focus-visible)) .no {
-    color: var(--accent);
   }
   .row:has(a:hover) .title a {
     text-decoration: underline;

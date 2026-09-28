@@ -17,8 +17,9 @@ import Base from '../layouts/Base.astro';
 
 <style>
   main {
-    /* The list starts 150px down, as in the mock; the corners sit above it. */
-    padding: 150px var(--grid-margin) var(--space-96);
+    /* The homepage is a single frame: content aligns to the frame inset, not
+       the grid margin (§7.5). The list starts 150px down, as in the mock. */
+    padding: 150px var(--frame-inset) var(--space-96);
   }
   @media (max-width: 639.98px) {
     main {

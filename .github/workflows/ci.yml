@@ -74,6 +74,60 @@ jobs:
       # Dependency-free script, no npm ci needed.
       - run: node scripts/check-js-budget.mjs
 
+  # Checks against the built pages in Chrome (the runner's Google Chrome,
+  # the same one Lighthouse uses): every character is in its subset font.
+  dist-tests:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist
+      - run: npm run test:dist
+
+  # Design reference screenshots, captured and compared in this environment
+  # (ubuntu-latest, the runner's Google Chrome). A report, not a gate: the
+  # page differs from the mock on purpose in places. To refresh the committed
+  # baselines, see docs/design/reference/README.md.
+  screens:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist
+      - run: node scripts/screens.mjs capture .screens/captured
+      - name: Do the committed baselines reproduce?
+        run: |
+          for f in docs/design/reference/screens/*.png; do
+            if cmp -s "$f" ".screens/captured/$(basename "$f")"; then echo "same     $(basename "$f")"; else echo "DIFFERS  $(basename "$f")"; fi
+          done | tee -a "$GITHUB_STEP_SUMMARY"
+      - run: node scripts/screens.mjs compare .screens/compare
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: reference-screens
+          path: .screens/captured
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: screens-compare
+          path: .screens/compare
+
   lighthouse:
     needs: build
     runs-on: ubuntu-latest
@@ -97,7 +151,7 @@ jobs:
           include-hidden-files: true
 
   deploy:
-    needs: [js-budget, lighthouse]
+    needs: [js-budget, lighthouse, dist-tests]
     # Production from main, previews from same-repo PRs (fork PRs have no secrets).
     if: >-
       (github.event_name == 'push' && github.ref == 'refs/heads/main') ||

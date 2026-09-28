@@ -8,3 +8,4 @@ dist/
 .astro/
 .vercel/
 .lighthouseci/
+.screens/
