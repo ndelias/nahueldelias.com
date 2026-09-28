@@ -1,0 +1,13 @@
+---
+date: 2026-09-28
+---
+
+Five checks tightened before the filmstrip merges. Each one found something.
+
+- **Screenshots match exactly or fail.** CI renders the same page with the same Chrome and fonts every time, so the site's baselines now allow no tolerance, not one pixel. The first exact run failed, and rightly. One cause was a real bug, below. The other was a thumbnail whose edge row came out one level different between identical runs. It was centred by moving it down half the strip and back up half its own height, and it reached a whole pixel only after two fractional steps that the compositor may round either way. Every frame now sits on whole pixels at rest. Six runs of the same build (the first and five reruns) produced identical screenshots. The comparison with the design stays a report, read against 0.5%.
+- **Nothing ships that no page uses.** The build had shipped the source PNG behind every poster and every SVG cover twice. Reading any field of an imported image tells Astro the original is needed, and one line read `.format`. Astro also never deletes an SVG's original, so passing one through its image component leaves two copies. A check now fails the build on any file in the output that no page references, and names it. Serving the SVGs directly also broke the Index preview, which rendered at 1600px wide once the list's styles no longer reached it. The exact screenshots caught that on the first run.
+- **Finding no tests is a failure.** Node's test runner passes when it finds nothing to run, which is how a folder of tests went unrun for a whole PR. Both test commands now fail if no test ran.
+- **The video path is tested end to end.** No entry has a recording yet, so the tests make one: a clip recorded in the browser from a canvas, served by the test, never a file. It loads only when its frame is focused. There's only ever one `<video>`, muted, inline and silent, and it moves into the focused frame. It pauses and lets go of its source when focus leaves. With reduced motion there's none. A clip that fails to load used to stay attached, invisible. Now it detaches and the frame keeps its poster.
+- **A size budget for posters.** Each strip poster must stay under 40KB as AVIF at 1x and 80KB at 2x. The fixtures are about 2KB and 4KB. Real screen recordings' first frames will be what this budget is for.
+
+Also fixed: on phones the homepage scrolled by 16px. I'd assumed the controls row was 60px tall, and it's 76.

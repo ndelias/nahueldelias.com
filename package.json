@@ -6,15 +6,22 @@
     "node": ">=22.12.0"
   },
   "scripts": {
+    "predev": "node scripts/fixture-posters.mjs",
     "dev": "astro dev",
+    "prebuild": "node scripts/fixture-posters.mjs",
     "build": "astro build",
     "preview": "astro preview",
+    "pretypecheck": "node scripts/fixture-posters.mjs",
     "typecheck": "astro check",
-    "test": "node --test 'tests/*.test.mjs'",
-    "test:dist": "node --test 'tests/dist/*.test.mjs'",
+    "test": "node scripts/run-tests.mjs 'tests/*.test.mjs'",
+    "test:dist": "node scripts/run-tests.mjs 'tests/dist/*.test.mjs'",
     "check:js": "node scripts/check-js-budget.mjs",
+    "check:dist": "node scripts/check-dist.mjs",
+    "check:posters": "node scripts/check-posters.mjs",
     "check:lh": "lhci autorun",
-    "ci": "npm run typecheck && npm test && npm run build && npm run test:dist && npm run check:js && npm run check:lh"
+    "screens": "node scripts/screens.mjs check",
+    "screens:update": "node scripts/screens-update.mjs",
+    "ci": "npm run typecheck && npm test && npm run build && npm run test:dist && npm run check:js && npm run check:dist && npm run check:posters && npm run check:lh"
   },
   "dependencies": {
     "@astrojs/mdx": "8.0.2",

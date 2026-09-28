@@ -1,0 +1,621 @@
+---
+// The homepage filmstrip (§7.5): every entry in a looping strip, the focused
+// one large with its meta above it. It enhances the Index list, which stays
+// the whole page without JS and with reduced motion; CSS hides everything
+// marked data-strip-ui in both cases.
+//
+// The first frame is rendered here, W01 focused, so the strip paints before
+// the script runs and its poster (the LCP element) is in the HTML. Two
+// copies of the ring are enough to fill any screen at first paint; the
+// island adds more when it needs room to wrap off-screen (src/lib/strip.ts).
+import { SECTION_LABELS, entryHref, entryNumber, entryYears, homepageEntries } from '../lib/entries';
+import { POSTER, posterOf } from '../lib/posters';
+import { isReal, layout } from '../lib/strip';
+import Icon from './Icon.astro';
+import StatusBadge from './StatusBadge.astro';
+
+const COPIES = 2;
+
+const entries = await Promise.all(
+  homepageEntries().map(async (entry) => ({
+    entry,
+    number: entryNumber(entry),
+    section: SECTION_LABELS[entry.collection],
+    href: entryHref(entry),
+    years: entryYears(entry),
+    poster: await posterOf(entry),
+  })),
+);
+const n = entries.length;
+const weights = entries.map(({ entry }) => entry.data.weight);
+const slots = layout(weights, n * COPIES, 0);
+const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
+---
+<section class="filmstrip" data-strip-ui data-filmstrip aria-label="Projects">
+  <div class="metas">
+    {entries.map(({ entry, number, section, href, years }, i) => (
+      <div class:list={['meta', { on: i === 0 }]} data-meta inert={i !== 0}>
+        <p class="row1 mono">
+          <span class="no">({number})</span>
+          <span>{section} · {years}</span>
+          <StatusBadge entry={entry} />
+        </p>
+        <h2 class="title">{entry.data.title}</h2>
+        <div class="row3">
+          <p class="tagline">{entry.data.tagline}</p>
+          {href && <a class="open mono" href={href}>Open <Icon name="arrow-right" /></a>}
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <div class="viewport">
+    <ul class="strip" data-strip data-weights={weights.join(',')}>
+      {frames.map(({ j, offset, x, w, h, entry, number, section, href, poster }) => {
+        const Hit = href ? 'a' : 'button';
+        const on = j === 0;
+        // Only W01's poster loads with the page: it's the LCP element, and
+        // any other request before it delays it. The island gives the rest
+        // their sources once it has painted (data-src, data-srcset).
+        const defer = j % n !== 0;
+        const src = (name: string, value: string) => ({ [defer ? `data-${name}` : name]: value });
+        return (
+          <li
+            class:list={['frame', { on }]}
+            data-frame
+            data-video={j < n ? entry.data.video : undefined}
+            aria-hidden={isReal(offset, n) ? undefined : 'true'}
+            style={`--x:${x};--w:${w};--h:${h}`}
+          >
+            <Hit
+              class="hit"
+              {...(href ? { href } : { type: 'button' })}
+              aria-label={`${entry.data.title}, ${section}`}
+              aria-current={on ? 'true' : undefined}
+              tabindex={on ? 0 : -1}
+            >
+              <picture>
+                {poster.dark?.avif && <source type="image/avif" {...src('srcset', poster.dark.avif)} media="(prefers-color-scheme: dark)" data-dark />}
+                {poster.dark?.webp && <source type="image/webp" {...src('srcset', poster.dark.webp)} media="(prefers-color-scheme: dark)" data-dark />}
+                {poster.light.avif && <source type="image/avif" {...src('srcset', poster.light.avif)} />}
+                <img
+                  {...{
+                    ...src('src', poster.light.src),
+                    ...(poster.light.webp && src('srcset', poster.light.webp)),
+                    ...(on ? { fetchpriority: 'high' } : { loading: 'lazy', decoding: 'async' }),
+                  }}
+                  width={POSTER.width}
+                  height={POSTER.height}
+                  alt=""
+                />
+              </picture>
+              <span class="label mono" aria-hidden="true">{number}</span>
+              {entry.data.video && (
+                <span class="hud mono" aria-hidden="true">
+                  <span class="playing"><Icon name="dot" /> Playing · muted</span>
+                  <span class="track"><span class="progress"></span></span>
+                </span>
+              )}
+            </Hit>
+          </li>
+        );
+      })}
+    </ul>
+  </div>
+  <p class="visually-hidden" aria-live="polite" data-strip-status></p>
+</section>
+
+{/* A theme chosen with the toggle overrides the system, which the dark
+    posters' media queries can't see. Before first paint, point them at the
+    chosen theme; the island keeps them in step after. */}
+<script is:inline>(function(){var t=document.documentElement.dataset.theme;if(t)document.querySelectorAll("source[data-dark]").forEach(function(s){s.media=t==="dark"?"all":"not all"})})()</script>
+
+<script>
+  import { GAP, SIZE, isReal, layout, wrap } from '../lib/strip';
+
+  const motion = matchMedia('(prefers-reduced-motion: no-preference)');
+  const root = document.querySelector<HTMLElement>('[data-filmstrip]');
+  let started = false;
+  const start = () => {
+    if (root && motion.matches && !started) {
+      started = true;
+      init(root);
+    }
+  };
+  start();
+  // Reduced motion switched off after load: the strip shows (CSS), so run it.
+  motion.addEventListener('change', start);
+
+  function init(root: HTMLElement) {
+    const html = document.documentElement;
+    const strip = root.querySelector<HTMLElement>('[data-strip]')!;
+    const viewport = strip.parentElement!;
+    const weights = strip.dataset.weights!.split(',').map(Number);
+    const n = weights.length;
+    const frames = [...strip.children] as HTMLElement[];
+    const originals = frames.slice(0, n);
+    const metas = [...root.querySelectorAll<HTMLElement>('[data-meta]')];
+    const titles = metas.map((m) => m.querySelector('h2')!.textContent!.trim());
+    const status = root.querySelector('[data-strip-status]')!;
+    const rows = [...document.querySelectorAll<HTMLElement>('[data-row]')];
+    const count = document.querySelector('[data-strip-count]');
+    const toggle = document.querySelector<HTMLButtonElement>('[data-view-toggle]');
+    const hit = (f: HTMLElement) => f.firstElementChild as HTMLElement;
+    const frameOf = (t: EventTarget | null) => frames.indexOf((t as Element | null)?.closest?.('[data-frame]') as HTMLElement);
+
+    let p = 0; // the focused frame
+    let offsets: number[] = [];
+    const active = () => p % n;
+
+    function render(delta = 0, instant = false) {
+      const slots = layout(weights, frames.length, p);
+      const jumped: HTMLElement[] = [];
+      frames.forEach((f, j) => {
+        const { offset, x, w, h } = slots[j];
+        // Crossed the far side of the ring: jump there without a transition.
+        if (instant || offsets[j] - delta !== offset) {
+          f.classList.add('jump');
+          jumped.push(f);
+        }
+        offsets[j] = offset;
+        f.style.cssText = `--x:${x};--w:${w};--h:${h}`;
+        const on = j === p;
+        f.classList.toggle('on', on);
+        if (isReal(offset, n)) f.removeAttribute('aria-hidden');
+        else f.setAttribute('aria-hidden', 'true');
+        const b = hit(f);
+        b.tabIndex = on ? 0 : -1;
+        if (on) b.setAttribute('aria-current', 'true');
+        else b.removeAttribute('aria-current');
+      });
+      if (jumped.length) {
+        strip.offsetWidth; // apply the jumps before transitions come back
+        jumped.forEach((f) => f.classList.remove('jump'));
+      }
+      const a = active();
+      metas.forEach((m, i) => {
+        m.classList.toggle('on', i === a);
+        m.inert = i !== a;
+      });
+      rows.forEach((r, i) => r.toggleAttribute('data-active', i === a));
+      if (count) count.textContent = String(a + 1).padStart(2, '0');
+      play();
+    }
+
+    function move(delta: number) {
+      if (!delta) return;
+      p = (((p + delta) % frames.length) + frames.length) % frames.length;
+      render(delta);
+    }
+    const toFrame = (j: number) => j >= 0 && move(offsets[j]);
+    const toEntry = (i: number) => move(wrap(i - active(), n));
+    const focusIfInside = (had: boolean) => had && hit(frames[p]).focus({ preventScroll: true });
+
+    // Enough copies that the frame wrapping round is off-screen, even on the
+    // largest jump (a click on the farthest visible frame).
+    function fill() {
+      const u = Math.min(1, (innerWidth - 96) / SIZE.active[0]); // --u in CSS
+      const side = Math.ceil((innerWidth / 2 - (SIZE.active[0] / 2 + GAP) * u) / ((SIZE.other[0] + GAP) * u)) + 1;
+      const copies = Math.max(2, Math.ceil((2 * (2 * side + 1)) / n));
+      if (frames.length >= copies * n) return false;
+      while (frames.length < copies * n) {
+        const f = originals[frames.length % n].cloneNode(true) as HTMLElement;
+        f.removeAttribute('data-video');
+        const img = f.querySelector('img')!;
+        img.removeAttribute('fetchpriority');
+        img.loading = 'lazy';
+        strip.append(f);
+        frames.push(f);
+      }
+      return true;
+    }
+
+    // Posters' dark sources follow the resolved theme, toggle included.
+    const syncTheme = () => {
+      const t = html.dataset.theme;
+      strip.querySelectorAll<HTMLSourceElement>('source[data-dark]').forEach((s) => {
+        s.media = t ? (t === 'dark' ? 'all' : 'not all') : '(prefers-color-scheme: dark)';
+      });
+    };
+    new MutationObserver(syncTheme).observe(html, { attributes: true, attributeFilter: ['data-theme'] });
+
+    // One <video>, moved into the focused frame once focus settles. Only for
+    // entries that have one; the rest stay on their poster. Muted and
+    // inline, never with sound. Leaving the frame pauses and detaches it and
+    // drops its source, so it stops downloading; a clip that fails to load
+    // detaches too, and the poster stays.
+    let player: HTMLVideoElement | undefined;
+    let timer = 0;
+    function detach() {
+      if (!player) return;
+      player.pause();
+      player.closest('[data-frame]')?.classList.remove('playing');
+      player.removeAttribute('src');
+      player.load();
+      player.remove();
+    }
+    function play() {
+      clearTimeout(timer);
+      detach();
+      const src = originals[active()].dataset.video;
+      if (!src || html.dataset.homeView === 'index') return;
+      timer = window.setTimeout(() => {
+        const f = frames[p];
+        if (!player) {
+          player = document.createElement('video');
+          player.muted = true;
+          player.playsInline = true;
+          player.loop = true;
+          player.setAttribute('aria-hidden', 'true');
+          player.addEventListener('playing', () => player!.closest('[data-frame]')?.classList.add('playing'));
+          player.addEventListener('error', () => player!.hasAttribute('src') && detach());
+          player.addEventListener('timeupdate', () => {
+            const f = player!.closest<HTMLElement>('[data-frame]');
+            f?.style.setProperty('--progress', String(player!.currentTime / (player!.duration || 1)));
+          });
+        }
+        player.src = src;
+        hit(f).prepend(player);
+        player.play().catch(() => {});
+      }, 250);
+    }
+
+    // Hover (mouse only: a moving strip under a still pointer doesn't count),
+    // focus, click. The first click on a frame focuses it; on the focused
+    // frame it opens the entry's page, if it has one.
+    let pressedOn: boolean | undefined;
+    let swiped = false;
+    strip.addEventListener('pointermove', (e) => {
+      if (e.pointerType === 'mouse') toFrame(frameOf(e.target));
+    });
+    strip.addEventListener('pointerdown', (e) => {
+      pressedOn = frameOf(e.target) === p;
+    });
+    strip.addEventListener('focusin', (e) => {
+      const j = frameOf(e.target);
+      if (j !== p) toFrame(j);
+    });
+    strip.addEventListener('click', (e) => {
+      const j = frameOf(e.target);
+      const wasOn = pressedOn ?? j === p;
+      pressedOn = undefined;
+      if (swiped || !wasOn) {
+        e.preventDefault();
+        if (!swiped) {
+          const had = strip.contains(document.activeElement);
+          toFrame(j);
+          focusIfInside(had);
+        }
+      }
+      swiped = false;
+    });
+
+    // Touch: a horizontal swipe is one step. touch-action: pan-y in CSS
+    // leaves vertical scrolling to the browser.
+    let startX = 0;
+    let startY = 0;
+    viewport.addEventListener('pointerdown', (e) => {
+      startX = e.clientX;
+      startY = e.clientY;
+      swiped = false;
+    });
+    viewport.addEventListener('pointerup', (e) => {
+      if (e.pointerType === 'mouse') return;
+      const dx = e.clientX - startX;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(e.clientY - startY)) {
+        swiped = true;
+        move(dx < 0 ? 1 : -1);
+      }
+    });
+
+    // ←/→ while focus is in the strip or nowhere in particular, never while
+    // typing or on another control.
+    document.addEventListener('keydown', (e) => {
+      if ((e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey || e.isComposing) return;
+      const el = document.activeElement;
+      const inside = !!el && strip.contains(el);
+      if (!inside && el && el !== document.body && el !== html) return;
+      e.preventDefault();
+      move(e.key === 'ArrowRight' ? 1 : -1);
+      focusIfInside(inside);
+    });
+
+    const say = () => (status.textContent = `${titles[active()]}, ${active() + 1} of ${n}`);
+    document.querySelector('[data-strip-prev]')?.addEventListener('click', () => (move(-1), say()));
+    document.querySelector('[data-strip-next]')?.addEventListener('click', () => (move(1), say()));
+
+    // The Index list follows too, and moves the strip.
+    rows.forEach((r, i) => {
+      r.addEventListener('pointerenter', (e) => e.pointerType === 'mouse' && toEntry(i));
+      r.addEventListener('focusin', () => toEntry(i));
+    });
+    rows[0]?.parentElement?.setAttribute('data-synced', '');
+
+    toggle?.addEventListener('click', () => {
+      const view = toggle.dataset.view === 'strip' ? 'index' : 'strip';
+      toggle.dataset.view = view;
+      toggle.setAttribute('aria-label', view === 'strip' ? 'Show as an index' : 'Show as a filmstrip');
+      if (view === 'index') html.dataset.homeView = 'index';
+      else delete html.dataset.homeView;
+      play();
+    });
+
+    let raf = 0;
+    addEventListener('resize', () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => fill() && render(0, true));
+    });
+
+    // The other posters.
+    const posters = () =>
+      strip.querySelectorAll<HTMLElement>('[data-src], [data-srcset]').forEach((el) => {
+        for (const name of ['src', 'srcset']) {
+          const value = el.dataset[name];
+          if (value) {
+            el.setAttribute(name, value);
+            el.removeAttribute(`data-${name}`);
+          }
+        }
+      });
+
+    // Only once W01's poster has painted: a request in flight before the
+    // largest paint delays it, even a lazy image's.
+    let later = false;
+    const rest = () => {
+      if (!later) {
+        later = true;
+        requestAnimationFrame(posters);
+      }
+    };
+    const first = originals[0].querySelector('img');
+    if (PerformanceObserver.supportedEntryTypes?.includes('largest-contentful-paint')) {
+      new PerformanceObserver((list, observer) => {
+        if (list.getEntries().some((e) => (e as PerformanceEntry & { element?: Element }).element === first)) {
+          observer.disconnect();
+          rest();
+        }
+      }).observe({ type: 'largest-contentful-paint', buffered: true });
+    }
+    // Without the LCP API, or if something else was the largest paint.
+    const fallback = () => setTimeout(rest, 1000);
+    if (document.readyState === 'complete') fallback();
+    else addEventListener('load', fallback, { once: true });
+
+    fill();
+    syncTheme();
+    render(0, true);
+  }
+</script>
+
+<style>
+  .filmstrip {
+    /* Design px → CSS px. 1 at 640px and up; on phones the focused frame is
+       the viewport less 48px a side, and everything scales with it. The
+       island repeats this formula in fill(). */
+    --u: min(1px, (100vw - 96px) / 520);
+    /* The strip is centred in the screen, as in the mock at 900px tall, and
+       never climbs into the meta's room under the header. */
+    --strip-top: max(round(calc(50% - 162px), 1px), 250px);
+    position: absolute;
+    inset: 0;
+    /* The layer spans the frame; only its parts take the pointer. */
+    pointer-events: none;
+    line-height: normal;
+  }
+
+  .metas {
+    position: absolute;
+    left: calc(50% - 260px);
+    width: 520px;
+    bottom: calc(100% - var(--strip-top) + 20px);
+    display: grid;
+    align-items: end;
+  }
+  .meta {
+    grid-area: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    opacity: 0;
+    transform: translateY(12px);
+    transition:
+      opacity 0.35s ease,
+      transform 0.45s var(--ease);
+  }
+  .meta.on {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+  .row1 {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin: 0;
+    color: var(--muted);
+  }
+  .row1 .no {
+    color: var(--ink);
+  }
+  .title {
+    margin: 0;
+    font-size: var(--text-meta-title);
+    line-height: var(--leading-meta-title);
+    letter-spacing: var(--tracking-meta-title);
+    font-weight: var(--weight-medium);
+  }
+  .row3 {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-24);
+  }
+  .tagline {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.45;
+    max-width: 42ch;
+  }
+  .open {
+    flex-shrink: 0;
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .open:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .viewport {
+    position: absolute;
+    left: 0;
+    right: 0;
+    /* 6px of room above and below the frames for the focus ring. */
+    top: calc(var(--strip-top) - 6px);
+    height: round(calc(325 * var(--u) + 12px), 1px);
+    overflow: clip;
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 9%, #000 91%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0, #000 9%, #000 91%, transparent 100%);
+    pointer-events: auto;
+    touch-action: pan-y;
+  }
+  .strip {
+    position: relative;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  /* Every edge on a whole pixel at rest. A frame centred with top: 50% and
+     translateY(-50%) lands there in two fractional steps (168.5px, then
+     -52.5px) that the compositor can round differently from run to run,
+     so its edge row changed between identical screenshots. */
+  .frame {
+    position: absolute;
+    left: round(50%, 1px);
+    top: round(calc((100% - var(--h) * var(--u)) / 2), 1px);
+    width: round(calc(var(--w) * var(--u)), 1px);
+    height: round(calc(var(--h) * var(--u)), 1px);
+    transform: translateX(round(calc(var(--x) * var(--u)), 1px));
+    transition:
+      transform 0.65s var(--ease),
+      width 0.6s var(--ease),
+      height 0.6s var(--ease),
+      top 0.6s var(--ease);
+  }
+  .frame:global(.jump) {
+    transition: none;
+  }
+  .hit {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    background: var(--surface);
+    color: var(--ink);
+    font: inherit;
+    cursor: pointer;
+    filter: saturate(0.6);
+    transition: filter 0.4s ease;
+  }
+  .on .hit {
+    filter: none;
+  }
+  .hit img,
+  .hit :global(video) {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .hit :global(video) {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  .label {
+    position: absolute;
+    left: 8px;
+    top: 7px;
+    font-size: var(--text-mono-sm);
+    opacity: 0.7;
+  }
+  .hud {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: var(--text-mono-sm);
+    text-align: left;
+    opacity: 0;
+    transition: opacity 0.4s ease 0.3s;
+  }
+  .track {
+    height: 2px;
+    background: color-mix(in srgb, var(--ink) 20%, transparent);
+  }
+  .progress {
+    display: block;
+    height: 2px;
+    background: var(--ink);
+    transform-origin: left;
+    transform: scaleX(var(--progress, 0));
+  }
+  :global(.playing) .hud,
+  :global(.playing) .hit :global(video) {
+    opacity: 1;
+  }
+
+  /* Phone: the strip sits under the header, in what's left of the screen,
+     with the controls under it. Same structure as desktop (the meta
+     above a strip placed on a whole pixel), just in the flow. */
+  @media (max-width: 639.98px) {
+    .filmstrip {
+      position: relative;
+      inset: auto;
+      /* The screen less the header (104px) and the controls row (76px),
+         never too short for the meta and the strip. */
+      height: max(calc(100svh - 180px), 440px);
+      /* A little below the middle: the meta above is taller than the
+         strip below. */
+      --strip-top: max(round(calc(50% - 12px), 1px), 220px);
+    }
+    .metas {
+      left: var(--frame-inset);
+      right: var(--frame-inset);
+      width: auto;
+    }
+    .row3 {
+      flex-direction: column;
+      gap: 10px;
+    }
+  }
+</style>
+
+<style is:global>
+  /* The strip and its controls exist only with JS and without reduced
+     motion. Otherwise the page is the Index list. */
+  :root:not(.js) [data-strip-ui] {
+    display: none !important;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-strip-ui] {
+      display: none !important;
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    :root.js:not([data-home-view='index']) [data-home-index] {
+      display: none;
+    }
+  }
+  :root[data-home-view='index'] .filmstrip {
+    display: none;
+  }
+</style>

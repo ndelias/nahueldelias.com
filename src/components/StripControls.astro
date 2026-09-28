@@ -1,0 +1,70 @@
+---
+// The filmstrip's corner controls (§7.5), placed in the frame's slots: the
+// (Index)/(Strip) switch top-center, the counter bottom-left, Prev / Next
+// bottom-center. Wired by Filmstrip.astro's island. Like the strip, they
+// exist only with JS and without reduced motion (data-strip-ui).
+import { homepageEntries } from '../lib/entries';
+import Icon from './Icon.astro';
+
+interface Props {
+  part: 'toggle' | 'counter' | 'nav';
+}
+
+const { part } = Astro.props;
+const total = String(homepageEntries().length).padStart(2, '0');
+---
+{part === 'toggle' && (
+  <button class="control mono" type="button" data-strip-ui data-view-toggle data-view="strip" aria-label="Show as an index">
+    <span class="to-index">(Index)</span><span class="to-strip">(Strip)</span>
+  </button>
+)}
+{part === 'counter' && (
+  <span class="counter mono" data-strip-ui aria-hidden="true"><span data-strip-count>01</span> <span class="muted">/ {total}</span></span>
+)}
+{part === 'nav' && (
+  <span class="nav" data-strip-ui>
+    <button class="control mono" type="button" data-strip-prev aria-label="Previous project">(<Icon name="arrow-left" /> Prev)</button>
+    <button class="control mono" type="button" data-strip-next aria-label="Next project">(Next <Icon name="arrow-right" />)</button>
+  </span>
+)}
+
+<style>
+  .control {
+    min-height: 44px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+    cursor: pointer;
+  }
+  /* The header's corner labels align on their baselines; a 44px toggle
+     would push the row down. Phones get the 44px target. */
+  [data-view-toggle] {
+    min-height: 0;
+  }
+  @media (max-width: 639.98px) {
+    [data-view-toggle] {
+      min-height: 44px;
+    }
+  }
+  .control:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .nav {
+    display: flex;
+    gap: 20px;
+  }
+  .to-strip {
+    display: none;
+  }
+  [data-view='index'] .to-index {
+    display: none;
+  }
+  [data-view='index'] .to-strip {
+    display: inline;
+  }
+</style>

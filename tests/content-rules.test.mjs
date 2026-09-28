@@ -9,6 +9,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
+import { existsSync } from 'node:fs';
 import { cp, mkdtemp, mkdir, readFile, rm, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
@@ -48,7 +49,7 @@ const essay = (overrides = {}) => ({
 /** Build a copy of the site with exactly these entries: { 'work/a': {...} }. */
 async function build(files, env = {}) {
   const dir = await mkdtemp(join(tmpdir(), 'content-rules-'));
-  for (const name of COPY) await cp(join(ROOT, name), join(dir, name), { recursive: true });
+  for (const name of COPY) if (existsSync(join(ROOT, name))) await cp(join(ROOT, name), join(dir, name), { recursive: true });
   await symlink(join(ROOT, 'node_modules'), join(dir, 'node_modules'), 'dir');
   for (const section of SECTIONS) await rm(join(dir, 'src/content', section), { recursive: true, force: true });
 

@@ -84,6 +84,8 @@ interface Entry {
   }
   versions?: ImageRef[]    // v1 → vN frames for the provenance stack (§7)
   cover: ImageRef
+  poster?: { src: Image; dark?: Image }  // homepage strip still, 16:10; falls back to cover
+  video?: string           // muted screen recording, swapped in on focus (§7.5)
   order: number
 }
 ```

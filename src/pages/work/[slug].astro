@@ -2,7 +2,7 @@
 // /work/[slug]: §9 step 2 renders every field end to end, unstyled. The case
 // study template proper is §9 step 5.
 import type { GetStaticPaths } from 'astro';
-import { Image } from 'astro:assets';
+import EntryImage from '../../components/EntryImage.astro';
 import { render } from 'astro:content';
 import EntryHeader from '../../components/EntryHeader.astro';
 import Base from '../../layouts/Base.astro';
@@ -21,7 +21,7 @@ const links = Object.entries(data.links).filter(([, href]) => href);
     {data.fixture && <p><strong>Fixture.</strong> A test entry for the content pipeline, not real work.</p>}
     <EntryHeader entry={entry} />
 
-    <Image src={data.cover.src} alt={data.cover.alt} loading="eager" />
+    <EntryImage src={data.cover.src} alt={data.cover.alt} loading="eager" />
 
     <dl>
       <dt>Role</dt>

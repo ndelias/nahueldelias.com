@@ -1,0 +1,25 @@
+---
+// An entry's image (cover, preview). Raster sources go through Astro's
+// <Image>. An SVG is served as is: <Image> would only copy it, and Astro
+// never deletes an SVG's original, so both would ship.
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+  loading?: 'eager' | 'lazy';
+  // The parent's scope (data-astro-cid-*) and anything else, passed to the
+  // <img> as <Image> does, so the parent's img rules still apply.
+  [attribute: string]: unknown;
+}
+
+const { src, alt, loading = 'lazy', ...rest } = Astro.props;
+// Read from a clone: reading the import itself marks the original as used.
+const { format, width, height } = (src as ImageMetadata & { clone?: ImageMetadata }).clone ?? src;
+---
+{format === 'svg' ? (
+  <img {...{ ...rest, src: src.src, width, height, alt, loading, decoding: 'async' }} />
+) : (
+  <Image {...rest} src={src} alt={alt} loading={loading} />
+)}

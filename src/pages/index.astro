@@ -1,28 +1,51 @@
 ---
-// The homepage, server-rendered: the frame and the (Index) list. This is the
-// complete page without JS and with reduced motion. The filmstrip island
-// (§9 step 4b) builds on top of it.
+// The homepage (§7.5). Server-rendered: the frame, the filmstrip in its first
+// state (W01 focused) and the (Index) list. Without JS or with reduced
+// motion, the Index list is the whole page; otherwise the filmstrip island
+// shows the strip and its controls, and (Index) switches back to the list.
+import Filmstrip from '../components/Filmstrip.astro';
 import Frame from '../components/Frame.astro';
 import IndexList from '../components/IndexList.astro';
+import StripControls from '../components/StripControls.astro';
 import Base from '../layouts/Base.astro';
+import { homepageEntries } from '../lib/entries';
+import { posterOf, type Srcsets } from '../lib/posters';
+
+// The W01 poster is the LCP element: preload the AVIF the strip will pick,
+// only where the strip shows (JS on, no reduced motion) and for the theme
+// the system asks for.
+const lcp = await posterOf(homepageEntries()[0]);
+const STRIP = '(scripting: enabled) and (prefers-reduced-motion: no-preference)';
+const link = (p: Srcsets, media: string) =>
+  p.avif ? { imagesrcset: p.avif, type: 'image/avif', media } : { href: p.src, media };
+const preloads = lcp.dark
+  ? [link(lcp.light, `${STRIP} and (prefers-color-scheme: light)`), link(lcp.dark, `${STRIP} and (prefers-color-scheme: dark)`)]
+  : [link(lcp.light, STRIP)];
 ---
 <Base title="Nahuel D'Elias — Product engineer" description="[Identity line]" preload={['sans-400', 'sans-500', 'mono-400']}>
+  {preloads.map((attrs) => <link slot="head" rel="preload" as="image" fetchpriority="high" {...attrs} />)}
   <Frame>
+    <StripControls slot="top-center" part="toggle" />
     <main>
       <h1 class="visually-hidden">Nahuel D'Elias, product engineer: work</h1>
-      <IndexList />
+      <Filmstrip />
+      <div class="home-index" data-home-index>
+        <IndexList />
+      </div>
     </main>
+    <StripControls slot="bottom-start" part="counter" />
+    <StripControls slot="bottom-center" part="nav" />
   </Frame>
 </Base>
 
 <style>
-  main {
+  .home-index {
     /* The homepage is a single frame: content aligns to the frame inset, not
        the grid margin (§7.5). The list starts 150px down, as in the mock. */
     padding: 150px var(--frame-inset) var(--space-96);
   }
   @media (max-width: 639.98px) {
-    main {
+    .home-index {
       padding-top: var(--space-32);
     }
   }
