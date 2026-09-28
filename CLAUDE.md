@@ -25,7 +25,8 @@ read as evidence of craft, performance sense and taste.
   at most two `weight: 1` entries; `decision` required when weight ≤ 2;
   `hypothesis` required for section `data`; status badge rendered automatically.
 - Sections render only when they have entries. No empty states, no "coming soon".
-- Fonts: Instrument Sans 400/500 + DM Mono 400. Self-hosted, Latin subset,
+- Fonts: Instrument Sans 400/500 + DM Mono 400. Self-hosted, Latin subset
+  (narrowed by scripts/subset-fonts.py to keep / inside the LCP budget),
   font-display: swap, preloaded. No other families.
 - Symbols (← → ↗ ●) are not in the subset font files. Draw them as inline SVG
   (currentColor, sized to the text) rather than relying on a fallback font.
