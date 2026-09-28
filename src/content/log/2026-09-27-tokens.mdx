@@ -1,0 +1,14 @@
+---
+date: 2026-09-27
+---
+
+The design tokens are in: color for both themes, the type scale, a 4px spacing scale and a 12-column grid, all as CSS custom properties in one file.
+
+- **Each color is one `light-dark()` pair.** Light is the default, dark follows the system, and a saved choice overrides the system in either direction. A one-line script in the `<head>` applies the saved choice before first paint, so there's no flash of the wrong theme. It's the only JavaScript on `/`: 0.1KB.
+- **Contrast is a test, not a promise.** It reads the token file, computes every text/background pair in both themes, and fails below WCAG AA. The tightest pair is muted text on a surface in light, at 4.72:1. I lightened the muted color until the test went red, and it did.
+- **Fonts are self-hosted.** Instrument Sans 400/500 and DM Mono 400, Latin subset: 48.9KB for all three. Each page preloads only the faces it uses above the fold. The placeholder `/` never downloads the mono.
+- **The arrows and the dot are SVG.** The subset fonts don't include ← → ↗ ●, so a small icon component draws them in the text color at the text's size.
+
+Webfonts cost load time. LCP on `/` went from 0.75s with system fonts to 1.05s, against a 1.2s budget. Removing the preloads didn't change it: the text waits for the font file either way. That leaves 150ms for the real homepage, which is worth knowing before building it.
+
+`/_tokens` shows every token in both themes side by side, for checking against the design. It isn't indexed or linked from anywhere.
