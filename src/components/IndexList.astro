@@ -1,0 +1,218 @@
+---
+// The homepage (Index) list (§7.5): every entry as a numbered row, weight 1
+// first, with a preview on the right. Server-rendered and complete on its own:
+// it's the whole homepage for no-JS and reduced-motion visitors.
+//
+// The preview needs no script: CSS swaps it to the hovered or focused row, and
+// shows the first entry otherwise. Linked rows are one big target (the title's
+// link is stretched over the row).
+import { Image } from 'astro:assets';
+import { SECTION_LABELS, entryHref, entryNumber, entryYears, homepageEntries } from '../lib/entries';
+import StatusBadge from './StatusBadge.astro';
+
+const rows = homepageEntries().map((entry) => ({
+  entry,
+  number: entryNumber(entry),
+  href: entryHref(entry),
+  years: entryYears(entry),
+}));
+
+// Which preview shows: the first by default; while a row is hovered or
+// focused, that row's. One rule per row, all here (unscoped) so their
+// specificity is plain: each per-row rule outranks the hide-all rule.
+const previewRules =
+  '.pv{visibility:hidden}.pv:first-child{visibility:visible}' +
+  '.index:has(.row:is(:hover,:focus-within)) .pv{visibility:hidden}' +
+  rows.map((_, i) => `.index:has(.row:nth-child(${i + 1}):is(:hover,:focus-within)) .pv:nth-child(${i + 1}){visibility:visible}`).join('');
+---
+<div class="index">
+  <ol class="rows" aria-label="Projects">
+    {rows.map(({ entry, number, href, years }) => (
+      <li class="row">
+        <span class="no mono">{number}</span>
+        <h2 class="title">{href ? <a href={href}>{entry.data.title}</a> : entry.data.title}</h2>
+        <p class="tagline">{entry.data.tagline}</p>
+        <span class="section mono">{SECTION_LABELS[entry.collection]}</span>
+        <span class="badge"><StatusBadge entry={entry} /></span>
+        <span class="year mono">{years}</span>
+      </li>
+    ))}
+  </ol>
+
+  <div class="previews" aria-hidden="true">
+    {rows.map(({ entry, number }, i) => (
+      <figure class="pv">
+        {/* Lazy: phones hide the preview and shouldn't fetch it (§6 LCP). */}
+        <Image src={entry.data.cover.src} alt="" loading="lazy" />
+        <figcaption class="mono muted">({number}) Preview</figcaption>
+      </figure>
+    ))}
+  </div>
+</div>
+
+<style is:inline set:html={previewRules}></style>
+
+<style>
+  .index {
+    display: grid;
+    grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+    column-gap: var(--grid-gutter);
+    align-items: start;
+    line-height: normal;
+  }
+  .rows {
+    grid-column: span 8;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .row {
+    position: relative;
+    display: grid;
+    grid-template-columns: 56px minmax(0, 3fr) minmax(0, 5fr) 72px 104px 64px;
+    column-gap: var(--space-16);
+    align-items: baseline;
+    padding-block: 14px;
+    border-top: 1px solid var(--line);
+  }
+  .no {
+    color: var(--muted);
+  }
+  /* The active row: the first by default, else the hovered or focused one.
+     Its title is ink and its number accent; the rest stay muted. No opacity
+     anywhere, so every row keeps AA contrast. */
+  .title {
+    color: var(--muted);
+  }
+  .row:first-child .title {
+    color: var(--ink);
+  }
+  .row:first-child .no {
+    color: var(--accent);
+  }
+  .rows:has(.row:is(:hover, :focus-within)) .row:first-child:not(:hover, :focus-within) .title {
+    color: var(--muted);
+  }
+  .rows:has(.row:is(:hover, :focus-within)) .row:first-child:not(:hover, :focus-within) .no {
+    color: var(--muted);
+  }
+  .row:is(:hover, :focus-within) .title {
+    color: var(--ink);
+  }
+  .row:is(:hover, :focus-within) .no {
+    color: var(--accent);
+  }
+  .title {
+    margin: 0;
+    font-size: var(--text-row-title);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-row-title);
+  }
+  .title a {
+    color: inherit;
+    text-decoration: none;
+  }
+  /* The whole row is the link's target. Its focus ring goes around the row. */
+  .title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .title a:focus-visible {
+    outline: none;
+  }
+  .title a:focus-visible::after {
+    outline: var(--focus-ring);
+    outline-offset: -2px;
+  }
+  .row:has(a:hover) .title a {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+  .tagline {
+    margin: 0;
+    font-size: var(--text-small);
+    color: var(--muted);
+  }
+  .section {
+    font-size: var(--text-mono-sm);
+    color: var(--muted);
+  }
+  /* 10px on the badge itself, not its cell: the cell keeps the row's 16px
+     line, which the badge may overflow without making the row taller. */
+  .badge :global(.status-badge) {
+    font-size: var(--text-mono-sm);
+  }
+  .year {
+    text-align: right;
+    color: var(--muted);
+    /* Years keep their case ("[Years]") and set without tracking. */
+    text-transform: none;
+    letter-spacing: normal;
+  }
+
+  .previews {
+    grid-column: 10 / span 3;
+    display: grid;
+  }
+  .pv {
+    grid-area: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0;
+  }
+  .pv img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    background: var(--surface);
+  }
+
+  /* Below 1200px the six-column row no longer fits beside the preview: the
+     rows take the full width and the preview goes. */
+  @media (max-width: 1199.98px) {
+    .rows {
+      grid-column: 1 / -1;
+    }
+    .previews {
+      display: none;
+    }
+  }
+
+  /* Below 960px, and on phones: number, then title with the year, tagline,
+     section and badge. */
+  @media (max-width: 959.98px) {
+    .row {
+      grid-template-columns: 40px auto minmax(0, 1fr) auto;
+      grid-template-areas:
+        'no title title year'
+        '. tagline tagline tagline'
+        '. section badge badge';
+      column-gap: var(--space-12);
+      row-gap: var(--space-8);
+      padding-block: var(--space-16);
+    }
+    .no {
+      grid-area: no;
+    }
+    .title {
+      grid-area: title;
+    }
+    .year {
+      grid-area: year;
+    }
+    .tagline {
+      grid-area: tagline;
+    }
+    .section {
+      grid-area: section;
+    }
+    .badge {
+      grid-area: badge;
+    }
+  }
+</style>

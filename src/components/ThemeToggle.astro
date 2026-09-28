@@ -1,25 +1,27 @@
 ---
-// Manual theme switch. Pressed means dark. It overrides the system setting in
-// either direction and the choice is saved; Base.astro's inline script applies
-// it before first paint on the next visit. Hidden until its script runs, since
-// it can't work without one.
+// Manual theme switch. It shows the theme it switches to, "(Dark)" in light
+// mode, overrides the system in either direction, and saves the choice;
+// Base.astro's inline script applies it before first paint on the next visit.
+// CSS picks the visible label from the resolved theme, so it's right at first
+// paint and nothing shifts when the script runs. Without JS it can't work, so
+// it doesn't render.
 ---
-<button class="theme-toggle mono" type="button" aria-pressed="false" hidden data-theme-toggle>
-  Dark<span class="visually-hidden"> theme</span>
+<button class="theme-toggle mono" type="button" aria-label="Switch to dark theme" data-theme-toggle>
+  <span class="to-dark">(Dark)</span><span class="to-light">(Light)</span>
 </button>
 
 <script>
   const root = document.documentElement;
   const system = matchMedia('(prefers-color-scheme: dark)');
   const current = () => root.dataset.theme ?? (system.matches ? 'dark' : 'light');
+  const other = () => (current() === 'dark' ? 'light' : 'dark');
 
   const buttons = document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]');
-  const sync = () => buttons.forEach((b) => b.setAttribute('aria-pressed', String(current() === 'dark')));
+  const sync = () => buttons.forEach((b) => b.setAttribute('aria-label', `Switch to ${other()} theme`));
 
-  buttons.forEach((button) => {
-    button.hidden = false;
+  buttons.forEach((button) =>
     button.addEventListener('click', () => {
-      const next = current() === 'dark' ? 'light' : 'dark';
+      const next = other();
       root.dataset.theme = next;
       try {
         localStorage.setItem('theme', next);
@@ -27,8 +29,8 @@
         // Storage blocked: the switch still works for this page view.
       }
       sync();
-    });
-  });
+    }),
+  );
   // With no saved choice, follow the system when it changes.
   system.addEventListener('change', sync);
   sync();
@@ -36,17 +38,38 @@
 
 <style>
   .theme-toggle {
+    display: none;
+    min-width: 44px;
     min-height: 44px;
     padding: 0;
     border: 0;
     background: none;
-    color: var(--muted);
+    color: inherit;
+    font: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
     cursor: pointer;
   }
-  .theme-toggle[aria-pressed='true'] {
-    color: var(--ink);
+  :global(.js) .theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
   }
-  .theme-toggle[hidden] {
+  .to-light {
     display: none;
+  }
+  :global(:root[data-theme='dark']) .to-dark {
+    display: none;
+  }
+  :global(:root[data-theme='dark']) .to-light {
+    display: inline;
+  }
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .to-dark {
+      display: none;
+    }
+    :global(:root:not([data-theme='light'])) .to-light {
+      display: inline;
+    }
   }
 </style>

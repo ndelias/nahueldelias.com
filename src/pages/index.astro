@@ -1,24 +1,29 @@
 ---
-// §9 step 1 placeholder: exists so the pipeline and budgets have a real page
-// to measure. Replaced by the (Index) list and filmstrip in step 4.
+// The homepage, server-rendered: the frame and the (Index) list. This is the
+// complete page without JS and with reduced motion. The filmstrip island
+// (§9 step 4b) builds on top of it.
+import Frame from '../components/Frame.astro';
+import IndexList from '../components/IndexList.astro';
 import Base from '../layouts/Base.astro';
 ---
-<Base title="Nahuel D'Elias — Product engineer" description="[Identity line]" preload={['sans-400', 'sans-500']}>
-  <main class="container">
-    <h1>Nahuel D'Elias</h1>
-    <p class="muted">Product engineer</p>
-  </main>
+<Base title="Nahuel D'Elias — Product engineer" description="[Identity line]" preload={['sans-400', 'sans-500', 'mono-400']}>
+  <Frame>
+    <main>
+      <h1 class="visually-hidden">Nahuel D'Elias, product engineer: work</h1>
+      <IndexList />
+    </main>
+  </Frame>
 </Base>
 
 <style>
   main {
-    padding-block: var(--space-32);
+    /* The homepage is a single frame: content aligns to the frame inset, not
+       the grid margin (§7.5). The list starts 150px down, as in the mock. */
+    padding: 150px var(--frame-inset) var(--space-96);
   }
-  h1 {
-    margin: 0;
-    font-size: inherit;
-  }
-  p {
-    margin: 0;
+  @media (max-width: 639.98px) {
+    main {
+      padding-top: var(--space-32);
+    }
   }
 </style>

@@ -223,7 +223,7 @@ Nahuel's inspiration folder (15 references, mostly fashion and visual-studio sit
 
 **Type sizes.** Display, h2 and the strip's meta title are fluid between a 320px and a 1440px viewport: display 40px → 72px, h2 30px → 44px, meta title 28px → 40px. The other steps are fixed at every width: title 22, lead 18, body 16, small 14, mono 11–12.
 
-**Frame vs grid.** The four-corner frame and the content grid are separate systems. Frame labels are inset 32px from the viewport edge (`--frame-inset`). Content sits on the 12-column grid: 24px gutter, 48px margin at desktop; one column and a 16px margin on phones.
+**Frame vs grid.** The four-corner frame and the content grid are separate systems. Frame labels are inset 32px from the viewport edge (`--frame-inset`). Content sits on the 12-column grid: 24px gutter, 48px margin at desktop; one column and a 16px margin on phones. The homepage is a single frame, so its content aligns to the frame inset.
 
 **Theme toggle:** top-right nav after Log, mono text button (Dark)/(Light), same position on every page.
 

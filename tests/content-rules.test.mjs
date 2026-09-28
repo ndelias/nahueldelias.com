@@ -46,7 +46,7 @@ const essay = (overrides = {}) => ({
 });
 
 /** Build a copy of the site with exactly these entries: { 'work/a': {...} }. */
-async function build(files) {
+async function build(files, env = {}) {
   const dir = await mkdtemp(join(tmpdir(), 'content-rules-'));
   for (const name of COPY) await cp(join(ROOT, name), join(dir, name), { recursive: true });
   await symlink(join(ROOT, 'node_modules'), join(dir, 'node_modules'), 'dir');
@@ -60,7 +60,7 @@ async function build(files) {
 
   const child = spawn(process.execPath, [join(ROOT, 'node_modules/astro/bin/astro.mjs'), 'build'], {
     cwd: dir,
-    env: { ...process.env, ASTRO_TELEMETRY_DISABLED: '1', NO_COLOR: '1', FORCE_COLOR: '0' },
+    env: { ...process.env, SHIP: undefined, ...env, ASTRO_TELEMETRY_DISABLED: '1', NO_COLOR: '1', FORCE_COLOR: '0' },
   });
   let output = '';
   child.stdout.on('data', (chunk) => (output += chunk));
@@ -137,4 +137,40 @@ test('essay: a writing entry without thesis fails the build and names the file',
     'writing/essay': noThesis,
   });
   await assertFails(result, 'writing → essay', 'thesis: Required for essays (§3)', 'src/content/writing/essay.mdx');
+});
+
+test('ship: with SHIP=1, any fixture entry fails the build and names every fixture file', async () => {
+  const result = await build(
+    {
+      'work/real': entry({ weight: 1, decision: DECISION }),
+      'work/placeholder': entry({ weight: 1, decision: DECISION, fixture: true }),
+      'play/sketch': entry({ fixture: true }),
+    },
+    { SHIP: '1' },
+  );
+  await assertFails(
+    result,
+    "SHIP=1: 2 fixture entries can't ship:",
+    'src/content/work/placeholder.mdx',
+    'src/content/play/sketch.mdx',
+  );
+});
+
+test('ship: the same fixtures build without SHIP=1, and real content builds with it', async () => {
+  const withFixtures = await build({
+    'work/placeholder': entry({ weight: 1, decision: DECISION, fixture: true }),
+  });
+  const shipped = await build({ 'work/real': entry({ weight: 1, decision: DECISION }) }, { SHIP: '1' });
+  try {
+    assert.equal(withFixtures.code, 0, `Fixtures should build without SHIP=1:\n${withFixtures.output}`);
+    assert.equal(shipped.code, 0, `Real content should build with SHIP=1:\n${shipped.output}`);
+  } finally {
+    await withFixtures.cleanup();
+    await shipped.cleanup();
+  }
+});
+
+test('placeholder dates: a bracketed date fails the build unless the entry is a fixture', async () => {
+  const result = await build({ 'play/real': entry({ dates: { start: '[Year]' } }) });
+  await assertFails(result, 'play → real', 'dates.start: "[Year]" is a placeholder. Only fixture entries may use one', 'src/content/play/real.mdx');
 });
