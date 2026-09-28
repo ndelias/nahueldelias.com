@@ -4,7 +4,7 @@
 inspo/
 
 node_modules/
-dist/
+/dist/
 .astro/
 .vercel/
 .lighthouseci/
