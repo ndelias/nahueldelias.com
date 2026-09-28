@@ -8,7 +8,7 @@
 // link is stretched over the row). With the filmstrip island running, the
 // active row is the strip's focused entry instead (data-active, set on rows
 // of a data-synced list), so the two views agree.
-import { Image } from 'astro:assets';
+import EntryImage from './EntryImage.astro';
 import { SECTION_LABELS, entryHref, entryNumber, entryYears, homepageEntries } from '../lib/entries';
 import StatusBadge from './StatusBadge.astro';
 
@@ -47,7 +47,7 @@ const previewRules =
     {rows.map(({ entry, number }, i) => (
       <figure class="pv">
         {/* Lazy: phones hide the preview and shouldn't fetch it (§6 LCP). */}
-        <Image src={entry.data.cover.src} alt="" loading="lazy" />
+        <EntryImage src={entry.data.cover.src} alt="" />
         <figcaption class="mono muted">({number}) Preview</figcaption>
       </figure>
     ))}

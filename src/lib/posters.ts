@@ -18,8 +18,11 @@ export interface Srcsets {
 }
 
 async function srcsets(src: ImageMetadata): Promise<Srcsets> {
-  // A vector cover standing in for a poster needs no raster sizes.
-  if (src.format === 'svg') return { src: src.src };
+  // A vector cover standing in for a poster needs no raster sizes. The
+  // format is read from a clone: reading any field of the import itself
+  // tells Astro the original is used, and it ships it to dist/.
+  const { format } = (src as ImageMetadata & { clone?: ImageMetadata }).clone ?? src;
+  if (format === 'svg') return { src: src.src };
   const sized = (format: 'avif' | 'webp', density: number) =>
     getImage({ src, format, width: POSTER.width * density, height: POSTER.height * density, fit: 'cover' });
   const [avif1, avif2, webp1, webp2] = await Promise.all([sized('avif', 1), sized('avif', 2), sized('webp', 1), sized('webp', 2)]);
