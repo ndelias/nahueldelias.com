@@ -94,21 +94,21 @@ Three constraints the build should enforce at compile time:
 2. **`decision` is required for `weight <= 2`.** A study without a defensible decision is a screenshot gallery; the schema should refuse to render one.
 3. **`status` renders a visible label automatically.** A concept entry carries a concept badge everywhere it appears — index, card, page header, OG image. Not opt-in.
 
-Writing has its own model. An essay isn't weighted, carries no decision and doesn't sit in a section, so rules 1 and 2 don't apply to it:
+**Writing has its own schema (decided 2026-09-27).** Essays don't have a chose/rejected/cost decision, and they don't compete for weight, so they don't use `Entry`:
 
 ```ts
 interface Essay {
   slug: string
   title: string
-  dek: string              // one line, <100 chars, shown in the essay index
-  thesis: string           // REQUIRED — build fails without it
+  dek: string              // one line, <100 chars, shown in the index
+  thesis: string           // REQUIRED: the one claim the essay defends
   date: string
   updated?: string
-  status: 'draft' | 'published'   // drafts never render in production builds
+  status: 'draft' | 'published'   // drafts never render in production
 }
 ```
 
-`thesis` is required because every essay commits to a position a reader can disagree with.
+`thesis` keeps the spirit of principle 3: every essay commits to a position a reader can disagree with.
 
 Separately:
 
@@ -220,6 +220,12 @@ Nahuel's inspiration folder (15 references, mostly fashion and visual-studio sit
 **Palette.** Warm off-white and warm near-black as the neutral pair (no pure greys). The references are near-monochrome and get color from imagery; the site does the same. One accent: an electric blue (from the curved-carousel and phone references), reserved for links, focus rings, and the concept badge outline. Dark theme is its own warm near-black palette with a re-tuned blue that passes AA — not an inversion.
 
 **Type.** Instrument Sans for headlines and body; DM Mono for all metadata (corner labels, list numbers, years, counts, status badges). The mono carries the "index" feel; the grotesk carries reading. Both free (OFL) — self-host, subset to Latin, `font-display: swap`, preload. Weights: Instrument Sans 400/500 (+600 only if a real need appears), DM Mono 400 only. Target ≈60KB total. Use `font-variant-numeric: tabular-nums` on every number/year column. Chosen over Hanken + IBM Plex Mono (Plex reads generic dev-portfolio), Schibsted + Martian Mono (wide mono crowds corners on phones) and Geist + Geist Mono (the default Vercel look).
+
+**Type sizes.** Display, h2 and the strip's meta title are fluid between a 320px and a 1440px viewport: display 40px → 72px, h2 30px → 44px, meta title 28px → 40px. The other steps are fixed at every width: title 22, lead 18, body 16, small 14, mono 11–12.
+
+**Frame vs grid.** The four-corner frame and the content grid are separate systems. Frame labels are inset 32px from the viewport edge (`--frame-inset`). Content sits on the 12-column grid: 24px gutter, 48px margin at desktop; one column and a 16px margin on phones.
+
+**Theme toggle:** top-right nav after Log, mono text button (Dark)/(Light), same position on every page.
 
 **Homepage: filmstrip (revised 2026-09-24).** The first homepage (hero line, two stacked frames, numbered list) was rejected as not creative enough and not showing interaction design. The homepage is now one screen, straight to the projects, with no identity headline:
 
