@@ -1,0 +1,12 @@
+---
+date: 2026-09-28
+---
+
+The screenshot checks gate the build again, but against the site's own screenshots rather than the design's.
+
+- **Committed baselines of the homepage.** `/` at 1440 and 390 wide, light and dark, in both views, captured in CI where the comparison runs. If any shot moves more than 0.5% from its baseline, CI fails and nothing deploys.
+- **Changing them is explicit.** `npm run screens:update` fetches the screenshots from the CI run for the current commit into `tests/screens/`. Committing them puts the change in the PR diff, where it gets reviewed like code.
+- **The design comparison stays, as a report.** The page differs from the mock on purpose in places, so a single percentage says little. The report now splits it by region (header, list or meta, preview or strip, footer, the rest) and posts it on the PR as one comment that updates in place.
+- **A test that never ran.** The ignore rule for the build folder, `dist/`, also matched `tests/dist/`. The glyph test from the last entry was never committed, and CI's dist tests had been passing with zero tests. The rule is anchored to the root now.
+
+A limit worth knowing: 0.5% of a 1440×900 screen is about 6,500 pixels. Adding the strip's counter and Prev/Next to the Index view changed 0.07%, which the gate lets through. It stays visible only because regenerating the baselines is part of the change.

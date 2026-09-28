@@ -1,0 +1,19 @@
+---
+date: 2026-09-28
+---
+
+The homepage is the filmstrip now: every entry in a looping strip, W01 focused and large, its title and tagline rising in above it. The Index list from the last entry is still underneath. With JavaScript off or reduced motion on, the list is the whole page, and none of the strip's controls exist.
+
+- **The two that matter stay larger.** At rest, the weight-1 frames are 168px wide and the rest 124px, and the page lands on W01.
+- **One way to focus, several ways in.** Hovering, arrow keys, Prev/Next, a click or a swipe all move focus. The arrow keys work only on the page body or in the strip, never in a field or on another control. Only the focused frame is in the tab order. Enter or a click on it opens its page, but only if the entry has one. Otherwise there's no "Open" link and the frame is a button.
+- **A loop without a reset.** The design repeats the strip five times and, 700ms after motion stops, jumps back to the middle copy. Holding an arrow key outruns that in about half a second. Here the strip is a ring instead. Every frame's position is its distance from the focused one, wrapped around, and the frame that crosses the far side moves to the other end with its transition off, always off-screen. There's nothing to reset and no end to reach. It takes 16 to 24 frames instead of 40. The cost is placing each frame separately, a few lines of arithmetic per step.
+- **Phones get the same strip, scaled.** The focused frame is the screen width less 48px a side, and everything else scales with it. A swipe moves one step, and the page still scrolls vertically.
+- **The first frame paints before any script runs.** The server computes where every frame sits with W01 focused, so the strip is in place at first paint and nothing moves when the script arrives (layout shift is 0). The script is 2.5KB compressed.
+
+The W01 poster is the largest paint, and getting it under the budget took three steps.
+
+- **A flat colour doesn't count.** Chrome skips images under 0.05 bits per pixel, so a solid-tone placeholder never became the LCP. The fixture posters now carry a faint grain, enough to count like a real screenshot.
+- **Every early request counts.** Lighthouse's simulated LCP is set by the latest request to finish before the largest paint, poster or not. The first version measured 1.203s against 1.199s, the same 4ms miss as last time. Taking things out one at a time found the cause: the favicon, the one request that couldn't start until another had finished. Inlining it as a data URI brought LCP to 1.05s. The script is inlined too, which brought first paint back from 0.76s to 0.63s.
+- **The other posters wait.** They load once W01's has painted, which leaves twice the margin under the budget. The neighbouring frames fill in one paint after W01.
+
+In CI, LCP is 1.06s. Against the design, the strip view differs by 0.6% in light and 5.5% in dark. Almost all of the dark difference is the mock's stand-in for a playing video: a sheen across the focused frame and a "Playing" line. No entry has a recording yet, so neither renders.
