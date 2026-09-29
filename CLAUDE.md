@@ -19,8 +19,16 @@ read as evidence of craft, performance sense and taste.
 
 ## Hard rules
 - Budgets are CI gates and must fail the build (§6):
-  JS on `/` < 100KB compressed · LCP < 1.2s (mobile, throttled 4G) ·
-  CLS < 0.05 · Lighthouse ≥ 95 in all four categories · WCAG AA contrast.
+  JS on `/` < 100KB compressed (checked on every page) · LCP < 1.2s
+  (mobile, throttled 4G) · CLS < 0.05 · Lighthouse ≥ 95 in all four
+  categories (SEO skipped only on noindexed fixture pages) · WCAG AA
+  contrast.
+- HTML budget: every page's HTML < 13.6KB gzipped (scripts/check-html.mjs),
+  about 20% above the largest page when set (Distribution, 11.4KB,
+  2026-09-29). It includes the inline CSS, and first paint waits on it.
+  Raise it deliberately, here and in the script, never to make a page fit.
+- Image budgets (scripts/check-posters.mjs), AVIF: strip posters 40KB 1x /
+  80KB 2x; case study heroes 60KB up to 1344w / 120KB at 2688w.
 - Content schema rules must fail the build, not warn (§3):
   at most two `weight: 1` entries; `decision` required when weight ≤ 2;
   `hypothesis` required for section `data`; status badge rendered automatically.
