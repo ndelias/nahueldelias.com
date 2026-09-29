@@ -1,0 +1,188 @@
+---
+// A one-input, one-decision, several-outcomes flow diagram (Distribution's
+// Fig. 1, docs/design/SubStudy.dc.html), for use in MDX. The boxes are real
+// text in reading order (input, the decision, then the outcomes as a list);
+// the connector lines are decoration.
+//
+// Wide: the mock's layout at its exact positions (input at 0, the decision at
+// 360, outcomes from 720), the outcomes taking the rest of the column. (The
+// mock is 1032 wide, 30px more than the 9-column body at 1440; the outcomes
+// give that up rather than run into the page margin.) Where the column is
+// narrower than the layout needs, and on phones, it's a vertical flow.
+interface Props {
+  label: string;
+  intro?: string;
+  input: { label: string; text: string };
+  classifier: { label: string; text: string };
+  lanes: { name: string; what: string }[];
+}
+
+const { label, intro, input, classifier, lanes } = Astro.props;
+const H = 300;
+// The mock's lanes are 90px apart from 24; lines meet each lane at its middle.
+const tops = lanes.map((_, i) => 24 + i * 90);
+const mids = tops.map((t) => t + 36);
+const id = `diagram-${label.toLowerCase().replace(/\W+/g, '-')}`;
+---
+<figure class="diagram grid" aria-labelledby={`${id}-label`}>
+  <figcaption class="intro">
+    <span class="label mono muted" id={`${id}-label`}>{label}</span>
+    {intro && <span class="muted">{intro}</span>}
+  </figcaption>
+  <div class="canvas" style={`--h: ${H}px`}>
+   <div class="flow">
+    <svg class="lines" height={H} aria-hidden="true">
+      <path class="line" d={`M200 150 H360 M560 150 H640 M640 ${mids[0]} V${mids[mids.length - 1]} ${mids.map((m) => `M640 ${m} H720`).join(' ')}`} />
+      <path class="head" d={`M352 145 L360 150 L352 155 ${mids.map((m) => `M712 ${m - 5} L720 ${m} L712 ${m + 5}`).join(' ')}`} />
+    </svg>
+    <div class="box input" style="left: 0; top: 110px; width: 200px; height: 80px">
+      <span class="box-label mono muted">{input.label}</span>
+      <span class="box-text">{input.text}</span>
+    </div>
+    <div class="box classifier" style="left: 360px; top: 100px; width: 200px; height: 100px">
+      <span class="box-label mono">{classifier.label}</span>
+      <span class="box-text">{classifier.text}</span>
+    </div>
+    <ul class="lanes">
+      {lanes.map((lane, i) => (
+        <li class="lane" style={`top: ${tops[i]}px`}>
+          <span class="lane-name mono">{lane.name}</span>
+          <span class="lane-what muted">{lane.what}</span>
+        </li>
+      ))}
+    </ul>
+   </div>
+  </div>
+</figure>
+
+<style>
+  .diagram {
+    margin: 0;
+  }
+  .intro {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+  }
+  .label {
+    line-height: normal;
+  }
+  .canvas {
+    container-type: inline-size;
+  }
+  .flow {
+    position: relative;
+    height: var(--h);
+  }
+  .lines {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    overflow: visible;
+    fill: none;
+  }
+  .line {
+    stroke: var(--line);
+    stroke-width: 1;
+  }
+  .head {
+    stroke: var(--muted);
+    stroke-width: 1;
+  }
+  .box {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: var(--space-12);
+    font-size: var(--text-meta);
+    line-height: normal;
+  }
+  .input {
+    background: var(--surface);
+  }
+  .classifier {
+    border: 1px solid var(--accent);
+  }
+  .classifier .box-label {
+    color: var(--accent);
+  }
+  .box-label {
+    font-size: var(--text-mono-sm);
+  }
+  .lanes {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .lane {
+    position: absolute;
+    left: 720px;
+    right: 0;
+    height: 72px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: 10px var(--space-12);
+    border-top: 1px solid var(--ink);
+  }
+  .lane-name {
+    line-height: normal;
+  }
+  .lane-what {
+    font-size: var(--text-caption);
+    line-height: 1.4;
+  }
+  @media (min-width: 640px) {
+    .intro {
+      grid-column: span 3;
+    }
+    .canvas {
+      grid-column: 4 / span 9;
+    }
+  }
+  @media (max-width: 639.98px) {
+    .intro {
+      margin-bottom: var(--space-24);
+    }
+  }
+
+  /* Too narrow for the layout (outcomes under 240px wide), and phones: top
+     to bottom. Input, a line down, the decision, a line down, the outcomes. */
+  @container (max-width: 959.98px) {
+    .flow {
+      height: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    .lines {
+      display: none;
+    }
+    .box,
+    .lane {
+      position: relative;
+      left: auto !important;
+      top: auto !important;
+      width: auto !important;
+      height: auto !important;
+    }
+    .box {
+      gap: var(--space-12);
+      margin-bottom: var(--space-32);
+    }
+    .box::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 100%;
+      height: var(--space-32);
+      border-left: 1px solid var(--line);
+    }
+    .lane {
+      padding: 10px 0 var(--space-16);
+    }
+  }
+</style>

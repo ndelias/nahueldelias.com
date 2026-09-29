@@ -70,7 +70,7 @@ const rows = parts.map((part) => {
             <th scope="row" role="rowheader" class="name">
               <span class="name-inner">
                 {href ? <a class="title" href={href}>{part.data.title}</a> : <span class="title">{part.data.title}</span>}
-                <span class="line muted">{part.data.tagline}</span>
+                <span class="line muted">{part.data.summary ?? part.data.tagline}</span>
               </span>
             </th>
             {cells.map((c) => (

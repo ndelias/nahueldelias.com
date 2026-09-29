@@ -79,6 +79,10 @@ const SITE = [
   { name: 'hub-1440-dark', viewport: DESKTOP, colorScheme: 'dark', path: '/work/vers1ons/' },
   { name: 'hub-390-light', viewport: PHONE, colorScheme: 'light', path: '/work/vers1ons/' },
   { name: 'hub-390-dark', viewport: PHONE, colorScheme: 'dark', path: '/work/vers1ons/' },
+  { name: 'part-1440-light', viewport: DESKTOP, colorScheme: 'light', path: '/work/vers1ons/distribution/' },
+  { name: 'part-1440-dark', viewport: DESKTOP, colorScheme: 'dark', path: '/work/vers1ons/distribution/' },
+  { name: 'part-390-light', viewport: PHONE, colorScheme: 'light', path: '/work/vers1ons/distribution/' },
+  { name: 'part-390-dark', viewport: PHONE, colorScheme: 'dark', path: '/work/vers1ons/distribution/' },
 ];
 
 // Case study pages against their canvas mocks, block by block: [name, site
@@ -97,6 +101,24 @@ const CASE_MOCKS = [
       ['Parts', 'section.parts', 'section[aria-label="Parts of vers1ons"]'],
       ['Versions', 'section.versions', 'section[aria-label="Versions"]'],
       ['Next', 'a.next', 'a[style*="margin-top: 160px"]'],
+    ],
+  },
+  {
+    name: 'part',
+    path: '/work/vers1ons/distribution/',
+    mock: 'SubStudy',
+    blocks: [
+      ['Parts nav', 'nav.parts-nav', 'nav[aria-label="Parts of vers1ons"]'],
+      ['Header', '[data-entry-header] .inner', 'section:first-of-type > div:first-child'],
+      ['Shows', '[data-entry-header] .shows', 'section:first-of-type > div:last-child'],
+      ['Meta row', 'dl.facts', 'dl'],
+      ['Hero', '.hero figure', 'figure'],
+      ['Decision', 'section.decision', 'section[aria-label="Decision"]'],
+      ['Diagram', 'figure.diagram', 'section[aria-label="How a change is classified"]'],
+      ['Table', 'section.data-table', 'section[aria-label="Credit rules"]'],
+      ['Screens', 'section.gallery', 'section[aria-label="Screens"]'],
+      ['Body', '.body-section', 'article > section:first-child'],
+      ['Pager', 'nav.pager', 'nav[aria-label="More parts"]'],
     ],
   },
 ];
@@ -153,7 +175,13 @@ async function shoot(browser, origin, { viewport, colorScheme, view, next = 0, p
   if (path) {
     await loadAll(page);
     await settle(page);
-    const png = await page.screenshot({ fullPage: true });
+    // Full length by growing the viewport to the page, not fullPage: Chrome's
+    // beyond-viewport capture fires a scroll on inner scrollers (the part
+    // page's sibling strip jumps from where its script put it).
+    const height = await page.evaluate(() => document.documentElement.scrollHeight);
+    await page.setViewportSize({ width: viewport.width, height });
+    await settle(page);
+    const png = await page.screenshot();
     await ctx.close();
     return png;
   }

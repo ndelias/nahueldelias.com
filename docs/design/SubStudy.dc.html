@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sub-study</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500&amp;family=DM+Mono:wght@400&amp;display=swap">
+<style>
+body{margin:0;font-family:"Instrument Sans",system-ui,sans-serif}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+a:focus-visible,button:focus-visible{outline:2px solid #2447F0;outline-offset:3px}
+</style>
+</helmet>
+<div style="width: 1440px; height: 5160px; box-sizing: border-box; padding: 28px 48px 32px; display: flex; flex-direction: column; background: {{t.bg}}; color: {{t.ink}}; font-family: 'Instrument Sans', system-ui, sans-serif;">
+
+  <header style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: baseline; margin: 0 -16px; font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;">
+    <a href="#top">Nahuel D’Elias<span style="color: {{t.muted}};"> · Product engineer</span></a>
+    <a href="CaseStudy.dc.html" style="justify-self: center;">(← vers1ons)</a>
+    <nav aria-label="Primary" style="justify-self: end; display: flex; gap: 24px;">
+      <a href="#top">Work</a><a href="#top" style="color: {{t.muted}};">About</a><a href="#top" style="color: {{t.muted}};">Log</a><button style="font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;">({{toggleLabel}})</button>
+    </nav>
+  </header>
+
+  <nav aria-label="Parts of vers1ons" style="margin-top: 56px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); column-gap: 24px;">
+    <sc-for list="{{parts}}" as="p" hint-placeholder-count="5">
+      <a href="{{p.href}}" aria-current="{{p.current}}" style="display: flex; flex-direction: column; gap: 6px; padding-top: 10px; border-top: 2px solid {{p.rule}}; font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: {{p.color}};">
+        <span style="width: 100%; aspect-ratio: 16 / 10; background: {{p.tone}}; opacity: {{p.imgOpacity}}; margin-bottom: 4px;"></span>
+        <span>{{p.no}}</span><span>{{p.title}}</span>
+      </a>
+    </sc-for>
+  </nav>
+
+  <section style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px; padding-top: 112px;">
+    <div style="grid-column: 1 / span 9; display: flex; flex-direction: column; gap: 20px;">
+      <div style="display: flex; gap: 12px; align-items: center; font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: {{t.muted}};">
+        <span style="color: {{t.ink}};">(W01.5)</span><span>vers1ons · [Years]</span>
+        <span style="padding: 2px 6px; border: 1px solid {{t.ink}}; border-radius: 2px; color: {{t.ink}};">Shipped</span>
+      </div>
+      <h1 style="margin: 0; font-size: 72px; line-height: 1; font-weight: 500; letter-spacing: -0.03em;">Distribution</h1>
+      <p style="margin: 0; font-size: 22px; line-height: 1.4; max-width: 38ch; text-wrap: balance;">Getting remixes onto streaming services, and keeping them correct after release.</p>
+    </div>
+    <div style="grid-column: 10 / span 3; align-self: end; display: flex; flex-direction: column; gap: 8px;">
+      <span style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: {{t.muted}};">Shows</span>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <span style="padding: 3px 8px; border: 1px solid {{t.ink}}; border-radius: 2px; font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;">Backend</span>
+        <span style="padding: 3px 8px; border: 1px solid {{t.ink}}; border-radius: 2px; font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;">Product</span>
+        <span style="padding: 3px 8px; border: 1px solid {{t.line}}; border-radius: 2px; font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: {{t.muted}};">Frontend</span>
+      </div>
+    </div>
+  </section>
+
+  <dl style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px; margin: 48px 0 0; padding-top: 16px; border-top: 1px solid {{t.ink}};">
+    <div style="grid-column: span 3; display: flex; flex-direction: column; gap: 6px;"><dt style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: {{t.muted}};">Role</dt><dd style="margin: 0; font-size: 15px; line-height: 1.5;">[Your part: spec, integration, admin UI]</dd></div>
+    <div style="grid-column: span 3; display: flex; flex-direction: column; gap: 6px;"><dt style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: {{t.muted}};">Partners</dt><dd style="margin: 0; font-size: 15px; line-height: 1.5;">NueMeta · Soundcharts</dd></div>
+    <div style="grid-column: span 4; display: flex; flex-direction: column; gap: 6px;"><dt style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: {{t.muted}};">Stack</dt><dd style="margin: 0; font-size: 15px; line-height: 1.5;">[APIs · queue · database]</dd></div>
+    <div style="grid-column: span 2; display: flex; flex-direction: column; gap: 6px;"><dt style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: {{t.muted}};">Status</dt><dd style="margin: 0; font-size: 15px; line-height: 1.5;">In production</dd></div>
+  </dl>
+
+  <figure style="margin: 56px 0 0; display: flex; flex-direction: column; gap: 10px;">
+    <div style="position: relative; width: 100%; aspect-ratio: 16 / 9; background: {{t.tone1}}; display: flex; align-items: center; justify-content: center;">
+      <span style="position: absolute; left: 14px; top: 12px; font-family: 'DM Mono', ui-monospace, monospace; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.7;">W01.5 · Hero</span>
+      <button aria-label="Play recording" style="width: 72px; height: 72px; border-radius: 50%; border: 1px solid {{t.ink}}; display: flex; align-items: center; justify-content: center;">
+        <svg width="20" height="22" viewBox="0 0 18 20" aria-hidden="true"><path d="M2 1.5v17L16.5 10z" fill="none" stroke="{{t.ink}}" stroke-width="1.5" stroke-linejoin="round"></path></svg>
+      </button>
+    </div>
+    <figcaption style="display: flex; justify-content: space-between; font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: {{t.muted}};"><span>[Recording or still of the admin view] · muted</span><span>[0:30]</span></figcaption>
+  </figure>
+
+  <section aria-label="Decision" style="margin-top: 88px; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px; padding: 32px 0 40px; border-top: 2px solid {{accent}}; border-bottom: 1px solid {{t.line}};">
+    <div style="grid-column: span 3; display: flex; flex-direction: column; gap: 8px;">
+      <span style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: {{accent}};">The decision</span>
+      <span style="font-size: 14px; line-height: 1.5; color: {{t.muted}};">A distributor treats every change as a new submission.</span>
+    </div>
+    <div style="grid-column: span 3; display: flex; flex-direction: column; gap: 10px;">
+      <span style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: {{t.muted}};">Chose</span>
+      <span style="font-size: 22px; line-height: 1.3; font-weight: 500; letter-spacing: -0.01em;">Classify every post-release change first: metadata-only, full update, or new UPC.</span>
+    </div>
+    <div style="grid-column: span 3; display: flex; flex-direction: column; gap: 10px;">
+      <span style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: {{t.muted}};">Rejected</span>
+      <span style="font-size: 22px; line-height: 1.3; font-weight: 500; letter-spacing: -0.01em; color: {{t.muted}};">[The alternative, e.g. re-submitting the release on any change.]</span>
+    </div>
+    <div style="grid-column: span 3; display: flex; flex-direction: column; gap: 10px;">
+      <span style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: {{t.muted}};">Cost</span>
+      <span style="font-size: 22px; line-height: 1.3; font-weight: 500; letter-spacing: -0.01em;">[What the classifier cost to build and maintain.]</span>
+    </div>
+  </section>
+
+  <section aria-label="How a change is classified" style="margin-top: 96px; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px;">
+    <div style="grid-column: span 3; display: flex; flex-direction: column; gap: 8px;">
+      <span style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: {{t.muted}};">Fig. 1</span>
+      <span style="font-size: 14px; line-height: 1.5; color: {{t.muted}};">Every change to a live release goes through one classifier before anything reaches the distributor.</span>
+    </div>
+    <div style="grid-column: 4 / span 9; position: relative; height: 300px;">
+      <svg width="1032" height="300" viewBox="0 0 1032 300" aria-hidden="true" style="position: absolute; left: 0; top: 0;">
+        <path d="M200 150 H360 M560 150 H640 M640 60 V240 M640 60 H720 M640 150 H720 M640 240 H720" fill="none" stroke="{{t.line}}" stroke-width="1"></path>
+        <path d="M352 145 L360 150 L352 155 M712 55 L720 60 L712 65 M712 145 L720 150 L712 155 M712 235 L720 240 L712 245" fill="none" stroke="{{t.muted}}" stroke-width="1"></path>
+      </svg>
+      <div style="position: absolute; left: 0; top: 110px; width: 200px; height: 80px; box-sizing: border-box; padding: 12px; background: {{t.surface}}; display: flex; flex-direction: column; justify-content: space-between;">
+        <span style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: {{t.muted}};">Input</span>
+        <span style="font-size: 15px;">A change to a live release</span>
+      </div>
+      <div style="position: absolute; left: 360px; top: 100px; width: 200px; height: 100px; box-sizing: border-box; padding: 12px; border: 1px solid {{accent}}; display: flex; flex-direction: column; justify-content: space-between;">
+        <span style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: {{accent}};">Classifier</span>
+        <span style="font-size: 15px;">Which fields changed, and does the distributor treat them as identity?</span>
+      </div>
+      <sc-for list="{{lanes}}" as="l" hint-placeholder-count="3">
+        <div style="position: absolute; left: 720px; top: {{l.top}}px; width: 312px; height: 72px; box-sizing: border-box; padding: 10px 12px; border-top: 1px solid {{t.ink}}; display: flex; flex-direction: column; gap: 4px;">
+          <span style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;">{{l.name}}</span>
+          <span style="font-size: 13px; line-height: 1.4; color: {{t.muted}};">{{l.what}}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section aria-label="Credit rules" style="margin-top: 96px; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px;">
+    <div style="grid-column: span 3; display: flex; flex-direction: column; gap: 8px;">
+      <span style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: {{t.muted}};">Table 1</span>
+      <span style="font-size: 14px; line-height: 1.5; color: {{t.muted}};">Who gets tagged on a streaming profile depends on their role on the remix.</span>
+    </div>
+    <table style="grid-column: 4 / span 6; border-collapse: collapse; font-size: 15px;">
+      <thead>
+        <tr style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: {{t.muted}};">
+          <th style="text-align: left; font-weight: 400; padding: 0 0 10px;">Contributor role</th>
+          <th style="text-align: left; font-weight: 400; padding: 0 0 10px;">On streaming services</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-top: 1px solid {{t.line}};"><td style="padding: 12px 0;">Performer, Featured</td><td style="padding: 12px 0;">Tagged to their artist profile</td></tr>
+        <tr style="border-top: 1px solid {{t.line}};"><td style="padding: 12px 0;">Writer, Producer</td><td style="padding: 12px 0;">Metadata credit only</td></tr>
+        <tr style="border-top: 1px solid {{t.line}}; border-bottom: 1px solid {{t.line}};"><td style="padding: 12px 0;">Original artist</td><td style="padding: 12px 0;">Writer/Producer credit at release; can approve tagging later, which sends a metadata-only update</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section aria-label="Screens" style="margin-top: 112px; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px; row-gap: 32px;">
+    <div style="grid-column: span 3; display: flex; flex-direction: column; gap: 8px;">
+      <span style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: {{t.muted}};">Screens</span>
+      <span style="font-size: 14px; line-height: 1.5; color: {{t.muted}};">The flow as shipped. Click any screen to see it full size.</span>
+    </div>
+    <figure style="grid-column: 4 / span 9; margin: 0; display: flex; flex-direction: column; gap: 10px;">
+      <div style="width: 100%; aspect-ratio: 16 / 10; background: {{t.tone2}};"></div>
+      <figcaption style="display: flex; gap: 16px; font-size: 13px; line-height: 1.5; color: {{t.muted}};"><span style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: {{t.ink}};">01</span>[The main screen, and the one thing to notice in it.]</figcaption>
+    </figure>
+    <sc-for list="{{screens}}" as="sc" hint-placeholder-count="3">
+      <figure style="grid-column: {{sc.col}}; margin: 0; display: flex; flex-direction: column; gap: 10px;">
+        <div style="width: 100%; aspect-ratio: {{sc.ratio}}; background: {{sc.tone}};"></div>
+        <figcaption style="display: flex; gap: 12px; font-size: 13px; line-height: 1.5; color: {{t.muted}};"><span style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: {{t.ink}};">{{sc.no}}</span>{{sc.caption}}</figcaption>
+      </figure>
+    </sc-for>
+  </section>
+
+  <article style="display: flex; flex-direction: column; gap: 64px; padding-top: 112px;">
+    <sc-for list="{{sections}}" as="s" hint-placeholder-count="3">
+      <section style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px;">
+        <div style="grid-column: span 3; display: flex; gap: 12px; align-items: baseline; font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: {{t.muted}};">
+          <span>{{s.no}}</span><span style="color: {{t.ink}};">{{s.label}}</span>
+        </div>
+        <div style="grid-column: 4 / span 6; display: flex; flex-direction: column; gap: 16px;">
+          <h2 style="margin: 0; font-size: 30px; line-height: 1.15; font-weight: 500; letter-spacing: -0.015em; text-wrap: balance;">{{s.heading}}</h2>
+          <p style="margin: 0; font-size: 17px; line-height: 1.65;">{{s.p}}</p>
+        </div>
+      </section>
+    </sc-for>
+  </article>
+
+  <nav aria-label="More parts" style="margin-top: 140px; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px; border-top: 1px solid {{t.ink}}; border-bottom: 1px solid {{t.line}};">
+    <a href="#top" style="grid-column: span 6; display: flex; flex-direction: column; gap: 8px; padding: 24px 0;">
+      <span style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: {{t.muted}};">(← Prev) W01.4</span>
+      <span style="font-size: 30px; font-weight: 500; letter-spacing: -0.015em;">Wallet &amp; payouts</span>
+    </a>
+    <a href="#top" style="grid-column: 7 / span 6; display: flex; flex-direction: column; gap: 8px; padding: 24px 0 24px 24px; align-items: flex-end; border-left: 1px solid {{t.line}};">
+      <span style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: {{t.muted}};">W01.1 (Next →)</span>
+      <span style="font-size: 30px; font-weight: 500; letter-spacing: -0.015em;">Design system</span>
+    </a>
+  </nav>
+
+  <footer style="margin: auto -16px 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: baseline; font-family: 'DM Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;">
+    <span style="color: {{t.muted}};">Updated [date] · <a href="#top" style="color: {{accent}};">Log</a></span>
+    <a href="CaseStudy.dc.html" style="justify-self: center;">(← vers1ons)</a>
+    <a href="#top" style="justify-self: end;">Contact ↗</a>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"$preview":{"width":1440,"height":5160}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var dark = this.props.dark === true;
+    var t = dark
+      ? { bg: '#161513', surface: '#211F1C', ink: '#EDEBE6', muted: '#9A968E', line: '#34312C', tones: ['#34302A', '#2C3037', '#3A332B', '#2E332C', '#322F38'] }
+      : { bg: '#F2F1ED', surface: '#E8E6E0', ink: '#1B1A18', muted: '#67645E', line: '#D3D0C8', tones: ['#CFC9BE', '#C3C8CF', '#D6CCBF', '#C8CDC2', '#D0CDD6'] };
+    t.tone1 = t.tones[1]; t.tone2 = t.tones[3];
+    var accent = dark ? '#7D93FF' : '#2447F0';
+    var parts = [
+      { no: 'W01.1', title: 'Design system' }, { no: 'W01.2', title: 'Licensing' }, { no: 'W01.3', title: 'Purchasing' },
+      { no: 'W01.4', title: 'Wallet & payouts' }, { no: 'W01.5', title: 'Distribution', current: true }
+    ].map(function (p, i) {
+      return { tone: t.tones[i], imgOpacity: p.current ? 1 : 0.55, no: p.no, title: p.title, current: p.current ? 'page' : 'false', href: p.current ? 'SubStudy.dc.html' : '#top', color: p.current ? t.ink : t.muted, rule: p.current ? accent : t.line };
+    });
+    var screens = [
+      { col: '4 / span 3', ratio: '9 / 16', no: '02', caption: '[Phone view of the same step.]', tone: t.tones[0] },
+      { col: '7 / span 6', ratio: '16 / 10', no: '03', caption: '[A held change, as the admin sees it.]', tone: t.tones[4] },
+      { col: '4 / span 9', ratio: '21 / 9', no: '04', caption: '[A detail crop: one field, one state.]', tone: t.tones[2] }
+    ];
+    var lanes = [
+      { top: 24, name: 'Metadata-only update', what: 'Credits, tags and text. The release stays live and keeps its IDs.' },
+      { top: 114, name: 'Full update', what: 'Changes the distributor must re-review. [What triggers it.]' },
+      { top: 204, name: 'New UPC', what: 'Changes that make it a different release. [What triggers it.]' }
+    ];
+    var sections = [
+      { no: '01', label: 'Problem', heading: '[Why a simple edit could take a remix down.]', p: '[What happened when a credit or tag changed after release, before the classifier existed. Who noticed, and what it cost.]' },
+      { no: '02', label: 'Build', heading: '[How the classifier and the integration work.]', p: '[The field-by-field rules, how Soundcharts data is reconciled on ingest, and what the admin sees when a change is held. Link the code or a sample payload.]' },
+      { no: '03', label: 'Outcome', heading: '[What changed once it shipped.]', p: '[Evidence, and what you would do differently. Real numbers or none.]' }
+    ];
+    return { t: t, accent: accent, parts: parts, screens: screens, lanes: lanes, sections: sections, toggleLabel: dark ? 'Light' : 'Dark' };
+  }
+}
+</script>
+</body>
+</html>

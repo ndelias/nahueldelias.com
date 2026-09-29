@@ -6,6 +6,7 @@ import type { GetStaticPaths } from 'astro';
 import { render } from 'astro:content';
 import DecisionBlock from '../../components/DecisionBlock.astro';
 import EntryHeader from '../../components/EntryHeader.astro';
+import Facts from '../../components/Facts.astro';
 import Figure from '../../components/Figure.astro';
 import Frame from '../../components/Frame.astro';
 import Icon from '../../components/Icon.astro';
@@ -30,34 +31,33 @@ const dates = `${data.dates.start} – ${data.dates.end ?? 'present'}`;
 const hero = data.hero;
 const heroMeta = hero?.video ? ['Walkthrough', 'muted', hero.duration].filter(Boolean).join(' · ') : undefined;
 ---
-<Base title={`${data.title} — Nahuel D'Elias`} description={data.tagline} noindex={data.fixture}>
+{/* Faces preloaded: the tagline's (sans 400, the LCP element on phones
+    until a hero outgrows it) and the title's (sans 500). Mono loads on use. */}
+<Base title={`${data.title} — Nahuel D'Elias`} description={data.tagline} noindex={data.fixture} preload={['sans-400', 'sans-500']}>
   <Frame>
     <a slot="top-center" class="back" href="/">(<Icon name="arrow-left" /> Index)</a>
     <main class="case container">
       {data.fixture && <p class="fixture mono muted">Fixture · a test entry for the templates, not real work</p>}
       <EntryHeader entry={entry} />
 
-      <dl class="facts grid">
-        <div class="fact role"><dt class="mono muted">Role</dt><dd>{data.role}</dd></div>
-        <div class="fact dates"><dt class="mono muted">Dates</dt><dd class="nums">{dates}</dd></div>
-        {data.stack.length > 0 && <div class="fact stack"><dt class="mono muted">Stack</dt><dd>{data.stack.join(' · ')}</dd></div>}
-        {links.length > 0 && (
-          <div class="fact links">
-            <dt class="mono muted">Links</dt>
-            <dd class="mono">{links.map((l) => <a href={l.href}>{l.label} <Icon name="arrow-up-right" /></a>)}</dd>
-          </div>
-        )}
-      </dl>
+      <Facts
+        facts={[
+          { label: 'Role', value: data.role, span: 3 },
+          { label: 'Dates', value: dates, span: 3, nums: true },
+          { label: 'Stack', value: data.stack.join(' · '), span: 4 },
+          { label: 'Links', links, span: 2 },
+        ]}
+      />
 
       {hero && (
         <div class="hero">
-          <Figure layout="full" priority src={hero.src} alt={hero.alt} video={hero.video} play="click" caption={hero.caption} meta={heroMeta} label={entryNumber(entry)} />
+          <Figure layout="full" priority src={hero.src} dark={hero.dark} alt={hero.alt} video={hero.video} play="click" caption={hero.caption} meta={heroMeta} label={entryNumber(entry)} />
         </div>
       )}
 
       {data.decision && (
         <div class="decision">
-          <DecisionBlock decision={data.decision} intro={isHub ? 'The call that shaped the whole product. Each part below has its own.' : undefined} />
+          <DecisionBlock decision={data.decision} intro={data.decision.intro ?? (isHub ? 'The call that shaped the whole product. Each part below has its own.' : undefined)} />
         </div>
       )}
 
@@ -85,10 +85,11 @@ const heroMeta = hero?.video ? ['Walkthrough', 'muted', hero.duration].filter(Bo
   }
   /* Phone: 44px targets, as in the frame. */
   @media (max-width: 639.98px) {
+    /* A 44px line box, not inline-flex: flex would trim the space after
+       the arrow. */
     .back {
-      display: inline-flex;
-      align-items: center;
-      min-height: 44px;
+      display: inline-block;
+      line-height: 44px;
     }
   }
   .back:hover {
@@ -105,40 +106,6 @@ const heroMeta = hero?.video ? ['Walkthrough', 'muted', hero.duration].filter(Bo
     position: absolute;
     top: calc(var(--frame-inset-block) + 14px + 96px);
     margin: 0;
-  }
-  .facts {
-    margin: 48px 0 0;
-    padding-top: var(--space-16);
-    border-top: 1px solid var(--ink);
-    row-gap: var(--space-24);
-  }
-  .fact {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-  dt {
-    line-height: normal;
-  }
-  dd {
-    margin: 0;
-    font-size: var(--text-meta);
-    line-height: 1.5;
-  }
-  .nums {
-    font-variant-numeric: tabular-nums;
-  }
-  .links dd {
-    display: flex;
-    gap: var(--space-16);
-    font-size: var(--text-mono-lg);
-  }
-  .links a {
-    text-decoration: none;
-  }
-  .links a:hover {
-    text-decoration: underline;
-    text-underline-offset: 3px;
   }
   .hero {
     margin-top: 56px;
@@ -159,20 +126,7 @@ const heroMeta = hero?.video ? ['Walkthrough', 'muted', hero.duration].filter(Bo
   .versions {
     margin-top: 180px;
   }
-  @media (min-width: 640px) {
-    .role,
-    .dates {
-      grid-column: span 3;
-    }
-    .stack {
-      grid-column: span 4;
-    }
-    .links {
-      grid-column: span 2;
-    }
-  }
-  /* Phone (approved 2026-09-28): the meta row as a 2×2 grid, and the
-     section breaks scaled down. */
+  /* Phone (approved 2026-09-28): the section breaks scaled down. */
   @media (max-width: 639.98px) {
     .case {
       padding-top: var(--space-48);
@@ -181,11 +135,6 @@ const heroMeta = hero?.video ? ['Walkthrough', 'muted', hero.duration].filter(Bo
     .fixture {
       position: static;
       margin-bottom: var(--space-24);
-    }
-    .facts {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      column-gap: var(--space-16);
-      margin-top: var(--space-32);
     }
     .hero {
       margin-top: var(--space-32);

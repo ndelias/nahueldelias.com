@@ -1,4 +1,12 @@
-# Homepage reference
+# Design references
+
+## Case study mocks: dc.html
+
+`dc.html` renders a canvas mock (`docs/design/*.dc.html`) in any browser with no runtime: `dc.html?mock=CaseStudy` (the hub) or `dc.html?mock=SubStudy` (a part page), plus `&theme=dark`. It implements just enough of the canvas format for these mocks (`{{expr}}`, `<sc-for>`, `<helmet>`, the Component class) and uses the local fonts below instead of Google Fonts. Serve `docs/design/` over HTTP; `[data-ready]` on `<html>` means it has rendered.
+
+`node scripts/screens.mjs mock` compares the built hub and Distribution with these, block by block, in the PR report. The mocks are fixed-height canvases (4700 and 5160px), so their last block can run into the canvas's end; a block that differs mostly by background in dark mode is that, not the page.
+
+## Homepage reference
 
 Standalone version of `docs/design/Main.dc.html` that opens in any browser with no runtime (the `.dc.html` mocks need the Design canvas's `support.js`, which isn't a public file).
 

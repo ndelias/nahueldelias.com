@@ -1,47 +1,93 @@
 ---
-# FIXTURE from docs/design/CaseStudy.dc.html (parts matrix), until the real
-# entry replaces it. Part 5 of the vers1ons hub.
-# Real copy, the classifier diagram and the credit table come from
-# docs/design/SubStudy.dc.html (§9 step 5, part pages).
+# FIXTURE, the real copy from docs/design/SubStudy.dc.html with its brackets,
+# until the real entry replaces it. Part 5 of the vers1ons hub.
 fixture: true
 parent: vers1ons
 title: 'Distribution'
-tagline: 'Post-release changes classified as metadata-only, full update or new UPC.'
+tagline: 'Getting remixes onto streaming services, and keeping them correct after release.'
+summary: 'Post-release changes classified as metadata-only, full update or new UPC.'
 weight: 2
 status: shipped
-role: '[Role]'
+role: '[Your part: spec, integration, admin UI]'
 dates:
   start: '[Years]'
-stack: []
+stack: ['[APIs · queue · database]']
+partners: ['NueMeta', 'Soundcharts']
+standing: 'In production'
 disciplines:
   led: [backend, product]
   contributed: [frontend]
 decision:
-  chose: '[What was chosen.]'
-  rejected: '[What was rejected.]'
-  cost: '[What it cost.]'
+  intro: 'A distributor treats every change as a new submission.'
+  chose: 'Classify every post-release change first: metadata-only, full update, or new UPC.'
+  rejected: '[The alternative, e.g. re-submitting the release on any change.]'
+  cost: '[What the classifier cost to build and maintain.]'
 hero:
-  src: ../../../assets/fixtures/tones/tone2-desktop.svg
-  alt: '[Hero screen.]'
-# All desktop until the part template shows the gallery: nothing ships
-# that no page references (check-dist). Phone and detail frames come with it.
+  # Raster, generated with the posters (scripts/fixture-posters.mjs), so
+  # the hero's AVIF path and budget run on the page Lighthouse measures.
+  src: ../../../assets/fixtures/posters/distribution-hero.png
+  dark: ../../../assets/fixtures/posters/distribution-hero-dark.png
+  alt: '[Hero: what the admin view shows.]'
+  caption: '[Recording or still of the admin view]'
 gallery:
-  - src: ../../../assets/fixtures/tones/tone2-desktop.svg
-    alt: '[Screen: what the desktop view shows.]'
-    caption: '[The one thing to notice.]'
+  - src: ../../../assets/fixtures/tones/tone4-desktop.svg
+    alt: '[Screen: the main screen of the flow.]'
+    caption: '[The main screen, and the one thing to notice in it.]'
     frame: desktop
-  - src: ../../../assets/fixtures/tones/tone2-desktop.svg
-    alt: '[Screen: what the phone view shows.]'
-    caption: '[The one thing to notice.]'
+  - src: ../../../assets/fixtures/tones/tone1-phone.svg
+    alt: '[Screen: the same step on a phone.]'
+    caption: '[Phone view of the same step.]'
+    frame: phone
+  - src: ../../../assets/fixtures/tones/tone5-desktop.svg
+    alt: '[Screen: a held change in the admin.]'
+    caption: '[A held change, as the admin sees it.]'
     frame: desktop
-  - src: ../../../assets/fixtures/tones/tone2-desktop.svg
-    alt: '[Detail: what the close-up shows.]'
-    caption: '[The one thing to notice.]'
-    frame: desktop
+  - src: ../../../assets/fixtures/tones/tone3-detail.svg
+    alt: '[Detail: one field in one state.]'
+    caption: '[A detail crop: one field, one state.]'
+    frame: detail
 cover:
   src: ../../../assets/fixtures/tones/tone2-desktop.svg
   alt: '[Cover image.]'
 order: 5
 ---
+import BodySection from '../../../components/BodySection.astro';
+import ClassifierDiagram from '../../../components/ClassifierDiagram.astro';
+import DataTable from '../../../components/DataTable.astro';
 
-[Body.]
+<ClassifierDiagram
+  label="Fig. 1"
+  intro="Every change to a live release goes through one classifier before anything reaches the distributor."
+  input={{ label: 'Input', text: 'A change to a live release' }}
+  classifier={{ label: 'Classifier', text: 'Which fields changed, and does the distributor treat them as identity?' }}
+  lanes={[
+    { name: 'Metadata-only update', what: 'Credits, tags and text. The release stays live and keeps its IDs.' },
+    { name: 'Full update', what: 'Changes the distributor must re-review. [What triggers it.]' },
+    { name: 'New UPC', what: 'Changes that make it a different release. [What triggers it.]' },
+  ]}
+/>
+
+<DataTable
+  label="Table 1"
+  intro="Who gets tagged on a streaming profile depends on their role on the remix."
+  columns={['Contributor role', 'On streaming services']}
+  rows={[
+    ['Performer, Featured', 'Tagged to their artist profile'],
+    ['Writer, Producer', 'Metadata credit only'],
+    ['Original artist', 'Writer/Producer credit at release; can approve tagging later, which sends a metadata-only update'],
+  ]}
+/>
+
+<Screens />
+
+<BodySection label="Problem" heading="[Why a simple edit could take a remix down.]">
+  [What happened when a credit or tag changed after release, before the classifier existed. Who noticed, and what it cost.]
+</BodySection>
+
+<BodySection label="Build" heading="[How the classifier and the integration work.]">
+  [The field-by-field rules, how Soundcharts data is reconciled on ingest, and what the admin sees when a change is held. Link the code or a sample payload.]
+</BodySection>
+
+<BodySection label="Outcome" heading="[What changed once it shipped.]">
+  [Evidence, and what you would do differently. Real numbers or none.]
+</BodySection>

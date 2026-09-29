@@ -1,6 +1,7 @@
 ---
-# FIXTURE from docs/design/CaseStudy.dc.html (parts matrix), until the real
-# entry replaces it. Part 2 of the vers1ons hub.
+# FIXTURE from docs/design/CaseStudy.dc.html (parts matrix) and the part
+# template in docs/design/SubStudy.dc.html, until the real entry replaces it.
+# Part 2 of the vers1ons hub.
 fixture: true
 parent: vers1ons
 title: 'Licensing'
@@ -19,27 +20,39 @@ decision:
   rejected: '[What was rejected.]'
   cost: '[What it cost.]'
 hero:
-  src: ../../../assets/fixtures/tones/tone3-desktop.svg
-  alt: '[Hero screen.]'
-# All desktop until the part template shows the gallery: nothing ships
-# that no page references (check-dist). Phone and detail frames come with it.
+  src: ../../../assets/fixtures/tones/tone3-wide.svg
+  alt: '[Hero: what the screen shows.]'
+  caption: '[Recording or still of the main view]'
 gallery:
   - src: ../../../assets/fixtures/tones/tone3-desktop.svg
     alt: '[Screen: what the desktop view shows.]'
-    caption: '[The one thing to notice.]'
+    caption: '[The main screen, and the one thing to notice in it.]'
     frame: desktop
-  - src: ../../../assets/fixtures/tones/tone3-desktop.svg
+  - src: ../../../assets/fixtures/tones/tone3-phone.svg
     alt: '[Screen: what the phone view shows.]'
-    caption: '[The one thing to notice.]'
-    frame: desktop
-  - src: ../../../assets/fixtures/tones/tone3-desktop.svg
+    caption: '[Phone view of the same step.]'
+    frame: phone
+  - src: ../../../assets/fixtures/tones/tone3-detail.svg
     alt: '[Detail: what the close-up shows.]'
-    caption: '[The one thing to notice.]'
-    frame: desktop
+    caption: '[A detail crop: one field, one state.]'
+    frame: detail
 cover:
   src: ../../../assets/fixtures/tones/tone3-desktop.svg
   alt: '[Cover image.]'
 order: 2
 ---
+import BodySection from '../../../components/BodySection.astro';
 
-[Body.]
+<Screens />
+
+<BodySection label="Problem" heading="[What was broken or missing before this part.]">
+  [Who it hurt, and what it cost.]
+</BodySection>
+
+<BodySection label="Build" heading="[How it works.]">
+  [The rules, the integration, what the user sees. Link the code or a sample.]
+</BodySection>
+
+<BodySection label="Outcome" heading="[What changed once it shipped.]">
+  [Evidence, and what you would do differently. Real numbers or none.]
+</BodySection>
