@@ -1,0 +1,15 @@
+---
+date: 2026-09-28
+entrySlug: vers1ons
+---
+
+The case study template, first half: the vers1ons hub and the rules for its parts.
+
+- **One hub, five parts.** vers1ons is a single weight 1 entry, and its five parts are entries of their own, each with its own decision. The schema enforces the shape. A part lives in its hub's folder and is weight 2. It needs a decision, at least three screens and a statement of what it led and contributed. Its `parent` has to be a real weight 1 entry. Parts can't raise the two-entry cap and never reach the homepage. Each of these rules has a test with a bad entry that has to fail the build.
+- **The matrix is a table.** Product, design, frontend and backend for each part, led or contributed. Each dot is read out with its column ("Design: Led"), and the rows come from the parts that exist, so there's never an empty one.
+- **The versions stack is the second motion moment.** Tabs riffle v1 to v3. Without JS or under reduced motion it's a plain strip, oldest first.
+- **Recordings play only in view.** An inline recording loads when it scrolls into view, plays muted, pauses when it leaves, and has a Pause button. Under reduced motion it never loads. The walkthrough at the top plays only when asked.
+- **Chrome is pinned.** Screenshots and Lighthouse ran on whatever Chrome the CI image had that week. Now they run one exact build, and bumping it is a deliberate commit that regenerates the baselines.
+- **The mocks render standalone.** The design canvas files need a runtime that isn't public, so a small renderer now draws them in the browser. The hub is checked against its mock block by block: each block is within a pixel of the mock's size.
+
+A number worth watching: on simulated mobile 4G the hub's largest paint is 1.13s, against a 1.2s gate. It's the tagline, waiting for the two text faces. A real screenshot in the hero will sit close to that line.
