@@ -59,7 +59,8 @@ jobs:
           path: dist
           include-hidden-files: true
 
-  # Budgets on the built files: JS on /, what ships, poster sizes.
+  # Budgets on the built files: JS and HTML per page, what ships, poster
+  # and hero sizes.
   js-budget:
     needs: build
     runs-on: ubuntu-24.04
@@ -74,6 +75,8 @@ jobs:
           path: dist
       # Dependency-free scripts, no npm ci needed.
       - run: node scripts/check-js-budget.mjs
+      # HTML: every page under 13.6KB gzipped (its inline CSS included).
+      - run: node scripts/check-html.mjs
       # Nothing ships that no page references (source images, strays).
       - run: node scripts/check-dist.mjs
       # Strip posters: AVIF under 40KB at 1x, 80KB at 2x.
@@ -180,6 +183,10 @@ jobs:
           name: dist
           path: dist
       - run: npx lhci autorun
+      # Each page's LCP: the element, the four-part breakdown, the resource.
+      - name: LCP report
+        if: always()
+        run: node scripts/lcp-report.mjs
       - uses: actions/upload-artifact@v7
         if: always()
         with:

@@ -179,7 +179,8 @@ test('figure: an in-view recording loads only in view, plays muted, pauses out o
   assert.equal((await state(page, 'view')).src, null, 'loaded before it was in view');
   assert.equal(requests.length, 0);
   await page.locator('video[data-play="view"]').scrollIntoViewIfNeeded();
-  await page.waitForFunction(() => !document.querySelector('video[data-play="view"]').paused);
+  // .playing is set once play() resolves, a beat after paused turns false.
+  await page.waitForFunction(() => document.querySelector('video[data-play="view"]').closest('[data-figure]').classList.contains('playing'));
   const s = await state(page, 'view');
   assert.equal(s.muted, true);
   assert.equal(s.playing, true);
@@ -228,5 +229,217 @@ test('figure: the walkthrough plays only when asked, muted with controls, and ta
   assert.equal(s.controls, true);
   assert.equal(await page.locator('[data-figure-play]').count(), 0, 'the Play button stays');
   assert.equal(await page.evaluate(() => document.activeElement?.dataset.play), 'click');
+  await ctx.close();
+});
+
+// Part pages: /work/vers1ons/[part].
+const PART = '/work/vers1ons/distribution/';
+async function openPart(path = PART, options = {}) {
+  const ctx = await browser.newContext({ viewport: DESKTOP, ...options });
+  const page = await ctx.newPage();
+  await page.goto(server.origin + path, { waitUntil: 'load' });
+  return { ctx, page };
+}
+
+test('hub: every matrix row links to its part page, and each page exists', async () => {
+  const { ctx, page } = await open();
+  const hrefs = await page.$$eval('.matrix tbody .title', (as) => as.map((a) => a.getAttribute('href')));
+  assert.deepEqual(hrefs, ['design-system', 'licensing', 'purchasing', 'wallet-payouts', 'distribution'].map((p) => `/work/vers1ons/${p}/`));
+  for (const href of hrefs) assert.ok(existsSync(join(DIST, href, 'index.html')), `${href} isn't built`);
+  await ctx.close();
+});
+
+test('part: sibling nav lists every part, the current one marked', async () => {
+  const { ctx, page } = await openPart();
+  const items = await page.$$eval('[data-parts-nav] a', (as) => as.map((a) => ({ href: a.getAttribute('href'), current: a.getAttribute('aria-current'), opacity: getComputedStyle(a.querySelector('.thumb')).opacity })));
+  assert.equal(items.length, 5);
+  assert.deepEqual(items.map((i) => i.current), [null, null, null, null, 'page']);
+  assert.equal(items[4].opacity, '1');
+  assert.ok(items.slice(0, 4).every((i) => Number(i.opacity) < 1), 'other parts are not dimmed');
+  assert.equal(await page.getAttribute('.back', 'href'), '/work/vers1ons/', '(← vers1ons) in the frame');
+  await ctx.close();
+});
+
+test('part: prev and next cycle through the parts', async () => {
+  const pager = async (path) => {
+    const { ctx, page } = await openPart(path);
+    const r = { prev: await page.getAttribute('nav.pager .prev', 'href'), next: await page.getAttribute('nav.pager .next', 'href') };
+    await ctx.close();
+    return r;
+  };
+  assert.deepEqual(await pager(PART), { prev: '/work/vers1ons/wallet-payouts/', next: '/work/vers1ons/design-system/' });
+  assert.deepEqual(await pager('/work/vers1ons/design-system/'), { prev: '/work/vers1ons/distribution/', next: '/work/vers1ons/licensing/' });
+});
+
+test('part: the header names what it shows, led and contributed, for screen readers too', async () => {
+  const { ctx, page } = await openPart();
+  assert.deepEqual(await page.$$eval('.chips li', (li) => li.map((l) => l.textContent)), ['Backend, led', 'Product, led', 'Frontend, contributed']);
+  await ctx.close();
+});
+
+test('part: the screens sit where the body places them, after Table 1 and before the sections', async () => {
+  const { ctx, page } = await openPart();
+  const order = await page.$$eval('.body > :not(script, style)', (els) => els.map((e) => e.className.split(' ')[0]));
+  assert.deepEqual(order.slice(0, 4), ['diagram', 'data-table', 'gallery', 'body-section']);
+  assert.equal(await page.locator('[data-gallery]').count(), 1);
+  // A body without <Screens /> gets them after it.
+  const other = await openPart('/work/vers1ons/licensing/');
+  assert.equal(await other.page.locator('[data-gallery]').count(), 1);
+  await other.ctx.close();
+  await ctx.close();
+});
+
+test('gallery: a screen opens full size in a dialog; arrows step, Esc closes, focus returns', async () => {
+  const { ctx, page } = await openPart();
+  const opener = page.locator('[data-gallery-open]').nth(1);
+  await opener.click();
+  assert.equal(await page.evaluate(() => document.querySelector('[data-gallery-viewer]').open), true);
+  assert.equal(await page.evaluate(() => document.activeElement?.hasAttribute('data-viewer-close')), true, 'focus not on Close');
+  assert.equal(await page.textContent('[data-viewer-count]'), '02 / 04');
+  const src1 = await page.getAttribute('[data-viewer-img]', 'src');
+  assert.equal(src1, await opener.getAttribute('href'), 'shows the full-size file the link points to');
+  assert.equal(await page.getAttribute('[data-viewer-img]', 'alt'), '[Screen: the same step on a phone.]');
+  await page.keyboard.press('ArrowRight');
+  assert.equal(await page.textContent('[data-viewer-count]'), '03 / 04');
+  await page.keyboard.press('ArrowLeft');
+  await page.keyboard.press('ArrowLeft');
+  assert.equal(await page.textContent('[data-viewer-count]'), '01 / 04');
+  await page.keyboard.press('ArrowLeft'); // wraps
+  assert.equal(await page.textContent('[data-viewer-count]'), '04 / 04');
+  await page.keyboard.press('Escape');
+  assert.equal(await page.evaluate(() => document.querySelector('[data-gallery-viewer]').open), false);
+  assert.equal(await page.evaluate(() => document.activeElement?.getAttribute('data-gallery-open')), '1', 'focus did not return to the screen');
+  await ctx.close();
+});
+
+test('gallery: Close and a backdrop click close it; the keyboard opens it', async () => {
+  const { ctx, page } = await openPart();
+  await page.focus('[data-gallery-open="0"]');
+  await page.keyboard.press('Enter');
+  assert.equal(await page.evaluate(() => document.querySelector('[data-gallery-viewer]').open), true);
+  await page.keyboard.press('Enter'); // on Close
+  assert.equal(await page.evaluate(() => document.querySelector('[data-gallery-viewer]').open), false);
+  await page.click('[data-gallery-open="2"]');
+  await page.mouse.click(5, 5); // the backdrop
+  assert.equal(await page.evaluate(() => document.querySelector('[data-gallery-viewer]').open), false);
+  await ctx.close();
+});
+
+test('gallery, without JS: each screen is a link to its full-size file', async () => {
+  const { ctx, page } = await openPart(PART, { javaScriptEnabled: false });
+  const hrefs = await page.$$eval('[data-gallery-open]', (as) => as.map((a) => a.getAttribute('href')));
+  assert.equal(hrefs.length, 4);
+  for (const href of hrefs) assert.ok(existsSync(join(DIST, href)), `${href} doesn't exist`);
+  await ctx.close();
+});
+
+test('hero: in the first HTML, eager, high priority, sized, AVIF first', async () => {
+  for (const path of [HUB, PART]) {
+    const html = await readFile(join(DIST, path, 'index.html'), 'utf8');
+    const picture = html.match(/<picture[^>]*>[\s\S]*?<\/picture>/)?.[0] ?? '';
+    assert.match(picture, /<source type="image\/avif"/, `${path}: no AVIF`);
+    const img = picture.match(/<img[^>]*>/)[0];
+    assert.match(img, /loading="eager"/);
+    assert.match(img, /fetchpriority="high"/);
+    assert.match(img, /width="\d+"/);
+    assert.match(img, /height="\d+"/);
+  }
+});
+
+test('part, phone: the sibling nav is a row of text tabs, 44px, no thumbnails fetched', async () => {
+  const { ctx, page } = await openPart(PART, { viewport: { width: 390, height: 844 } });
+  const requested = [];
+  page.on('request', (r) => r.resourceType() === 'image' && requested.push(r.url()));
+  await page.waitForTimeout(300);
+  const tabs = await page.$$eval('[data-parts-nav] a', (as) =>
+    as.map((a) => ({ h: a.getBoundingClientRect().height, text: a.innerText.replace(/\s+/g, ' ').trim(), thumb: getComputedStyle(a.querySelector('.thumb')).display })),
+  );
+  assert.equal(tabs.length, 5);
+  assert.ok(tabs.every((t) => t.h >= 44), `a tab under 44px: ${tabs.map((t) => t.h)}`);
+  assert.ok(tabs.every((t) => t.thumb === 'none'), 'thumbnails show on a phone');
+  assert.equal(tabs[4].text, 'W01.5 DISTRIBUTION');
+  const covers = await page.$$eval('[data-parts-nav] img', (imgs) => imgs.map((i) => i.currentSrc || i.src));
+  assert.ok(!requested.some((u) => covers.includes(u)), 'a hidden thumbnail was fetched');
+  const current = await page.$eval('[data-parts-nav] [aria-current="page"]', (a) => {
+    const r = a.getBoundingClientRect();
+    return { left: r.left, right: r.right, underline: getComputedStyle(a).borderBottomColor, color: getComputedStyle(a).color };
+  });
+  assert.ok(current.left >= 0 && current.right <= 390, 'the current tab is scrolled out of view');
+  assert.notEqual(current.underline, 'rgba(0, 0, 0, 0)', 'no underline on the current tab');
+  // The page itself never scrolls sideways.
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), 390);
+  await ctx.close();
+});
+
+// Below-the-fold blocks are content-visibility: auto. Skipped rendering
+// mustn't break what reaches into them.
+test('deferred blocks: the gallery dialog opens from a screen that was never rendered', async () => {
+  const { ctx, page } = await openPart();
+  assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('[data-gallery]')).contentVisibility), 'auto');
+  // Opened without scrolling: the gallery is still skipped.
+  await page.evaluate(() => document.querySelector('[data-gallery-open="3"]').click());
+  const box = await page.evaluate(() => {
+    const d = document.querySelector('[data-gallery-viewer]');
+    const img = d.querySelector('img');
+    return { open: d.open, w: d.getBoundingClientRect().width, img: img.getBoundingClientRect().height, visible: img.checkVisibility({ contentVisibilityAuto: true }) };
+  });
+  assert.equal(box.open, true);
+  assert.ok(box.w > 0 && box.img > 0 && box.visible, `the dialog isn't rendered: ${JSON.stringify(box)}`);
+  await ctx.close();
+});
+
+for (const [path, id] of [
+  [HUB, 'parts-label'],
+  [HUB, 'versions-label'],
+  [PART, 'gallery-screens-label'],
+  [PART, 'table-table-1-label'],
+]) {
+  test(`deferred blocks: an in-page link to #${id} lands on it`, async () => {
+    const ctx = await browser.newContext({ viewport: DESKTOP });
+    const page = await ctx.newPage();
+    await page.goto(`${server.origin}${path}#${id}`, { waitUntil: 'load' });
+    await page.waitForTimeout(500);
+    const top = await page.evaluate((id) => document.getElementById(id).getBoundingClientRect().top, id);
+    assert.ok(Math.abs(top) <= 2, `#${id} is ${top}px from the top of the viewport`);
+    await ctx.close();
+  });
+}
+
+test('deferred blocks: find-in-page reaches text in a block that was never rendered', async () => {
+  // window.find is the scriptable form of Chrome's find bar; both search
+  // content-visibility: auto content and reveal the match.
+  for (const [path, text] of [[HUB, '[Where it is now.]'], [PART, 'Real numbers or none']]) {
+    const { ctx, page } = await openPart(path);
+    const r = await page.evaluate((text) => {
+      const found = window.find(text);
+      const node = getSelection().anchorNode?.parentElement;
+      return { found, visible: node?.checkVisibility({ contentVisibilityAuto: true }), top: node?.getBoundingClientRect().top };
+    }, text);
+    assert.equal(r.found, true, `"${text}" not found on ${path}`);
+    assert.equal(r.visible, true, `"${text}" found but not rendered`);
+    assert.ok(r.top >= 0 && r.top < DESKTOP.height, `"${text}" not scrolled into view (${r.top})`);
+    await ctx.close();
+  }
+});
+
+test("deferred blocks: a focus ring at a block's edge isn't clipped", async () => {
+  const { ctx, page } = await openPart(HUB);
+  await page.focus('a.next');
+  await page.waitForTimeout(100);
+  const { x, y } = await page.evaluate(() => {
+    const r = document.querySelector('a.next').getBoundingClientRect();
+    return { x: Math.round(r.left - 4), y: Math.round(r.top + r.height / 2) };
+  });
+  // The ring is 2px of accent, 3px out: 4px left of the link is inside it.
+  const png = await page.screenshot({ clip: { x, y, width: 1, height: 1 } });
+  const rgb = await page.evaluate(async (b64) => {
+    const img = new Image();
+    img.src = 'data:image/png;base64,' + b64;
+    await img.decode();
+    const c = new OffscreenCanvas(1, 1).getContext('2d');
+    c.drawImage(img, 0, 0);
+    return [...c.getImageData(0, 0, 1, 1).data.slice(0, 3)];
+  }, png.toString('base64'));
+  assert.deepEqual(rgb, [0x24, 0x47, 0xf0], `ring clipped: ${rgb}`);
   await ctx.close();
 });

@@ -1,0 +1,139 @@
+---
+// Sibling navigation on a part page: every part of the hub, in build order,
+// with its thumbnail. The current part at full strength with an accent rule,
+// the others dimmed. Phones: a row of text tabs (number and title) that
+// scrolls sideways on its own, the current part scrolled into view.
+import type { Entry } from '../lib/entries';
+import { entryHref, entryNumber, parentOf, partsOf } from '../lib/entries';
+import EntryImage from './EntryImage.astro';
+
+interface Props {
+  part: Entry;
+}
+
+const { part } = Astro.props;
+const hub = parentOf(part)!;
+const parts = partsOf(hub);
+---
+<nav class="parts-nav" aria-label={`Parts of ${hub.data.title}`} data-parts-nav>
+  <ol style={`--n: ${parts.length}`}>
+    {parts.map((p) => (
+      <li>
+        <a href={entryHref(p)} aria-current={p === part ? 'page' : undefined} class:list={['item mono', { current: p === part }]}>
+          {/* Low priority: on phones these sit above the header, in view, and
+              Chrome would raise them to High, where they'd compete with the
+              tagline and hero for the largest paint. */}
+          <span class="thumb"><EntryImage src={p.data.cover.src} alt="" fetchpriority="low" /></span>
+          <span class="no">{entryNumber(p)}</span>
+          <span class="title">{p.data.title}</span>
+        </a>
+      </li>
+    ))}
+  </ol>
+</nav>
+
+<script>
+  // Phones: bring the current part into view inside the strip, without
+  // scrolling the page.
+  for (const nav of document.querySelectorAll<HTMLElement>('[data-parts-nav]')) {
+    const list = nav.querySelector('ol')!;
+    const current = nav.querySelector<HTMLElement>('[aria-current="page"]')?.closest('li');
+    if (current && list.scrollWidth > list.clientWidth) {
+      list.scrollLeft = current.offsetLeft - (list.clientWidth - current.offsetWidth) / 2;
+    }
+  }
+</script>
+
+<style>
+  ol {
+    /* The offset parent for the scroll-into-view script. */
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+    column-gap: var(--grid-gutter);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-top: 10px;
+    border-top: 2px solid var(--line);
+    color: var(--muted);
+    text-decoration: none;
+    line-height: normal;
+  }
+  .item.current {
+    border-top-color: var(--accent);
+    color: var(--ink);
+  }
+  .thumb {
+    display: block;
+    margin-bottom: var(--space-4);
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    opacity: 0.55;
+  }
+  .current .thumb {
+    opacity: 1;
+  }
+  .thumb :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .item:hover .title {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .item:hover .thumb {
+    opacity: 0.8;
+  }
+  .current:hover .thumb {
+    opacity: 1;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .thumb {
+      transition: opacity 0.2s var(--ease);
+    }
+  }
+  /* Phone: one row of text tabs, number and title, scrolling sideways on
+     its own. The current tab in ink with an accent underline; 44px targets.
+     No thumbnails: hidden, and lazy, so they're never fetched. The row
+     bleeds to the screen edges; the first and last tabs keep the gutter. No
+     scroll snapping: a re-snap on resize would undo the script's centering. */
+  @media (max-width: 639.98px) {
+    ol {
+      grid-template-columns: none;
+      grid-auto-flow: column;
+      grid-auto-columns: max-content;
+      column-gap: var(--space-24);
+      margin-inline: calc(-1 * var(--grid-margin));
+      padding-inline: var(--grid-margin);
+      overflow-x: auto;
+      scrollbar-width: none;
+      border-bottom: 1px solid var(--line);
+    }
+    .item {
+      flex-direction: row;
+      align-items: center;
+      gap: var(--space-8);
+      min-height: 44px;
+      padding: 0;
+      border-top: 0;
+      /* Sits on the row's rule. */
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      white-space: nowrap;
+    }
+    .item.current {
+      border-bottom-color: var(--accent);
+    }
+    .thumb {
+      display: none;
+    }
+  }
+</style>

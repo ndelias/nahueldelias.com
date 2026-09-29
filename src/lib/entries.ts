@@ -87,6 +87,15 @@ export const partsOf = (hub: Entry): Entry[] =>
 export const parentOf = (part: Entry): Entry | undefined =>
   part.data.parent === undefined ? undefined : all.find((e) => e.collection === part.collection && e.id === part.data.parent);
 
+/** A part's previous and next sibling, cycling through the hub's parts. */
+export const siblingsOf = (part: Entry): { prev: Entry; next: Entry } | undefined => {
+  const hub = parentOf(part);
+  if (!hub) return undefined;
+  const parts = partsOf(hub);
+  const at = parts.indexOf(part);
+  return { prev: parts[(at - 1 + parts.length) % parts.length], next: parts[(at + 1) % parts.length] };
+};
+
 /** The part's own slug: "distribution" for vers1ons/distribution. */
 export const partSlug = (part: Entry): string => part.id.slice(part.id.indexOf('/') + 1);
 
@@ -121,12 +130,7 @@ export function entryYears(entry: Entry): string {
 // link until their template exists (§9 step 7), never as a dead one.
 const DETAIL_PAGES: Partial<Record<Section, string>> = { work: '/work/' };
 
-// Part pages (/work/vers1ons/[part]) are §9 step 5's second template. Until
-// it exists, the hub lists its parts without links.
-const PART_PAGES = false;
-
 export const entryHref = (entry: Entry): string | undefined => {
-  if (isPart(entry) && !PART_PAGES) return undefined;
   const base = DETAIL_PAGES[entry.collection];
   return base && `${base}${entry.id}/`;
 };

@@ -72,18 +72,22 @@ interface Entry {
   slug: string
   title: string
   tagline: string          // one line, <100 chars, shown in every index
+  summary?: string         // a part's line in its hub's parts matrix, <100 chars; defaults to tagline
   section: Section
   weight: Weight
   status: Status           // drives an automatic, non-optional label
   role: string
   dates: { start: string; end?: string }
   stack: string[]
+  partners?: string[]      // outside parties the work integrates with, e.g. 'NueMeta', 'Soundcharts'
+  standing?: string        // where it stands now, in the meta row: 'In production'. The status badge says shipped or not; this says how it runs
   links: {
     live?: string
     repo?: string
     demo?: string          // recorded walkthrough
   }
   decision?: {             // REQUIRED when weight <= 2 — build fails without it
+    intro?: string         // one line of context beside "The decision"
     chose: string
     rejected: string
     cost: string

@@ -21,7 +21,8 @@
     "check:lh": "lhci autorun",
     "screens": "node scripts/screens.mjs check",
     "screens:update": "node scripts/screens-update.mjs",
-    "ci": "npm run typecheck && npm test && npm run build && npm run test:dist && npm run check:js && npm run check:dist && npm run check:posters && npm run check:lh"
+    "ci": "npm run typecheck && npm test && npm run build && npm run test:dist && npm run check:js && npm run check:html && npm run check:dist && npm run check:posters && npm run check:lh",
+    "check:html": "node scripts/check-html.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "8.0.2",

@@ -29,11 +29,20 @@ const entrySchema = ({ image }: SchemaContext) => {
     .object({
       title: z.string().min(1),
       tagline: z.string().min(1).max(99, 'Taglines are one line: under 100 characters.'),
+      // A part's line in its hub's parts matrix, when it should differ from
+      // the tagline (the matrix says what the part does; the page's tagline
+      // says why it matters). Defaults to the tagline.
+      summary: z.string().min(1).max(99, 'Summaries are one line: under 100 characters.').optional(),
       weight: z.union([z.literal(1), z.literal(2), z.literal(3)]),
       status: z.enum(STATUSES),
       role: z.string().min(1),
       dates: z.object({ start: month, end: month.optional() }),
       stack: z.array(z.string().min(1)),
+      // Outside parties the work integrates with: "NueMeta", "Soundcharts".
+      partners: z.array(z.string().min(1)).optional(),
+      // Where it stands now, in the meta row: "In production". The status
+      // badge says shipped or not; this says how it's running.
+      standing: z.string().min(1).optional(),
       links: z
         .object({
           live: z.url().optional(),
@@ -43,6 +52,8 @@ const entrySchema = ({ image }: SchemaContext) => {
         .default({}),
       decision: z
         .object({
+          // One line of context beside "The decision".
+          intro: z.string().min(1).optional(),
           chose: z.string().min(1),
           rejected: z.string().min(1),
           cost: z.string().min(1),
@@ -70,6 +81,8 @@ const entrySchema = ({ image }: SchemaContext) => {
       // image is its poster and the recording plays on request, muted.
       hero: imageRef
         .extend({
+          // Dark-theme variant of the still, like the strip poster's.
+          dark: image().optional(),
           video: z.string().min(1).optional(),
           // "0:48", shown beside "Walkthrough · muted".
           duration: z.string().min(1).optional(),

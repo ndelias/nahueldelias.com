@@ -1,0 +1,114 @@
+---
+// A small reference table with a numbered label and one line of context
+// (Distribution's Table 1, docs/design/SubStudy.dc.html), for use in MDX.
+// Phones: each row stacks, the first cell above the rest.
+interface Props {
+  label: string;
+  intro?: string;
+  columns: string[];
+  rows: string[][];
+}
+
+const { label, intro, columns, rows } = Astro.props;
+const id = `table-${label.toLowerCase().replace(/\W+/g, '-')}`;
+---
+<section class="data-table grid" aria-labelledby={`${id}-label`}>
+  <div class="intro">
+    <h2 class="label mono muted" id={`${id}-label`}>{label}</h2>
+    {intro && <p class="muted">{intro}</p>}
+  </div>
+  <table role="table" aria-labelledby={`${id}-label`}>
+    <thead role="rowgroup" class="mono muted">
+      <tr role="row">{columns.map((c) => <th scope="col" role="columnheader">{c}</th>)}</tr>
+    </thead>
+    <tbody role="rowgroup">
+      {rows.map((row) => (
+        <tr role="row">
+          {row.map((cell, i) => (i === 0 ? <th scope="row" role="rowheader">{cell}</th> : <td role="cell">{cell}</td>))}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</section>
+
+<style>
+  .intro {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+  }
+  .label {
+    margin: 0;
+    font-weight: var(--weight-regular);
+    line-height: normal;
+  }
+  .intro p {
+    margin: 0;
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+  }
+  table {
+    border-collapse: collapse;
+    font-size: var(--text-meta);
+    line-height: normal;
+  }
+  th,
+  td {
+    text-align: left;
+    font-weight: var(--weight-regular);
+  }
+  thead th {
+    padding: 0 0 10px;
+    font-size: var(--text-mono-sm);
+  }
+  tbody th,
+  tbody td {
+    padding: 12px 0;
+  }
+  tbody tr {
+    border-top: 1px solid var(--line);
+  }
+  tbody tr:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+  @media (min-width: 640px) {
+    .intro {
+      grid-column: span 3;
+    }
+    table {
+      grid-column: 4 / span 6;
+    }
+  }
+  /* Phone: stacked rows. The header row is kept for screen readers. */
+  @media (max-width: 639.98px) {
+    .intro {
+      margin-bottom: var(--space-24);
+    }
+    table,
+    tbody,
+    tr {
+      display: block;
+    }
+    thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+    }
+    tbody th,
+    tbody td {
+      display: block;
+      padding: 0;
+    }
+    tbody tr {
+      padding: 12px 0;
+    }
+    tbody td {
+      margin-top: var(--space-4);
+      color: var(--muted);
+      font-size: var(--text-small);
+      line-height: var(--leading-small);
+    }
+  }
+</style>

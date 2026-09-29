@@ -1,9 +1,11 @@
 ---
-// Page header for any entry page: number, section and years, the status
-// badge, title and tagline. The badge is part of the header, not something a
-// page opts into (§3 rule 3).
+// Page header for any entry page: number, section (or hub) and years, the
+// status badge, title and tagline. The badge is part of the header, not
+// something a page opts into (§3 rule 3). A part also shows what it
+// demonstrates: led disciplines, then contributed.
 import type { Entry } from '../lib/entries';
-import { SECTION_LABELS, entryNumber, entryYears } from '../lib/entries';
+import { SECTION_LABELS, entryNumber, entryYears, parentOf } from '../lib/entries';
+import { DISCIPLINES, type Discipline } from '../lib/model';
 import StatusBadge from './StatusBadge.astro';
 
 interface Props {
@@ -11,17 +13,35 @@ interface Props {
 }
 
 const { entry } = Astro.props;
-const { title, tagline } = entry.data;
+const { title, tagline, disciplines } = entry.data;
+const hub = parentOf(entry);
+const NAMES: Record<Discipline, string> = { product: 'Product', design: 'Design', frontend: 'Frontend', backend: 'Backend' };
+const chips = hub && disciplines
+  ? [
+      ...disciplines.led.map((d) => ({ name: NAMES[d], led: true })),
+      ...DISCIPLINES.filter((d) => disciplines.contributed.includes(d)).map((d) => ({ name: NAMES[d], led: false })),
+    ]
+  : [];
 ---
-<header class="entry-header grid" data-entry-header>
+<header class:list={['entry-header grid', { part: hub }]} data-entry-header>
   <div class="inner">
     <p class="meta mono muted">
-      <span class="no">({entryNumber(entry)})</span><span>{SECTION_LABELS[entry.collection]} · {entryYears(entry)}</span>
+      <span class="no">({entryNumber(entry)})</span><span>{hub ? hub.data.title : SECTION_LABELS[entry.collection]} · {entryYears(entry)}</span>
       <StatusBadge entry={entry} />
     </p>
     <h1 class="title">{title}</h1>
     <p class="tagline">{tagline}</p>
   </div>
+  {chips.length > 0 && (
+    <div class="shows">
+      <h2 class="shows-label mono muted" id="shows-label">Shows</h2>
+      <ul class="chips" aria-labelledby="shows-label">
+        {chips.map((c) => (
+          <li class:list={['chip mono', { led: c.led }]}>{c.name}<span class="visually-hidden">, {c.led ? 'led' : 'contributed'}</span></li>
+        ))}
+      </ul>
+    </div>
+  )}
 </header>
 
 <style>
@@ -54,9 +74,51 @@ const { title, tagline } = entry.data;
     line-height: 1.4;
     text-wrap: balance;
   }
+  .part .tagline {
+    max-width: 38ch;
+  }
+  .shows {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+  }
+  .shows-label {
+    margin: 0;
+    font-size: var(--text-mono-sm);
+    font-weight: var(--weight-regular);
+    line-height: normal;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-8);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .chip {
+    padding: 3px 8px;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    color: var(--muted);
+    line-height: normal;
+  }
+  .chip.led {
+    border-color: var(--ink);
+    color: var(--ink);
+  }
   @media (min-width: 640px) {
     .inner {
       grid-column: 1 / span 9;
+    }
+    .shows {
+      grid-column: 10 / span 3;
+      align-self: end;
+    }
+  }
+  @media (max-width: 639.98px) {
+    .shows {
+      margin-top: var(--space-24);
     }
   }
 </style>

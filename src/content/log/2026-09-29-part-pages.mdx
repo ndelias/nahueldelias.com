@@ -1,0 +1,16 @@
+---
+date: 2026-09-29
+entrySlug: vers1ons
+---
+
+The case study template, second half: the five vers1ons parts get their own pages, and the hero is built to be the largest paint.
+
+- **Every part is a page.** Each has sibling navigation (the current part at full strength, the others dimmed), what it shows (led, then contributed), its own decision, and prev/next that loops through the five. The hub's matrix now links every row.
+- **Screens open full size without a library.** Each screen is a link to the full-size file, which also works without JS. With JS it opens a native dialog: the arrow keys step through, Esc or a click outside closes it, and focus goes back to the screen you opened.
+- **Distribution has its real content.** The classifier that sorts a post-release change into metadata-only, full update or new UPC is drawn from the design, as real text. On phones and in narrow columns it becomes a vertical flow. The credit table stacks on phones.
+- **The hero is ready for real screenshots.** It's in the first HTML, loads eagerly at high priority with explicit dimensions, and ships as AVIF at three widths with a dark variant. It has a budget: 60KB up to 1344 wide, 120KB at 2688.
+- **LCP is reported for every page Lighthouse runs on,** with the element and the breakdown. At 1.13s, the hub's LCP is the hero and Distribution's is the tagline.
+- **A fix the numbers found.** On phones the sibling thumbnails sit above the header, and Chrome raised them to high priority, which pushed one Distribution run to 1.20s. They're navigation, so they now load at low priority.
+- **A screenshot fix.** Chrome's full-page capture was scrolling the sibling strip away from where the page put it. Full-length shots now grow the viewport instead.
+
+Checked against the design: every block of the hub and of Distribution starts within a pixel of where the mock puts it at 1440.
