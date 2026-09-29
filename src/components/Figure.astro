@@ -16,11 +16,14 @@
 // Explicit dimensions from the image, so nothing shifts when it or the video
 // arrives (§5).
 import type { ImageMetadata } from 'astro';
+import { HERO_SIZES, heroSources } from '../lib/posters';
 import EntryImage from './EntryImage.astro';
 import Text from './Text.astro';
 
 interface Props {
   src: ImageMetadata;
+  /** Dark-theme variant of the still. Used by a priority (hero) figure. */
+  dark?: ImageMetadata;
   alt: string;
   video?: string;
   play?: 'view' | 'click';
@@ -31,11 +34,13 @@ interface Props {
   label?: string;
   /** inset: the body's reading and figure columns (4 / span 9). full: the page width. */
   layout?: 'inset' | 'full';
-  /** eager + high priority for a figure above the fold (the hero). */
+  /** The hero: likely the LCP element. In the HTML at first paint, eager,
+   * fetchpriority high, AVIF and WebP at three widths, dark variant. */
   priority?: boolean;
 }
 
-const { src, alt, video, play = 'view', caption, meta, label, layout = 'inset', priority = false } = Astro.props;
+const { src, dark, alt, video, play = 'view', caption, meta, label, layout = 'inset', priority = false } = Astro.props;
+const hero = priority ? await heroSources(src, dark) : undefined;
 const { width, height } = (src as ImageMetadata & { clone?: ImageMetadata }).clone ?? src;
 const sizes = layout === 'full' ? '(min-width: 640px) calc(100vw - 96px), calc(100vw - 32px)' : '(min-width: 640px) 75vw, calc(100vw - 32px)';
 const row = layout === 'full';
@@ -43,15 +48,30 @@ const row = layout === 'full';
 <figure class:list={['figure', layout === 'inset' && 'grid']} data-figure>
   <div class="inner">
     <div class="media" style={`aspect-ratio: ${width} / ${height}`}>
-      <EntryImage
-        class="still"
-        src={src}
-        alt={alt}
-        loading={priority ? 'eager' : 'lazy'}
-        fetchpriority={priority ? 'high' : undefined}
-        widths={[640, 1280, 1920, 2560].filter((w) => w <= width)}
-        sizes={sizes}
-      />
+      {hero ? (
+        <picture>
+          {hero.dark && <source type="image/avif" srcset={hero.dark.avif} sizes={HERO_SIZES} media="(prefers-color-scheme: dark)" data-dark data-hero />}
+          {hero.dark && <source type="image/webp" srcset={hero.dark.webp} sizes={HERO_SIZES} media="(prefers-color-scheme: dark)" data-dark data-hero />}
+          <source type="image/avif" srcset={hero.light.avif} sizes={HERO_SIZES} data-hero />
+          <source type="image/webp" srcset={hero.light.webp} sizes={HERO_SIZES} data-hero />
+          <img class="still" src={hero.light.src} alt={alt} width={width} height={height} loading="eager" fetchpriority="high" />
+        </picture>
+      ) : (
+        <EntryImage
+          class="still"
+          src={src}
+          alt={alt}
+          loading={priority ? 'eager' : 'lazy'}
+          fetchpriority={priority ? 'high' : undefined}
+          widths={[640, 1280, 1920, 2560].filter((w) => w <= width)}
+          sizes={sizes}
+        />
+      )}
+      {/* A theme chosen with the toggle overrides the system: point the dark
+          sources at it before the image is picked. Tiny and inline. */}
+      {hero?.dark && (
+        <script is:inline>(function(){var t=document.documentElement.dataset.theme;if(t)document.querySelectorAll("source[data-hero][data-dark]").forEach(function(s){s.media=t==="dark"?"all":"not all"})})()</script>
+      )}
       {video && (
         <video class="video" data-src={video} data-play={play} muted playsinline preload="none" width={width} height={height} aria-label={alt} loop={play === 'view'} />
       )}
@@ -129,6 +149,16 @@ const row = layout === 'full';
       start(clickable);
       clickable.focus();
     });
+  }
+
+  // The hero's dark sources follow the theme toggle too.
+  const root = document.documentElement;
+  const heroDark = document.querySelectorAll<HTMLSourceElement>('source[data-hero][data-dark]');
+  if (heroDark.length) {
+    new MutationObserver(() => {
+      const t = root.dataset.theme;
+      heroDark.forEach((s) => (s.media = t ? (t === 'dark' ? 'all' : 'not all') : '(prefers-color-scheme: dark)'));
+    }).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
   }
 
   // Turning reduced motion on mid-visit stops what's playing.
@@ -214,8 +244,9 @@ const row = layout === 'full';
     justify-content: space-between;
     flex-wrap: wrap;
   }
-  /* Alone in a full-width row, the caption still sits on the right. */
-  .caption.row > :only-child {
+  /* Alone in a full-width row, the caption still sits on the right (the
+     meta line, alone, stays left). */
+  .caption.row > :only-child:not(.meta) {
     margin-left: auto;
   }
   .text {
@@ -252,7 +283,7 @@ const row = layout === 'full';
       flex-direction: column;
       gap: var(--space-4);
     }
-    .caption.row > :only-child {
+    .caption.row > :only-child:not(.meta) {
       margin-left: 0;
     }
   }

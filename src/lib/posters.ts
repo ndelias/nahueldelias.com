@@ -40,3 +40,37 @@ export async function posterOf(entry: Entry): Promise<{ light: Srcsets; dark?: S
     dark: poster?.dark && (await srcsets(poster.dark)),
   };
 }
+
+// Case study heroes (§6: eager for the LCP element). Full width: 1344px at
+// 1440, 358px on a 390 phone. AVIF with a WebP fallback at 672, 1344 and
+// 2688 wide, so a 2x or 3x phone takes the 1344 and a 2x desktop the 2688.
+// Never wider than the source. scripts/check-posters.mjs holds them to 60KB
+// up to 1344 wide (1x) and 120KB at 2688 (2x).
+export const HERO_WIDTHS = [672, 1344, 2688] as const;
+export const HERO_SIZES = '(min-width: 640px) calc(100vw - 96px), calc(100vw - 32px)';
+
+export interface HeroSources {
+  avif: string;
+  webp: string;
+  /** The 1344 WebP (or the widest there is), for the <img> src. */
+  src: string;
+}
+
+async function heroSrcsets(src: ImageMetadata): Promise<HeroSources> {
+  const { width } = (src as ImageMetadata & { clone?: ImageMetadata }).clone ?? src;
+  const widths: number[] = HERO_WIDTHS.filter((w) => w <= width);
+  if (!widths.length) widths.push(width);
+  const sized = (format: 'avif' | 'webp', w: number) => getImage({ src, format, width: w });
+  const set = async (format: 'avif' | 'webp') =>
+    (await Promise.all(widths.map((w) => sized(format, w)))).map((img, i) => ({ url: img.src, w: widths[i] }));
+  const [avif, webp] = await Promise.all([set('avif'), set('webp')]);
+  const join = (list: { url: string; w: number }[]) => list.map((c) => `${c.url} ${c.w}w`).join(', ');
+  return { avif: join(avif), webp: join(webp), src: (webp.find((c) => c.w === 1344) ?? webp[webp.length - 1]).url };
+}
+
+/** Raster hero sources for both themes, or undefined for an SVG (served as is). */
+export async function heroSources(src: ImageMetadata, dark?: ImageMetadata): Promise<{ light: HeroSources; dark?: HeroSources } | undefined> {
+  const { format } = (src as ImageMetadata & { clone?: ImageMetadata }).clone ?? src;
+  if (format === 'svg') return undefined;
+  return { light: await heroSrcsets(src), dark: dark && (await heroSrcsets(dark)) };
+}

@@ -180,6 +180,10 @@ jobs:
           name: dist
           path: dist
       - run: npx lhci autorun
+      # Each page's LCP: the element, the four-part breakdown, the resource.
+      - name: LCP report
+        if: always()
+        run: node scripts/lcp-report.mjs
       - uses: actions/upload-artifact@v7
         if: always()
         with:

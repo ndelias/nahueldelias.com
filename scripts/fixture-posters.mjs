@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 // Placeholder posters for the fixture entries: one tone per entry and theme,
 // from docs/design/reference/home.html (TONES), at 2x the focused frame
-// (1040×650, 16:10). Astro's <Picture> turns them into AVIF and WebP at 1x
+// (1040×650, 16:10). Also raster heroes for the case study pages Lighthouse
+// measures (HEROES), at 2x the full-width hero, so the hero's AVIF path and
+// its budget run on something shaped like a real screenshot. Astro's <Picture> turns them into AVIF and WebP at 1x
 // and 2x. Generated, not committed: npm runs this before dev, build and
 // typecheck, and the output is the same every time (seeded). PNGs need no
 // image library: this writes them with zlib.
@@ -23,10 +25,16 @@ import { deflateSync } from 'node:zlib';
 const OUT = resolve(import.meta.dirname, '../src/assets/fixtures/posters');
 const WIDTH = 1040;
 const HEIGHT = 650;
-const GRAIN = 3;
+const POSTER_GRAIN = 3;
 // Values on an 8px lattice, eased between: single-pixel grain averages out
 // when the 1x is scaled down, and hard cells read as a mosaic.
-const GRAIN_SIZE = 8;
+const POSTER_GRAIN_SIZE = 8;
+// Heroes get coarser, stronger grain: at the 672 a phone loads, the poster
+// grain compresses below 0.05 bits per pixel and Chrome wouldn't count the
+// hero as the largest paint, which a real screenshot always is. This keeps
+// every hero size above ~0.1.
+const HERO_GRAIN = 8;
+const HERO_GRAIN_SIZE = 4;
 
 // Homepage order, as in the reference: [slug, light, dark].
 const TONES = [
@@ -38,6 +46,13 @@ const TONES = [
   ['data-project', '#CBC3B8', '#37312A'],
   ['sketches', '#C2C9D3', '#2B313A'],
   ['paper-projects', '#D7D0C3', '#39342C'],
+];
+
+// [name, width, height, light, dark]: 2x of a 1344px hero. The hub's is
+// 16:10 (docs/design/CaseStudy.dc.html), a part's 16:9 (SubStudy.dc.html).
+const HEROES = [
+  ['vers1ons-hero', 2688, 1680, '#CFC9BE', '#34302A'],
+  ['distribution-hero', 2688, 1512, '#C3C8CF', '#2C3037'],
 ];
 
 const CRC = new Int32Array(256).map((_, n) => {
@@ -69,7 +84,7 @@ function random(seed) {
   };
 }
 
-function png(hex, seed) {
+function png(hex, seed, WIDTH, HEIGHT, GRAIN = POSTER_GRAIN, GRAIN_SIZE = POSTER_GRAIN_SIZE) {
   const rgb = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
   const next = random(seed);
   const across = Math.ceil(WIDTH / GRAIN_SIZE) + 1;
@@ -105,7 +120,11 @@ function png(hex, seed) {
 
 await mkdir(OUT, { recursive: true });
 for (const [i, [slug, light, dark]] of TONES.entries()) {
-  await writeFile(join(OUT, `${slug}.png`), png(light, 2 * i + 1));
-  await writeFile(join(OUT, `${slug}-dark.png`), png(dark, 2 * i + 2));
+  await writeFile(join(OUT, `${slug}.png`), png(light, 2 * i + 1, WIDTH, HEIGHT));
+  await writeFile(join(OUT, `${slug}-dark.png`), png(dark, 2 * i + 2, WIDTH, HEIGHT));
 }
-console.log(`Wrote ${TONES.length * 2} posters to ${OUT}`);
+for (const [i, [name, w, h, light, dark]] of HEROES.entries()) {
+  await writeFile(join(OUT, `${name}.png`), png(light, 101 + 2 * i, w, h, HERO_GRAIN, HERO_GRAIN_SIZE));
+  await writeFile(join(OUT, `${name}-dark.png`), png(dark, 102 + 2 * i, w, h, HERO_GRAIN, HERO_GRAIN_SIZE));
+}
+console.log(`Wrote ${TONES.length * 2} posters and ${HEROES.length * 2} heroes to ${OUT}`);
