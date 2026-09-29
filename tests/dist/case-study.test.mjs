@@ -179,7 +179,8 @@ test('figure: an in-view recording loads only in view, plays muted, pauses out o
   assert.equal((await state(page, 'view')).src, null, 'loaded before it was in view');
   assert.equal(requests.length, 0);
   await page.locator('video[data-play="view"]').scrollIntoViewIfNeeded();
-  await page.waitForFunction(() => !document.querySelector('video[data-play="view"]').paused);
+  // .playing is set once play() resolves, a beat after paused turns false.
+  await page.waitForFunction(() => document.querySelector('video[data-play="view"]').closest('[data-figure]').classList.contains('playing'));
   const s = await state(page, 'view');
   assert.equal(s.muted, true);
   assert.equal(s.playing, true);
