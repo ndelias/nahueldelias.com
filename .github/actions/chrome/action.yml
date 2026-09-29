@@ -23,6 +23,12 @@ runs:
         mkdir -p ~/.chrome-for-testing
         curl -fsSL -o /tmp/chrome.zip "https://storage.googleapis.com/chrome-for-testing-public/${{ steps.version.outputs.version }}/linux64/chrome-linux64.zip"
         unzip -q /tmp/chrome.zip -d ~/.chrome-for-testing
+    # Ubuntu 24.04 blocks unprivileged user namespaces through AppArmor, and
+    # only the Google Chrome package installs a profile allowing them. Chrome
+    # for Testing needs them for its sandbox; without this, Lighthouse's
+    # Chrome never starts. (Playwright runs Chrome unsandboxed by default.)
+    - shell: bash
+      run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
     - shell: bash
       run: |
         bin="$HOME/.chrome-for-testing/chrome-linux64/chrome"
