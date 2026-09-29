@@ -1,0 +1,95 @@
+---
+// The decision (§3): chose, rejected, cost. Shared by the hub and its parts,
+// and by any weight 1 or 2 entry. The intro line says what kind of decision
+// this is: the whole product's on a hub, the part's own on a part.
+interface Props {
+  decision: { chose: string; rejected: string; cost: string };
+  intro?: string;
+}
+
+const { decision, intro } = Astro.props;
+const cells = [
+  { label: 'Chose', text: decision.chose },
+  { label: 'Rejected', text: decision.rejected, muted: true },
+  { label: 'Cost', text: decision.cost },
+];
+---
+<section class="decision grid" aria-labelledby="decision-label">
+  <div class="head">
+    <h2 class="label mono" id="decision-label">The decision</h2>
+    {intro && <p class="intro muted">{intro}</p>}
+  </div>
+  <dl class="cells">
+    {cells.map((c) => (
+      <div class="cell">
+        <dt class="mono muted">{c.label}</dt>
+        <dd class:list={['text', { muted: c.muted }]}>{c.text}</dd>
+      </div>
+    ))}
+  </dl>
+</section>
+
+<style>
+  .decision {
+    row-gap: var(--space-24);
+    padding: var(--space-32) 0 40px;
+    border-top: 2px solid var(--accent);
+    border-bottom: 1px solid var(--line);
+  }
+  .head,
+  .cell {
+    display: flex;
+    flex-direction: column;
+  }
+  .head {
+    gap: var(--space-8);
+  }
+  .label {
+    margin: 0;
+    font-weight: var(--weight-regular);
+    line-height: normal;
+    color: var(--accent);
+  }
+  .intro {
+    margin: 0;
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+  }
+  /* The three cells sit on the page grid: dl's own box is transparent to it. */
+  .cells {
+    display: contents;
+  }
+  .cell {
+    gap: 10px;
+  }
+  dt {
+    line-height: normal;
+  }
+  .text {
+    margin: 0;
+    font-size: var(--text-title);
+    line-height: 1.3;
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-title);
+  }
+  @media (min-width: 640px) {
+    .head,
+    .cell {
+      grid-column: span 3;
+    }
+  }
+  /* Phone: stacked, the three cells split by lines. */
+  @media (max-width: 639.98px) {
+    .decision {
+      row-gap: 0;
+      padding-bottom: 0;
+    }
+    .head {
+      padding-bottom: var(--space-24);
+    }
+    .cell {
+      padding: var(--space-16) 0 var(--space-24);
+      border-top: 1px solid var(--line);
+    }
+  }
+</style>

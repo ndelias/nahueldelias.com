@@ -1,0 +1,76 @@
+---
+// The next entry with a page, in homepage order: one big row at the end of a
+// case study.
+import type { Entry } from '../lib/entries';
+import { entryHref, entryNumber, nextEntry } from '../lib/entries';
+import Icon from './Icon.astro';
+import StatusBadge from './StatusBadge.astro';
+
+interface Props {
+  entry: Entry;
+}
+
+const next = nextEntry(Astro.props.entry);
+const href = next && entryHref(next);
+---
+{next && href && (
+  <a class="next grid" href={href}>
+    <span class="label mono muted">(Next <Icon name="arrow-right" />) {entryNumber(next)}</span>
+    <span class="title">{next.data.title}</span>
+    <span class="badge mono"><StatusBadge entry={next} /></span>
+  </a>
+)}
+
+<style>
+  .next {
+    margin-top: var(--space-160);
+    align-items: baseline;
+    padding: var(--space-24) 0;
+    border-top: 1px solid var(--ink);
+    border-bottom: 1px solid var(--line);
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .label {
+    line-height: normal;
+  }
+  .title {
+    font-size: var(--text-h2);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-h2);
+    line-height: var(--leading-h2);
+  }
+  .next:hover .title {
+    text-decoration: underline;
+    text-underline-offset: 6px;
+    text-decoration-thickness: 1px;
+  }
+  .badge {
+    line-height: normal;
+  }
+  @media (min-width: 640px) {
+    .label {
+      grid-column: span 3;
+    }
+    .title {
+      grid-column: 4 / span 6;
+    }
+    .badge {
+      grid-column: 10 / span 3;
+      justify-self: end;
+    }
+  }
+  /* Phone: stacked. */
+  @media (max-width: 639.98px) {
+    .next {
+      margin-top: var(--space-96);
+      row-gap: var(--space-12);
+    }
+    .title {
+      font-size: var(--text-h3);
+    }
+    .badge {
+      justify-self: start;
+    }
+  }
+</style>

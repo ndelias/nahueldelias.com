@@ -1,0 +1,19 @@
+---
+// A content string with its arrows drawn as icons. Frontmatter copy can say
+// "Upload → License"; the subset fonts have no arrows, so each ← → ↗ becomes
+// an inline SVG. The text reads the same to assistive tech: each icon keeps
+// the arrow's meaning as a label.
+import Icon from './Icon.astro';
+
+interface Props {
+  text: string;
+}
+
+const ICONS = { '←': 'arrow-left', '→': 'arrow-right', '↗': 'arrow-up-right' } as const;
+const LABELS = { '←': 'to', '→': 'to', '↗': 'opens' } as const;
+type Arrow = keyof typeof ICONS;
+
+const parts = Astro.props.text.split(/([←→↗])/).filter(Boolean);
+const isArrow = (s: string): s is Arrow => s in ICONS;
+---
+{parts.map((part) => (isArrow(part) ? <Icon name={ICONS[part]} label={LABELS[part]} /> : part))}

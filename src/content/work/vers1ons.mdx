@@ -1,19 +1,40 @@
 ---
-# FIXTURE from docs/design/reference/home.html, until the real entry replaces it.
+# FIXTURE from docs/design/CaseStudy.dc.html, until the real entry replaces it.
+# The hub: the 0→1 story. Its five parts are in ./vers1ons/.
 # A SHIP=1 build fails while any fixture remains.
 fixture: true
 title: 'vers1ons'
-tagline: 'Music remix licensing and distribution platform. [Tagline.]'
+tagline: 'The licensing marketplace for music and its versions.'
 weight: 1
 status: shipped
-role: '[Role]'
+role: 'Product engineer, founding team'
 dates:
   start: '[Years]'
-stack: []
+stack: ['[Framework · Database · Infra]']
+links:
+  live: 'https://vers1ons.com'
 decision:
-  chose: '[What was chosen.]'
-  rejected: '[What was rejected.]'
-  cost: '[What it cost.]'
+  chose: '[What you built first, or what you kept out.]'
+  rejected: '[The serious alternative you turned down.]'
+  cost: '[What it cost you, stated plainly.]'
+hero:
+  src: ../../assets/fixtures/tones/tone1-desktop.svg
+  alt: '[Walkthrough poster: what the first frame shows.]'
+  duration: '[0:48]'
+  caption: 'Upload → License → Release → Royalties'
+versions:
+  - src: ../../assets/fixtures/tones/tone3-desktop.svg
+    alt: '[v1 screen.]'
+    date: '[Date]'
+    note: '[What v1 got wrong.]'
+  - src: ../../assets/fixtures/tones/tone2-desktop.svg
+    alt: '[v2 screen.]'
+    date: '[Date]'
+    note: '[What changed and why.]'
+  - src: ../../assets/fixtures/tones/tone1-desktop.svg
+    alt: '[v3 screen.]'
+    date: '[Date]'
+    note: '[Where it is now.]'
 cover:
   src: ../../assets/fixtures/vers1ons.svg
   alt: '[Cover image.]'
@@ -22,5 +43,26 @@ poster:
   dark: ../../assets/fixtures/posters/vers1ons-dark.png
 order: 1
 ---
+import BodySection from '../../components/BodySection.astro';
+import Figure from '../../components/Figure.astro';
+import fig1 from '../../assets/fixtures/tones/tone2-wide.svg';
 
-[Body.]
+<BodySection label="The bet" heading="[Why remixes needed a licensing marketplace at all.]" note="[One concrete fact that makes the problem real.]">
+  [The market problem in two or three sentences: who owns the rights, who wants to use them, and why that deal was slow, informal or illegal before.]
+
+  [Your role from day zero: founding team, joined as an intern, owned product and engineering across the parts below.]
+</BodySection>
+
+<BodySection label="Sequencing" heading="[What had to exist first, and what could wait.]" note="[A timeline of the five parts can sit here.]">
+  [The order you built the five parts in, and why that order. This is the product-management story: what you cut, what you deferred, what you shipped half of on purpose.]
+
+  [How the design system let the later parts move faster.]
+</BodySection>
+
+<BodySection label="Where it is" heading="[What exists now, and what you would change.]" note="[Link the release notes or log entries that date each part.]">
+  [Evidence: partners, releases, licenses signed, money paid out. Real numbers or none.]
+
+  [The one thing you would build differently from zero.]
+</BodySection>
+
+<Figure src={fig1} alt="[What the clip shows.]" caption="[Caption: what the reader should notice in this clip, in one sentence.]" />

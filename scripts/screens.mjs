@@ -1,8 +1,9 @@
 #!/usr/bin/env node
-// Screenshots of the homepage, always over HTTP (never file://). Two kinds:
+// Screenshots of the site, always over HTTP (never file://). Two kinds:
 //
-// Site baselines, a gate. Committed screenshots of the built / itself
-// (tests/screens/), captured in CI. Any change to how the page renders has to
+// Site baselines, a gate. Committed screenshots of the built pages themselves
+// (tests/screens/): / in both views, and case study pages full length,
+// captured in CI. Any change to how the page renders has to
 // show up as a changed baseline in the PR diff.
 //
 //   node scripts/screens.mjs site [outDir]
@@ -16,9 +17,12 @@
 //   npm run screens:update
 //     Regenerates the baselines from CI (scripts/screens-update.mjs).
 //
-// Design reference, a report. The page against the mock's screenshots
+// Design reference, a report. / against the mock's screenshots
 // (docs/design/reference/screens/), with a per-region breakdown, since the
-// page differs from the mock on purpose in places.
+// page differs from the mock on purpose in places. Case study pages against
+// their canvas mocks, rendered live by docs/design/reference/dc.html, block
+// by block (the page is longer than the fixed-height mock, so blocks are
+// matched by element, not by position).
 //
 //   node scripts/screens.mjs capture [outDir]
 //     Renders docs/design/reference/home.html into its baselines, default
@@ -70,6 +74,31 @@ const SITE = [
   { name: 'home-strip-1440-dark', viewport: DESKTOP, colorScheme: 'dark', view: 'strip' },
   { name: 'home-strip-390-light', viewport: PHONE, colorScheme: 'light', view: 'strip' },
   { name: 'home-strip-390-dark', viewport: PHONE, colorScheme: 'dark', view: 'strip' },
+  // Case studies, full length.
+  { name: 'hub-1440-light', viewport: DESKTOP, colorScheme: 'light', path: '/work/vers1ons/' },
+  { name: 'hub-1440-dark', viewport: DESKTOP, colorScheme: 'dark', path: '/work/vers1ons/' },
+  { name: 'hub-390-light', viewport: PHONE, colorScheme: 'light', path: '/work/vers1ons/' },
+  { name: 'hub-390-dark', viewport: PHONE, colorScheme: 'dark', path: '/work/vers1ons/' },
+];
+
+// Case study pages against their canvas mocks, block by block: [name, site
+// selector, mock selector]. "Top" is the first screen.
+const CASE_MOCKS = [
+  {
+    name: 'hub',
+    path: '/work/vers1ons/',
+    mock: 'CaseStudy',
+    blocks: [
+      ['Header', '[data-entry-header] .inner', 'section:first-of-type > div'],
+      ['Meta row', 'dl.facts', 'dl'],
+      ['Hero', '.hero figure', 'figure'],
+      ['Decision', 'section.decision', 'section[aria-label="Decision"]'],
+      ['Body', 'article.body', 'article'],
+      ['Parts', 'section.parts', 'section[aria-label="Parts of vers1ons"]'],
+      ['Versions', 'section.versions', 'section[aria-label="Versions"]'],
+      ['Next', 'a.next', 'a[style*="margin-top: 160px"]'],
+    ],
+  },
 ];
 
 // Regions of the 1440×900 mock, for the report's breakdown. A pixel counts
@@ -106,12 +135,28 @@ async function settle(page) {
   await page.waitForTimeout(1000);
 }
 
-/** Load / in a fresh context and put it in the given state. */
-async function shoot(browser, origin, { viewport, colorScheme, view, next = 0 }) {
+// Full-length shots: load every lazy image first, or the shot has holes.
+async function loadAll(page) {
+  await page.evaluate(async () => {
+    const imgs = [...document.images];
+    for (const img of imgs) img.loading = 'eager';
+    await Promise.all(imgs.map((img) => (img.complete ? null : img.decode().catch(() => {}))));
+  });
+}
+
+/** Load a page in a fresh context and put it in the given state. */
+async function shoot(browser, origin, { viewport, colorScheme, view, next = 0, path }) {
   const ctx = await browser.newContext({ viewport, deviceScaleFactor: 1, colorScheme });
   const page = await ctx.newPage();
-  await page.goto(`${origin}/`, { waitUntil: 'load' });
+  await page.goto(`${origin}${path ?? '/'}`, { waitUntil: 'load' });
   await settle(page);
+  if (path) {
+    await loadAll(page);
+    await settle(page);
+    const png = await page.screenshot({ fullPage: true });
+    await ctx.close();
+    return png;
+  }
   // Clicked from script, not the mouse: no hover or focus ring in the shot.
   const ok = await page.evaluate(
     ([view, next]) => {
@@ -138,7 +183,7 @@ async function shoot(browser, origin, { viewport, colorScheme, view, next = 0 })
 // Runs in the page: compares two PNGs (base64) and returns the count of
 // differing pixels, per region too, and a diff image (differences red, the
 // rest dimmed).
-async function diffInPage([a, b, channel, regions]) {
+async function diffInPage([a, b, channel, regions, crop = false]) {
   const load = async (d) => {
     const img = new Image();
     img.src = 'data:image/png;base64,' + d;
@@ -148,8 +193,20 @@ async function diffInPage([a, b, channel, regions]) {
     x.drawImage(img, 0, 0);
     return x.getImageData(0, 0, img.width, img.height);
   };
-  const A = await load(a), B = await load(b);
-  if (A.width !== B.width || A.height !== B.height) return { error: `size ${A.width}×${A.height} vs ${B.width}×${B.height}` };
+  let A = await load(a), B = await load(b);
+  const size = `${A.width}×${A.height} vs ${B.width}×${B.height}`;
+  if (A.width !== B.width || A.height !== B.height) {
+    if (!crop) return { error: `size ${size}` };
+    // Blocks matched by element: compare the common top-left area.
+    const w = Math.min(A.width, B.width), h = Math.min(A.height, B.height);
+    const cut = (I) => {
+      const c = new OffscreenCanvas(I.width, I.height);
+      c.getContext('2d').putImageData(I, 0, 0);
+      return c.getContext('2d').getImageData(0, 0, w, h);
+    };
+    A = cut(A);
+    B = cut(B);
+  }
   const out = new ImageData(A.width, A.height);
   const counts = regions.map((r) => ({ name: r.name, differ: 0, total: 0 }));
   const restCount = { name: 'Rest', differ: 0, total: 0 };
@@ -175,7 +232,7 @@ async function diffInPage([a, b, channel, regions]) {
   const bytes = new Uint8Array(await (await c.convertToBlob()).arrayBuffer());
   let bin = '';
   for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
-  return { differ, total: A.width * A.height, regions: regions.length ? [...counts, restCount] : [], png: btoa(bin) };
+  return { differ, total: A.width * A.height, size, regions: regions.length ? [...counts, restCount] : [], png: btoa(bin) };
 }
 
 const pct = (n, of) => (of ? (n / of) * 100 : 0).toFixed(2) + '%';
@@ -267,6 +324,46 @@ try {
       );
     }
     await server.close();
+
+    // Case studies against their canvas mocks, block by block.
+    const caseRows = [];
+    const site = await serve(join(ROOT, 'dist'));
+    const design = await serve(join(ROOT, 'docs/design'));
+    try {
+      for (const c of CASE_MOCKS) {
+        for (const colorScheme of ['light', 'dark']) {
+          const ctx = await browser.newContext({ viewport: DESKTOP, deviceScaleFactor: 1, colorScheme });
+          const page = await ctx.newPage();
+          await page.goto(`${site.origin}${c.path}`, { waitUntil: 'load' });
+          await settle(page);
+          await loadAll(page);
+          const mock = await ctx.newPage();
+          await mock.goto(`${design.origin}/reference/dc.html?mock=${c.mock}${colorScheme === 'dark' ? '&theme=dark' : ''}`);
+          await mock.waitForSelector('[data-ready]');
+          await settle(mock);
+          for (const [name, siteSel, mockSel] of c.blocks) {
+            const file = `${c.name}-${colorScheme}-${name.toLowerCase().replace(/\W+/g, '-')}`;
+            const a = page.locator(siteSel).first();
+            const b = mock.locator(`#root ${mockSel}`).first();
+            if (!(await a.count()) || !(await b.count())) {
+              caseRows.push(`| ${c.name} · ${colorScheme} | ${name} | missing | ${(await a.count()) ? '' : 'site'} ${(await b.count()) ? '' : 'mock'} |`);
+              continue;
+            }
+            const [pa, pb] = [await a.screenshot(), await b.screenshot()];
+            await writeFile(join(out, `${file}.actual.png`), pa);
+            await writeFile(join(out, `${file}.mock.png`), pb);
+            const r = await differ.evaluate(diffInPage, [pa.toString('base64'), pb.toString('base64'), MOCK_CHANNEL, [], true]);
+            await writeFile(join(out, `${file}.diff.png`), Buffer.from(r.png, 'base64'));
+            caseRows.push(`| ${c.name} · ${colorScheme} | ${name} | ${pct(r.differ, r.total)} | ${r.size} |`);
+          }
+          await ctx.close();
+        }
+      }
+    } finally {
+      await site.close();
+      await design.close();
+    }
+
     const report = [
       '<!-- screens-mock -->',
       '### Homepage vs design reference (report, not a gate)',
@@ -278,6 +375,14 @@ try {
       ...rows,
       '',
       ...details.flatMap((d) => [d, '']),
+      '### Case studies vs their canvas mocks (report, not a gate)',
+      '',
+      'Each block of the page against the same block of the mock (docs/design/reference/dc.html), compared over their common area. Sizes are page vs mock.',
+      '',
+      '| Page | Block | Differs | Size |',
+      '| --- | --- | ---: | --- |',
+      ...caseRows,
+      '',
     ].join('\n');
     await writeFile(join(out, 'report.md'), report);
     console.log(report);

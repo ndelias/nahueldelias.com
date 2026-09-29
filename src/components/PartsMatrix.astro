@@ -1,0 +1,351 @@
+---
+// The hub's parts (§3 hub and parts): one row per part that exists, in build
+// order, with what each led or contributed across the four disciplines. A
+// table, so each dot reads with its column ("Design: Led"). Explicit roles
+// keep the semantics when the phone layout changes the display of rows and
+// cells.
+import type { Entry } from '../lib/entries';
+import { entryHref, entryNumber, partsOf } from '../lib/entries';
+import { DISCIPLINES, type Discipline } from '../lib/model';
+import EntryImage from './EntryImage.astro';
+import Icon from './Icon.astro';
+
+interface Props {
+  hub: Entry;
+}
+
+const { hub } = Astro.props;
+const parts = partsOf(hub);
+
+const NAMES: Record<Discipline, string> = { product: 'Product', design: 'Design', frontend: 'Frontend', backend: 'Backend' };
+const COUNT = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+const count = COUNT[parts.length] ?? String(parts.length);
+
+const STATUS = { led: 'Led', contributed: 'Contributed', none: 'Not involved' } as const;
+
+const rows = parts.map((part) => {
+  const { led = [], contributed = [] } = part.data.disciplines ?? {};
+  return {
+    part,
+    number: entryNumber(part),
+    href: entryHref(part),
+    cells: DISCIPLINES.map((d) => ({
+      name: NAMES[d],
+      role: (led.includes(d) ? 'led' : contributed.includes(d) ? 'contributed' : 'none') as keyof typeof STATUS,
+    })),
+  };
+});
+---
+{rows.length > 0 && (
+  <section class="parts grid" aria-labelledby="parts-label">
+    <div class="intro">
+      <h2 class="label mono muted" id="parts-label">Zero to one, in {count} {parts.length === 1 ? 'part' : 'parts'}</h2>
+      <p class="muted">Each part is its own case study with its own decision. Listed in the order they were built.</p>
+      <ul class="legend mono muted" aria-hidden="true">
+        <li><span class="dot led"></span>Led</li>
+        <li><span class="dot contributed"></span>Contributed</li>
+      </ul>
+    </div>
+
+    <table class="matrix" role="table" aria-labelledby="parts-label">
+      <colgroup>
+        <col class="c-no" /><col class="c-thumb" /><col class="c-part" />
+        {DISCIPLINES.map(() => <col class="c-dot" />)}
+        <col class="c-read" />
+      </colgroup>
+      <thead class="mono muted" role="rowgroup">
+        <tr role="row">
+          <th scope="col" role="columnheader">No.</th>
+          <th scope="col" role="columnheader"><span class="visually-hidden">Preview</span></th>
+          <th scope="col" role="columnheader">Part</th>
+          {DISCIPLINES.map((d) => <th scope="col" role="columnheader" class="center">{NAMES[d]}</th>)}
+          <th scope="col" role="columnheader"><span class="visually-hidden">Link</span></th>
+        </tr>
+      </thead>
+      <tbody role="rowgroup">
+        {rows.map(({ part, number, href, cells }) => (
+          <tr role="row" class:list={['row', { linked: href }]}>
+            <td role="cell" class="no mono muted">{number}</td>
+            <td role="cell" class="thumb"><EntryImage src={part.data.cover.src} alt="" /></td>
+            <th scope="row" role="rowheader" class="name">
+              <span class="name-inner">
+                {href ? <a class="title" href={href}>{part.data.title}</a> : <span class="title">{part.data.title}</span>}
+                <span class="line muted">{part.data.tagline}</span>
+              </span>
+            </th>
+            {cells.map((c) => (
+              <td role="cell" class:list={['cell', c.role]}>
+                <span class:list={['dot', c.role]} aria-hidden="true"></span>
+                <span class="discipline">{c.name}</span>
+                <span class="visually-hidden">{STATUS[c.role]}</span>
+              </td>
+            ))}
+            {/* Kept when empty, so the columns sit where they will once parts link. */}
+            <td role="cell" class="read mono" aria-hidden="true">{href && <>Read <Icon name="arrow-right" /></>}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </section>
+)}
+
+<style>
+  .intro {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .label {
+    margin: 0;
+    font-weight: var(--weight-regular);
+    line-height: normal;
+  }
+  .intro p {
+    margin: 0;
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+  }
+  .legend {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    padding: 12px 0 0;
+    list-style: none;
+    font-size: var(--text-mono-sm);
+    line-height: normal;
+  }
+  .legend li {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .legend .dot {
+    width: 8px;
+    height: 8px;
+  }
+
+  .dot {
+    display: block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dot.led {
+    background: var(--ink);
+    box-shadow: inset 0 0 0 1px var(--ink);
+  }
+  .dot.contributed {
+    box-shadow: inset 0 0 0 1px var(--muted);
+  }
+
+  .matrix {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+  /* The mock's column gap is 16px: every column after the first carries it
+     as left padding, so the widths include it. */
+  .c-no {
+    width: 64px;
+  }
+  .c-thumb {
+    width: 136px;
+  }
+  .c-dot,
+  .c-read {
+    width: 88px;
+  }
+  th,
+  td {
+    padding: 0 0 0 16px;
+    text-align: left;
+    font-weight: var(--weight-regular);
+  }
+  th:first-child,
+  td:first-child {
+    padding-left: 0;
+  }
+  thead th,
+  thead td {
+    padding-bottom: 12px;
+    vertical-align: bottom;
+    font-size: var(--text-mono-sm);
+    /* The mock's header row renders 14px tall (26 with its padding). */
+    line-height: 14px;
+  }
+  thead .center {
+    text-align: center;
+  }
+  tbody td,
+  tbody th {
+    padding-top: 14px;
+    padding-bottom: 14px;
+    vertical-align: middle;
+    border-top: 1px solid var(--line);
+  }
+  tbody tr:last-child > * {
+    border-bottom: 1px solid var(--line);
+  }
+  .no {
+    font-size: var(--text-mono);
+  }
+  .thumb :global(img) {
+    display: block;
+    width: 120px;
+    height: 75px;
+    object-fit: cover;
+  }
+  /* Flex inside the cell, not on it: a flex th stops being a table cell
+     and loses vertical-align. */
+  .name-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .title {
+    font-size: var(--text-title);
+    line-height: normal;
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-title);
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .line {
+    font-size: var(--text-small);
+    line-height: 1.45;
+  }
+  .cell .dot {
+    margin: 0 auto;
+  }
+  /* The discipline's name shows beside its dot only on phones, where there
+     are no column headers to read it from. */
+  .discipline {
+    display: none;
+  }
+  .read {
+    text-align: right;
+    color: var(--accent);
+  }
+
+  /* A linked row is one target: the title's link is stretched over it. */
+  .row.linked {
+    position: relative;
+  }
+  .row.linked .title::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .row.linked:hover .title {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-thickness: 1px;
+  }
+  .row.linked .title:focus-visible {
+    outline: none;
+  }
+  .row.linked .title:focus-visible::after {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-offset);
+  }
+
+  @media (min-width: 640px) {
+    .intro {
+      grid-column: span 3;
+    }
+    .matrix {
+      grid-column: 4 / span 9;
+    }
+  }
+
+  /* Phone: each row is a card. Thumbnail beside number, title and line; the
+     disciplines on one line below, each named. */
+  @media (max-width: 639.98px) {
+    .intro {
+      margin-bottom: var(--space-24);
+    }
+    .matrix,
+    .matrix tbody {
+      display: block;
+    }
+    colgroup {
+      display: none;
+    }
+    thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+    }
+    /* Row 3 is the disciplines line: the first sits under the thumbnail,
+       the rest follow at their own width. */
+    tbody tr {
+      display: grid;
+      grid-template-columns: 96px repeat(3, auto) minmax(0, 1fr);
+      column-gap: var(--space-16);
+      row-gap: var(--space-4);
+      padding: var(--space-16) 0;
+      border-top: 1px solid var(--line);
+    }
+    tbody tr:last-child {
+      border-bottom: 1px solid var(--line);
+    }
+    tbody td,
+    tbody th {
+      padding: 0;
+      border: 0 !important;
+    }
+    .no {
+      grid-column: 2 / -1;
+      grid-row: 1;
+    }
+    .thumb {
+      grid-column: 1;
+      grid-row: 1 / 3;
+    }
+    .thumb :global(img) {
+      width: 96px;
+      height: 60px;
+    }
+    .name {
+      grid-column: 2 / -1;
+      grid-row: 2;
+    }
+    .title {
+      font-size: var(--text-lead);
+    }
+    .cell {
+      grid-row: 3;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: var(--space-12);
+      font-family: var(--font-mono);
+      font-size: var(--text-mono-sm);
+      letter-spacing: var(--tracking-mono);
+      text-transform: uppercase;
+      line-height: normal;
+      color: var(--muted);
+    }
+    .cell.led {
+      color: var(--ink);
+    }
+    .cell.none {
+      display: none;
+    }
+    .cell .dot {
+      margin: 0;
+      width: 8px;
+      height: 8px;
+    }
+    .discipline {
+      display: inline;
+    }
+    .read {
+      display: none;
+    }
+  }
+</style>

@@ -9,17 +9,21 @@ interface Props {
   src: ImageMetadata;
   alt: string;
   loading?: 'eager' | 'lazy';
+  // Responsive sizes for a raster source. An SVG scales on its own and
+  // ignores them.
+  widths?: number[];
+  sizes?: string;
   // The parent's scope (data-astro-cid-*) and anything else, passed to the
   // <img> as <Image> does, so the parent's img rules still apply.
   [attribute: string]: unknown;
 }
 
-const { src, alt, loading = 'lazy', ...rest } = Astro.props;
+const { src, alt, loading = 'lazy', widths, sizes, ...rest } = Astro.props;
 // Read from a clone: reading the import itself marks the original as used.
 const { format, width, height } = (src as ImageMetadata & { clone?: ImageMetadata }).clone ?? src;
 ---
 {format === 'svg' ? (
   <img {...{ ...rest, src: src.src, width, height, alt, loading, decoding: 'async' }} />
 ) : (
-  <Image {...rest} src={src} alt={alt} loading={loading} />
+  <Image {...rest} {...(widths && { widths, sizes })} src={src} alt={alt} loading={loading} />
 )}

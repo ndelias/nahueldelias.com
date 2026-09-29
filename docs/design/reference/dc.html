@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1440">
+<title>Design canvas reference</title>
+<!--
+  Renders a docs/design/*.dc.html mock standalone, with no canvas runtime (its
+  support.js isn't public). Enough of the format for these mocks: {{expr}} in
+  attributes and text, <sc-for list as>, <helmet>, and the Component class
+  (renderVals, state, setState, onClick handlers). Design reference only:
+  port the values, not this markup.
+
+  URL options: ?mock=CaseStudy (the file name without .dc.html, required)
+               ?theme=dark
+  Fonts are the local reference files, not Google Fonts, so screenshots are
+  deterministic and work offline.
+-->
+<style>
+@font-face{font-family:"Instrument Sans";font-weight:400;font-display:block;src:url(fonts/instrument-sans-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:"Instrument Sans";font-weight:500;font-display:block;src:url(fonts/instrument-sans-latin-500-normal.woff2) format("woff2")}
+@font-face{font-family:"DM Mono";font-weight:400;font-display:block;src:url(fonts/dm-mono-latin-400-normal.woff2) format("woff2")}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+(async () => {
+  const params = new URLSearchParams(location.search);
+  const name = params.get('mock');
+  if (!/^[\w-]+$/.test(name || '')) throw new Error('?mock=Name required');
+  const source = await (await fetch(`../${name}.dc.html`)).text();
+  const doc = new DOMParser().parseFromString(source, 'text/html');
+
+  // <helmet>: styles into <head>. Stylesheet links (Google Fonts) are dropped
+  // for the local faces above.
+  const helmet = doc.querySelector('helmet');
+  for (const el of helmet ? [...helmet.children] : []) if (el.tagName !== 'LINK') document.head.append(el.cloneNode(true));
+  helmet?.remove();
+  document.title = doc.title;
+
+  class DCLogic {
+    constructor(props) { this.props = props; this.state = {}; }
+    setState(patch) { this.state = { ...this.state, ...patch }; render(); }
+  }
+  const script = doc.querySelector('script[data-dc-script]');
+  const Component = new Function('DCLogic', `${script.textContent}\nreturn Component;`)(DCLogic);
+  const props = {};
+  for (const [key, spec] of Object.entries(JSON.parse(script.dataset.props || '{}'))) if (!key.startsWith('$')) props[key] = spec.default;
+  if (params.get('theme') === 'dark') props.dark = true;
+  const component = new Component(props);
+  const template = doc.querySelector('x-dc');
+
+  const evaluate = (expr, scope) => new Function('scope', `with (scope) { return (${expr}); }`)(scope);
+  const ONLY = /^\{\{([^}]+)\}\}$/;
+  const interpolate = (text, scope) => text.replace(/\{\{([^}]+)\}\}/g, (_, e) => String(evaluate(e, scope)));
+
+  function build(node, scope, out) {
+    if (node.nodeType === Node.TEXT_NODE) return out.append(document.createTextNode(interpolate(node.data, scope)));
+    if (node.nodeType !== Node.ELEMENT_NODE) return;
+    if (node.tagName === 'SC-FOR') {
+      const list = evaluate(node.getAttribute('list').match(ONLY)[1], scope);
+      const as = node.getAttribute('as');
+      for (const item of list) for (const child of node.childNodes) build(child, { ...scope, [as]: item }, out);
+      return;
+    }
+    const el = document.createElementNS(node.namespaceURI, node.tagName.toLowerCase());
+    for (const { name, value } of node.attributes) {
+      const whole = value.match(ONLY);
+      if (/^on[A-Z]/.test(name) && whole) {
+        const fn = evaluate(whole[1], scope);
+        if (typeof fn === 'function') el.addEventListener(name.slice(2).toLowerCase(), fn);
+        continue;
+      }
+      if (name.startsWith('hint-')) continue;
+      el.setAttribute(name, interpolate(value, scope));
+    }
+    for (const child of node.childNodes) build(child, scope, el);
+    out.append(el);
+  }
+
+  const root = document.getElementById('root');
+  function render() {
+    const scope = component.renderVals();
+    const frag = document.createDocumentFragment();
+    for (const child of template.childNodes) build(child, scope, frag);
+    root.replaceChildren(frag);
+  }
+  render();
+  await document.fonts.ready;
+  document.documentElement.dataset.ready = '1';
+})();
+</script>
+</body>
+</html>
