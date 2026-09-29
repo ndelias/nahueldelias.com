@@ -178,7 +178,22 @@ async function shoot(browser, origin, { viewport, colorScheme, view, next = 0, p
     // Full length by growing the viewport to the page, not fullPage: Chrome's
     // beyond-viewport capture fires a scroll on inner scrollers (the part
     // page's sibling strip jumps from where its script put it).
-    const height = await page.evaluate(() => document.documentElement.scrollHeight);
+    // Deferred blocks (content-visibility: auto) take their real height only
+    // once rendered, and the frame is at least a viewport tall, so the
+    // page's scrollHeight can't be trusted here. Render everything in one
+    // tall viewport, measure where the content ends (main's box includes
+    // the room for the footer row), then size the viewport to that.
+    await page.setViewportSize({ width: viewport.width, height: 20_000 });
+    await settle(page);
+    const height = await page.evaluate(() =>
+      Math.round(
+        Math.max(
+          ...[...document.querySelector('.frame').children]
+            .filter((el) => getComputedStyle(el).position !== 'absolute')
+            .map((el) => el.getBoundingClientRect().bottom + scrollY),
+        ),
+      ),
+    );
     await page.setViewportSize({ width: viewport.width, height });
     await settle(page);
     const png = await page.screenshot();

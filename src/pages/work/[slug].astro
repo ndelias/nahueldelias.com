@@ -56,7 +56,7 @@ const heroMeta = hero?.video ? ['Walkthrough', 'muted', hero.duration].filter(Bo
       )}
 
       {data.decision && (
-        <div class="decision">
+        <div class="decision defer" style="--defer-size: 157px">
           <DecisionBlock decision={data.decision} intro={data.decision.intro ?? (isHub ? 'The call that shaped the whole product. Each part below has its own.' : undefined)} />
         </div>
       )}
@@ -65,11 +65,11 @@ const heroMeta = hero?.video ? ['Walkthrough', 'muted', hero.duration].filter(Bo
         <Content />
       </article>
 
-      <div class="parts"><PartsMatrix hub={entry} /></div>
+      <div class="parts defer" style="--defer-size: 547px"><PartsMatrix hub={entry} /></div>
 
-      {data.versions && <div class="versions"><VersionsStack versions={data.versions} /></div>}
+      {data.versions && <div class="versions defer" style="--defer-size: 521px"><VersionsStack versions={data.versions} /></div>}
 
-      <NextEntry entry={entry} />
+      <div class="defer" style="--defer-size: 257px"><NextEntry entry={entry} /></div>
     </main>
     {updated && (
       <span slot="bottom-start" class="muted">Updated <time datetime={updated.toISOString().slice(0, 10)}>{updated.toISOString().slice(0, 10)}</time></span>
@@ -119,6 +119,15 @@ const heroMeta = hero?.video ? ['Walkthrough', 'muted', hero.duration].filter(Bo
     gap: 72px;
     padding-top: var(--space-96);
     counter-reset: body-section;
+  }
+  /* Every body block is below the fold: deferred (see .defer in base.css). */
+  .body > :global(:not(script, style)) {
+    content-visibility: auto;
+    contain-intrinsic-block-size: auto 320px;
+    overflow-clip-margin: 8px;
+  }
+  .body > :global(figure) {
+    contain-intrinsic-block-size: auto 590px;
   }
   .parts:not(:empty) {
     margin-top: 120px;

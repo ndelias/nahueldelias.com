@@ -345,3 +345,101 @@ test('hero: in the first HTML, eager, high priority, sized, AVIF first', async (
     assert.match(img, /height="\d+"/);
   }
 });
+
+test('part, phone: the sibling nav is a row of text tabs, 44px, no thumbnails fetched', async () => {
+  const { ctx, page } = await openPart(PART, { viewport: { width: 390, height: 844 } });
+  const requested = [];
+  page.on('request', (r) => r.resourceType() === 'image' && requested.push(r.url()));
+  await page.waitForTimeout(300);
+  const tabs = await page.$$eval('[data-parts-nav] a', (as) =>
+    as.map((a) => ({ h: a.getBoundingClientRect().height, text: a.innerText.replace(/\s+/g, ' ').trim(), thumb: getComputedStyle(a.querySelector('.thumb')).display })),
+  );
+  assert.equal(tabs.length, 5);
+  assert.ok(tabs.every((t) => t.h >= 44), `a tab under 44px: ${tabs.map((t) => t.h)}`);
+  assert.ok(tabs.every((t) => t.thumb === 'none'), 'thumbnails show on a phone');
+  assert.equal(tabs[4].text, 'W01.5 DISTRIBUTION');
+  const covers = await page.$$eval('[data-parts-nav] img', (imgs) => imgs.map((i) => i.currentSrc || i.src));
+  assert.ok(!requested.some((u) => covers.includes(u)), 'a hidden thumbnail was fetched');
+  const current = await page.$eval('[data-parts-nav] [aria-current="page"]', (a) => {
+    const r = a.getBoundingClientRect();
+    return { left: r.left, right: r.right, underline: getComputedStyle(a).borderBottomColor, color: getComputedStyle(a).color };
+  });
+  assert.ok(current.left >= 0 && current.right <= 390, 'the current tab is scrolled out of view');
+  assert.notEqual(current.underline, 'rgba(0, 0, 0, 0)', 'no underline on the current tab');
+  // The page itself never scrolls sideways.
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), 390);
+  await ctx.close();
+});
+
+// Below-the-fold blocks are content-visibility: auto. Skipped rendering
+// mustn't break what reaches into them.
+test('deferred blocks: the gallery dialog opens from a screen that was never rendered', async () => {
+  const { ctx, page } = await openPart();
+  assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('[data-gallery]')).contentVisibility), 'auto');
+  // Opened without scrolling: the gallery is still skipped.
+  await page.evaluate(() => document.querySelector('[data-gallery-open="3"]').click());
+  const box = await page.evaluate(() => {
+    const d = document.querySelector('[data-gallery-viewer]');
+    const img = d.querySelector('img');
+    return { open: d.open, w: d.getBoundingClientRect().width, img: img.getBoundingClientRect().height, visible: img.checkVisibility({ contentVisibilityAuto: true }) };
+  });
+  assert.equal(box.open, true);
+  assert.ok(box.w > 0 && box.img > 0 && box.visible, `the dialog isn't rendered: ${JSON.stringify(box)}`);
+  await ctx.close();
+});
+
+for (const [path, id] of [
+  [HUB, 'parts-label'],
+  [HUB, 'versions-label'],
+  [PART, 'gallery-screens-label'],
+  [PART, 'table-table-1-label'],
+]) {
+  test(`deferred blocks: an in-page link to #${id} lands on it`, async () => {
+    const ctx = await browser.newContext({ viewport: DESKTOP });
+    const page = await ctx.newPage();
+    await page.goto(`${server.origin}${path}#${id}`, { waitUntil: 'load' });
+    await page.waitForTimeout(500);
+    const top = await page.evaluate((id) => document.getElementById(id).getBoundingClientRect().top, id);
+    assert.ok(Math.abs(top) <= 2, `#${id} is ${top}px from the top of the viewport`);
+    await ctx.close();
+  });
+}
+
+test('deferred blocks: find-in-page reaches text in a block that was never rendered', async () => {
+  // window.find is the scriptable form of Chrome's find bar; both search
+  // content-visibility: auto content and reveal the match.
+  for (const [path, text] of [[HUB, '[Where it is now.]'], [PART, 'Real numbers or none']]) {
+    const { ctx, page } = await openPart(path);
+    const r = await page.evaluate((text) => {
+      const found = window.find(text);
+      const node = getSelection().anchorNode?.parentElement;
+      return { found, visible: node?.checkVisibility({ contentVisibilityAuto: true }), top: node?.getBoundingClientRect().top };
+    }, text);
+    assert.equal(r.found, true, `"${text}" not found on ${path}`);
+    assert.equal(r.visible, true, `"${text}" found but not rendered`);
+    assert.ok(r.top >= 0 && r.top < DESKTOP.height, `"${text}" not scrolled into view (${r.top})`);
+    await ctx.close();
+  }
+});
+
+test("deferred blocks: a focus ring at a block's edge isn't clipped", async () => {
+  const { ctx, page } = await openPart(HUB);
+  await page.focus('a.next');
+  await page.waitForTimeout(100);
+  const { x, y } = await page.evaluate(() => {
+    const r = document.querySelector('a.next').getBoundingClientRect();
+    return { x: Math.round(r.left - 4), y: Math.round(r.top + r.height / 2) };
+  });
+  // The ring is 2px of accent, 3px out: 4px left of the link is inside it.
+  const png = await page.screenshot({ clip: { x, y, width: 1, height: 1 } });
+  const rgb = await page.evaluate(async (b64) => {
+    const img = new Image();
+    img.src = 'data:image/png;base64,' + b64;
+    await img.decode();
+    const c = new OffscreenCanvas(1, 1).getContext('2d');
+    c.drawImage(img, 0, 0);
+    return [...c.getImageData(0, 0, 1, 1).data.slice(0, 3)];
+  }, png.toString('base64'));
+  assert.deepEqual(rgb, [0x24, 0x47, 0xf0], `ring clipped: ${rgb}`);
+  await ctx.close();
+});

@@ -72,7 +72,7 @@ const hubHref = entryHref(hub)!;
       )}
 
       {data.decision && (
-        <div class="decision">
+        <div class="decision defer" style="--defer-size: 186px">
           <DecisionBlock decision={data.decision} intro={data.decision.intro} />
         </div>
       )}
@@ -82,7 +82,7 @@ const hubHref = entryHref(hub)!;
         {!placesScreens && <Gallery />}
       </article>
 
-      <div class="pager"><PartPager part={part} /></div>
+      <div class="pager defer" style="--defer-size: 110px"><PartPager part={part} /></div>
     </main>
     {updated && (
       <span slot="bottom-start" class="muted">Updated <time datetime={updated.toISOString().slice(0, 10)}>{updated.toISOString().slice(0, 10)}</time></span>
@@ -129,6 +129,22 @@ const hubHref = entryHref(hub)!;
     gap: var(--space-96);
     padding-top: var(--space-96);
     counter-reset: body-section;
+  }
+  /* Every body block is below the fold: deferred (see .defer in base.css),
+     with the mock's heights at 1440 as the first estimate. */
+  .body > :global(:not(script, style)) {
+    content-visibility: auto;
+    contain-intrinsic-block-size: auto 110px;
+    overflow-clip-margin: 8px;
+  }
+  .body > :global(figure) {
+    contain-intrinsic-block-size: auto 301px;
+  }
+  .body > :global(.data-table) {
+    contain-intrinsic-block-size: auto 195px;
+  }
+  .body > :global([data-gallery]) {
+    contain-intrinsic-block-size: auto 1774px;
   }
   .body > :global([data-gallery]),
   .body > :global([data-gallery] ~ .body-section) {

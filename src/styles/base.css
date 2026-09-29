@@ -146,6 +146,18 @@ a {
   border: 0;
 }
 
+/* Below-the-fold blocks on long pages: skip their rendering until they near
+   the viewport. contain-intrinsic-block-size is the estimate used until the
+   block has rendered once, after which the browser remembers the real size
+   (auto). Set --defer-size per block to the mock's height at 1440. Content
+   visibility also clips paint to the block; overflow-clip-margin leaves
+   room for focus rings (2px ring, 3px offset) on links at its edge. */
+.defer {
+  content-visibility: auto;
+  contain-intrinsic-block-size: auto var(--defer-size, 600px);
+  overflow-clip-margin: 8px;
+}
+
 /* Motion is opt-out everywhere. Components that animate still write their own
    reduced-motion rules; this is the backstop. */
 @media (prefers-reduced-motion: reduce) {
