@@ -1,0 +1,11 @@
+---
+date: 2026-09-29
+entrySlug: vers1ons
+---
+
+Three changes aimed at the first screen of the case study pages, plus a new budget.
+
+- **On phones, the part pages' sibling nav is text.** It's one row of tabs (number and title) that scrolls sideways, with the current part in ink, an accent underline and 44px targets. The thumbnails show from 640px up; on phones they're never fetched. With the thumbnails gone the hero moves up, and it's now Distribution's largest paint on a phone, at 1.13s.
+- **Below the fold, rendering waits.** Every block under the fold on the hub and the part pages uses `content-visibility: auto`, with the mock's height as the size it assumes until it renders. The hub's largest paint dropped from 1.13s to 1.05s. Distribution didn't move. It loads the same requests in the same order as the hub, and I haven't isolated the 75ms difference inside Lighthouse's simulation.
+- **What could have broken, now tested.** The screens dialog still opens from a gallery that has never rendered. Links to anchors inside deferred blocks still land on them. Find-in-page still finds text in them and scrolls to it. One thing did break: content visibility clips painting at the block's edge, which cut off focus rings on links there. `overflow-clip-margin` gives them room, and a test fails if it's removed.
+- **HTML has a budget.** Each page's HTML carries its CSS inline, and first paint waits on it. The largest page is Distribution, at 11.4KB gzipped, and the gate sits about 20% above that, at 13.6KB. A page over it fails the build, named.
