@@ -1,8 +1,8 @@
 ---
 // Sibling navigation on a part page: every part of the hub, in build order,
 // with its thumbnail. The current part at full strength with an accent rule,
-// the others dimmed. Phones: a strip that scrolls sideways on its own, the
-// current part scrolled into view.
+// the others dimmed. Phones: a row of text tabs (number and title) that
+// scrolls sideways on its own, the current part scrolled into view.
 import type { Entry } from '../lib/entries';
 import { entryHref, entryNumber, parentOf, partsOf } from '../lib/entries';
 import EntryImage from './EntryImage.astro';
@@ -100,22 +100,40 @@ const parts = partsOf(hub);
       transition: opacity 0.2s var(--ease);
     }
   }
-  /* Phone: a sideways strip of fixed-width items. The strip bleeds to the
-     screen edges; its first and last items keep the gutter. No scroll
-     snapping: a re-snap on resize would undo the script's centering. */
+  /* Phone: one row of text tabs, number and title, scrolling sideways on
+     its own. The current tab in ink with an accent underline; 44px targets.
+     No thumbnails: hidden, and lazy, so they're never fetched. The row
+     bleeds to the screen edges; the first and last tabs keep the gutter. No
+     scroll snapping: a re-snap on resize would undo the script's centering. */
   @media (max-width: 639.98px) {
     ol {
       grid-template-columns: none;
       grid-auto-flow: column;
-      grid-auto-columns: 40%;
-      column-gap: var(--space-16);
+      grid-auto-columns: max-content;
+      column-gap: var(--space-24);
       margin-inline: calc(-1 * var(--grid-margin));
       padding-inline: var(--grid-margin);
       overflow-x: auto;
       scrollbar-width: none;
+      border-bottom: 1px solid var(--line);
     }
     .item {
+      flex-direction: row;
+      align-items: center;
+      gap: var(--space-8);
       min-height: 44px;
+      padding: 0;
+      border-top: 0;
+      /* Sits on the row's rule. */
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      white-space: nowrap;
+    }
+    .item.current {
+      border-bottom-color: var(--accent);
+    }
+    .thumb {
+      display: none;
     }
   }
 </style>
