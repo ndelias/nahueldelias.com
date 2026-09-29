@@ -38,6 +38,12 @@
   --leading-h2: 1.04;
   --tracking-h2: -0.022em;
 
+  /* Body section headings on case study pages. Fixed: 30 is already the
+     phone size of h2. */
+  --text-h3: 1.875rem; /* 30 */
+  --leading-h3: 1.15;
+  --tracking-h3: -0.015em;
+
   /* The focused entry's title on the homepage strip. */
   --text-meta-title: clamp(1.75rem, 1.5357rem + 1.0714vw, 2.5rem); /* 28–40 */
   --leading-meta-title: 1.04;
@@ -58,8 +64,18 @@
   --leading-body: 1.6;
   --measure: 65ch;
 
+  /* Case study running text, a step up from body for long reading. */
+  --text-prose: 1.0625rem; /* 17 */
+  --leading-prose: 1.65;
+
+  /* Meta row values on case study pages. */
+  --text-meta: 0.9375rem; /* 15 */
+
   --text-small: 0.875rem; /* 14 */
   --leading-small: 1.5;
+
+  /* Figure captions and margin notes. */
+  --text-caption: 0.8125rem; /* 13 */
 
   --text-mono-sm: 0.625rem; /* 10: section and badge in the Index list */
   --text-mono: 0.6875rem; /* 11 */

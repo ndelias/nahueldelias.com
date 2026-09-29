@@ -1,0 +1,283 @@
+---
+// The provenance stack (§7.3, §7.5 motion budget b): v1 → vN frames from
+// `versions`, stacked, newest on top. Tabs riffle the stack: the picked
+// frame comes to the front and the others fall back behind it in order.
+//
+// Server-rendered as a static strip, oldest first. That's what shows without
+// JS and under reduced motion; the island upgrades it to the stack and tabs
+// only when motion is allowed, and back if that changes mid-visit.
+import type { ImageMetadata } from 'astro';
+import EntryImage from './EntryImage.astro';
+
+interface Props {
+  versions: { src: ImageMetadata; alt: string; label?: string; date: string; note: string }[];
+}
+
+const versions = Astro.props.versions.map((v, i) => ({ ...v, label: v.label ?? `v${i + 1}` }));
+const n = versions.length;
+const active = n - 1;
+const depth = (i: number) => (active - i + n) % n;
+const place = (d: number) => `--depth: ${d}; --o: ${d === 0 ? 1 : 0.9 - d * 0.15}; z-index: ${10 - d}`;
+---
+{n > 0 && (
+  <section class="versions grid" aria-labelledby="versions-label" data-versions style={`--n: ${n}`}>
+    <div class="intro">
+      <h2 class="label mono muted" id="versions-label">Versions</h2>
+      <p class="muted"><span class="when-stack">How it looked at each stage. Pick a version to riffle the stack.</span><span class="when-strip">How it looked at each stage, oldest first.</span></p>
+      <div class="tabs" data-versions-tabs aria-label="Versions">
+        {versions.map((v, i) => (
+          <button class="tab" type="button" id={`version-tab-${i}`} aria-controls={`version-${i}`} data-version-tab tabindex={i === active ? 0 : -1} aria-selected={i === active ? 'true' : 'false'}>
+            <span class="mono tab-label">{v.label}</span>
+            <span class="mono muted tab-date">{v.date}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+    <div class="wrap">
+      <div class="stack" data-versions-stack>
+        {versions.map((v, i) => (
+          <div class="frame" id={`version-${i}`} data-version style={place(depth(i))} aria-labelledby={`version-tab-${i}`}>
+            <EntryImage class="shot" src={v.src} alt={v.alt} />
+            <span class="meta mono">{v.label} · {v.date}</span>
+            <span class="note">{v.note}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+)}
+
+<script>
+  const MOTION = matchMedia('(prefers-reduced-motion: no-preference)');
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-versions]')) {
+    const tablist = root.querySelector<HTMLElement>('[data-versions-tabs]')!;
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('[data-version-tab]')];
+    const frames = [...root.querySelectorAll<HTMLElement>('[data-version]')];
+    const n = frames.length;
+    let active = n - 1;
+
+    const pick = (next: number, focus = false) => {
+      active = (next + n) % n;
+      frames.forEach((frame, i) => {
+        const d = (active - i + n) % n;
+        frame.style.setProperty('--depth', String(d));
+        frame.style.setProperty('--o', String(d === 0 ? 1 : 0.9 - d * 0.15));
+        frame.style.zIndex = String(10 - d);
+        // Only the front frame is the panel; the ones behind are decoration.
+        if (d === 0) frame.removeAttribute('aria-hidden');
+        else frame.setAttribute('aria-hidden', 'true');
+      });
+      tabs.forEach((tab, i) => {
+        tab.setAttribute('aria-selected', String(i === active));
+        tab.tabIndex = i === active ? 0 : -1;
+      });
+      if (focus) tabs[active].focus();
+    };
+
+    // Stack mode: tabs and tabpanel roles. Strip mode: plain list, no roles.
+    const apply = () => {
+      const on = MOTION.matches;
+      root.classList.toggle('stacked', on);
+      if (on) {
+        tablist.setAttribute('role', 'tablist');
+        tabs.forEach((tab) => tab.setAttribute('role', 'tab'));
+        frames.forEach((frame) => frame.setAttribute('role', 'tabpanel'));
+        pick(active);
+      } else {
+        tablist.removeAttribute('role');
+        tabs.forEach((tab) => tab.removeAttribute('role'));
+        frames.forEach((frame) => {
+          frame.removeAttribute('role');
+          frame.removeAttribute('aria-hidden');
+        });
+      }
+    };
+
+    tabs.forEach((tab, i) => tab.addEventListener('click', () => pick(i)));
+    tablist.addEventListener('keydown', (event) => {
+      const step = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[event.key];
+      if (step) pick(active + step, true);
+      else if (event.key === 'Home') pick(0, true);
+      else if (event.key === 'End') pick(n - 1, true);
+      else return;
+      event.preventDefault();
+    });
+
+    MOTION.addEventListener('change', apply);
+    apply();
+  }
+</script>
+
+<style>
+  .intro {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-16);
+  }
+  .label {
+    margin: 0;
+    font-weight: var(--weight-regular);
+    line-height: normal;
+  }
+  .intro p {
+    margin: 0;
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+  }
+  .when-stack,
+  .tabs {
+    display: none;
+  }
+  .stacked .when-stack {
+    display: inline;
+  }
+  .stacked .when-strip {
+    display: none;
+  }
+  .stacked .tabs {
+    display: flex;
+    flex-direction: column;
+  }
+  .tab {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    min-height: 44px;
+    padding: 0;
+    border: 0;
+    border-top: 1px solid var(--line);
+    background: none;
+    color: var(--muted);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .tab[aria-selected='true'] {
+    color: var(--ink);
+  }
+  .tab:hover .tab-label {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .tab-label {
+    font-size: var(--text-mono-lg);
+    line-height: 44px;
+  }
+  /* Dates as written, not uppercased: "[Date]", "2025-03". */
+  .tab-date {
+    text-transform: none;
+  }
+
+  .wrap {
+    container-type: inline-size;
+  }
+  .frame {
+    position: relative;
+    background: var(--surface);
+    box-shadow: 0 1px 0 var(--line);
+    overflow: hidden;
+  }
+  .frame :global(.shot) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .meta,
+  .note {
+    position: absolute;
+    left: 12px;
+    color: var(--ink);
+  }
+  .meta {
+    top: 10px;
+    font-size: var(--text-mono-sm);
+    line-height: normal;
+    opacity: 0.7;
+  }
+  .note {
+    right: 12px;
+    bottom: 10px;
+    font-size: var(--text-small);
+    line-height: 1.4;
+  }
+
+  /* Strip: side by side, oldest first. */
+  .stack {
+    display: grid;
+    grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+    gap: var(--grid-gutter);
+  }
+  .frame {
+    aspect-ratio: 82 / 44;
+  }
+
+  /* Stack: the frames on top of each other, each step back offset down and
+     right and a little smaller. The mock's 820×440 frames and 56/36px steps
+     in a 1002px column, in container units so the proportions hold at any
+     width. */
+  .stacked .wrap {
+    --w: calc(820 / 1002 * 100cqw);
+    --dx: calc(56 / 1002 * 100cqw);
+    --dy: calc(36 / 1002 * 100cqw);
+  }
+  .stacked .stack {
+    display: block;
+    position: relative;
+    height: calc(520 / 1002 * 100cqw);
+  }
+  .stacked .frame {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: var(--w);
+    transform: translate(calc(var(--depth) * var(--dx)), calc(var(--depth) * var(--dy))) scale(calc(1 - var(--depth) * 0.04));
+    transform-origin: top left;
+    opacity: var(--o);
+    transition:
+      transform 0.5s var(--ease),
+      opacity 0.3s ease;
+  }
+
+  @media (min-width: 640px) {
+    .intro {
+      grid-column: span 3;
+    }
+    .wrap {
+      grid-column: 4 / span 9;
+    }
+  }
+
+  /* Phone: the tabs in one row above the stack, smaller steps. The strip
+     becomes a column. */
+  @media (max-width: 639.98px) {
+    .intro {
+      margin-bottom: var(--space-24);
+    }
+    .stacked .tabs {
+      flex-direction: row;
+      gap: var(--space-16);
+    }
+    .tab {
+      flex: 1;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0;
+    }
+    .tab-label {
+      line-height: normal;
+    }
+    .stack {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .stacked .wrap {
+      --dx: 16px;
+      --dy: 12px;
+      --w: calc(100cqw - (var(--n) - 1) * var(--dx));
+    }
+    .stacked .stack {
+      height: calc(var(--w) * 44 / 82 + (var(--n) - 1) * var(--dy));
+    }
+  }
+</style>

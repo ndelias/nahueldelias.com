@@ -1,12 +1,19 @@
 ---
-// /work/[slug]: §9 step 2 renders every field end to end, unstyled. The case
-// study template proper is §9 step 5.
+// /work/[slug]: the case study template (§9 step 5). Every block renders only
+// when the entry has what it needs: a hub gets its parts matrix, an entry
+// with versions its provenance stack, and so on. Nothing renders empty.
 import type { GetStaticPaths } from 'astro';
-import EntryImage from '../../components/EntryImage.astro';
 import { render } from 'astro:content';
+import DecisionBlock from '../../components/DecisionBlock.astro';
 import EntryHeader from '../../components/EntryHeader.astro';
+import Figure from '../../components/Figure.astro';
+import Frame from '../../components/Frame.astro';
+import Icon from '../../components/Icon.astro';
+import NextEntry from '../../components/NextEntry.astro';
+import PartsMatrix from '../../components/PartsMatrix.astro';
+import VersionsStack from '../../components/VersionsStack.astro';
 import Base from '../../layouts/Base.astro';
-import { entriesIn } from '../../lib/entries';
+import { entriesIn, entryNumber, lastUpdated, partsOf } from '../../lib/entries';
 
 export const getStaticPaths = (() =>
   entriesIn('work').map((entry) => ({ params: { slug: entry.id }, props: { entry } }))) satisfies GetStaticPaths;
@@ -14,44 +21,188 @@ export const getStaticPaths = (() =>
 const { entry } = Astro.props;
 const { data } = entry;
 const { Content } = await render(entry);
-const links = Object.entries(data.links).filter(([, href]) => href);
+const isHub = partsOf(entry).length > 0;
+const updated = await lastUpdated();
+
+const LINKS = { live: 'Live', repo: 'Repo', demo: 'Demo' } as const;
+const links = (Object.keys(LINKS) as (keyof typeof LINKS)[]).filter((k) => data.links[k]).map((k) => ({ label: LINKS[k], href: data.links[k]! }));
+const dates = `${data.dates.start} – ${data.dates.end ?? 'present'}`;
+const hero = data.hero;
+const heroMeta = hero?.video ? ['Walkthrough', 'muted', hero.duration].filter(Boolean).join(' · ') : undefined;
 ---
 <Base title={`${data.title} — Nahuel D'Elias`} description={data.tagline} noindex={data.fixture}>
-  <main>
-    {data.fixture && <p><strong>Fixture.</strong> A test entry for the content pipeline, not real work.</p>}
-    <EntryHeader entry={entry} />
+  <Frame>
+    <a slot="top-center" class="back" href="/">(<Icon name="arrow-left" /> Index)</a>
+    <main class="case container">
+      {data.fixture && <p class="fixture mono muted">Fixture · a test entry for the templates, not real work</p>}
+      <EntryHeader entry={entry} />
 
-    <EntryImage src={data.cover.src} alt={data.cover.alt} loading="eager" />
+      <dl class="facts grid">
+        <div class="fact role"><dt class="mono muted">Role</dt><dd>{data.role}</dd></div>
+        <div class="fact dates"><dt class="mono muted">Dates</dt><dd class="nums">{dates}</dd></div>
+        {data.stack.length > 0 && <div class="fact stack"><dt class="mono muted">Stack</dt><dd>{data.stack.join(' · ')}</dd></div>}
+        {links.length > 0 && (
+          <div class="fact links">
+            <dt class="mono muted">Links</dt>
+            <dd class="mono">{links.map((l) => <a href={l.href}>{l.label} <Icon name="arrow-up-right" /></a>)}</dd>
+          </div>
+        )}
+      </dl>
 
-    <dl>
-      <dt>Role</dt>
-      <dd>{data.role}</dd>
-      <dt>Dates</dt>
-      <dd>{data.dates.start}–{data.dates.end ?? 'present'}</dd>
-      <dt>Stack</dt>
-      <dd>{data.stack.join(', ')}</dd>
-    </dl>
+      {hero && (
+        <div class="hero">
+          <Figure layout="full" priority src={hero.src} alt={hero.alt} video={hero.video} play="click" caption={hero.caption} meta={heroMeta} label={entryNumber(entry)} />
+        </div>
+      )}
 
-    {links.length > 0 && (
-      <ul>
-        {links.map(([name, href]) => <li><a href={href}>{name}</a></li>)}
-      </ul>
+      {data.decision && (
+        <div class="decision">
+          <DecisionBlock decision={data.decision} intro={isHub ? 'The call that shaped the whole product. Each part below has its own.' : undefined} />
+        </div>
+      )}
+
+      <article class="body">
+        <Content />
+      </article>
+
+      <div class="parts"><PartsMatrix hub={entry} /></div>
+
+      {data.versions && <div class="versions"><VersionsStack versions={data.versions} /></div>}
+
+      <NextEntry entry={entry} />
+    </main>
+    {updated && (
+      <span slot="bottom-start" class="muted">Updated <time datetime={updated.toISOString().slice(0, 10)}>{updated.toISOString().slice(0, 10)}</time></span>
     )}
-
-    {data.decision && (
-      <section>
-        <h2>Decision</h2>
-        <dl>
-          <dt>Chose</dt>
-          <dd>{data.decision.chose}</dd>
-          <dt>Rejected</dt>
-          <dd>{data.decision.rejected}</dd>
-          <dt>Cost</dt>
-          <dd>{data.decision.cost}</dd>
-        </dl>
-      </section>
-    )}
-
-    <Content />
-  </main>
+    <a slot="bottom-center" class="back" href="/">(<Icon name="arrow-left" /> Index)</a>
+  </Frame>
 </Base>
+
+<style>
+  .back {
+    color: inherit;
+    text-decoration: none;
+  }
+  /* Phone: 44px targets, as in the frame. */
+  @media (max-width: 639.98px) {
+    .back {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+    }
+  }
+  .back:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .case {
+    /* Clear the frame's fixed header (28px inset plus one mono line), then
+       the mock's 140px. The footer row sits in the last 32px + line. */
+    padding-top: calc(var(--frame-inset-block) + 14px + 140px);
+    padding-bottom: calc(var(--frame-inset-block) + 14px + 96px);
+  }
+  .fixture {
+    position: absolute;
+    top: calc(var(--frame-inset-block) + 14px + 96px);
+    margin: 0;
+  }
+  .facts {
+    margin: 48px 0 0;
+    padding-top: var(--space-16);
+    border-top: 1px solid var(--ink);
+    row-gap: var(--space-24);
+  }
+  .fact {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  dt {
+    line-height: normal;
+  }
+  dd {
+    margin: 0;
+    font-size: var(--text-meta);
+    line-height: 1.5;
+  }
+  .nums {
+    font-variant-numeric: tabular-nums;
+  }
+  .links dd {
+    display: flex;
+    gap: var(--space-16);
+    font-size: var(--text-mono-lg);
+  }
+  .links a {
+    text-decoration: none;
+  }
+  .links a:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .hero {
+    margin-top: 56px;
+  }
+  .decision {
+    margin-top: var(--space-96);
+  }
+  .body {
+    display: flex;
+    flex-direction: column;
+    gap: 72px;
+    padding-top: var(--space-96);
+    counter-reset: body-section;
+  }
+  .parts:not(:empty) {
+    margin-top: 120px;
+  }
+  .versions {
+    margin-top: 180px;
+  }
+  @media (min-width: 640px) {
+    .role,
+    .dates {
+      grid-column: span 3;
+    }
+    .stack {
+      grid-column: span 4;
+    }
+    .links {
+      grid-column: span 2;
+    }
+  }
+  /* Phone (approved 2026-09-28): the meta row as a 2×2 grid, and the
+     section breaks scaled down. */
+  @media (max-width: 639.98px) {
+    .case {
+      padding-top: var(--space-48);
+      padding-bottom: var(--space-48);
+    }
+    .fixture {
+      position: static;
+      margin-bottom: var(--space-24);
+    }
+    .facts {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: var(--space-16);
+      margin-top: var(--space-32);
+    }
+    .hero {
+      margin-top: var(--space-32);
+    }
+    .decision,
+    .body {
+      margin-top: var(--space-64);
+    }
+    .body {
+      padding-top: 0;
+      gap: var(--space-64);
+    }
+    .parts:not(:empty) {
+      margin-top: var(--space-96);
+    }
+    .versions {
+      margin-top: var(--space-96);
+    }
+  }
+</style>

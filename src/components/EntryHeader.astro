@@ -1,7 +1,9 @@
 ---
-// Page header for any entry page. The status badge is part of the header, not
-// something a page opts into.
+// Page header for any entry page: number, section and years, the status
+// badge, title and tagline. The badge is part of the header, not something a
+// page opts into (§3 rule 3).
 import type { Entry } from '../lib/entries';
+import { SECTION_LABELS, entryNumber, entryYears } from '../lib/entries';
 import StatusBadge from './StatusBadge.astro';
 
 interface Props {
@@ -11,8 +13,50 @@ interface Props {
 const { entry } = Astro.props;
 const { title, tagline } = entry.data;
 ---
-<header>
-  <p>{entry.collection} <StatusBadge entry={entry} /></p>
-  <h1>{title}</h1>
-  <p>{tagline}</p>
+<header class="entry-header grid" data-entry-header>
+  <div class="inner">
+    <p class="meta mono muted">
+      <span class="no">({entryNumber(entry)})</span><span>{SECTION_LABELS[entry.collection]} · {entryYears(entry)}</span>
+      <StatusBadge entry={entry} />
+    </p>
+    <h1 class="title">{title}</h1>
+    <p class="tagline">{tagline}</p>
+  </div>
 </header>
+
+<style>
+  .inner {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-12);
+    align-items: center;
+    margin: 0;
+    line-height: normal;
+  }
+  .no {
+    color: var(--ink);
+  }
+  .title {
+    margin: 0;
+    font-size: var(--text-display);
+    line-height: var(--leading-display);
+    letter-spacing: -0.03em;
+  }
+  .tagline {
+    margin: 0;
+    max-width: 34ch;
+    font-size: var(--text-title);
+    line-height: 1.4;
+    text-wrap: balance;
+  }
+  @media (min-width: 640px) {
+    .inner {
+      grid-column: 1 / span 9;
+    }
+  }
+</style>

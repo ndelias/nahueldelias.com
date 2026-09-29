@@ -54,5 +54,13 @@ Easing for strip motion: cubic-bezier(0.2, 0.7, 0.2, 1).
   pixel (the ~0.5% allowance is for comparisons with docs/design). When a
   render change is intended, push, run `npm run screens:update` and commit
   the new baselines with the change.
+- Chrome is pinned. The screens, dist-tests and Lighthouse jobs run Chrome
+  for Testing at the exact version in `.chrome-version` (installed by
+  .github/actions/chrome, which fails if the binary reports anything else),
+  on `ubuntu-24.04`. GitHub doesn't allow pinning the image build under that
+  label; each job logs it ("Image: … Version: …") and the Chrome version
+  goes in the job summary. To bump Chrome: edit `.chrome-version` → push →
+  `npm run screens:update` → review the baseline diff → commit the version
+  and baselines together.
 - Never commit placeholder copy as if it were real: bracketed text like
   [Tagline] stays bracketed until Nahuel supplies it.

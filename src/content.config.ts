@@ -1,16 +1,19 @@
 import { defineCollection, type SchemaContext } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
-import { ESSAY_STATUSES, STATUSES, type Section } from './lib/model';
+import { DISCIPLINES, ESSAY_STATUSES, FRAMES, STATUSES, type Section } from './lib/model';
 
 // §3 content model. Each entry section is its own collection; the section is the
 // collection name and the slug is the filename, so neither is repeated in
 // frontmatter. Two of the three compile-time rules are enforced here, per
 // entry. The third (at most two weight: 1 entries) spans collections and lives
-// in src/lib/entries.ts.
+// in src/lib/entries.ts, as do the part rules that need the parent entry.
 
 // Month precision: "2025-03". YAML leaves this as a string, unquoted.
 const MONTH = /^\d{4}-(0[1-9]|1[0-2])$/;
+// Parts (entries with a parent) need at least this many gallery screens.
+export const MIN_PART_GALLERY = 3;
+
 // Fixtures may hold a bracketed placeholder ("[Years]") instead, so an unknown
 // date renders as visibly unknown rather than as a made-up one.
 const PLACEHOLDER = /^\[.+\]$/;
@@ -20,6 +23,7 @@ const month = z
 
 const entrySchema = ({ image }: SchemaContext) => {
   const imageRef = z.object({ src: image(), alt: z.string().min(1) });
+  const disciplines = z.array(z.enum(DISCIPLINES));
 
   return z
     .object({
@@ -51,7 +55,43 @@ const entrySchema = ({ image }: SchemaContext) => {
           outcome: z.string().min(1),
         })
         .optional(),
-      versions: z.array(imageRef).optional(),
+      // v1 → vN frames for the provenance stack, oldest first. The label
+      // defaults to v1, v2…
+      versions: z
+        .array(
+          imageRef.extend({
+            label: z.string().min(1).optional(),
+            date: month,
+            note: z.string().min(1),
+          }),
+        )
+        .optional(),
+      // Full-width still or recording under the header. With a video, the
+      // image is its poster and the recording plays on request, muted.
+      hero: imageRef
+        .extend({
+          video: z.string().min(1).optional(),
+          // "0:48", shown beside "Walkthrough · muted".
+          duration: z.string().min(1).optional(),
+          // The flow the recording walks through, or the one thing to notice.
+          caption: z.string().min(1).optional(),
+        })
+        .optional(),
+      gallery: z
+        .array(
+          z.object({
+            src: image(),
+            alt: z.string({ error: 'Required: describe what the screen shows.' }).min(1, 'Required: describe what the screen shows.'),
+            caption: z.string().min(1).optional(),
+            frame: z.enum(FRAMES).default('desktop'),
+          }),
+        )
+        .optional(),
+      // Slug of the hub entry. Set on parts (vers1ons/licensing…), which live
+      // in the hub's folder: src/content/work/vers1ons/licensing.mdx.
+      parent: z.string().min(1).optional(),
+      // What the entry demonstrates. Shown on the hub's parts matrix.
+      disciplines: z.object({ led: disciplines, contributed: disciplines }).optional(),
       cover: imageRef,
       // The homepage strip's still, 16:10, at least 1040×650 (2x the focused
       // frame). Optionally a dark-theme variant. Falls back to the cover.
@@ -74,8 +114,51 @@ const entrySchema = ({ image }: SchemaContext) => {
           });
         }
       }
+      if (entry.disciplines) {
+        const both = entry.disciplines.led.filter((d) => entry.disciplines!.contributed.includes(d));
+        if (both.length) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['disciplines'],
+            message: `${both.join(', ')} can't be both led and contributed. Keep it in one list.`,
+          });
+        }
+      }
+      // Parts (§3 hub and parts). The rules that need the parent entry itself
+      // are in src/lib/entries.ts.
+      if (entry.parent) {
+        if (entry.weight !== 2) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['weight'],
+            message: 'Parts are weight 2 (§3 hub and parts). Only their hub carries weight 1.',
+          });
+        }
+        if (!entry.decision) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['decision'],
+            message: 'Required for parts (§3 hub and parts): every part has its own decision. Add decision: { chose, rejected, cost }.',
+          });
+        }
+        const screens = entry.gallery?.length ?? 0;
+        if (screens < MIN_PART_GALLERY) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['gallery'],
+            message: `Parts need at least ${MIN_PART_GALLERY} gallery screens (§3 hub and parts). Found ${screens}.`,
+          });
+        }
+        if (!entry.disciplines || entry.disciplines.led.length + entry.disciplines.contributed.length === 0) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['disciplines'],
+            message: "Required for parts: the hub's matrix shows what each part led and contributed. Add disciplines: { led, contributed }.",
+          });
+        }
+      }
       // Rule 2: a weight 1 or 2 entry without a decision is a screenshot gallery.
-      if (entry.weight <= 2 && !entry.decision) {
+      if (entry.weight <= 2 && !entry.decision && !entry.parent) {
         ctx.addIssue({
           code: 'custom',
           path: ['decision'],
