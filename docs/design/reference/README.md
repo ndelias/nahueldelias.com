@@ -12,7 +12,7 @@ This is a design reference at a fixed 1440px frame. Port the values and behavior
 
 ## Baselines and comparisons
 
-Baselines are captured in the same environment the comparisons run in: the `screens` job in CI (ubuntu-latest, the runner's Google Chrome, 1440×900 at 1x), which serves this folder over HTTP and runs:
+Baselines are captured in the same environment the comparisons run in: the `screens` job in CI (ubuntu-24.04, the pinned Chrome for Testing in `.chrome-version`, 1440×900 at 1x), which serves this folder over HTTP and runs:
 
 ```sh
 node scripts/screens.mjs capture .screens/captured

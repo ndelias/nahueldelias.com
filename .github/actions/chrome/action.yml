@@ -1,0 +1,34 @@
+# One exact Chrome for every job that renders pages (screens, dist tests,
+# Lighthouse): Chrome for Testing at the version in .chrome-version, straight
+# from Google's bucket. Not the runner's Google Chrome, which moves with the
+# image, so a runner update can't change a pixel. Exports CHROME_PATH, which
+# scripts/lib/browser.mjs and Lighthouse CI both read.
+# To bump: see "Chrome" in CLAUDE.md.
+name: Chrome
+description: Install the pinned Chrome for Testing build and export CHROME_PATH
+runs:
+  using: composite
+  steps:
+    - id: version
+      shell: bash
+      run: echo "version=$(tr -d '[:space:]' < .chrome-version)" >> "$GITHUB_OUTPUT"
+    - uses: actions/cache@v6
+      id: cache
+      with:
+        path: ~/.chrome-for-testing
+        key: chrome-${{ runner.os }}-${{ steps.version.outputs.version }}
+    - if: steps.cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        mkdir -p ~/.chrome-for-testing
+        curl -fsSL -o /tmp/chrome.zip "https://storage.googleapis.com/chrome-for-testing-public/${{ steps.version.outputs.version }}/linux64/chrome-linux64.zip"
+        unzip -q /tmp/chrome.zip -d ~/.chrome-for-testing
+    - shell: bash
+      run: |
+        bin="$HOME/.chrome-for-testing/chrome-linux64/chrome"
+        echo "CHROME_PATH=$bin" >> "$GITHUB_ENV"
+        v=$("$bin" --version)
+        echo "$v"
+        echo "Chrome: \`$v\`" >> "$GITHUB_STEP_SUMMARY"
+        # Fail if the binary isn't the version the repo pins.
+        case "$v" in *" ${{ steps.version.outputs.version }}"*) ;; *) echo "::error::Expected Chrome ${{ steps.version.outputs.version }}"; exit 1 ;; esac
