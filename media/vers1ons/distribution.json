@@ -37,11 +37,6 @@
       "donor": "videos/12-distribution-night-swim.mp4"
     },
     {
-      "from": "screens/eras/today/flows/distribution/mobile-distribution-1.png",
-      "to": "work/vers1ons/distribution/gallery/02-phone-source.webp",
-      "width": 1170
-    },
-    {
       "from": "screens/flows/distribution/02-track.png",
       "to": "work/vers1ons/distribution/gallery/03-track.webp",
       "width": 2560,
@@ -311,6 +306,14 @@
       "width": 1344,
       "start": 1.5,
       "duration": 6.5
+    },
+    {
+      "from": "videos/12-distribution-night-swim.mp4",
+      "to": "media/vers1ons/distribution/clip-track.mp4",
+      "kind": "inline",
+      "width": 1344,
+      "start": 28.5,
+      "duration": 7
     },
     {
       "from": "videos/12-distribution-night-swim.mp4",

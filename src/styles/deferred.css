@@ -965,6 +965,54 @@
       margin-bottom: var(--space-24);
     }
   }
+  /* Wide: the run buttons, the log and the inspector move into the margin
+     under the caption, beside the diagram they drive. The diagram's box and
+     section give up their own boxes (display: contents) so its stage and
+     panel sit in the figure's grid; the stage takes the frame. */
+  @media (min-width: 1024px) {
+    & {
+      grid-template-rows: auto 1fr;
+      row-gap: var(--space-24);
+    }
+    .body,
+    .sd {
+      display: contents;
+    }
+    .sd-stage {
+      grid-column: 4 / span 9;
+      grid-row: 1 / span 2;
+      align-self: start;
+      container-type: inline-size;
+      padding: 40px;
+      border: 1px solid var(--sd-line);
+      border-radius: 4px;
+      background: var(--sd-bg);
+    }
+    .sd-panel {
+      grid-column: 1 / span 3;
+      grid-row: 2;
+      align-self: start;
+      grid-template-columns: minmax(0, 1fr);
+      margin-top: 0;
+      font-family: var(--sd-sans);
+    }
+    .sd-log {
+      min-height: 0;
+    }
+    .sd-reset {
+      margin-left: 0;
+    }
+    /* Each log line's step and time on a line of their own, under its text. */
+    .sd-log li {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      column-gap: 10px;
+    }
+    .sd-log time {
+      grid-column: 2;
+      margin-left: 0;
+    }
+  }
 }
 
 /* DecisionBlock */

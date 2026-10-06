@@ -5,7 +5,7 @@ export const distribution: DiagramSpec = {
   id: "distribution",
   eyebrow: "vers1ons · distribution",
   title: "From one click to every store",
-  subtitle: "Nothing is written until every check passes, and every hop after that is a step that can resume on its own.",
+  subtitle: "Nothing is written until every check passes. After that, the release is one Inngest function, and every hop is a step that can resume on its own.",
   columns: 4,
   nodes: [
     {

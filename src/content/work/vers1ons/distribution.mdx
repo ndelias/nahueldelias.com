@@ -36,16 +36,12 @@ gallery:
     caption: 'Start from a brand-new upload or a track you already licensed. A licensed track brings its listing''s audio and details with it, so there''s less to type and nothing to contradict.'
     frame: desktop
     clip: /media/vers1ons/distribution/clip-source.mp4
-  - src: ../../../assets/work/vers1ons/distribution/gallery/02-phone-source.webp
-    alt: 'The source step on a phone.'
-    title: 'On a phone'
-    caption: 'The same first step on a phone: one plain question, then the next.'
-    frame: phone
   - src: ../../../assets/work/vers1ons/distribution/gallery/03-track.webp
     alt: 'Track setup with the waveform preview picker.'
     title: 'Track details'
     caption: 'Pick the store preview by dragging across the real waveform; stores play that 30-second clip before purchase. Choose none, and stores pick their own.'
     frame: desktop
+    clip: /media/vers1ons/distribution/clip-track.mp4
   - src: ../../../assets/work/vers1ons/distribution/gallery/04-audio-processed.webp
     alt: 'Track setup, audio processed.'
     title: 'Audio checked'
@@ -180,8 +176,6 @@ cover:
 order: 5
 ---
 import BodySection from '../../../components/BodySection.astro';
-import ClassifierDiagram from '../../../components/ClassifierDiagram.astro';
-import DataTable from '../../../components/DataTable.astro';
 import SystemFigure from '../../../components/diagrams/SystemFigure.astro';
 import { distribution } from '../../../components/diagrams/specs/distribution';
 
@@ -196,39 +190,6 @@ import { distribution } from '../../../components/diagrams/specs/distribution';
 <Steps />
 
 <Comparisons />
-
-<BodySection label="Under the hood" heading="Refuse before writing.">
-  Submitting a release runs every check before it touches the database: schema, ownership, beta access, drop timing, payout readiness, the license's store scope, storefront timing, duplicates, worker readiness. Then it writes the job, the rights grants and the dispatch envelope in one transaction.
-
-  - **Hybrid partners.** One partner issues the codes and another delivers to stores, a deliberate choice: no registrant prefix of our own.
-  - **Durable orchestration.** One durable job walks seven replay-safe steps: context, codes, release setup, staging audio and art (ffmpeg to WAV), assembling and hashing the metadata, delivery per route, then waiting up to seven days for the partner's confirmation.
-  - **Live status, no polling.** Each step writes the job row and publishes through Redis to Socket.IO, and the wizard updates in place.
-  - **Remix lineage.** Remixes of remixes accumulate contributors up the chain and inherit derivative titles correctly.
-  - **Post-release edits** are classified as metadata-only or full update. ISWC is editable after release.
-</BodySection>
-
-<ClassifierDiagram
-  label="Fig. 2"
-  intro="Every change to a live release goes through one classifier before anything reaches the distributor."
-  input={{ label: 'Input', text: 'A change to a live release' }}
-  classifier={{ label: 'Classifier', text: 'Which fields changed, and does the distributor treat them as identity?' }}
-  lanes={[
-    { name: 'Metadata-only update', what: 'Credits, tags and text. The release stays live and keeps its IDs.' },
-    { name: 'Full update', what: 'Changes the distributor must re-review. [What triggers it.]' },
-    { name: 'New UPC', what: 'Changes that make it a different release. [What triggers it.]' },
-  ]}
-/>
-
-<DataTable
-  label="Table 1"
-  intro="Who gets tagged on a streaming profile depends on their role on the remix."
-  columns={['Contributor role', 'On streaming services']}
-  rows={[
-    ['Performer, Featured', 'Tagged to their artist profile'],
-    ['Writer, Producer', 'Metadata credit only'],
-    ['Original artist', 'Writer/Producer credit at release; can approve tagging later, which sends a metadata-only update'],
-  ]}
-/>
 
 <BodySection label="Reliability" heading="245+ unit tests plus adversarial endpoint coverage.">
   Metrics, tracing and an ops playbook. Production canaries found real bugs, all fixed: a partner's dedupe conflict, a label and parental-advisory rejection, and codes that didn't issue when the release setup failed.

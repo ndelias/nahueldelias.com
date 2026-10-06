@@ -501,7 +501,7 @@ for (const [path, id] of [
   [HUB, 'versions-label'],
   [PART, 'steps-label'],
   [GALLERY, 'gallery-screens-label'],
-  [PART, 'table-table-1-label'],
+  [PART, 'comparisons-label'],
 ]) {
   test(`deferred blocks: an in-page link to #${id} lands on it`, async () => {
     const ctx = await browser.newContext({ viewport: DESKTOP });

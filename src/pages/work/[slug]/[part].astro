@@ -126,8 +126,8 @@ const hubHref = entryHref(hub)!;
   .fixture + .header {
     padding-top: calc(112px - var(--space-48) - 14px);
   }
-  /* The walkthrough sits in the body's figure column, not the full width:
-     a screen recording blown up past its own size only gets softer. */
+  /* The walkthrough sits centered on eight columns, not the full width: a
+     screen recording blown up past its own size only gets softer. */
   .hero {
     margin-top: 56px;
   }
@@ -138,7 +138,7 @@ const hubHref = entryHref(hub)!;
       column-gap: var(--grid-gutter);
     }
     .hero > :global(figure) {
-      grid-column: 4 / -1;
+      grid-column: 3 / span 8;
     }
   }
   .decision {
