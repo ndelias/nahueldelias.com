@@ -1,0 +1,304 @@
+{
+  "archive": "~/Vers1ons/portfolio-vers1ons",
+  "images": [
+    {
+      "from": "screens/flows/distribution/08-pending-release.png",
+      "to": "work/vers1ons/distribution/hero.webp",
+      "width": 2688,
+      "donor": "videos/12-distribution-night-swim.mp4",
+      "patch": [
+        {
+          "rect": [
+            770,
+            1350,
+            140,
+            130
+          ],
+          "at": 119.75
+        }
+      ]
+    },
+    {
+      "from": "screens/flows/distribution/05-release-stores.png",
+      "to": "work/vers1ons/distribution/cover.webp",
+      "width": 1600,
+      "donor": "videos/12-distribution-night-swim.mp4"
+    },
+    {
+      "from": "screens/app/desktop-release-failed.png",
+      "to": "work/vers1ons/distribution/release-states-poster.webp",
+      "width": 2688,
+      "donor": "videos/12-distribution-night-swim.mp4"
+    },
+    {
+      "from": "screens/flows/distribution/01-source-pick.png",
+      "to": "work/vers1ons/distribution/gallery/01-source.webp",
+      "width": 2560,
+      "donor": "videos/12-distribution-night-swim.mp4"
+    },
+    {
+      "from": "screens/eras/today/flows/distribution/mobile-distribution-1.png",
+      "to": "work/vers1ons/distribution/gallery/02-phone-source.webp",
+      "width": 1170
+    },
+    {
+      "from": "screens/flows/distribution/02-track.png",
+      "to": "work/vers1ons/distribution/gallery/03-track.webp",
+      "width": 2560,
+      "donor": "videos/12-distribution-night-swim.mp4"
+    },
+    {
+      "from": "screens/flows/_cand2/12-distribution-night-swim/c003.png",
+      "to": "work/vers1ons/distribution/gallery/04-audio-processed.webp",
+      "width": 2560,
+      "donor": "videos/12-distribution-night-swim.mp4"
+    },
+    {
+      "from": "screens/flows/distribution/03-contributors-locked.png",
+      "to": "work/vers1ons/distribution/gallery/05-contributors.webp",
+      "width": 2560,
+      "donor": "videos/12-distribution-night-swim.mp4",
+      "patch": [
+        {
+          "rect": [
+            2600,
+            1693,
+            240,
+            107
+          ],
+          "at": 30.5,
+          "force": true
+        }
+      ]
+    },
+    {
+      "from": "screens/flows/distribution/04-splits.png",
+      "to": "work/vers1ons/distribution/gallery/06-splits.webp",
+      "width": 2560,
+      "donor": "videos/12-distribution-night-swim.mp4",
+      "patch": [
+        {
+          "rect": [
+            2600,
+            1693,
+            240,
+            107
+          ],
+          "at": 30.5,
+          "force": true
+        }
+      ]
+    },
+    {
+      "from": "screens/flows/_cand2/12-distribution-night-swim/c024.png",
+      "to": "work/vers1ons/distribution/gallery/07-release-details.webp",
+      "width": 2560,
+      "donor": "videos/12-distribution-night-swim.mp4"
+    },
+    {
+      "from": "screens/flows/distribution/05-release-stores.png",
+      "to": "work/vers1ons/distribution/gallery/08-stores.webp",
+      "width": 2560,
+      "donor": "videos/12-distribution-night-swim.mp4"
+    },
+    {
+      "from": "screens/flows/_cand2/12-distribution-night-swim/c025.png",
+      "to": "work/vers1ons/distribution/gallery/09-more-stores.webp",
+      "width": 2560,
+      "donor": "videos/12-distribution-night-swim.mp4"
+    },
+    {
+      "from": "screens/flows/_cand2/12-distribution-night-swim/c027.png",
+      "to": "work/vers1ons/distribution/gallery/10-cover-art.webp",
+      "width": 2560,
+      "donor": "videos/12-distribution-night-swim.mp4",
+      "patch": [
+        {
+          "rect": [
+            2600,
+            1693,
+            240,
+            107
+          ],
+          "at": 68
+        }
+      ]
+    },
+    {
+      "from": "screens/flows/_cand2/12-distribution-night-swim/c031.png",
+      "to": "work/vers1ons/distribution/gallery/11-review.webp",
+      "width": 2560,
+      "donor": "videos/12-distribution-night-swim.mp4",
+      "patch": [
+        {
+          "rect": [
+            2600,
+            1693,
+            240,
+            107
+          ],
+          "at": 99
+        }
+      ]
+    },
+    {
+      "from": "screens/flows/_cand2/12-distribution-night-swim/c034.png",
+      "to": "work/vers1ons/distribution/gallery/12-attestations.webp",
+      "width": 2560,
+      "donor": "videos/12-distribution-night-swim.mp4",
+      "method": "paint",
+      "restore": [
+        {
+          "rect": [
+            586,
+            1340,
+            100,
+            72
+          ],
+          "from": [
+            0,
+            -102
+          ]
+        }
+      ]
+    },
+    {
+      "from": "screens/flows/distribution/07-submitted.png",
+      "to": "work/vers1ons/distribution/gallery/13-submitted.webp",
+      "width": 2560,
+      "donor": "videos/12-distribution-night-swim.mp4"
+    },
+    {
+      "from": "screens/flows/_cand2/12-distribution-night-swim/c040.png",
+      "to": "work/vers1ons/distribution/gallery/14-processing.webp",
+      "width": 2560,
+      "donor": "videos/12-distribution-night-swim.mp4",
+      "patch": [
+        {
+          "rect": [
+            2400,
+            1660,
+            436,
+            124
+          ],
+          "at": 120
+        }
+      ]
+    },
+    {
+      "from": "screens/flows/_cand2/12-distribution-night-swim/c044.png",
+      "to": "work/vers1ons/distribution/gallery/15-credits.webp",
+      "width": 2560,
+      "donor": "videos/12-distribution-night-swim.mp4",
+      "restore": [
+        {
+          "rect": [
+            804,
+            1352,
+            26,
+            54
+          ],
+          "from": [
+            145,
+            212
+          ]
+        },
+        {
+          "rect": [
+            830,
+            1388,
+            48,
+            28
+          ],
+          "from": [
+            145,
+            212
+          ]
+        }
+      ],
+      "pad": 10
+    },
+    {
+      "from": "screens/eras/nov25/flows/distribution/desktop-distribution-1.png",
+      "to": "work/vers1ons/distribution/before-after/start-before.webp",
+      "width": 2000
+    },
+    {
+      "from": "screens/eras/today/flows/distribution/desktop-distribution-1.png",
+      "to": "work/vers1ons/distribution/before-after/start-now.webp",
+      "width": 2000,
+      "donor": "videos/12-distribution-night-swim.mp4"
+    },
+    {
+      "from": "screens/eras/mar26/flows/distribution/desktop-distribution-3.png",
+      "to": "work/vers1ons/distribution/before-after/track-before.webp",
+      "width": 2000
+    },
+    {
+      "from": "screens/eras/today/flows/distribution/desktop-distribution-2.png",
+      "to": "work/vers1ons/distribution/before-after/track-now.webp",
+      "width": 2000,
+      "donor": "videos/12-distribution-night-swim.mp4"
+    },
+    {
+      "from": "screens/eras/jul26/flows/distribution/desktop-distribution-3.png",
+      "to": "work/vers1ons/distribution/before-after/credits-before.webp",
+      "width": 2000
+    },
+    {
+      "from": "screens/eras/today/flows/distribution/desktop-distribution-3.png",
+      "to": "work/vers1ons/distribution/before-after/credits-now.webp",
+      "width": 2000,
+      "donor": "videos/12-distribution-night-swim.mp4",
+      "patch": [
+        {
+          "rect": [
+            2600,
+            1693,
+            240,
+            107
+          ],
+          "at": 30.5,
+          "force": true
+        }
+      ]
+    },
+    {
+      "from": "screens/eras/nov25/flows/distribution/mobile-distribution-2.png",
+      "to": "work/vers1ons/distribution/before-after/phone-before.webp",
+      "width": 1170
+    },
+    {
+      "from": "screens/eras/today/flows/distribution/mobile-distribution-1.png",
+      "to": "work/vers1ons/distribution/before-after/phone-now.webp",
+      "width": 1170
+    },
+    {
+      "from": "screens/eras/nov25/desktop-library.png",
+      "to": "work/vers1ons/distribution/before-after/library-before.webp",
+      "width": 2000
+    },
+    {
+      "from": "screens/eras/today/desktop-library.png",
+      "to": "work/vers1ons/distribution/before-after/library-now.webp",
+      "width": 2000,
+      "donor": "videos/12-distribution-night-swim.mp4"
+    }
+  ],
+  "videos": [
+    {
+      "from": "videos/12-distribution-night-swim.mp4",
+      "to": "media/vers1ons/distribution/walkthrough.mp4",
+      "kind": "hero",
+      "width": 1344
+    },
+    {
+      "from": "videos/04-release-states.mp4",
+      "to": "media/vers1ons/distribution/release-states.mp4",
+      "kind": "inline",
+      "width": 1344,
+      "start": 13,
+      "duration": 15
+    }
+  ]
+}
