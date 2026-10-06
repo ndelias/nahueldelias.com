@@ -1,0 +1,27 @@
+---
+// The stylesheet for below-the-fold case study components
+// (src/styles/deferred.css), added once the first content has painted
+// (afterPaint, Base.astro), so it never competes with the first paint for
+// the network. Without JS it's a plain stylesheet in <noscript>. Goes in
+// Base's head slot.
+//
+// A link to a #fragment lands before these styles exist, measured against
+// the unstyled blocks above it, and those blocks (content-visibility: auto)
+// remember their unstyled heights while skipped. Once the styles apply, the
+// blocks render for one frame to remember their real heights, and the link
+// lands again, unless the reader has scrolled or typed since.
+import href from '../styles/deferred.css?url';
+---
+<noscript><link rel="stylesheet" href={href} /></noscript>
+<script is:inline define:vars={{ href }}>
+  afterPaint(function () {
+    var l = document.createElement('link'), m = 0, f = function () { m = 1; }; l.rel = 'stylesheet'; l.href = href;
+    ['wheel', 'touchstart', 'keydown'].forEach(function (e) { addEventListener(e, f, { once: true, passive: true }); });
+    l.onload = function () { var t = location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1))); if (!t || m) return;
+      var b = document.querySelectorAll('.body > *'), cv = function (v) { b.forEach(function (e) { e.style.contentVisibility = v; }); };
+      cv('visible'); t.scrollIntoView();
+      requestAnimationFrame(function () { setTimeout(function () { cv(''); t.scrollIntoView(); }); });
+    };
+    document.head.append(l);
+  });
+</script>

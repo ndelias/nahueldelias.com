@@ -32,10 +32,14 @@ const toUrlPath = (file) => '/' + relative(DIST, file).split(sep).join('/');
 const files = new Set((await walk(DIST)).map(toUrlPath));
 const pages = [...files].filter((f) => f.endsWith('.html'));
 
-const ATTR = /\s(?:src|href|data-src|poster|content)\s*=\s*["']([^"']+)["']/gi;
+const ATTR = /\s(?:src|href|data-src|data-[\w-]*-url|poster|content)\s*=\s*["']([^"']+)["']/gi;
+// Files listed in a JSON file a page fetches (a gallery's screens.json).
+const JSON_URL = /"(?:full|src)":"([^"]+)"/g;
 const SRCSET = /\s(?:srcset|data-srcset|imagesrcset)\s*=\s*["']([^"']+)["']/gi;
 const CSS_URL = /url\(\s*["']?([^"')]+)["']?\s*\)/gi;
 const IMPORT = /(?:\bimport\s*\(\s*|(?:^|[;\s}])(?:import|export)\s*(?:[\w$*{}\s,]*?\bfrom\s*)?)["']([^"']+)["']/g;
+// Scripts added after load (AfterLoad.astro): their URL is a string literal.
+const AFTER_LOAD = /\bsrc = "(\/_astro\/[^"]+\.js)"/g;
 
 function refs(text, isHtml) {
   const out = [];
@@ -45,6 +49,8 @@ function refs(text, isHtml) {
   }
   for (const [, v] of text.matchAll(CSS_URL)) out.push(v);
   for (const [, v] of text.matchAll(IMPORT)) out.push(v);
+  for (const [, v] of text.matchAll(AFTER_LOAD)) out.push(v);
+  for (const [, v] of text.matchAll(JSON_URL)) out.push(v);
   return out;
 }
 
@@ -61,7 +67,7 @@ const used = new Set(pages);
 const queue = [...pages];
 while (queue.length) {
   const file = queue.shift();
-  if (!/\.(html|css|js|mjs)$/.test(file)) continue;
+  if (!/\.(html|css|js|mjs|json)$/.test(file)) continue;
   const text = await readFile(join(DIST, file), 'utf8');
   for (const ref of refs(text, file.endsWith('.html'))) {
     const path = resolveRef(ref, file);

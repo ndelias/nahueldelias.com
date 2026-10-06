@@ -7,6 +7,12 @@
 // close it, the arrow keys step through the screens, and focus goes back to
 // the screen that opened it. No library.
 //
+// Screens marked `more` aren't on the page, only in the viewer: "See all N
+// screens" opens it at the first one. That keeps a long gallery's HTML small
+// enough for the page to arrive in one round trip (the HTML budget). The
+// page keeps each screen's number in the full set, so the gaps say there's
+// more.
+//
 // Layout (9 columns beside the intro): a desktop screen spans all 9, or 6
 // beside a phone screen before it; a phone spans 3; a detail crop spans 9.
 // Phones: desktop screens full width, phone and detail two to a row.
@@ -14,10 +20,12 @@ import type { ImageMetadata } from 'astro';
 import { getImage } from 'astro:assets';
 import type { FrameType } from '../lib/model';
 import EntryImage from './EntryImage.astro';
+import AfterLoad from './AfterLoad.astro';
+import behaviour from '../scripts/gallery.ts?worker&url';
 
 interface Props {
   /** Defaults to the page's gallery (Astro.locals.gallery), for <Screens />. */
-  items?: { src: ImageMetadata; alt: string; caption?: string; frame: FrameType }[];
+  items?: { src: ImageMetadata; alt: string; caption?: string; frame: FrameType; more?: boolean }[];
   label?: string;
   intro?: string;
 }
@@ -38,11 +46,20 @@ const screens = await Promise.all(
     const { width, height, format } = meta(item.src);
     // Full size: the source as is for an SVG, else one WebP at its own width.
     const full = format === 'svg' ? item.src.src : (await getImage({ src: item.src, format: 'webp', width })).src;
-    const span = item.frame === 'desktop' && items[i - 1]?.frame === 'phone' ? 6 : SPAN[item.frame];
-    return { ...item, no: String(i + 1).padStart(2, '0'), full, width, height, span };
+    return { ...item, index: i, no: String(i + 1).padStart(2, '0'), full, width, height };
   }),
 );
+const shown = screens
+  .filter((s) => !s.more)
+  .map((s, i, list) => ({ ...s, span: s.frame === 'desktop' && list[i - 1]?.frame === 'phone' ? 6 : SPAN[s.frame] }));
+// The viewer-only screens: their details are in screens.json next to the
+// page (pages/work/[slug]/[part]/screens.json.ts), fetched when the viewer
+// opens. The "See all" link goes to the first one's full-size file.
+const extra = screens.filter((s) => s.more);
+const extraUrl = `${Astro.url.pathname.replace(/\/?$/, '/')}screens.json`;
 const id = `gallery-${label.toLowerCase().replace(/\W+/g, '-')}`;
+// Styles: src/styles/deferred.css (loaded after first paint; this
+// component only renders below the fold).
 ---
 {screens.length > 0 && (
   <section class="gallery grid" aria-labelledby={`${id}-label`} data-gallery>
@@ -51,16 +68,16 @@ const id = `gallery-${label.toLowerCase().replace(/\W+/g, '-')}`;
       <p class="muted"><span class="when-js">{intro}</span><span class="when-no-js">{intro.replace('Click any screen to see it', 'Each screen links to it at')}</span></p>
     </div>
     <ol class="screens">
-      {screens.map((s, i) => (
+      {shown.map((s) => (
         <li class:list={['screen', s.frame]} style={`--span: ${s.span}`}>
           <figure>
-            <a class="open" href={s.full} data-gallery-open={i} data-full={s.full} data-width={s.width} data-height={s.height} aria-describedby={`${id}-cap-${i}`}>
+            <a class="open" href={s.full} data-gallery-open={s.index} data-width={s.width} data-height={s.height} aria-describedby={`${id}-cap-${s.index}`}>
               <span class="frame" style={`aspect-ratio: ${RATIO[s.frame]}`}>
-                <EntryImage class="shot" src={s.src} alt={s.alt} widths={[480, 960, 1440, 1920].filter((w) => w <= s.width)} sizes={SIZES[s.frame]} />
+                <EntryImage class="shot" src={s.src} alt={s.alt} widths={(s.frame === 'phone' ? [480, 960] : [960, 1920]).filter((w) => w <= s.width)} sizes={SIZES[s.frame]} />
               </span>
               <span class="visually-hidden"> (opens full size)</span>
             </a>
-            <figcaption id={`${id}-cap-${i}`} class:list={['caption', { first: i === 0 }]}>
+            <figcaption id={`${id}-cap-${s.index}`} class:list={['caption', { first: s.index === 0 }]}>
               <span class="no mono">{s.no}</span>
               {s.caption && <span class="text muted">{s.caption}</span>}
             </figcaption>
@@ -68,6 +85,13 @@ const id = `gallery-${label.toLowerCase().replace(/\W+/g, '-')}`;
         </li>
       ))}
     </ol>
+    {extra.length > 0 && (
+      <p class="see-all">
+        <a class="mono" href={extra[0].full} data-gallery-all data-extra-url={extraUrl} data-total={screens.length}>
+          See all {screens.length} screens <span class="muted">({extra.length} more)</span>
+        </a>
+      </p>
+    )}
 
     <dialog class="viewer" aria-labelledby={`${id}-viewer-caption`} data-gallery-viewer>
       <div class="viewer-bar mono">
@@ -84,221 +108,4 @@ const id = `gallery-${label.toLowerCase().replace(/\W+/g, '-')}`;
   </section>
 )}
 
-<script>
-  for (const root of document.querySelectorAll<HTMLElement>('[data-gallery]')) {
-    const links = [...root.querySelectorAll<HTMLAnchorElement>('[data-gallery-open]')];
-    const dialog = root.querySelector<HTMLDialogElement>('[data-gallery-viewer]')!;
-    const img = dialog.querySelector<HTMLImageElement>('[data-viewer-img]')!;
-    const caption = dialog.querySelector<HTMLElement>('[data-viewer-caption]')!;
-    const count = dialog.querySelector<HTMLElement>('[data-viewer-count]')!;
-    const total = String(links.length).padStart(2, '0');
-    let at = 0;
-    let opener: HTMLElement | null = null;
-
-    const show = (i: number) => {
-      at = (i + links.length) % links.length;
-      const link = links[at];
-      const shot = link.querySelector('img')!;
-      img.src = link.dataset.full!;
-      img.width = Number(link.dataset.width);
-      img.height = Number(link.dataset.height);
-      img.alt = shot.alt;
-      const text = link.closest('figure')!.querySelector('.text')?.textContent ?? '';
-      caption.textContent = text || shot.alt;
-      count.textContent = `${String(at + 1).padStart(2, '0')} / ${total}`;
-    };
-
-    links.forEach((link, i) =>
-      link.addEventListener('click', (event) => {
-        if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return; // new tab: let it
-        event.preventDefault();
-        opener = link;
-        show(i);
-        dialog.showModal();
-      }),
-    );
-    dialog.querySelector('[data-viewer-close]')!.addEventListener('click', () => dialog.close());
-    dialog.querySelector('[data-viewer-prev]')!.addEventListener('click', () => show(at - 1));
-    dialog.querySelector('[data-viewer-next]')!.addEventListener('click', () => show(at + 1));
-    dialog.addEventListener('keydown', (event) => {
-      if (event.key === 'ArrowLeft') show(at - 1);
-      else if (event.key === 'ArrowRight') show(at + 1);
-      else return;
-      event.preventDefault();
-    });
-    // A click on the backdrop (outside the dialog's box) closes it.
-    dialog.addEventListener('click', (event) => {
-      if (event.target !== dialog) return;
-      const r = dialog.getBoundingClientRect();
-      const inside = event.clientX >= r.left && event.clientX <= r.right && event.clientY >= r.top && event.clientY <= r.bottom;
-      if (!inside) dialog.close();
-    });
-    dialog.addEventListener('close', () => {
-      img.removeAttribute('src');
-      opener?.focus();
-    });
-  }
-</script>
-
-<style>
-  .intro {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-8);
-  }
-  .label {
-    margin: 0;
-    font-weight: var(--weight-regular);
-    line-height: normal;
-  }
-  .intro p {
-    margin: 0;
-    font-size: var(--text-small);
-    line-height: var(--leading-small);
-  }
-  .when-js {
-    display: none;
-  }
-  :global(.js) .when-js {
-    display: inline;
-  }
-  :global(.js) .when-no-js {
-    display: none;
-  }
-  .screens {
-    display: grid;
-    grid-template-columns: repeat(9, minmax(0, 1fr));
-    column-gap: var(--grid-gutter);
-    row-gap: var(--space-32);
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-  .screen {
-    grid-column: span var(--span);
-  }
-  figure {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin: 0;
-  }
-  .open {
-    display: block;
-    color: inherit;
-  }
-  .frame {
-    display: block;
-    width: 100%;
-    overflow: hidden;
-    background: var(--surface);
-  }
-  .frame :global(.shot) {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: top;
-  }
-  .caption {
-    display: flex;
-    gap: var(--space-12);
-    font-size: var(--text-caption);
-    line-height: var(--leading-small);
-  }
-  .caption.first {
-    gap: var(--space-16);
-  }
-  .no {
-    color: var(--ink);
-    line-height: inherit;
-  }
-
-  .viewer {
-    width: min(100vw - 2 * var(--grid-margin), 1344px);
-    max-height: calc(100vh - 2 * var(--space-32));
-    padding: var(--space-16);
-    border: 1px solid var(--line);
-    background: var(--bg);
-    color: var(--ink);
-  }
-  .viewer::backdrop {
-    background: rgb(0 0 0 / 0.6);
-  }
-  .viewer-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--space-12);
-  }
-  .viewer-nav {
-    display: flex;
-    gap: var(--space-16);
-  }
-  .viewer button {
-    min-height: 44px;
-    padding: 0;
-    border: 0;
-    background: none;
-    color: inherit;
-    font: inherit;
-    letter-spacing: inherit;
-    text-transform: inherit;
-    cursor: pointer;
-  }
-  .viewer button:hover {
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
-  .viewer-img {
-    display: block;
-    width: 100%;
-    height: auto;
-    max-height: calc(100vh - 2 * var(--space-32) - 140px);
-    object-fit: contain;
-    background: var(--surface);
-  }
-  .viewer-caption {
-    margin: var(--space-12) 0 0;
-    font-size: var(--text-caption);
-    line-height: var(--leading-small);
-    color: var(--muted);
-  }
-
-  @media (min-width: 640px) {
-    .intro {
-      grid-column: span 3;
-    }
-    .screens {
-      grid-column: 4 / span 9;
-    }
-  }
-  /* Phone: desktop screens full width, phone and detail two to a row; the
-     viewer takes the whole screen. */
-  @media (max-width: 639.98px) {
-    .intro {
-      margin-bottom: var(--space-24);
-    }
-    .screens {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      column-gap: var(--space-16);
-    }
-    .screen {
-      grid-column: span 1;
-    }
-    .screen.desktop {
-      grid-column: span 2;
-    }
-    .viewer {
-      width: 100vw;
-      max-width: 100vw;
-      height: 100dvh;
-      max-height: 100dvh;
-      margin: 0;
-      border: 0;
-    }
-    .viewer-img {
-      max-height: calc(100dvh - 140px);
-    }
-  }
-</style>
+<AfterLoad src={behaviour} />

@@ -144,19 +144,19 @@ async function recordClip() {
 async function withVideos(options = {}) {
   clip ??= await recordClip();
   let html = await readFile(join(DIST, HUB, 'index.html'), 'utf8');
-  // Figure's scope attribute, from its media box.
-  const cid = html.match(/<div class="media"[^>]*\s(data-astro-cid-\w+)/)[1];
-  const medias = [...html.matchAll(/<div class="media" [^>]*>/g)];
+  // Figure's scope class, from its media box.
+  const cid = html.match(/<div class="media (astro-\w+)"/)[1];
+  const medias = [...html.matchAll(/<div class="media astro-\w+"[^>]*>/g)];
   assert.equal(medias.length, 2, 'expected the hero and Fig. 1');
   const [hero, fig] = medias;
-  const video = (play) => `<video class="video" ${cid} data-src="/__test/clip.webm" data-play="${play}" muted playsinline preload="none"${play === 'view' ? ' loop' : ''}></video>`;
+  const video = (play) => `<video class="video ${cid}" data-src="/__test/clip.webm" data-play="${play}" muted playsinline preload="none"${play === 'view' ? ' loop' : ''}></video>`;
   const insertAt = (h, at, s) => h.slice(0, at) + s + h.slice(at);
   // Fig. 1 first, so the hero's offsets stay put.
   html = insertAt(html, fig.index + fig[0].length, video('view'));
   const caption = html.indexOf('<figcaption', fig.index);
   const captionOpen = html.indexOf('>', caption) + 1;
-  html = insertAt(html, captionOpen, `<button class="pause mono" ${cid} type="button" data-figure-pause aria-pressed="false">(Pause)</button>`);
-  html = insertAt(html, hero.index + hero[0].length, video('click') + `<button class="play" ${cid} type="button" data-figure-play aria-label="Play walkthrough, muted"></button>`);
+  html = insertAt(html, captionOpen, `<button class="pause mono ${cid}" type="button" data-figure-pause aria-pressed="false">(Pause)</button>`);
+  html = insertAt(html, hero.index + hero[0].length, video('click') + `<button class="play ${cid}" type="button" data-figure-play aria-label="Play walkthrough, muted"></button>`);
 
   const { ctx, page } = await open(options, { html });
   const requests = [];
@@ -277,35 +277,141 @@ test('part: the header names what it shows, led and contributed, for screen read
   await ctx.close();
 });
 
-test('part: the screens sit where the body places them, after Table 1 and before the sections', async () => {
+test('part: the body places the steps and comparisons; a body without <Screens /> gets the gallery after it', async () => {
   const { ctx, page } = await openPart();
-  const order = await page.$$eval('.body > :not(script, style)', (els) => els.map((e) => e.className.split(' ')[0]));
-  assert.deepEqual(order.slice(0, 4), ['diagram', 'data-table', 'gallery', 'body-section']);
-  assert.equal(await page.locator('[data-gallery]').count(), 1);
-  // A body without <Screens /> gets them after it.
+  const order = await page.$$eval('article.body > :not(script, style)', (els) => els.map((e) => e.className.split(' ')[0]));
+  assert.deepEqual(order.slice(0, 5), ['system-figure', 'body-section', 'steps', 'comparisons', 'body-section']);
+  assert.equal(await page.locator('[data-steps]').count(), 1);
+  assert.equal(await page.locator('[data-gallery]').count(), 0);
   const other = await openPart('/work/vers1ons/licensing/');
   assert.equal(await other.page.locator('[data-gallery]').count(), 1);
   await other.ctx.close();
   await ctx.close();
 });
 
-test('gallery: a screen opens full size in a dialog; arrows step, Esc closes, focus returns', async () => {
+// The steps: a sideways track that moves on by itself while in view.
+const stepAt = (page) => page.$eval('[data-steps-rail] [aria-current]', (a) => a.textContent);
+const showSteps = (page) => page.evaluate(() => document.querySelector('[data-steps]').scrollIntoView());
+
+test('steps: the rail has a number per step; Next, Prev and a number move the track', async () => {
   const { ctx, page } = await openPart();
+  await showSteps(page);
+  await page.waitForSelector('[data-steps-rail] [aria-current]');
+  const steps = await page.locator('[data-step]').count();
+  assert.equal(await page.locator('[data-steps-rail] a').count(), steps);
+  await page.click('[data-steps-pause]');
+  await page.click('[data-steps-next]');
+  await page.waitForFunction(() => document.querySelector('[data-steps-rail] [aria-current]').textContent === '02');
+  await page.click('[data-steps-rail] a >> nth=4');
+  await page.waitForFunction(() => document.querySelector('[data-steps-rail] [aria-current]').textContent === '05');
+  await page.click('[data-steps-prev]');
+  await page.waitForFunction(() => document.querySelector('[data-steps-rail] [aria-current]').textContent === '04');
+  await ctx.close();
+});
+
+test('steps: they advance on their own in view; Pause stops it, and the page never scrolls', async () => {
+  const { ctx, page } = await openPart();
+  await page.waitForSelector('[data-steps].is-live', { state: 'attached' });
+  await page.clock.install();
+  await showSteps(page);
+  await page.mouse.move(1, 1);
+  await page.waitForSelector('[data-steps-rail] [aria-current]');
+  const y = await page.evaluate(() => scrollY);
+  assert.equal(await stepAt(page), '01');
+  await page.clock.runFor(20_000);
+  await page.waitForFunction(() => document.querySelector('[data-steps-rail] [aria-current]').textContent !== '01');
+  assert.equal(await page.evaluate(() => scrollY), y, 'advancing moved the page');
+  await page.click('[data-steps-pause]');
+  assert.equal(await page.getAttribute('[data-steps-pause]', 'aria-pressed'), 'true');
+  const at = await stepAt(page);
+  await page.clock.runFor(30_000);
+  await page.waitForTimeout(300);
+  assert.equal(await stepAt(page), at, 'moved on while paused');
+  await ctx.close();
+});
+
+test('steps, reduced motion: no advancing, no clips, no Pause', async () => {
+  const { ctx, page } = await openPart(PART, { reducedMotion: 'reduce' });
+  await page.waitForSelector('[data-steps].is-live', { state: 'attached' });
+  await page.clock.install();
+  await showSteps(page);
+  await page.waitForSelector('[data-steps-rail] [aria-current]');
+  await page.clock.runFor(30_000);
+  await page.waitForTimeout(300);
+  assert.equal(await stepAt(page), '01');
+  assert.equal(await page.locator('[data-steps-pause]').isVisible(), false);
+  assert.equal(await page.$$eval('[data-step] video', (vs) => vs.filter((v) => v.getAttribute('src')).length), 0, 'a clip loaded');
+  await ctx.close();
+});
+
+// The comparisons: tabs; in each, the before screen fades into today's,
+// then the next tab comes up.
+const shown = (page) =>
+  page.evaluate(() => {
+    const panel = document.querySelector('[data-compare-panel]:not([hidden])');
+    const [before, now] = panel.querySelectorAll('.pair > figure');
+    return { tab: document.querySelector('[role="tab"][aria-selected="true"]').textContent, now: getComputedStyle(now).opacity === '1', stacked: before.getBoundingClientRect().top === now.getBoundingClientRect().top && before.getBoundingClientRect().left === now.getBoundingClientRect().left };
+  });
+
+test('comparisons: before fades into now in one frame, then the next tab; Pause stops it', async () => {
+  const { ctx, page } = await openPart();
+  await page.waitForSelector('.comparisons.is-tabbed', { state: 'attached' });
+  await page.clock.install();
+  await page.evaluate(() => document.querySelector('.comparisons').scrollIntoView());
+  await page.mouse.move(1, 1);
+  await page.waitForSelector('.comparisons.is-fading');
+  const first = await shown(page);
+  assert.equal(first.stacked, true, 'before and now side by side');
+  assert.equal(first.now, false);
+  await page.clock.runFor(4000);
+  await page.waitForFunction(() => getComputedStyle(document.querySelector('[data-compare-panel]:not([hidden]) .pair > figure + figure')).opacity === '1');
+  await page.clock.runFor(5000);
+  assert.notEqual((await shown(page)).tab, first.tab, 'stayed on the first tab');
+  await page.click('.comparisons .pause');
+  const { tab } = await shown(page);
+  await page.clock.runFor(30_000);
+  assert.equal((await shown(page)).tab, tab, 'moved on while paused');
+  await ctx.close();
+});
+
+test('comparisons, reduced motion: the pair side by side, tabs by hand only', async () => {
+  const { ctx, page } = await openPart(PART, { reducedMotion: 'reduce' });
+  await page.waitForSelector('.comparisons.is-tabbed', { state: 'attached' });
+  await page.clock.install();
+  await page.evaluate(() => document.querySelector('.comparisons').scrollIntoView());
+  const first = await shown(page);
+  assert.equal(first.stacked, false);
+  await page.clock.runFor(30_000);
+  assert.equal((await shown(page)).tab, first.tab);
+  await page.keyboard.press('Tab');
+  await page.focus('[role="tab"][aria-selected="true"]');
+  await page.keyboard.press('ArrowRight');
+  assert.notEqual((await shown(page)).tab, first.tab);
+  assert.equal(await page.locator('.comparisons .pause').isVisible(), false);
+  await ctx.close();
+});
+
+// The gallery, on a part page whose body doesn't place steps.
+const GALLERY = '/work/vers1ons/licensing/';
+
+test('gallery: a screen opens full size in a dialog; arrows step, Esc closes, focus returns', async () => {
+  const { ctx, page } = await openPart(GALLERY);
+  await page.waitForSelector('[data-gallery].is-live', { state: 'attached' });
   const opener = page.locator('[data-gallery-open]').nth(1);
   await opener.click();
   assert.equal(await page.evaluate(() => document.querySelector('[data-gallery-viewer]').open), true);
   assert.equal(await page.evaluate(() => document.activeElement?.hasAttribute('data-viewer-close')), true, 'focus not on Close');
-  assert.equal(await page.textContent('[data-viewer-count]'), '02 / 04');
+  assert.equal(await page.textContent('[data-viewer-count]'), '02 / 03');
   const src1 = await page.getAttribute('[data-viewer-img]', 'src');
   assert.equal(src1, await opener.getAttribute('href'), 'shows the full-size file the link points to');
-  assert.equal(await page.getAttribute('[data-viewer-img]', 'alt'), '[Screen: the same step on a phone.]');
+  assert.equal(await page.getAttribute('[data-viewer-img]', 'alt'), '[Screen: what the phone view shows.]');
   await page.keyboard.press('ArrowRight');
-  assert.equal(await page.textContent('[data-viewer-count]'), '03 / 04');
+  assert.equal(await page.textContent('[data-viewer-count]'), '03 / 03');
   await page.keyboard.press('ArrowLeft');
   await page.keyboard.press('ArrowLeft');
-  assert.equal(await page.textContent('[data-viewer-count]'), '01 / 04');
+  assert.equal(await page.textContent('[data-viewer-count]'), '01 / 03');
   await page.keyboard.press('ArrowLeft'); // wraps
-  assert.equal(await page.textContent('[data-viewer-count]'), '04 / 04');
+  assert.equal(await page.textContent('[data-viewer-count]'), '03 / 03');
   await page.keyboard.press('Escape');
   assert.equal(await page.evaluate(() => document.querySelector('[data-gallery-viewer]').open), false);
   assert.equal(await page.evaluate(() => document.activeElement?.getAttribute('data-gallery-open')), '1', 'focus did not return to the screen');
@@ -313,7 +419,8 @@ test('gallery: a screen opens full size in a dialog; arrows step, Esc closes, fo
 });
 
 test('gallery: Close and a backdrop click close it; the keyboard opens it', async () => {
-  const { ctx, page } = await openPart();
+  const { ctx, page } = await openPart(GALLERY);
+  await page.waitForSelector('[data-gallery].is-live', { state: 'attached' });
   await page.focus('[data-gallery-open="0"]');
   await page.keyboard.press('Enter');
   assert.equal(await page.evaluate(() => document.querySelector('[data-gallery-viewer]').open), true);
@@ -326,9 +433,9 @@ test('gallery: Close and a backdrop click close it; the keyboard opens it', asyn
 });
 
 test('gallery, without JS: each screen is a link to its full-size file', async () => {
-  const { ctx, page } = await openPart(PART, { javaScriptEnabled: false });
+  const { ctx, page } = await openPart(GALLERY, { javaScriptEnabled: false });
   const hrefs = await page.$$eval('[data-gallery-open]', (as) => as.map((a) => a.getAttribute('href')));
-  assert.equal(hrefs.length, 4);
+  assert.equal(hrefs.length, 3);
   for (const href of hrefs) assert.ok(existsSync(join(DIST, href)), `${href} doesn't exist`);
   await ctx.close();
 });
@@ -374,10 +481,11 @@ test('part, phone: the sibling nav is a row of text tabs, 44px, no thumbnails fe
 // Below-the-fold blocks are content-visibility: auto. Skipped rendering
 // mustn't break what reaches into them.
 test('deferred blocks: the gallery dialog opens from a screen that was never rendered', async () => {
-  const { ctx, page } = await openPart();
+  const { ctx, page } = await openPart(GALLERY);
+  await page.waitForSelector('[data-gallery].is-live', { state: 'attached' });
   assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('[data-gallery]')).contentVisibility), 'auto');
   // Opened without scrolling: the gallery is still skipped.
-  await page.evaluate(() => document.querySelector('[data-gallery-open="3"]').click());
+  await page.evaluate(() => document.querySelector('[data-gallery-open="2"]').click());
   const box = await page.evaluate(() => {
     const d = document.querySelector('[data-gallery-viewer]');
     const img = d.querySelector('img');
@@ -391,7 +499,8 @@ test('deferred blocks: the gallery dialog opens from a screen that was never ren
 for (const [path, id] of [
   [HUB, 'parts-label'],
   [HUB, 'versions-label'],
-  [PART, 'gallery-screens-label'],
+  [PART, 'steps-label'],
+  [GALLERY, 'gallery-screens-label'],
   [PART, 'table-table-1-label'],
 ]) {
   test(`deferred blocks: an in-page link to #${id} lands on it`, async () => {
@@ -408,7 +517,7 @@ for (const [path, id] of [
 test('deferred blocks: find-in-page reaches text in a block that was never rendered', async () => {
   // window.find is the scriptable form of Chrome's find bar; both search
   // content-visibility: auto content and reveal the match.
-  for (const [path, text] of [[HUB, '[Where it is now.]'], [PART, 'Real numbers or none']]) {
+  for (const [path, text] of [[HUB, '[Where it is now.]'], [PART, 'adversarial endpoint coverage']]) {
     const { ctx, page } = await openPart(path);
     const r = await page.evaluate((text) => {
       const found = window.find(text);

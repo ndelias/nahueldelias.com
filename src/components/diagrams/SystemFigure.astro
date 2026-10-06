@@ -1,0 +1,28 @@
+---
+// A system diagram as a numbered figure on a case study: label, title and
+// one line in the margin, the runnable diagram in the body columns. For MDX:
+//
+//   import { distribution } from '…/diagrams/specs/distribution';
+//   <SystemFigure label="Fig. 1" spec={distribution} />
+import type { DiagramSpec } from './types';
+import SystemDiagram from './SystemDiagram.astro';
+
+interface Props {
+  label: string;
+  spec: DiagramSpec;
+}
+
+const { label, spec } = Astro.props;
+// Styles: src/styles/deferred.css (loaded after first paint; this
+// component only renders below the fold).
+---
+<figure class="system-figure grid" aria-labelledby={`sf-${spec.id}`}>
+  <figcaption class="intro" id={`sf-${spec.id}`}>
+    <span class="label mono muted">{label}</span>
+    <span class="title">{spec.title}</span>
+    <span class="muted">{spec.subtitle}</span>
+  </figcaption>
+  <div class="body">
+    <SystemDiagram spec={spec} header={false} />
+  </div>
+</figure>

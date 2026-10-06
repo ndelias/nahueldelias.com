@@ -5,6 +5,7 @@
 import type { GetStaticPaths } from 'astro';
 import { render } from 'astro:content';
 import DecisionBlock from '../../components/DecisionBlock.astro';
+import DeferredStyles from '../../components/DeferredStyles.astro';
 import EntryHeader from '../../components/EntryHeader.astro';
 import Facts from '../../components/Facts.astro';
 import Figure from '../../components/Figure.astro';
@@ -14,7 +15,7 @@ import NextEntry from '../../components/NextEntry.astro';
 import PartsMatrix from '../../components/PartsMatrix.astro';
 import VersionsStack from '../../components/VersionsStack.astro';
 import Base from '../../layouts/Base.astro';
-import { entriesIn, entryNumber, lastUpdated, partsOf } from '../../lib/entries';
+import { entriesIn, lastUpdated, partsOf } from '../../lib/entries';
 
 export const getStaticPaths = (() =>
   entriesIn('work').map((entry) => ({ params: { slug: entry.id }, props: { entry } }))) satisfies GetStaticPaths;
@@ -34,6 +35,7 @@ const heroMeta = hero?.video ? ['Walkthrough', 'muted', hero.duration].filter(Bo
 {/* Faces preloaded: the tagline's (sans 400, the LCP element on phones
     until a hero outgrows it) and the title's (sans 500). Mono loads on use. */}
 <Base title={`${data.title} — Nahuel D'Elias`} description={data.tagline} noindex={data.fixture} preload={['sans-400', 'sans-500']}>
+  <DeferredStyles slot="head" />
   <Frame>
     <a slot="top-center" class="back" href="/">(<Icon name="arrow-left" /> Index)</a>
     <main class="case container">
@@ -51,7 +53,7 @@ const heroMeta = hero?.video ? ['Walkthrough', 'muted', hero.duration].filter(Bo
 
       {hero && (
         <div class="hero">
-          <Figure layout="full" priority src={hero.src} dark={hero.dark} alt={hero.alt} video={hero.video} play="click" caption={hero.caption} meta={heroMeta} label={entryNumber(entry)} />
+          <Figure layout="full" priority src={hero.src} dark={hero.dark} alt={hero.alt} video={hero.video} play="auto" caption={hero.caption} meta={heroMeta} />
         </div>
       )}
 

@@ -411,8 +411,19 @@ async function importImage(pick) {
     }
   }
   if (check) return { to: pick.to, cursors };
+  // Art: an image the capture caught mid-load (the cover art drawing in from
+  // the top) gets the finished file the screen was loading, in the same box.
+  // { from: archive file, rect: [x, y, w, h], radius }. Line the rect up
+  // with the part that had loaded.
+  let out = sharp(data, { raw: { width: W, height: H, channels: C } });
+  if (pick.art) {
+    const { rect: [ax, ay, aw, ah], radius = 0 } = pick.art;
+    const mask = Buffer.from(`<svg width="${aw}" height="${ah}"><rect width="${aw}" height="${ah}" rx="${radius}" fill="#fff"/></svg>`);
+    const art = await sharp(source(pick.art.from)).resize(aw, ah).ensureAlpha().composite([{ input: mask, blend: 'dest-in' }]).png().toBuffer();
+    out = sharp(await out.composite([{ input: art, left: ax, top: ay }]).png().toBuffer());
+  }
   mkdirSync(dirname(to), { recursive: true });
-  await sharp(data, { raw: { width: W, height: H, channels: C } })
+  await out
     .resize({ width: pick.width ?? 2560, withoutEnlargement: true })
     .webp({ quality: pick.quality ?? 90, effort: 6 })
     .toFile(to);
@@ -428,6 +439,16 @@ function importVideo(pick) {
   const budget = pick.budget ?? VIDEO_BUDGET[pick.kind ?? 'inline'];
   if (check) return { to: pick.to };
   mkdirSync(dirname(to), { recursive: true });
+  // Hold: a box that's still loading early in the clip shows how it looks
+  // once loaded, taken from a later moment of the same recording, until the
+  // recording gets there itself. { rect: [x, y, w, h], at: seconds }; the
+  // box must not move in between.
+  const scale = `scale=${pick.width ?? 1344}:-2:flags=lanczos,format=yuv420p`;
+  const hold = pick.hold
+    ? ['-ss', String(pick.hold.at), '-i', from, '-filter_complex',
+       `[1:v]trim=end_frame=1,crop=${pick.hold.rect[2]}:${pick.hold.rect[3]}:${pick.hold.rect[0]}:${pick.hold.rect[1]},loop=-1:1,setpts=N/FRAME_RATE/TB[h];` +
+       `[0:v][h]overlay=${pick.hold.rect[0]}:${pick.hold.rect[1]}:shortest=1:enable='lt(t,${pick.hold.at - (pick.start ?? 0)})',${scale}`]
+    : ['-vf', scale];
   const encode = (crf) =>
     execFileSync('ffmpeg', [
       '-v', 'error', '-y',
@@ -435,7 +456,7 @@ function importVideo(pick) {
       ...(pick.duration != null ? ['-t', String(pick.duration)] : []),
       '-i', from,
       '-an',
-      '-vf', `scale=${pick.width ?? 1344}:-2:flags=lanczos,format=yuv420p`,
+      ...hold,
       '-c:v', 'libx264', '-preset', 'slow', '-crf', String(crf), '-profile:v', 'high',
       '-movflags', '+faststart',
       to,

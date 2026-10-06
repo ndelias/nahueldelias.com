@@ -1,0 +1,78 @@
+---
+// What changed, and why (the page's "comparisons"): an early build and
+// today, for a few parts of the product, each with why it changed. Usable in
+// MDX; part pages place it with <Comparisons />.
+//
+// Without JS, or with reduced motion, each pair sits side by side. With JS
+// (src/scripts/comparisons.ts, after the first paint) they're tabs, one at a
+// time, and the before screen fades into today's in the same frame, then the
+// next tab comes up. It holds while hovered or focused, and Pause stops it
+// (WCAG 2.2.2).
+import type { ImageMetadata } from 'astro';
+import type { FrameType } from '../lib/model';
+import EntryImage from './EntryImage.astro';
+import AfterLoad from './AfterLoad.astro';
+import Icon from './Icon.astro';
+import behaviour from '../scripts/comparisons.ts?worker&url';
+
+export interface Comparison {
+  title: string;
+  frame: FrameType;
+  why?: string;
+  before: { src: ImageMetadata; alt: string; label: string; caption?: string };
+  now: { src: ImageMetadata; alt: string; label: string; caption?: string };
+}
+
+interface Props {
+  items?: Comparison[];
+  label?: string;
+  intro?: string;
+}
+
+const { items = Astro.locals.comparisons ?? [], label = 'What changed, and why', intro = 'The same part of the product in an early build and today.' } = Astro.props;
+const meta = (src: ImageMetadata) => (src as ImageMetadata & { clone?: ImageMetadata }).clone ?? src;
+// One size per image: these are below the fold and every srcset entry is a
+// long hashed URL in the page's HTML (the HTML budget).
+const one = (src: ImageMetadata, frame: FrameType) => Math.min(frame === 'phone' ? 720 : 1280, meta(src).width);
+// Styles: src/styles/deferred.css (loaded after first paint; this
+// component only renders below the fold).
+---
+{items.length > 0 && (
+  <section class="comparisons grid" aria-labelledby="comparisons-label">
+    <div class="intro">
+      <h2 class="label mono muted" id="comparisons-label">{label}</h2>
+      <p class="muted">{intro}</p>
+    </div>
+    <div class="bar mono" data-compare-bar>
+      <div class="tabs" data-compare-tabs aria-label={label}>
+        {items.map((c, i) => (
+          <button type="button" class="tab" data-compare-tab={i} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1}>{c.title}</button>
+        ))}
+      </div>
+    </div>
+    <ol class="items">
+      {items.map((c, i) => (
+        <li class:list={['item', c.frame]} id={`compare-${i}`} data-compare-panel={i}>
+          <h3 class="title">{c.title}</h3>
+          {c.why && <p class="why">{c.why}</p>}
+          <div class="pair">
+            {[c.before, c.now].map((shot, i) => (
+              <figure>
+                <span class="frame">
+                  <EntryImage class="shot" src={shot.src} alt={shot.alt} width={one(shot.src, c.frame)} />
+                </span>
+                <figcaption>
+                  <span class="mono">{i === 0 ? 'Before' : 'Now'} · {shot.label}</span>
+                  {shot.caption && <span class="muted">{shot.caption}</span>}
+                </figcaption>
+              </figure>
+            ))}
+            <span class="arrow" aria-hidden="true"><Icon name="arrow-right" /></span>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </section>
+)}
+
+<AfterLoad src={behaviour} />

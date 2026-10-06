@@ -20,6 +20,10 @@ export const PAIRS = [
   { fg: 'muted', bg: 'surface', min: 4.5, use: 'Metadata on surfaces' },
   { fg: 'accent', bg: 'bg', min: 4.5, use: 'Links, Concept badge, focus ring' },
   { fg: 'accent', bg: 'surface', min: 4.5, use: 'Links and focus ring on surfaces' },
+  { fg: 'money', bg: 'bg', min: 4.5, use: 'Diagram: done, money landed' },
+  { fg: 'money', bg: 'surface', min: 4.5, use: 'Diagram: done, on panels' },
+  { fg: 'warn', bg: 'bg', min: 4.5, use: 'Diagram: failed, refused' },
+  { fg: 'warn', bg: 'surface', min: 4.5, use: 'Diagram: failed, on panels' },
 ];
 
 const HEX = '#[0-9a-fA-F]{6}';

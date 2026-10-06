@@ -23,10 +23,12 @@ read as evidence of craft, performance sense and taste.
   (mobile, throttled 4G) · CLS < 0.05 · Lighthouse ≥ 95 in all four
   categories (SEO skipped only on noindexed fixture pages) · WCAG AA
   contrast.
-- HTML budget: every page's HTML < 13.6KB gzipped (scripts/check-html.mjs),
-  about 20% above the largest page when set (Distribution, 11.4KB,
-  2026-09-29). It includes the inline CSS, and first paint waits on it.
-  Raise it deliberately, here and in the script, never to make a page fit.
+- HTML budget: every page's HTML < 14.0KB gzipped (scripts/check-html.mjs).
+  That's about what TCP's first round trip carries: over it, the page needs
+  a second round trip and LCP on mobile 4G jumps ~150ms (measured: 1053ms →
+  1202ms). It's that limit, not a margin; don't raise it to make a page fit.
+  Keep below-the-fold styles in src/styles/deferred.css and behaviours in
+  src/scripts/ (loaded after the first paint by DeferredStyles/AfterLoad).
 - Image budgets (scripts/check-posters.mjs), AVIF: strip posters 40KB 1x /
   80KB 2x; case study heroes 60KB up to 1344w / 120KB at 2688w.
 - Content schema rules must fail the build, not warn (§3):

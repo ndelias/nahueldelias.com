@@ -29,8 +29,13 @@ const favicon = `data:image/svg+xml,${encodeURIComponent(faviconSvg.trim())}`;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     {/* Before first paint: mark that JS runs (controls that need it show only
-        then) and apply a saved theme choice. Must stay tiny and inline. */}
-    <script is:inline>var d=document.documentElement;d.classList.add("js");try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")d.dataset.theme=t}catch(e){}</script>
+        then), apply a saved theme choice, and define afterPaint(f): run f
+        once the first content has painted (the first largest-contentful-paint
+        entry), or a second after load where that isn't reported. Below-the-
+        fold styles and behaviours load through it (DeferredStyles,
+        AfterLoad), so nothing they fetch is on the way to the first paint.
+        Must stay tiny and inline. */}
+    <script is:inline>var d=document.documentElement;d.classList.add("js");try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")d.dataset.theme=t}catch(e){}var q=[],p=0;function g(){if(!p){p=1;setTimeout(function(){q.forEach(function(f){f()});q=null},0)}}window.afterPaint=function(f){q?q.push(f):setTimeout(f,0)};try{new PerformanceObserver(function(){requestAnimationFrame(g)}).observe({type:"largest-contentful-paint",buffered:true})}catch(e){}addEventListener("load",function(){setTimeout(g,1000)})</script>
     <title>{title}</title>
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex" />}

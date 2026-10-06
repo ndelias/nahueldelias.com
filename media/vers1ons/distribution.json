@@ -102,12 +102,6 @@
       "donor": "videos/12-distribution-night-swim.mp4"
     },
     {
-      "from": "screens/flows/_cand2/12-distribution-night-swim/c025.png",
-      "to": "work/vers1ons/distribution/gallery/09-more-stores.webp",
-      "width": 2560,
-      "donor": "videos/12-distribution-night-swim.mp4"
-    },
-    {
       "from": "screens/flows/_cand2/12-distribution-night-swim/c027.png",
       "to": "work/vers1ons/distribution/gallery/10-cover-art.webp",
       "width": 2560,
@@ -139,7 +133,17 @@
           ],
           "at": 99
         }
-      ]
+      ],
+      "art": {
+        "from": "assets/newsong/night-swim-cover.jpg",
+        "rect": [
+          546,
+          154,
+          396,
+          396
+        ],
+        "radius": 26
+      }
     },
     {
       "from": "screens/flows/_cand2/12-distribution-night-swim/c034.png",
@@ -299,6 +303,55 @@
       "width": 1344,
       "start": 13,
       "duration": 15
+    },
+    {
+      "from": "videos/12-distribution-night-swim.mp4",
+      "to": "media/vers1ons/distribution/clip-source.mp4",
+      "kind": "inline",
+      "width": 1344,
+      "start": 1.5,
+      "duration": 6.5
+    },
+    {
+      "from": "videos/12-distribution-night-swim.mp4",
+      "to": "media/vers1ons/distribution/clip-release.mp4",
+      "kind": "inline",
+      "width": 1344,
+      "start": 65,
+      "duration": 8
+    },
+    {
+      "from": "videos/12-distribution-night-swim.mp4",
+      "to": "media/vers1ons/distribution/clip-attest.mp4",
+      "kind": "inline",
+      "width": 1344,
+      "start": 93.5,
+      "duration": 7,
+      "hold": {
+        "rect": [
+          576,
+          744,
+          100,
+          100
+        ],
+        "at": 99.5
+      }
+    },
+    {
+      "from": "videos/12-distribution-night-swim.mp4",
+      "to": "media/vers1ons/distribution/clip-submit.mp4",
+      "kind": "inline",
+      "width": 1344,
+      "start": 101.2,
+      "duration": 7
+    },
+    {
+      "from": "videos/12-distribution-night-swim.mp4",
+      "to": "media/vers1ons/distribution/clip-live.mp4",
+      "kind": "inline",
+      "width": 1344,
+      "start": 113,
+      "duration": 8
     }
   ]
 }
