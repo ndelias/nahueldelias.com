@@ -278,9 +278,9 @@ order: 2
 ---
 import BodySection from '../../../components/BodySection.astro';
 import SystemFigure from '../../../components/diagrams/SystemFigure.astro';
-import { licensing } from '../../../components/diagrams/specs/licensing';
-
-<SystemFigure label="How it works" spec={licensing} />
+import { licensingDrops } from '../../../components/diagrams/specs/licensing-drops';
+import { licensingListings } from '../../../components/diagrams/specs/licensing-listings';
+import { licensingSheets } from '../../../components/diagrams/specs/licensing-sheets';
 
 <BodySection label="Problem" heading="A license is only worth something if everyone can trust it, and ours couldn't yet be trusted.">
   What a licensor set on a listing didn't always match what the system allowed, so a remix could reach a store the license didn't cover. Once a remix was remixed again, it got hard to tell who the original rights holders were and who should be paid. And setting up a listing, with its contributors, splits and terms, was easy to get wrong.
@@ -290,6 +290,8 @@ import { licensing } from '../../../components/diagrams/specs/licensing';
 
 <Tabs label="Three parts">
   <Tab id="listings">
+    <SystemFigure label="How it works" spec={licensingListings} />
+
     <BodySection label="What I did" heading="I led the product decisions on licensing and built it with our engineering team.">
       I worked with legal on the agreement, with labels and artists on the terms they needed, and with our founders on the license model. Then we turned the agreement into data the platform runs on. Every purchase issues a rights grant that points back to the grant it came from, so rights and royalties resolve up the chain however deep it goes. The terms a buyer signs are frozen at purchase, and one check decides where a remix may release, the same in the API, the release wizard and the delivery worker.
 
@@ -306,6 +308,8 @@ import { licensing } from '../../../components/diagrams/specs/licensing';
   </Tab>
 
   <Tab id="drops">
+    <SystemFigure label="How it works" spec={licensingDrops} />
+
     <BodySection label="What I did" heading="I built Drops end to end: a remix contest where no one leaves as a loser.">
       Most remix contests run on a form and a Dropbox link. Stems leak, entries have no license, and the winning remix can't be released because nobody cleared the rights. In a drop, the license is the entry fee. The artist is paid for every license sold, and every producer leaves with a remix they're licensed to release to socials and stores, with no legal back-and-forth between teams.
 
@@ -322,6 +326,8 @@ import { licensing } from '../../../components/diagrams/specs/licensing';
   </Tab>
 
   <Tab id="sheets">
+    <SystemFigure label="How it works" spec={licensingSheets} />
+
     <BodySection label="What I did" heading="A satellite app that gets the paperwork done before a license exists.">
       Most co-written songs have no split sheet, and without one there's no clean license to sell. So I built sheets.vers1ons.com on my own, from nothing: anyone can create a split sheet, or bring in one they already have, with no account. When it's ready, it collects signatures and the authority of everyone who owns a share, and then hands the song to vers1ons to become a license agreement.
     </BodySection>
