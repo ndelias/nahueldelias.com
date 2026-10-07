@@ -557,7 +557,7 @@ for (const [path, id] of [
 test('deferred blocks: find-in-page reaches text in a block that was never rendered', async () => {
   // window.find is the scriptable form of Chrome's find bar; both search
   // content-visibility: auto content and reveal the match.
-  for (const [path, text] of [[HUB, '[Where it is now.]'], [PART, 'adversarial endpoint coverage']]) {
+  for (const [path, text] of [[HUB, '[Where it is now.]'], [PART, 'a playbook for when something goes wrong']]) {
     const { ctx, page } = await openPart(path);
     const r = await page.evaluate((text) => {
       const found = window.find(text);
