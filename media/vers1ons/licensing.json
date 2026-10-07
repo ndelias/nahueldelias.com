@@ -391,42 +391,6 @@
       "to": "work/vers1ons/licensing/drops/phone/08-submissions.webp",
       "width": 1170,
       "retouch": false
-    },
-    {
-      "from": "screens/flows/sheets/mobile-00-landing.png",
-      "to": "work/vers1ons/licensing/sheets/phone/01-landing.webp",
-      "width": 1170,
-      "retouch": false
-    },
-    {
-      "from": "screens/flows/sheets/mobile-06-splits-balanced.png",
-      "to": "work/vers1ons/licensing/sheets/phone/02-splits.webp",
-      "width": 1170,
-      "retouch": false
-    },
-    {
-      "from": "screens/flows/sheets/mobile-08-done.png",
-      "to": "work/vers1ons/licensing/sheets/phone/03-done.webp",
-      "width": 1170,
-      "retouch": false
-    },
-    {
-      "from": "screens/flows/sheets/mobile-01-song.png",
-      "to": "work/vers1ons/licensing/sheets/phone/04-song.webp",
-      "width": 1170,
-      "retouch": false
-    },
-    {
-      "from": "screens/flows/sheets/mobile-04-contributors-list.png",
-      "to": "work/vers1ons/licensing/sheets/phone/05-contributors.webp",
-      "width": 1170,
-      "retouch": false
-    },
-    {
-      "from": "screens/flows/sheets/mobile-07-review.png",
-      "to": "work/vers1ons/licensing/sheets/phone/06-review.webp",
-      "width": 1170,
-      "retouch": false
     }
   ],
   "videos": [
