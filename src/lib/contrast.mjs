@@ -24,6 +24,8 @@ export const PAIRS = [
   { fg: 'money', bg: 'surface', min: 4.5, use: 'Diagram: done, on panels' },
   { fg: 'warn', bg: 'bg', min: 4.5, use: 'Diagram: failed, refused' },
   { fg: 'warn', bg: 'surface', min: 4.5, use: 'Diagram: failed, on panels' },
+  { fg: 'vers1ons', bg: 'bg', min: 4.5, use: 'vers1ons numbers' },
+  { fg: 'vers1ons', bg: 'surface', min: 4.5, use: 'vers1ons numbers on surfaces' },
 ];
 
 const HEX = '#[0-9a-fA-F]{6}';

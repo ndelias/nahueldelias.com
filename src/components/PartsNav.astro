@@ -16,6 +16,8 @@ interface Props {
 const { part } = Astro.props;
 const hub = parentOf(part)!;
 const parts = partsOf(hub);
+// vers1ons' numbers carry its own color.
+const brand = hub.id === 'vers1ons';
 ---
 <nav class="parts-nav" aria-label={`Parts of ${hub.data.title}`} data-parts-nav>
   <ol style={`--n: ${parts.length}`}>
@@ -25,7 +27,7 @@ const parts = partsOf(hub);
           {/* Low priority: on phones these sit above the header, in view, and
               Chrome would raise them to High, where they'd compete with the
               tagline and hero for the largest paint. */}
-          <span class="name"><span class="no">{entryNumber(p)}</span> <span class="title">{p.data.title}</span></span>
+          <span class="name"><span class:list={['no', { brand }]}>{entryNumber(p)}</span> <span class="title">{p.data.title}</span></span>
           <span class="thumb"><EntryImage src={p.data.cover.src} alt="" fetchpriority="low" /></span>
         </a>
       </li>
@@ -72,6 +74,9 @@ const parts = partsOf(hub);
   .name {
     display: flex;
     gap: var(--space-8);
+  }
+  .no.brand {
+    color: var(--vers1ons);
   }
   /* The blind: each thumbnail hangs under its title, over the page, rolled
      up (clipped to nothing) until the row is pointed at or focused. Its
