@@ -411,6 +411,14 @@ async function importImage(pick) {
     }
   }
   if (check) return { to: pick.to, cursors };
+  // Grafts: a box copied from another capture of the same screen size, where
+  // that spot shows the same thing cleanly (a button the cursor sat on for
+  // the whole recording, from the next screen, where it didn't).
+  // { from: archive file, rect: [x, y, w, h] }
+  for (const { from: graftFrom, rect: [gx, gy, gw, gh] } of pick.graft ?? []) {
+    const patch = await sharp(source(graftFrom)).removeAlpha().extract({ left: gx, top: gy, width: gw, height: gh }).raw().toBuffer();
+    for (let y = 0; y < gh; y++) patch.copy(data, ((gy + y) * W + gx) * C, y * gw * C, (y + 1) * gw * C);
+  }
   // Art: an image the capture caught mid-load (the cover art drawing in from
   // the top) gets the finished file the screen was loading, in the same box.
   // { from: archive file, rect: [x, y, w, h], radius }. Line the rect up

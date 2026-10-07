@@ -5,7 +5,18 @@
       "from": "screens/flows/create-listing/07-review.png",
       "to": "work/vers1ons/licensing/listings/walkthrough.webp",
       "width": 2688,
-      "donor": "videos/10-create-listing.mp4"
+      "donor": "videos/10-create-listing.mp4",
+      "graft": [
+        {
+          "from": "screens/flows/create-listing/08-sign-publish.png",
+          "rect": [
+            2600,
+            1676,
+            240,
+            124
+          ]
+        }
+      ]
     },
     {
       "from": "screens/flows/drop-remix/04-licensed.png",
@@ -65,7 +76,18 @@
       "from": "screens/flows/create-listing/07-review.png",
       "to": "work/vers1ons/licensing/listings/steps/07-review.webp",
       "width": 2560,
-      "donor": "videos/10-create-listing.mp4"
+      "donor": "videos/10-create-listing.mp4",
+      "graft": [
+        {
+          "from": "screens/flows/create-listing/08-sign-publish.png",
+          "rect": [
+            2600,
+            1676,
+            240,
+            124
+          ]
+        }
+      ]
     },
     {
       "from": "screens/flows/create-listing/08-sign-publish.png",
@@ -101,6 +123,18 @@
       "from": "screens/app/desktop-drop-late-bloomer.png",
       "to": "work/vers1ons/licensing/drops/steps/03-drop-app.webp",
       "width": 2560,
+      "donor": "videos/11b-drop-owner-review.mp4"
+    },
+    {
+      "from": "screens/app/desktop-drop-late-bloomer--full.png",
+      "to": "work/vers1ons/licensing/drops/steps/03b-drop-details.webp",
+      "width": 2560,
+      "crop": [
+        0,
+        1600,
+        2880,
+        1800
+      ],
       "donor": "videos/11b-drop-owner-review.mp4"
     },
     {
