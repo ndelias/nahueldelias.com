@@ -28,7 +28,13 @@
       "from": "screens/flows/sheets/desktop-08-done.png",
       "to": "work/vers1ons/licensing/sheets/walkthrough.webp",
       "width": 2688,
-      "donor": "videos/02-sheets.mp4"
+      "donor": "videos/02-sheets.mp4",
+      "crop": [
+        0,
+        0,
+        2880,
+        1800
+      ]
     },
     {
       "from": "screens/flows/create-listing/06-license-terms.png",
