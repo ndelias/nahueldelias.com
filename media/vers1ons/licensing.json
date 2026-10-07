@@ -120,6 +120,12 @@
       "donor": "videos/11b-drop-owner-review.mp4"
     },
     {
+      "from": "screens/flows/drop-remix/00-public-rules.png",
+      "to": "work/vers1ons/licensing/drops/steps/02b-public-rules.webp",
+      "width": 2560,
+      "donor": "videos/13-drop-public-scroll.mp4"
+    },
+    {
       "from": "screens/flows/_cand2/11a-drop-buy-submit/c001.png",
       "to": "work/vers1ons/licensing/drops/steps/03-drop-app.webp",
       "width": 2560,
@@ -379,6 +385,14 @@
       "width": 1344,
       "start": 39,
       "duration": 8
+    },
+    {
+      "from": "videos/13-drop-public-scroll.mp4",
+      "to": "media/vers1ons/licensing/clip-public-drop.mp4",
+      "kind": "inline",
+      "width": 1344,
+      "start": 0,
+      "duration": 16.8
     }
   ]
 }
