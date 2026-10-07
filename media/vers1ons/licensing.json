@@ -301,6 +301,138 @@
       "from": "screens/eras/today/flows/sheets/desktop-sheets-5.png",
       "to": "work/vers1ons/licensing/sheets/before-after/wizard-now.webp",
       "width": 2000
+    },
+    {
+      "from": "screens/flows/create-listing/mobile-05-splits.png",
+      "to": "work/vers1ons/licensing/listings/phone/01-splits.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/create-listing/mobile-06-license-terms.png",
+      "to": "work/vers1ons/licensing/listings/phone/02-license-terms.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/listing-page/mobile-01-listing-top.png",
+      "to": "work/vers1ons/licensing/listings/phone/03-listing.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/create-listing/mobile-03-contributor-roles.png",
+      "to": "work/vers1ons/licensing/listings/phone/04-contributor-roles.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/create-listing/mobile-07-review.png",
+      "to": "work/vers1ons/licensing/listings/phone/05-review.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/create-listing/mobile-08-sign-publish.png",
+      "to": "work/vers1ons/licensing/listings/phone/06-sign-publish.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/create-listing/mobile-09-share-card.png",
+      "to": "work/vers1ons/licensing/listings/phone/07-share-card.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/listing-page/mobile-03-price-royalties.png",
+      "to": "work/vers1ons/licensing/listings/phone/08-price-royalties.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/drop-remix/mobile-02-drop-top.png",
+      "to": "work/vers1ons/licensing/drops/phone/01-drop.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/drop-remix/mobile-05-agreement.png",
+      "to": "work/vers1ons/licensing/drops/phone/02-agreement.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/drop-remix/mobile-07-licensed.png",
+      "to": "work/vers1ons/licensing/drops/phone/03-licensed.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/drop-remix/mobile-01-drops-list.png",
+      "to": "work/vers1ons/licensing/drops/phone/04-drops.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/drop-remix/mobile-03-drop-rules.png",
+      "to": "work/vers1ons/licensing/drops/phone/05-rules.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/drop-remix/mobile-04-order-summary.png",
+      "to": "work/vers1ons/licensing/drops/phone/06-order-summary.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/drop-remix/mobile-08-submit-remix.png",
+      "to": "work/vers1ons/licensing/drops/phone/07-submit.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/drop-remix/mobile-09-host-submissions.png",
+      "to": "work/vers1ons/licensing/drops/phone/08-submissions.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/sheets/mobile-00-landing.png",
+      "to": "work/vers1ons/licensing/sheets/phone/01-landing.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/sheets/mobile-06-splits-balanced.png",
+      "to": "work/vers1ons/licensing/sheets/phone/02-splits.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/sheets/mobile-08-done.png",
+      "to": "work/vers1ons/licensing/sheets/phone/03-done.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/sheets/mobile-01-song.png",
+      "to": "work/vers1ons/licensing/sheets/phone/04-song.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/sheets/mobile-04-contributors-list.png",
+      "to": "work/vers1ons/licensing/sheets/phone/05-contributors.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/sheets/mobile-07-review.png",
+      "to": "work/vers1ons/licensing/sheets/phone/06-review.webp",
+      "width": 1170,
+      "retouch": false
     }
   ],
   "videos": [

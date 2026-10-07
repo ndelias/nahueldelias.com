@@ -131,6 +131,9 @@ const entrySchema = ({ image }: SchemaContext) => {
             walkthrough: walkthrough.optional(),
             gallery: z.array(galleryItem).optional(),
             comparisons: z.array(comparison).optional(),
+            // The same flow on a phone (<MobileDesign />): a few on the page,
+            // the rest (`more`) only in the full-size viewer.
+            phones: z.array(galleryItem).optional(),
           }),
         )
         .min(2, 'At least two tabs: one tab is just the page.')

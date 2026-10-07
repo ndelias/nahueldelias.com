@@ -1,0 +1,8 @@
+---
+// The open tab's flow on a phone (its `phones`), for use in MDX inside a
+// <Tab>: a few screens on the page, "See all" for the rest in the viewer.
+import Gallery from './Gallery.astro';
+
+const phones = Astro.locals.tabs?.open.phones ?? [];
+---
+<Gallery items={phones.map((p) => ({ ...p, frame: 'phone' as const }))} label="Mobile design" intro="The same flow on a phone. Click any screen to see it full size." />
