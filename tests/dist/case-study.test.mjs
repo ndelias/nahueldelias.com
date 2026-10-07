@@ -351,6 +351,9 @@ test('steps: the rail has a number per step; Next, Prev and a number move the tr
 test('steps: they advance on their own in view; Pause stops it, and the page never scrolls', async () => {
   const { ctx, page } = await openPart();
   await page.waitForSelector('[data-steps].is-live', { state: 'attached' });
+  // The below-the-fold styles too: when they arrive the blocks above the
+  // steps take their real heights, which moves the page, not the steps.
+  await page.waitForFunction(() => [...document.styleSheets].some((s) => s.href?.includes('/deferred') && s.cssRules.length > 0));
   await page.clock.install();
   await showSteps(page);
   await page.mouse.move(1, 1);
