@@ -48,10 +48,14 @@ function initDiagram(root: HTMLElement, spec: DiagramSpec) {
   const el = (id: string) => root.querySelector<HTMLElement>(`[data-node="${CSS.escape(id)}"]`)!;
   const wires = new Map<string, SVGPathElement>();
 
+  // Boxes relative to the stage, on whole pixels, so the wires land on the
+  // same pixels every time (fractional layout would anti-alias them a shade
+  // differently from one render to the next).
   const rel = (r: DOMRect): Box => {
     const s = stage.getBoundingClientRect();
-    const l = r.left - s.left, t = r.top - s.top;
-    return { l, t, r: l + r.width, b: t + r.height, cx: l + r.width / 2, cy: t + r.height / 2 };
+    const l = Math.round(r.left - s.left), t = Math.round(r.top - s.top);
+    const w = Math.round(r.width), h = Math.round(r.height);
+    return { l, t, r: l + w, b: t + h, cx: l + Math.round(w / 2), cy: t + Math.round(h / 2) };
   };
   const boxes = (id: string) => {
     const outer = rel(el(id.split(".")[0]).getBoundingClientRect());

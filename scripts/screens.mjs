@@ -169,8 +169,27 @@ async function loadAll(page) {
 /** Load a page in a fresh context and put it in the given state. */
 async function shoot(browser, origin, { viewport, colorScheme, view, next = 0, path }) {
   const ctx = await browser.newContext({ viewport, deviceScaleFactor: 1, colorScheme });
+  // Case study pages move on their own: recordings play, steps advance,
+  // comparisons rotate. A shot has to be the same every run, so the
+  // recordings never load (posters show) and the moving blocks are paused
+  // (from script, so no focus ring) before anything is captured.
+  if (path) await ctx.route('**/*.mp4', (route) => route.abort());
   const page = await ctx.newPage();
   await page.goto(`${origin}${path ?? '/'}`, { waitUntil: 'load' });
+  if (path) {
+    await page.waitForFunction(
+      () =>
+        (!document.querySelector('[data-steps]') || document.querySelector('[data-steps].is-live')) &&
+        (!document.querySelector('.comparisons') || document.querySelector('.comparisons .bar .pause')),
+    );
+    await page.evaluate(() => {
+      document.querySelector('[data-steps-pause]')?.click();
+      document.querySelector('.comparisons .bar .pause')?.click();
+    });
+    // No transitions either: a layer mid-fade (even at opacity 0) rasterizes
+    // what's under it a pixel differently from run to run.
+    await page.addStyleTag({ content: '*, *::before, *::after { transition: none !important; }' });
+  }
   await settle(page);
   if (path) {
     await loadAll(page);
