@@ -1,0 +1,494 @@
+{
+  "archive": "~/Vers1ons/portfolio-vers1ons",
+  "images": [
+    {
+      "from": "screens/flows/create-listing/07-review.png",
+      "to": "work/vers1ons/licensing/listings/walkthrough.webp",
+      "width": 2688,
+      "donor": "videos/10-create-listing.mp4",
+      "graft": [
+        {
+          "from": "screens/flows/create-listing/08-sign-publish.png",
+          "rect": [
+            2600,
+            1676,
+            240,
+            124
+          ]
+        }
+      ]
+    },
+    {
+      "from": "screens/flows/drop-remix/04-licensed.png",
+      "to": "work/vers1ons/licensing/drops/walkthrough.webp",
+      "width": 2688,
+      "donor": "videos/11a-drop-buy-submit.mp4"
+    },
+    {
+      "from": "screens/flows/sheets/desktop-08-done.png",
+      "to": "work/vers1ons/licensing/sheets/walkthrough.webp",
+      "width": 2688,
+      "donor": "videos/02-sheets.mp4",
+      "crop": [
+        0,
+        0,
+        2880,
+        1800
+      ]
+    },
+    {
+      "from": "screens/flows/create-listing/06-license-terms.png",
+      "to": "work/vers1ons/licensing/cover.webp",
+      "width": 1600,
+      "donor": "videos/10-create-listing.mp4"
+    },
+    {
+      "from": "screens/flows/create-listing/01-upload-processed.png",
+      "to": "work/vers1ons/licensing/listings/steps/01-upload-processed.webp",
+      "width": 2560,
+      "donor": "videos/10-create-listing.mp4"
+    },
+    {
+      "from": "screens/flows/create-listing/02-metadata-cover.png",
+      "to": "work/vers1ons/licensing/listings/steps/02-metadata-cover.webp",
+      "width": 2560,
+      "donor": "videos/10-create-listing.mp4"
+    },
+    {
+      "from": "screens/flows/create-listing/03-contributor-roles.png",
+      "to": "work/vers1ons/licensing/listings/steps/03-contributor-roles.webp",
+      "width": 2560,
+      "donor": "videos/10-create-listing.mp4"
+    },
+    {
+      "from": "screens/flows/create-listing/04-contributors.png",
+      "to": "work/vers1ons/licensing/listings/steps/04-contributors.webp",
+      "width": 2560,
+      "donor": "videos/10-create-listing.mp4"
+    },
+    {
+      "from": "screens/flows/create-listing/05-splits.png",
+      "to": "work/vers1ons/licensing/listings/steps/05-splits.webp",
+      "width": 2560,
+      "donor": "videos/10-create-listing.mp4"
+    },
+    {
+      "from": "screens/flows/create-listing/06-license-terms.png",
+      "to": "work/vers1ons/licensing/listings/steps/06-license-terms.webp",
+      "width": 2560,
+      "donor": "videos/10-create-listing.mp4"
+    },
+    {
+      "from": "screens/flows/create-listing/07-review.png",
+      "to": "work/vers1ons/licensing/listings/steps/07-review.webp",
+      "width": 2560,
+      "donor": "videos/10-create-listing.mp4",
+      "graft": [
+        {
+          "from": "screens/flows/create-listing/08-sign-publish.png",
+          "rect": [
+            2600,
+            1676,
+            240,
+            124
+          ]
+        }
+      ]
+    },
+    {
+      "from": "screens/flows/create-listing/08-sign-publish.png",
+      "to": "work/vers1ons/licensing/listings/steps/08-sign-publish.webp",
+      "width": 2560,
+      "donor": "videos/10-create-listing.mp4"
+    },
+    {
+      "from": "screens/flows/create-listing/09-share-card.png",
+      "to": "work/vers1ons/licensing/listings/steps/09-share-card.webp",
+      "width": 2560,
+      "donor": "videos/10-create-listing.mp4"
+    },
+    {
+      "from": "screens/app/desktop-listing-velvet-hour.png",
+      "to": "work/vers1ons/licensing/listings/steps/10-listing.webp",
+      "width": 2560,
+      "donor": "videos/10-create-listing.mp4"
+    },
+    {
+      "from": "screens/app/desktop-drops.png",
+      "to": "work/vers1ons/licensing/drops/steps/01-drops.webp",
+      "width": 2560,
+      "donor": "videos/11b-drop-owner-review.mp4"
+    },
+    {
+      "from": "screens/app/desktop-drop-late-bloomer-public.png",
+      "to": "work/vers1ons/licensing/drops/steps/02-drop-public.webp",
+      "width": 2560,
+      "donor": "videos/11b-drop-owner-review.mp4"
+    },
+    {
+      "from": "screens/flows/drop-remix/00-public-rules.png",
+      "to": "work/vers1ons/licensing/drops/steps/02b-public-rules.webp",
+      "width": 2560,
+      "donor": "videos/13-drop-public-scroll.mp4"
+    },
+    {
+      "from": "screens/flows/_cand2/11a-drop-buy-submit/c001.png",
+      "to": "work/vers1ons/licensing/drops/steps/03-drop-app.webp",
+      "width": 2560,
+      "donor": "videos/11a-drop-buy-submit.mp4"
+    },
+    {
+      "from": "screens/flows/drop-remix/01-order-summary.png",
+      "to": "work/vers1ons/licensing/drops/steps/05-order-summary.webp",
+      "width": 2560,
+      "donor": "videos/11a-drop-buy-submit.mp4"
+    },
+    {
+      "from": "screens/flows/drop-remix/02-agreement.png",
+      "to": "work/vers1ons/licensing/drops/steps/06-agreement.webp",
+      "width": 2560,
+      "donor": "videos/11a-drop-buy-submit.mp4"
+    },
+    {
+      "from": "screens/flows/drop-remix/03-payment.png",
+      "to": "work/vers1ons/licensing/drops/steps/07-payment.webp",
+      "width": 2560,
+      "donor": "videos/11a-drop-buy-submit.mp4"
+    },
+    {
+      "from": "screens/flows/drop-remix/04-licensed.png",
+      "to": "work/vers1ons/licensing/drops/steps/08-licensed.webp",
+      "width": 2560,
+      "donor": "videos/11a-drop-buy-submit.mp4"
+    },
+    {
+      "from": "screens/flows/drop-remix/05-submit-cover.png",
+      "to": "work/vers1ons/licensing/drops/steps/09-submit-cover.webp",
+      "width": 2560,
+      "donor": "videos/11a-drop-buy-submit.mp4"
+    },
+    {
+      "from": "screens/flows/drop-remix/06-submit-ready.png",
+      "to": "work/vers1ons/licensing/drops/steps/10-submit-ready.webp",
+      "width": 2560,
+      "donor": "videos/11a-drop-buy-submit.mp4"
+    },
+    {
+      "from": "screens/app/desktop-drop-submissions.png",
+      "to": "work/vers1ons/licensing/drops/steps/11-submissions.webp",
+      "width": 2560,
+      "donor": "videos/11b-drop-owner-review.mp4"
+    },
+    {
+      "from": "screens/flows/sheets/desktop-00-landing.png",
+      "to": "work/vers1ons/licensing/sheets/steps/01-landing.webp",
+      "width": 2560,
+      "donor": "videos/02-sheets.mp4"
+    },
+    {
+      "from": "screens/flows/sheets/desktop-01-song.png",
+      "to": "work/vers1ons/licensing/sheets/steps/02-song.webp",
+      "width": 2560,
+      "donor": "videos/02-sheets.mp4"
+    },
+    {
+      "from": "screens/flows/sheets/desktop-02-contributor.png",
+      "to": "work/vers1ons/licensing/sheets/steps/03-contributor.webp",
+      "width": 2560,
+      "donor": "videos/02-sheets.mp4"
+    },
+    {
+      "from": "screens/flows/sheets/desktop-03-roles.png",
+      "to": "work/vers1ons/licensing/sheets/steps/04-roles.webp",
+      "width": 2560,
+      "donor": "videos/02-sheets.mp4"
+    },
+    {
+      "from": "screens/flows/sheets/desktop-04-contributors-list.png",
+      "to": "work/vers1ons/licensing/sheets/steps/05-contributors-list.webp",
+      "width": 2560,
+      "donor": "videos/02-sheets.mp4"
+    },
+    {
+      "from": "screens/flows/sheets/desktop-05-splits-empty.png",
+      "to": "work/vers1ons/licensing/sheets/steps/06-splits-empty.webp",
+      "width": 2560,
+      "donor": "videos/02-sheets.mp4"
+    },
+    {
+      "from": "screens/flows/sheets/desktop-06-splits-balanced.png",
+      "to": "work/vers1ons/licensing/sheets/steps/07-splits-balanced.webp",
+      "width": 2560,
+      "donor": "videos/02-sheets.mp4"
+    },
+    {
+      "from": "screens/flows/sheets/desktop-07-review.png",
+      "to": "work/vers1ons/licensing/sheets/steps/08-review.webp",
+      "width": 2560,
+      "donor": "videos/02-sheets.mp4"
+    },
+    {
+      "from": "screens/flows/sheets/desktop-08-done.png",
+      "to": "work/vers1ons/licensing/sheets/steps/09-done.webp",
+      "width": 2560,
+      "donor": "videos/02-sheets.mp4"
+    },
+    {
+      "from": "screens/flows/sheets/midnight-signal-split-sheet.pdf.png",
+      "to": "work/vers1ons/licensing/sheets/steps/10-pdf.webp",
+      "width": 1272
+    },
+    {
+      "from": "screens/eras/nov25/desktop-listing.png",
+      "to": "work/vers1ons/licensing/listings/before-after/listing-before.webp",
+      "width": 2000
+    },
+    {
+      "from": "screens/eras/today/desktop-listing.png",
+      "to": "work/vers1ons/licensing/listings/before-after/listing-now.webp",
+      "width": 2000
+    },
+    {
+      "from": "screens/eras/nov25/flows/upload/desktop-upload-4-license.png",
+      "to": "work/vers1ons/licensing/listings/before-after/terms-before.webp",
+      "width": 2000
+    },
+    {
+      "from": "screens/eras/today/flows/upload/desktop-upload-4-license.png",
+      "to": "work/vers1ons/licensing/listings/before-after/terms-now.webp",
+      "width": 2000
+    },
+    {
+      "from": "screens/eras/nov25/flows/upload/desktop-upload-3-contributions.png",
+      "to": "work/vers1ons/licensing/listings/before-after/contributors-before.webp",
+      "width": 2000
+    },
+    {
+      "from": "screens/eras/today/flows/upload/desktop-upload-3-contributions.png",
+      "to": "work/vers1ons/licensing/listings/before-after/contributors-now.webp",
+      "width": 2000
+    },
+    {
+      "from": "screens/eras/nov25/flows/checkout/desktop-checkout-2.png",
+      "to": "work/vers1ons/licensing/listings/before-after/agreement-before.webp",
+      "width": 2000
+    },
+    {
+      "from": "screens/eras/today/flows/checkout/desktop-checkout-2.png",
+      "to": "work/vers1ons/licensing/listings/before-after/agreement-now.webp",
+      "width": 2000
+    },
+    {
+      "from": "screens/eras/jul26/desktop-drop-public.png",
+      "to": "work/vers1ons/licensing/drops/before-after/drop-page-before.webp",
+      "width": 2000
+    },
+    {
+      "from": "screens/eras/today/desktop-drop-public.png",
+      "to": "work/vers1ons/licensing/drops/before-after/drop-page-now.webp",
+      "width": 2000
+    },
+    {
+      "from": "screens/eras/jul26/desktop-drop-submissions.png",
+      "to": "work/vers1ons/licensing/drops/before-after/submissions-before.webp",
+      "width": 2000
+    },
+    {
+      "from": "screens/eras/today/desktop-drop-submissions.png",
+      "to": "work/vers1ons/licensing/drops/before-after/submissions-now.webp",
+      "width": 2000
+    },
+    {
+      "from": "screens/eras/sheets-jun26/flows/sheets/desktop-sheets-2-filled.png",
+      "to": "work/vers1ons/licensing/sheets/before-after/wizard-before.webp",
+      "width": 2000
+    },
+    {
+      "from": "screens/eras/today/flows/sheets/desktop-sheets-5.png",
+      "to": "work/vers1ons/licensing/sheets/before-after/wizard-now.webp",
+      "width": 2000
+    },
+    {
+      "from": "screens/flows/create-listing/mobile-05-splits.png",
+      "to": "work/vers1ons/licensing/listings/phone/01-splits.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/create-listing/mobile-06-license-terms.png",
+      "to": "work/vers1ons/licensing/listings/phone/02-license-terms.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/listing-page/mobile-01-listing-top.png",
+      "to": "work/vers1ons/licensing/listings/phone/03-listing.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/create-listing/mobile-03-contributor-roles.png",
+      "to": "work/vers1ons/licensing/listings/phone/04-contributor-roles.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/create-listing/mobile-07-review.png",
+      "to": "work/vers1ons/licensing/listings/phone/05-review.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/create-listing/mobile-08-sign-publish.png",
+      "to": "work/vers1ons/licensing/listings/phone/06-sign-publish.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/create-listing/mobile-09-share-card.png",
+      "to": "work/vers1ons/licensing/listings/phone/07-share-card.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/listing-page/mobile-03-price-royalties.png",
+      "to": "work/vers1ons/licensing/listings/phone/08-price-royalties.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/drop-remix/mobile-02-drop-top.png",
+      "to": "work/vers1ons/licensing/drops/phone/01-drop.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/drop-remix/mobile-05-agreement.png",
+      "to": "work/vers1ons/licensing/drops/phone/02-agreement.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/drop-remix/mobile-07-licensed.png",
+      "to": "work/vers1ons/licensing/drops/phone/03-licensed.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/drop-remix/mobile-01-drops-list.png",
+      "to": "work/vers1ons/licensing/drops/phone/04-drops.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/drop-remix/mobile-03-drop-rules.png",
+      "to": "work/vers1ons/licensing/drops/phone/05-rules.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/drop-remix/mobile-04-order-summary.png",
+      "to": "work/vers1ons/licensing/drops/phone/06-order-summary.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/drop-remix/mobile-09-host-submissions.png",
+      "to": "work/vers1ons/licensing/drops/phone/08-submissions.webp",
+      "width": 1170,
+      "retouch": false
+    }
+  ],
+  "videos": [
+    {
+      "from": "videos/10-create-listing.mp4",
+      "to": "media/vers1ons/licensing/listings-walkthrough.mp4",
+      "kind": "hero",
+      "width": 1344
+    },
+    {
+      "from": "videos/11a-drop-buy-submit.mp4",
+      "to": "media/vers1ons/licensing/drops-walkthrough.mp4",
+      "kind": "hero",
+      "width": 1344
+    },
+    {
+      "from": "videos/02-sheets.mp4",
+      "to": "media/vers1ons/licensing/sheets-walkthrough.mp4",
+      "kind": "hero",
+      "width": 1344
+    },
+    {
+      "from": "videos/10-create-listing.mp4",
+      "to": "media/vers1ons/licensing/clip-splits.mp4",
+      "kind": "inline",
+      "width": 1344,
+      "start": 57.5,
+      "duration": 8
+    },
+    {
+      "from": "videos/10-create-listing.mp4",
+      "to": "media/vers1ons/licensing/clip-terms.mp4",
+      "kind": "inline",
+      "width": 1344,
+      "start": 68,
+      "duration": 8
+    },
+    {
+      "from": "videos/10-create-listing.mp4",
+      "to": "media/vers1ons/licensing/clip-publish.mp4",
+      "kind": "inline",
+      "width": 1344,
+      "start": 82,
+      "duration": 8
+    },
+    {
+      "from": "videos/11a-drop-buy-submit.mp4",
+      "to": "media/vers1ons/licensing/clip-agreement.mp4",
+      "kind": "inline",
+      "width": 1344,
+      "start": 7,
+      "duration": 10
+    },
+    {
+      "from": "videos/11a-drop-buy-submit.mp4",
+      "to": "media/vers1ons/licensing/clip-submit.mp4",
+      "kind": "inline",
+      "width": 1344,
+      "start": 46,
+      "duration": 8
+    },
+    {
+      "from": "videos/11b-drop-owner-review.mp4",
+      "to": "media/vers1ons/licensing/clip-submissions.mp4",
+      "kind": "inline",
+      "width": 1344,
+      "start": 8,
+      "duration": 8
+    },
+    {
+      "from": "videos/02-sheets.mp4",
+      "to": "media/vers1ons/licensing/clip-sheet-splits.mp4",
+      "kind": "inline",
+      "width": 1344,
+      "start": 29,
+      "duration": 8
+    },
+    {
+      "from": "videos/02-sheets.mp4",
+      "to": "media/vers1ons/licensing/clip-sheet-done.mp4",
+      "kind": "inline",
+      "width": 1344,
+      "start": 39,
+      "duration": 8
+    },
+    {
+      "from": "videos/13-drop-public-scroll.mp4",
+      "to": "media/vers1ons/licensing/clip-public-drop.mp4",
+      "kind": "inline",
+      "width": 1344,
+      "start": 0,
+      "duration": 16.8
+    }
+  ]
+}

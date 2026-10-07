@@ -1,0 +1,12 @@
+---
+// One tab's content inside <Tabs>, for use in MDX. Renders only on the
+// page for that tab (Astro.locals.tabs.open), so a page's HTML carries one
+// tab, not all of them.
+//
+//   <Tab id="drops">…</Tab>
+interface Props {
+  id: string;
+}
+const { id } = Astro.props;
+---
+{Astro.locals.tabs?.open.id === id && <slot />}

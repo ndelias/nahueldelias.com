@@ -134,11 +134,17 @@
     color: var(--muted);
   }
 
+  /* "See all": under the screens, one line. */
+  .see-all {
+    grid-column: 1 / -1;
+    margin: var(--space-24) 0 0;
+  }
   @media (min-width: 640px) {
     .intro {
       grid-column: span 3;
     }
-    .screens {
+    .screens,
+    .see-all {
       grid-column: 4 / span 9;
     }
   }
@@ -994,6 +1000,13 @@
       grid-row: 1 / span 2;
       align-self: start;
       container-type: inline-size;
+      /* Tall enough for the panel beside it: a short diagram still leaves
+         room for several log lines and the longest inspector note,
+         with the diagram centred in it. */
+      min-height: 640px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
       padding: 40px;
       border: 1px solid var(--sd-line);
       border-radius: 4px;
@@ -1026,9 +1039,10 @@
       padding: 12px;
     }
     /* One row: short names, compact buttons; Reset in the same row, muted
-       and unboxed. */
+       and unboxed (it wraps to its own line, at the right, rather than
+       leave the box). */
     .sd-controls {
-      flex-wrap: nowrap;
+      flex-wrap: wrap;
       gap: 4px;
       margin-bottom: 10px;
     }
@@ -1305,6 +1319,108 @@ nav.pager {
   }
 }
 
+/* Tabs: a part told as a few sub-stories (components/Tabs.astro). The row
+   is like the parts nav, larger: a rule over each tab, the open one in
+   accent, its name and its one line. Below it the open tab's content, laid
+   out like the body around it. */
+.tabbed {
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+  & .tab-head {
+    row-gap: var(--space-16);
+  }
+  & .label {
+    margin: 0;
+    font-weight: var(--weight-regular);
+    line-height: normal;
+  }
+  & .tab-row ol {
+    display: grid;
+    grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+    column-gap: var(--grid-gutter);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  & .tab {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+    height: 100%;
+    padding-top: var(--space-12);
+    border-top: 2px solid var(--line);
+    color: var(--muted);
+    text-decoration: none;
+  }
+  & .tab:hover {
+    color: var(--ink);
+  }
+  & .tab[aria-current='page'] {
+    border-top-color: var(--accent);
+    color: var(--ink);
+  }
+  & .tab-name {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-8);
+    font-size: var(--text-title);
+    font-weight: var(--weight-medium);
+    line-height: 1.2;
+  }
+  & .tab-no {
+    color: var(--muted);
+    font-size: var(--text-caption);
+    font-weight: var(--weight-regular);
+  }
+  & .tab-caption {
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+  }
+  & .tab-panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-96);
+  }
+  & .tab-panel > .body-section + .body-section {
+    margin-top: -32px;
+  }
+  @media (min-width: 640px) {
+    & .tab-head > .label {
+      grid-column: span 3;
+    }
+    & .tab-row {
+      grid-column: 4 / span 9;
+    }
+    & .walkthrough {
+      display: grid;
+      grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+      column-gap: var(--grid-gutter);
+    }
+    & .walkthrough > figure {
+      grid-column: 3 / span 8;
+    }
+  }
+  @media (max-width: 639.98px) {
+    gap: var(--space-32);
+    & .tab-head > * {
+      grid-column: 1 / -1;
+    }
+    & .tab-name {
+      font-size: var(--text-lead);
+    }
+    & .tab-caption {
+      font-size: var(--text-caption);
+    }
+    & .tab-panel {
+      gap: var(--space-64);
+    }
+    & .tab-panel > .body-section + .body-section {
+      margin-top: -16px;
+    }
+  }
+}
+
 /* Steps: the flow as a sideways track, one step at a time */
 .steps {
   & .intro {
@@ -1492,6 +1608,10 @@ nav.pager {
 /* Figure, inset (below the fold; the hero's own rules stay inline), and the
    walkthrough's running state: a small Pause in the corner. */
 .figure {
+  /* The walkthrough pauses and plays from anywhere on it. */
+  &:has([data-figure-toggle]) .media {
+    cursor: pointer;
+  }
   &.running .p-play {
     display: none;
   }

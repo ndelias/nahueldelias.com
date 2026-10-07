@@ -3,9 +3,11 @@
 const STILL_MS = 5000; // how long a still shows before the next step
 const CLIP_MIN_MS = 5000; // a clip shows once through, at least this long
 
-function init() {
+function init(scope: ParentNode = document) {
   const still = matchMedia('(prefers-reduced-motion: reduce)');
-  for (const root of document.querySelectorAll<HTMLElement>('[data-steps]')) {
+  for (const root of scope.querySelectorAll<HTMLElement>('[data-steps]')) {
+    if (root.dataset.bound) continue;
+    root.dataset.bound = '';
     const track = root.querySelector<HTMLElement>('[data-steps-track]')!;
     const cards = [...track.querySelectorAll<HTMLElement>('[data-step]')];
     // The rail: one numbered link per step, built here (it's only for the
@@ -140,5 +142,8 @@ function init() {
 }
 
 init();
+
+// A tab swaps in new content (Tabs.astro): set up what came in with it.
+document.addEventListener('tabs:swap', (event) => init((event as CustomEvent<HTMLElement>).detail));
 
 export {}; // a module, so each script keeps its own scope

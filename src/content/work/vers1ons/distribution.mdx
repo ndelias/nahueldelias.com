@@ -10,7 +10,7 @@ status: shipped
 role: 'Owner, end to end'
 dates:
   start: 2025-11
-stack: ['Inngest', 'Postgres', 'Redis', 'Socket.IO', 'Object storage', 'ffmpeg']
+stack: ['Next.js', 'Inngest', 'Postgres', 'Redis', 'Socket.IO', 'Object storage', 'ffmpeg']
 standing: 'In production'
 disciplines:
   led: [backend, product, frontend]
@@ -73,7 +73,7 @@ gallery:
   - src: ../../../assets/work/vers1ons/distribution/gallery/11-review.webp
     alt: 'Review and submit.'
     title: 'Review'
-    caption: 'The release the way stores will show it, cover art first, with every step one click away to edit.'
+    caption: 'This is how the release will appear in stores.'
     frame: desktop
   - src: ../../../assets/work/vers1ons/distribution/gallery/12-attestations.webp
     alt: 'The attestations, all checked.'
@@ -194,8 +194,8 @@ import { distribution } from '../../../components/diagrams/specs/distribution';
 
 <Comparisons />
 
-<BodySection label="Reliability" heading="245+ unit tests plus adversarial endpoint coverage.">
-  Metrics, tracing and an ops playbook. Production canaries found real bugs, all fixed: a partner's dedupe conflict, a label and parental-advisory rejection, and codes that didn't issue when the release setup failed.
+<BodySection label="Reliability" heading="Every failure we've seen in production, we caught and fixed.">
+  Over 245 unit tests, plus tests that try to break the endpoints on purpose. Metrics, tracing and a playbook for when something goes wrong. Our test releases in production have found real bugs, and we've fixed and addressed each one. We continue to do so.
 </BodySection>
 
 <BodySection label="Outcome" heading="Live in production: a remix no longer has to leave vers1ons to reach the stores.">

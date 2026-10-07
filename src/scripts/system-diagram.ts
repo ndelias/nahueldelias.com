@@ -289,11 +289,16 @@ function initDiagram(root: HTMLElement, spec: DiagramSpec) {
   document.fonts?.ready.then(draw);
 }
 
-function init() {
-  for (const root of document.querySelectorAll<HTMLElement>('[data-sd]')) {
+function init(scope: ParentNode = document) {
+  for (const root of scope.querySelectorAll<HTMLElement>('[data-sd]')) {
+    if (root.dataset.bound) continue;
+    root.dataset.bound = '';
     const spec = loadSpec(root.dataset.sd!);
     if (spec) initDiagram(root, spec);
   }
 }
 
 init();
+
+// A tab swaps in new content (Tabs.astro): set up the diagram in it.
+document.addEventListener('tabs:swap', (event) => init((event as CustomEvent<HTMLElement>).detail));

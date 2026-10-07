@@ -24,6 +24,39 @@ const month = z
 const entrySchema = ({ image }: SchemaContext) => {
   const imageRef = z.object({ src: image(), alt: z.string().min(1) });
   const disciplines = z.array(z.enum(DISCIPLINES));
+  // A still or a recording: with a video, the image is its poster (the
+  // hero, and a tab's walkthrough).
+  const walkthrough = imageRef.extend({
+    // Dark-theme variant of the still, like the strip poster's.
+    dark: image().optional(),
+    video: z.string().min(1).optional(),
+    // "0:48", shown beside "Walkthrough · muted".
+    duration: z.string().min(1).optional(),
+    // The flow the recording walks through, or the one thing to notice.
+    caption: z.string().min(1).optional(),
+  });
+  const galleryItem = z.object({
+    src: image(),
+    alt: z.string({ error: 'Required: describe what the screen shows.' }).min(1, 'Required: describe what the screen shows.'),
+    caption: z.string().min(1).optional(),
+    frame: z.enum(FRAMES).default('desktop'),
+    // Only in the full-size viewer ("See all"), not on the page: keeps
+    // the page's HTML inside the first round trip (the HTML budget).
+    more: z.boolean().default(false),
+    // As a step of the flow (<Steps />): its name, and a muted clip
+    // that plays while the step is showing (a path under public/).
+    // The caption is the step's two or three lines.
+    title: z.string().min(1).optional(),
+    clip: z.string().min(1).optional(),
+  });
+  const comparison = z.object({
+    title: z.string().min(1),
+    // Why it changed, in two or three lines.
+    why: z.string().min(1).optional(),
+    frame: z.enum(FRAMES).default('desktop'),
+    before: imageRef.extend({ label: z.string().min(1), caption: z.string().min(1).optional() }),
+    now: imageRef.extend({ label: z.string().min(1), caption: z.string().min(1).optional() }),
+  });
 
   return z
     .object({
@@ -78,49 +111,32 @@ const entrySchema = ({ image }: SchemaContext) => {
         )
         .optional(),
       // Full-width still or recording under the header. With a video, the
-      // image is its poster and the recording plays on request, muted.
-      hero: imageRef
-        .extend({
-          // Dark-theme variant of the still, like the strip poster's.
-          dark: image().optional(),
-          video: z.string().min(1).optional(),
-          // "0:48", shown beside "Walkthrough · muted".
-          duration: z.string().min(1).optional(),
-          // The flow the recording walks through, or the one thing to notice.
-          caption: z.string().min(1).optional(),
-        })
-        .optional(),
-      gallery: z
-        .array(
-          z.object({
-            src: image(),
-            alt: z.string({ error: 'Required: describe what the screen shows.' }).min(1, 'Required: describe what the screen shows.'),
-            caption: z.string().min(1).optional(),
-            frame: z.enum(FRAMES).default('desktop'),
-            // Only in the full-size viewer ("See all"), not on the page: keeps
-            // the page's HTML inside the first round trip (the HTML budget).
-            more: z.boolean().default(false),
-            // As a step of the flow (<Steps />): its name, and a muted clip
-            // that plays while the step is showing (a path under public/).
-            // The caption is the step's two or three lines.
-            title: z.string().min(1).optional(),
-            clip: z.string().min(1).optional(),
-          }),
-        )
-        .optional(),
+      // image is its poster and the recording plays muted.
+      hero: walkthrough.optional(),
+      gallery: z.array(galleryItem).optional(),
       // Before → now: the same part of the product in an early build and
       // today. The before screen fades into the now one in the same frame.
-      comparisons: z
+      comparisons: z.array(comparison).optional(),
+      // A part told as a few sub-stories (Licensing: listings, drops,
+      // sheets), as tabs below its shared sections. Each tab has its own
+      // walkthrough, steps (its gallery) and before → now. Only the open tab
+      // is in a page's HTML, and each tab has its own URL (the HTML budget).
+      tabs: z
         .array(
           z.object({
-            title: z.string().min(1),
-            // Why it changed, in two or three lines.
-            why: z.string().min(1).optional(),
-            frame: z.enum(FRAMES).default('desktop'),
-            before: imageRef.extend({ label: z.string().min(1), caption: z.string().min(1).optional() }),
-            now: imageRef.extend({ label: z.string().min(1), caption: z.string().min(1).optional() }),
+            id: z.string().regex(/^[a-z0-9-]+$/, 'A tab id is its URL segment: lowercase letters, digits and hyphens.'),
+            label: z.string().min(1),
+            // One line under the tab row: what this tab shows.
+            caption: z.string().min(1),
+            walkthrough: walkthrough.optional(),
+            gallery: z.array(galleryItem).optional(),
+            comparisons: z.array(comparison).optional(),
+            // The same flow on a phone (<MobileDesign />): a few on the page,
+            // the rest (`more`) only in the full-size viewer.
+            phones: z.array(galleryItem).optional(),
           }),
         )
+        .min(2, 'At least two tabs: one tab is just the page.')
         .optional(),
       // Shown at the end of the page: whose artwork it is, what's fictional,
       // what's staged. Required wording lives with the content, not the template.
@@ -152,6 +168,11 @@ const entrySchema = ({ image }: SchemaContext) => {
           });
         }
       }
+      (entry.tabs ?? []).forEach((tab, i, tabs) => {
+        if (tabs.findIndex((t) => t.id === tab.id) !== i) {
+          ctx.addIssue({ code: 'custom', path: ['tabs', i, 'id'], message: `Tab id "${tab.id}" is used twice.` });
+        }
+      });
       if (entry.disciplines) {
         const both = entry.disciplines.led.filter((d) => entry.disciplines!.contributed.includes(d));
         if (both.length) {
@@ -179,7 +200,7 @@ const entrySchema = ({ image }: SchemaContext) => {
             message: 'Required for parts (§3 hub and parts): every part has its own decision. Add decision: { chose, rejected, cost }.',
           });
         }
-        const screens = entry.gallery?.length ?? 0;
+        const screens = (entry.gallery?.length ?? 0) + (entry.tabs ?? []).reduce((n, t) => n + (t.gallery?.length ?? 0), 0);
         if (screens < MIN_PART_GALLERY) {
           ctx.addIssue({
             code: 'custom',

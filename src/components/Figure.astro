@@ -161,14 +161,34 @@ const row = layout === 'full';
     align-items: center;
     justify-content: center;
     padding: 0;
-    border: 1px solid var(--ink);
+    /* White on a dark disc, like the Pause in the corner: it sits over the
+       recording, which is dark whatever the page's theme. */
+    border: 1px solid #fff;
     border-radius: 50%;
-    background: none;
-    color: var(--ink);
+    background: rgb(0 0 0 / 0.55);
+    color: #fff;
     cursor: pointer;
   }
   :global(.js) .play {
     display: flex;
+  }
+  /* With a pointer, the button shows only while it's over the recording (or
+     the button has keyboard focus), fading in and out. Touch screens keep
+     it: there's no hover to find it with. */
+  @media (hover: hover) {
+    :global(.js) .play {
+      opacity: 0;
+      transition: opacity 400ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    }
+    .media:hover .play,
+    .play:focus-visible {
+      opacity: 1;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .play {
+      transition: none;
+    }
   }
   .play path {
     fill: none;

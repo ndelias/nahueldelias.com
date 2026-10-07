@@ -43,52 +43,63 @@ function init() {
     { threshold: 0 },
   );
 
-  for (const figure of document.querySelectorAll<HTMLElement>('[data-figure]')) {
-    const auto = figure.querySelector<HTMLVideoElement>('video[data-play="auto"]');
-    const toggle = figure.querySelector<HTMLButtonElement>('[data-figure-toggle]');
-    if (auto && toggle) {
-      const label = () => toggle.setAttribute('aria-label', auto.paused ? 'Play walkthrough, muted' : 'Pause walkthrough');
-      auto.addEventListener('play', () => (figure.classList.add('running'), label()));
-      auto.addEventListener('pause', () => (figure.classList.remove('running'), label()));
-      autoObserver.observe(auto);
-      toggle.addEventListener('click', () => {
-        if (auto.paused) {
-          paused.delete(auto);
-          start(auto);
-        } else {
-          paused.add(auto);
-          auto.pause();
-        }
+  const bind = (scope: ParentNode) => {
+    for (const figure of scope.querySelectorAll<HTMLElement>('[data-figure]')) {
+      if (figure.dataset.bound) continue;
+      figure.dataset.bound = '';
+      const auto = figure.querySelector<HTMLVideoElement>('video[data-play="auto"]');
+      const toggle = figure.querySelector<HTMLButtonElement>('[data-figure-toggle]');
+      if (auto && toggle) {
+        const label = () => toggle.setAttribute('aria-label', auto.paused ? 'Play walkthrough, muted' : 'Pause walkthrough');
+        auto.addEventListener('play', () => (figure.classList.add('running'), label()));
+        auto.addEventListener('pause', () => (figure.classList.remove('running'), label()));
+        autoObserver.observe(auto);
+        toggle.addEventListener('click', () => {
+          if (auto.paused) {
+            paused.delete(auto);
+            start(auto);
+          } else {
+            paused.add(auto);
+            auto.pause();
+          }
+        });
+        // A click anywhere on the recording does the same as the button.
+        figure.querySelector('.media')?.addEventListener('click', (event) => {
+          if (!toggle.contains(event.target as Node)) toggle.click();
+        });
+      }
+
+      const v = figure.querySelector<HTMLVideoElement>('video[data-play="view"]');
+      if (v) {
+        observer.observe(v);
+        const button = figure.querySelector<HTMLButtonElement>('[data-figure-pause]')!;
+        button.addEventListener('click', () => {
+          const pause = !paused.has(v);
+          if (pause) {
+            paused.add(v);
+            v.pause();
+          } else {
+            paused.delete(v);
+            start(v);
+          }
+          button.setAttribute('aria-pressed', String(pause));
+          button.textContent = pause ? '(Play)' : '(Pause)';
+        });
+      }
+
+      const clickable = figure.querySelector<HTMLVideoElement>('video[data-play="click"]');
+      figure.querySelector<HTMLButtonElement>('[data-figure-play]')?.addEventListener('click', (event) => {
+        if (!clickable) return;
+        (event.currentTarget as HTMLElement).remove();
+        clickable.controls = true;
+        start(clickable);
+        clickable.focus();
       });
     }
-
-    const v = figure.querySelector<HTMLVideoElement>('video[data-play="view"]');
-    if (v) {
-      observer.observe(v);
-      const button = figure.querySelector<HTMLButtonElement>('[data-figure-pause]')!;
-      button.addEventListener('click', () => {
-        const pause = !paused.has(v);
-        if (pause) {
-          paused.add(v);
-          v.pause();
-        } else {
-          paused.delete(v);
-          start(v);
-        }
-        button.setAttribute('aria-pressed', String(pause));
-        button.textContent = pause ? '(Play)' : '(Pause)';
-      });
-    }
-
-    const clickable = figure.querySelector<HTMLVideoElement>('video[data-play="click"]');
-    figure.querySelector<HTMLButtonElement>('[data-figure-play]')?.addEventListener('click', (event) => {
-      if (!clickable) return;
-      (event.currentTarget as HTMLElement).remove();
-      clickable.controls = true;
-      start(clickable);
-      clickable.focus();
-    });
-  }
+  };
+  bind(document);
+  // A tab swaps in new content (Tabs.astro): set up the figures in it.
+  document.addEventListener('tabs:swap', (event) => bind((event as CustomEvent<HTMLElement>).detail));
 
   // The hero's dark sources follow the theme toggle too.
   const root = document.documentElement;

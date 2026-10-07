@@ -32,7 +32,8 @@ interface Props {
 
 const { items = Astro.locals.gallery ?? [], label = 'Screens', intro = 'The flow as shipped. Click any screen to see it full size.' } = Astro.props;
 
-const RATIO: Record<FrameType, string> = { desktop: '16 / 10', phone: '9 / 16', detail: '21 / 9' };
+// A phone is the 390 × 844 viewport the phone screens are captured at.
+const RATIO: Record<FrameType, string> = { desktop: '16 / 10', phone: '390 / 844', detail: '21 / 9' };
 const SPAN: Record<FrameType, number> = { desktop: 9, phone: 3, detail: 9 };
 const SIZES: Record<FrameType, string> = {
   desktop: '(min-width: 640px) 70vw, calc(100vw - 32px)',

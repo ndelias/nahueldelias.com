@@ -1,0 +1,242 @@
+---
+// A part of a hub (§3 hub and parts, §9 step 5), from
+// docs/design/Substudy.dc.html, for /work/[hub]/[part] and, for a part told
+// in tabs, /work/[hub]/[part]/[tab] (the open tab; the first is the part's
+// own URL). Sibling navigation, a header with what the
+// part shows, the meta row, the hero, its own decision, the MDX body (which
+// places the screens with <Screens />; without it they follow the body),
+// and prev/next cycling through the parts.
+import { render } from 'astro:content';
+import DecisionBlock from './DecisionBlock.astro';
+import DeferredStyles from './DeferredStyles.astro';
+import EntryHeader from './EntryHeader.astro';
+import Facts from './Facts.astro';
+import Figure from './Figure.astro';
+import Frame from './Frame.astro';
+import Comparisons from './Comparisons.astro';
+import Gallery from './Gallery.astro';
+import Steps from './Steps.astro';
+import Tab from './Tab.astro';
+import Tabs from './Tabs.astro';
+import Icon from './Icon.astro';
+import MobileDesign from './MobileDesign.astro';
+import PartPager from './PartPager.astro';
+import PartsNav from './PartsNav.astro';
+import Base from '../layouts/Base.astro';
+import { HERO_INSET_SIZES } from '../lib/posters';
+import { entryHref, lastUpdated, partSlug, stackLine } from '../lib/entries';
+
+import type { Entry } from '../lib/entries';
+
+type PartTab = NonNullable<Entry['data']['tabs']>[number];
+interface Props {
+  part: Entry;
+  hub: Entry;
+  /** The open tab, for a part told in tabs. */
+  tab?: PartTab;
+}
+
+const { part, hub, tab } = Astro.props;
+const { data } = part;
+const hubHref = entryHref(hub)!;
+const partHref = `${hubHref}${partSlug(part)}/`;
+// The open tab's screens and comparisons are the page's: <Steps /> and
+// <Comparisons /> in its <Tab> render them.
+Astro.locals.gallery = tab?.gallery ?? data.gallery;
+Astro.locals.comparisons = tab?.comparisons ?? data.comparisons;
+if (tab && data.tabs) {
+  Astro.locals.tabs = {
+    open: tab,
+    list: data.tabs.map((t, i) => ({ id: t.id, label: t.label, caption: t.caption, href: i === 0 ? partHref : `${partHref}${t.id}/` })),
+  };
+}
+const { Content } = await render(part);
+// A body that doesn't place its screens (<Screens /> as a gallery, or
+// <Steps /> as the flow step by step) or <Comparisons /> gets them after it:
+// every part shows its gallery (§3 hub and parts).
+const placesScreens = /<(Screens|Steps|Tabs)\b/.test(part.body ?? '');
+const placesComparisons = /<(Comparisons|Tabs)\b/.test(part.body ?? '');
+const updated = await lastUpdated();
+const hero = data.hero;
+const heroMeta = hero && hero.caption && (hero.video ? `${hero.caption} · muted` : hero.caption);
+---
+{/* Faces preloaded: the tagline's (sans 400, the LCP element until a hero
+    outgrows it) and the title's (sans 500). Mono loads on use. */}
+<Base title={`${tab && tab !== data.tabs?.[0] ? `${tab.label} — ` : ''}${data.title} — ${hub.data.title} — Nahuel D'Elias`} description={data.tagline} noindex={data.fixture} preload={['sans-400', 'sans-500']}>
+  <DeferredStyles slot="head" />
+  <Frame>
+    <a slot="top-center" class="back" href={hubHref}>(<Icon name="arrow-left" /> {hub.data.title})</a>
+    <main class="case container part-page">
+      <PartsNav part={part} />
+      {data.fixture && <p class="fixture mono muted">Fixture · a test entry for the templates, not real work</p>}
+      <div class="header"><EntryHeader entry={part} /></div>
+
+      <Facts
+        facts={[
+          { label: 'Role', value: data.role, span: 3 },
+          { label: 'Partners', value: data.partners?.join(' · '), span: 3 },
+          { label: 'Stack', value: stackLine(data.stack), span: 4 },
+          { label: 'Status', value: data.standing, span: 2 },
+        ]}
+      />
+
+      {hero && (
+        <div class="hero">
+          <Figure
+            layout="full"
+            priority
+            src={hero.src}
+            dark={hero.dark}
+            alt={hero.alt}
+            video={hero.video}
+            play="auto"
+            meta={heroMeta}
+            caption={hero.video ? hero.duration : undefined}
+            sizes={HERO_INSET_SIZES}
+          />
+        </div>
+      )}
+
+      {data.decision && (
+        <div class="decision defer" style="--defer-size: 186px">
+          <DecisionBlock decision={data.decision} intro={data.decision.intro} />
+        </div>
+      )}
+
+      <article class="body">
+        <Content components={{ Screens: Gallery, Steps, Comparisons, Tabs, Tab, MobileDesign }} />
+        {!placesScreens && <Gallery />}
+        {!placesComparisons && <Comparisons />}
+      </article>
+
+      {data.disclaimer && <p class="disclaimer muted">{data.disclaimer}</p>}
+
+      <div class="pager defer" style="--defer-size: 110px"><PartPager part={part} /></div>
+    </main>
+    {updated && (
+      <span slot="bottom-start" class="muted">Updated <time datetime={updated.toISOString().slice(0, 10)}>{updated.toISOString().slice(0, 10)}</time></span>
+    )}
+    <a slot="bottom-center" class="back" href={hubHref}>(<Icon name="arrow-left" /> {hub.data.title})</a>
+  </Frame>
+</Base>
+
+<style>
+  .back {
+    color: inherit;
+    text-decoration: none;
+  }
+  .back:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .case {
+    /* Clear the frame's fixed header (28px inset plus one mono line), then
+       the mock's 56px to the parts. */
+    padding-top: calc(var(--frame-inset-block) + 14px + 56px);
+    padding-bottom: calc(var(--frame-inset-block) + 14px + 96px);
+  }
+  .fixture {
+    margin: var(--space-48) 0 0;
+  }
+  /* A rule in ink divides the hub's other parts from this one. */
+  .header {
+    margin-top: var(--space-32);
+    padding-top: var(--space-48);
+    border-top: 1px solid var(--ink);
+  }
+  /* The walkthrough sits centered on eight columns, not the full width: a
+     screen recording blown up past its own size only gets softer. */
+  .hero {
+    margin-top: 56px;
+  }
+  @media (min-width: 640px) {
+    .hero {
+      display: grid;
+      grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+      column-gap: var(--grid-gutter);
+    }
+    .hero > :global(figure) {
+      grid-column: 3 / span 8;
+    }
+  }
+  .decision {
+    margin-top: 88px;
+  }
+  /* The body's spacing, the disclaimer and the pager are styled in
+     src/styles/deferred.css (.part-page), loaded after the first paint;
+     they're all below the fold. */
+  /* Every body block is below the fold: deferred (see .defer in base.css),
+     with the mock's heights at 1440 as the first estimate. */
+  .body > :global(:not(script, style)) {
+    content-visibility: auto;
+    contain-intrinsic-block-size: auto 110px;
+    overflow-clip-margin: 8px;
+  }
+  .body > :global(figure) {
+    contain-intrinsic-block-size: auto 301px;
+  }
+  .body > :global(.data-table) {
+    contain-intrinsic-block-size: auto 195px;
+  }
+  .body > :global([data-gallery]) {
+    contain-intrinsic-block-size: auto 1774px;
+  }
+  .body > :global(.system-figure) {
+    contain-intrinsic-block-size: auto 1072px;
+  }
+  .body > :global(.steps) {
+    contain-intrinsic-block-size: auto 763px;
+  }
+  .body > :global(.comparisons) {
+    contain-intrinsic-block-size: auto 838px;
+  }
+  /* A part in tabs: the row stays rendered (it's what a tab switch keeps in
+     place); the blocks in the open tab are deferred like the body's. */
+  .body > :global(.tabbed) {
+    content-visibility: visible;
+  }
+  .body :global(.tab-panel > :not(script, style)) {
+    content-visibility: auto;
+    contain-intrinsic-block-size: auto 110px;
+    overflow-clip-margin: 8px;
+  }
+  .body :global(.tab-panel > .walkthrough) {
+    contain-intrinsic-block-size: auto 560px;
+  }
+  .body :global(.tab-panel > .system-figure) {
+    contain-intrinsic-block-size: auto 1072px;
+  }
+  .body :global(.tab-panel > .steps) {
+    contain-intrinsic-block-size: auto 763px;
+  }
+  .body :global(.tab-panel > .comparisons) {
+    contain-intrinsic-block-size: auto 838px;
+  }
+  @media (max-width: 639.98px) {
+    /* A 44px line box, not inline-flex: flex would trim the space after
+       the arrow. */
+    .back {
+      display: inline-block;
+      line-height: 44px;
+    }
+    .case {
+      padding-top: var(--space-24);
+      padding-bottom: var(--space-48);
+    }
+    .fixture {
+      margin-top: var(--space-24);
+    }
+    /* The tab row has its own rule on a phone. */
+    .header {
+      margin-top: 0;
+      padding-top: var(--space-32);
+      border-top: 0;
+    }
+    .hero {
+      margin-top: var(--space-32);
+    }
+    .decision {
+      margin-top: var(--space-64);
+    }
+  }
+</style>
