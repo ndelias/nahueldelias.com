@@ -1,33 +1,67 @@
 // Behaviour for Comparisons.astro, compiled on its own and added by
 // <AfterLoad> once the first content has painted: the comparisons become
 // tabs, one panel at a time (arrow keys, Home and End move between tabs).
-// While the section is in view, each panel shows its before screen, fades it
-// into today's, then hands over to the next tab, looping. It stays on the
+// While the section is in view, each panel shows its before screen, dissolves
+// it into today's through a wave of pixels, then hands over to the next tab,
+// looping. It stays on the
 // tab while the pointer is over the screens or keyboard focus is in the
 // section, and Pause stops it. Reduced motion: no fade and no rotation; the
 // pair sits side by side and the tabs are manual.
 const BEFORE = 2500; // ms on the before screen
-const NOW = 4500; // ms on today's, wipe included
+const NOW = 3500; // ms on today's, after the reveal
 
-// The wipe's mask at a frame's size, three frames wide: opaque, then a band
-// one frame wide where square blocks thin out from left to right with some
-// noise (the pixel edge), then clear. Sliding it across reveals the screen
-// under it from left to right.
-function wipeMask(w: number, h: number) {
-  const block = Math.max(8, Math.round(w / 36));
-  const cols = Math.ceil(w / block);
-  const canvas = document.createElement('canvas');
-  canvas.width = w * 3;
-  canvas.height = h;
+const REVEAL = 2600; // ms for the before screen to dissolve into today's
+const BANDS = 12; // vertical bands, each a beat behind the one on its left
+const COARSEST = 36; // px per block at the peak, in CSS pixels
+
+// The reveal: drawn on a canvas over the frame. Each band of the screen
+// breaks up into ever larger blocks, crossfades from the before screen to
+// today's at its coarsest, then resolves back into today's at full detail,
+// a little after the band to its left, so the change travels left to
+// right as a wave of pixels.
+const smooth = (x: number) => x * x * (3 - 2 * x);
+function reveal(canvas: HTMLCanvasElement, before: HTMLImageElement, after: HTMLImageElement, done: () => void) {
+  const { width: w, height: h } = canvas.getBoundingClientRect();
+  const dpr = Math.min(2, devicePixelRatio || 1);
+  canvas.width = Math.round(w * dpr);
+  canvas.height = Math.round(h * dpr);
   const g = canvas.getContext('2d')!;
-  g.fillStyle = '#000';
-  g.fillRect(0, 0, w, h);
-  for (let c = 0; c < cols; c++) {
-    for (let y = 0; y < h; y += block) {
-      if (c / cols + (Math.random() - 0.5) * 0.7 < 0.5) g.fillRect(w + c * block, y, block, block);
+  const small = document.createElement('canvas').getContext('2d')!;
+  // The part of each image the frame shows (object-fit: cover, top).
+  const crop = (img: HTMLImageElement) => {
+    const scale = Math.max(w / img.naturalWidth, h / img.naturalHeight);
+    const sw = w / scale, sh = h / scale;
+    return { img, sx: (img.naturalWidth - sw) / 2, sw, sh };
+  };
+  const a = crop(before), b = crop(after);
+  const bandW = canvas.width / BANDS;
+  const lag = 0.45; // how far behind the last band starts, of the whole
+  const start = performance.now();
+  const frame = (now: number) => {
+    const t = Math.min(1, (now - start) / REVEAL);
+    g.imageSmoothingEnabled = false;
+    for (let k = 0; k < BANDS; k++) {
+      const local = Math.min(1, Math.max(0, (t - (k / (BANDS - 1)) * lag) / (1 - lag)));
+      // Block size: up to the coarsest and back, smoothly.
+      const block = Math.max(1, COARSEST * dpr * Math.sin(Math.PI * smooth(local)));
+      const mix = smooth(Math.min(1, Math.max(0, (local - 0.35) / 0.3)));
+      const x0 = Math.round(k * bandW), x1 = Math.round((k + 1) * bandW), bw = x1 - x0;
+      const cols = Math.max(1, Math.round(bw / block)), rows = Math.max(1, Math.round(canvas.height / block));
+      small.canvas.width = cols;
+      small.canvas.height = rows;
+      for (const [src, alpha] of [[a, 1 - mix], [b, mix]] as const) {
+        if (alpha <= 0) continue;
+        small.globalAlpha = alpha;
+        const sx = src.sx + (x0 / canvas.width) * src.sw, sw = (bw / canvas.width) * src.sw;
+        small.drawImage(src.img, sx, 0, sw, src.sh, 0, 0, cols, rows);
+      }
+      small.globalAlpha = 1;
+      g.drawImage(small.canvas, 0, 0, cols, rows, x0, 0, bw, canvas.height);
     }
-  }
-  return `url(${canvas.toDataURL()})`;
+    if (t < 1) requestAnimationFrame(frame);
+    else done();
+  };
+  requestAnimationFrame(frame);
 }
 
 function init() {
@@ -59,18 +93,7 @@ function init() {
     let timer = 0;
     // The fade runs while in view; moving on to the next tab also needs
     // nobody looking closely.
-    const running = () => inView && !paused && !still.matches && !(now && held);
-
-    // Each panel's mask, drawn the first time it shows, at its frame's size.
-    const masked = new WeakSet<HTMLElement>();
-    const mask = (panel: HTMLElement) => {
-      const frame = panel.querySelector<HTMLElement>('.pair > figure + figure .frame');
-      if (!frame || masked.has(panel) || !root.classList.contains('is-fading')) return;
-      const { width, height } = frame.getBoundingClientRect();
-      if (!width) return;
-      masked.add(panel);
-      panel.style.setProperty('--wipe', wipeMask(Math.round(width), Math.round(height)));
-    };
+    const running = () => inView && !paused && !still.matches && !(now && held) && !revealing;
 
     const show = (i: number, focus = false) => {
       at = i;
@@ -79,27 +102,47 @@ function init() {
         t.setAttribute('aria-selected', String(k === i));
         t.tabIndex = k === i ? 0 : -1;
         panels[k].hidden = k !== i;
-        panels[k].classList.remove('now');
+        panels[k].classList.remove('now', 'going');
       });
-      mask(panels[i]);
       if (focus) tabs[i].focus();
     };
     const schedule = () => {
       clearTimeout(timer);
       if (running()) timer = window.setTimeout(advance, now ? NOW : BEFORE);
     };
+    // Today's screen comes in: through the pixel reveal when both images are
+    // ready (otherwise straight), then it simply shows under the canvas,
+    // which goes. The next step waits for the reveal to finish.
+    let revealing = false;
     function advance() {
-      if (now) show((at + 1) % tabs.length);
-      else {
-        mask(panels[at]);
-        now = true;
-        panels[at].classList.add('now');
+      if (now) {
+        show((at + 1) % tabs.length);
+        schedule();
+        return;
       }
-      schedule();
+      const panel = panels[at];
+      const [before, after] = panel.querySelectorAll<HTMLImageElement>('.pair > figure .shot');
+      const land = () => {
+        now = true;
+        panel.classList.remove('going');
+        panel.classList.add('now');
+        schedule();
+      };
+      if (!before?.complete || !after?.complete || !before.naturalWidth || !after.naturalWidth) return land();
+      revealing = true;
+      panel.classList.add('going');
+      const canvas = document.createElement('canvas');
+      canvas.className = 'reveal';
+      canvas.setAttribute('aria-hidden', 'true');
+      panel.querySelector('.pair')!.append(canvas);
+      reveal(canvas, before, after, () => {
+        revealing = false;
+        land();
+        requestAnimationFrame(() => canvas.remove());
+      });
     }
     const sync = () => {
       root.classList.toggle('is-fading', !still.matches);
-      mask(panels[at]);
       pause.hidden = still.matches;
       pause.setAttribute('aria-pressed', String(paused));
       pause.textContent = paused ? '(Play)' : '(Pause)';

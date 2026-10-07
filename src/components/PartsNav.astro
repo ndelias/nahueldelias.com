@@ -1,8 +1,9 @@
 ---
 // Sibling navigation on a part page: every part of the hub, in build order.
 // At rest it's one quiet row, number and title. Pointing at it (or tabbing
-// into it) lowers the thumbnails over the page like a blind, and they roll
-// back up when you leave. The current part at full strength with an accent
+// into it) lowers the thumbnails like a blind, pushing the page down, and
+// they roll back up a moment after you leave, so brushing off the edge
+// doesn't snap it shut. The current part at full strength with an accent
 // rule, the others dimmed. Phones: a row of text tabs that scrolls sideways
 // on its own, the current part scrolled into view, no thumbnails.
 import type { Entry } from '../lib/entries';
@@ -28,7 +29,7 @@ const brand = hub.id === 'vers1ons';
               Chrome would raise them to High, where they'd compete with the
               tagline and hero for the largest paint. */}
           <span class="name"><span class:list={['no', { brand }]}>{entryNumber(p)}</span> <span class="title">{p.data.title}</span></span>
-          <span class="thumb"><EntryImage src={p.data.cover.src} alt="" fetchpriority="low" /></span>
+          <span class="blind"><span class="thumb"><EntryImage src={p.data.cover.src} alt="" fetchpriority="low" /></span></span>
         </a>
       </li>
     ))}
@@ -78,37 +79,34 @@ const brand = hub.id === 'vers1ons';
   .no.brand {
     color: var(--vers1ons);
   }
-  /* The blind: each thumbnail hangs under its title, over the page, rolled
-     up (clipped to nothing) until the row is pointed at or focused. Its
-     shadow in the page's color covers the gutters and a margin below, so
-     the thumbnails read as one panel. */
+  /* The blind: each thumbnail sits under its title in a row that's rolled
+     up to nothing (0fr) until the row is pointed at or focused, when it
+     unrolls to the thumbnail's height (1fr) and the page moves down with it. */
+  .blind {
+    display: grid;
+    grid-template-rows: 0fr;
+  }
   .thumb {
-    position: absolute;
-    z-index: 2;
-    top: calc(100% + 12px);
-    left: 0;
-    width: 100%;
-    aspect-ratio: 16 / 10;
+    display: block;
+    min-height: 0;
     overflow: hidden;
-    background: var(--surface);
-    box-shadow: 0 0 0 calc(var(--grid-gutter) / 2) var(--bg);
-    clip-path: inset(0 0 100% 0);
-    pointer-events: none;
   }
   .thumb :global(img) {
     display: block;
     width: 100%;
-    height: 100%;
+    height: auto;
+    margin-top: 12px;
+    aspect-ratio: 16 / 10;
     object-fit: cover;
+    background: var(--surface);
     opacity: 0.55;
   }
   .current .thumb :global(img) {
     opacity: 1;
   }
-  [data-parts-nav]:hover .thumb,
-  [data-parts-nav]:focus-within .thumb {
-    clip-path: inset(0 calc(var(--grid-gutter) / -2) calc(var(--grid-gutter) / -2));
-    pointer-events: auto;
+  [data-parts-nav]:hover .blind,
+  [data-parts-nav]:focus-within .blind {
+    grid-template-rows: 1fr;
   }
   .item:hover .title {
     text-decoration: underline;
@@ -120,15 +118,23 @@ const brand = hub.id === 'vers1ons';
   .current:hover .thumb :global(img) {
     opacity: 1;
   }
-  /* Down in 0.55s, back up a touch quicker, after a beat, so passing over
-     the row on the way somewhere else doesn't flap it. */
+  /* Down in 0.6s; back up only after the pointer has been gone for 0.7s,
+     so slipping off an edge or crossing a gutter doesn't close it. Under
+     reduced motion it opens and closes at once, still after the pause. */
+  .blind {
+    transition: grid-template-rows 0s 0.7s;
+  }
+  [data-parts-nav]:hover .blind,
+  [data-parts-nav]:focus-within .blind {
+    transition: grid-template-rows 0s;
+  }
   @media (prefers-reduced-motion: no-preference) {
-    .thumb {
-      transition: clip-path 0.45s var(--ease) 0.12s;
+    .blind {
+      transition: grid-template-rows 0.5s var(--ease) 0.7s;
     }
-    [data-parts-nav]:hover .thumb,
-    [data-parts-nav]:focus-within .thumb {
-      transition: clip-path 0.55s var(--ease);
+    [data-parts-nav]:hover .blind,
+    [data-parts-nav]:focus-within .blind {
+      transition: grid-template-rows 0.6s var(--ease);
     }
     .thumb :global(img) {
       transition: opacity 0.2s var(--ease);
@@ -165,7 +171,7 @@ const brand = hub.id === 'vers1ons';
     .item.current {
       border-bottom-color: var(--accent);
     }
-    .thumb {
+    .blind {
       display: none;
     }
   }

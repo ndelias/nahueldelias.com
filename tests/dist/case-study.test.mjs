@@ -350,10 +350,10 @@ const shown = (page) =>
   page.evaluate(() => {
     const panel = document.querySelector('[data-compare-panel]:not([hidden])');
     const [before, now] = panel.querySelectorAll('.pair > figure');
-    return { tab: document.querySelector('[role="tab"][aria-selected="true"]').textContent, now: panel.classList.contains('now') && panel.style.getPropertyValue('--wipe').startsWith('url('), stacked: before.getBoundingClientRect().top === now.getBoundingClientRect().top && before.getBoundingClientRect().left === now.getBoundingClientRect().left };
+    return { tab: document.querySelector('[role="tab"][aria-selected="true"]').textContent, now: panel.classList.contains('now') && getComputedStyle(now).visibility === 'visible', stacked: before.getBoundingClientRect().top === now.getBoundingClientRect().top && before.getBoundingClientRect().left === now.getBoundingClientRect().left };
   });
 
-test('comparisons: today wipes in over the before in one frame, then the next tab; Pause stops it', async () => {
+test('comparisons: the before dissolves into today in one frame, then the next tab; Pause stops it', async () => {
   const { ctx, page } = await openPart();
   await page.waitForSelector('.comparisons.is-tabbed', { state: 'attached' });
   await page.clock.install();
@@ -363,9 +363,10 @@ test('comparisons: today wipes in over the before in one frame, then the next ta
   const first = await shown(page);
   assert.equal(first.stacked, true, 'before and now side by side');
   assert.equal(first.now, false);
-  await page.clock.runFor(4000);
+  await page.clock.runFor(7000);
   await page.waitForFunction(() => document.querySelector('[data-compare-panel]:not([hidden])').classList.contains('now'));
-  assert.equal((await shown(page)).now, true, "today's screen didn't wipe in");
+  assert.equal((await shown(page)).now, true, "today's screen didn't come in");
+  assert.equal(await page.locator('.comparisons .reveal').count(), 0, 'the reveal canvas stayed');
   await page.clock.runFor(5000);
   assert.notEqual((await shown(page)).tab, first.tab, 'stayed on the first tab');
   await page.click('.comparisons .pause');
@@ -460,7 +461,7 @@ test('part, phone: the sibling nav is a row of text tabs, 44px, no thumbnails fe
   page.on('request', (r) => r.resourceType() === 'image' && requested.push(r.url()));
   await page.waitForTimeout(300);
   const tabs = await page.$$eval('[data-parts-nav] a', (as) =>
-    as.map((a) => ({ h: a.getBoundingClientRect().height, text: a.innerText.replace(/\s+/g, ' ').trim(), thumb: getComputedStyle(a.querySelector('.thumb')).display })),
+    as.map((a) => ({ h: a.getBoundingClientRect().height, text: a.innerText.replace(/\s+/g, ' ').trim(), thumb: getComputedStyle(a.querySelector('.blind')).display })),
   );
   assert.equal(tabs.length, 5);
   assert.ok(tabs.every((t) => t.h >= 44), `a tab under 44px: ${tabs.map((t) => t.h)}`);

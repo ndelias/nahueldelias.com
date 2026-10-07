@@ -326,13 +326,14 @@
     left: calc(220px + var(--grid-gutter) / 2);
   }
   /* Revealing (JS, motion allowed): the two screens share one frame, sized
-     to sit within a laptop screen with the tabs. Today's screen wipes in
-     over the before from left to right behind a ragged edge of pixel
-     blocks: a mask three frames wide (opaque, a band of blocks, clear;
-     drawn by the script at the frame's size, --wipe) slides across. Its
-     caption takes the before's place. */
+     to sit within a laptop screen with the tabs. The script's canvas
+     (.reveal) covers the frame while the before screen dissolves into
+     today's; then today's shows under it and the canvas goes. The captions
+     take turns: the before's goes as the reveal starts, today's comes as
+     it lands. */
   &.is-fading {
     .pair {
+      position: relative;
       grid-template-columns: minmax(0, calc(58vh * 1.6));
     }
     .phone .pair {
@@ -341,29 +342,36 @@
     .pair > figure {
       grid-area: 1 / 1;
     }
-    .pair > figure + figure .frame {
-      mask: var(--wipe, linear-gradient(#0000, #0000)) 100% 0 / 300% 100% no-repeat;
+    .pair > figure + figure {
+      visibility: hidden;
     }
-    .now .pair > figure + figure .frame {
-      mask-position: 0 0;
-      transition: mask-position 1.6s cubic-bezier(0.45, 0, 0.25, 1);
+    .now .pair > figure + figure {
+      visibility: visible;
     }
-    /* The captions take turns, never both at once: the before's goes as
-       the wipe starts, today's comes as it lands. */
+    .reveal {
+      position: absolute;
+      z-index: 1;
+      top: 0;
+      left: 0;
+      width: 100%;
+      aspect-ratio: 16 / 10;
+    }
+    .phone .reveal {
+      aspect-ratio: 9 / 16;
+    }
     .pair > figure:first-child figcaption {
       transition: opacity 0.3s ease;
     }
     .pair > figure + figure figcaption {
-      transition: opacity 0.4s ease 1.1s;
+      opacity: 0;
+      transition: opacity 0.4s ease;
     }
-    .pair > figure + figure figcaption {
+    .going .pair > figure:first-child figcaption,
+    .now .pair > figure:first-child figcaption {
       opacity: 0;
     }
     .now .pair > figure + figure figcaption {
       opacity: 1;
-    }
-    .now .pair > figure:first-child figcaption {
-      opacity: 0;
     }
     .arrow {
       display: none;
@@ -1005,8 +1013,10 @@
       border-radius: 4px;
       background: var(--sd-bg);
     }
-    /* The panel is as tall as the diagram beside it, no taller: the log
-       scrolls inside it, newest line in view. */
+    /* The panel grows as a run writes its steps, up to the diagram's
+       height and no further: past that the log scrolls inside it, newest
+       line in view. (contain: size keeps the panel from stretching the
+       row; the console inside it sizes to its lines.) */
     .sd-panel {
       grid-column: 1 / span 3;
       grid-row: 2;
@@ -1021,7 +1031,7 @@
     .sd-console {
       display: flex;
       flex-direction: column;
-      flex: 1;
+      flex: 0 1 auto;
       min-height: 0;
       padding: 12px;
     }
@@ -1057,10 +1067,10 @@
       text-underline-offset: 3px;
     }
     .sd-log {
-      flex: 1;
+      flex: 0 1 auto;
       min-height: 0;
       overflow-y: auto;
-      gap: 2px;
+      gap: 8px;
       font-size: 11px;
       line-height: 1.45;
       scrollbar-width: thin;
@@ -1284,10 +1294,11 @@ nav.pager {
     font-size: var(--text-caption);
     line-height: var(--leading-small);
   }
-  & .pager {
+  /* The pager's wrapper (div.pager), not the nav inside it. */
+  & > .pager {
     margin-top: 140px;
   }
-  & .disclaimer + .pager {
+  & > .disclaimer + .pager {
     margin-top: var(--space-48);
   }
   @media (max-width: 639.98px) {
@@ -1302,7 +1313,7 @@ nav.pager {
     & > .body > .body-section + .body-section {
       margin-top: -16px;
     }
-    & .pager {
+    & > .pager {
       margin-top: var(--space-96);
     }
   }
