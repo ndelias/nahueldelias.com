@@ -1608,6 +1608,10 @@ nav.pager {
 /* Figure, inset (below the fold; the hero's own rules stay inline), and the
    walkthrough's running state: a small Pause in the corner. */
 .figure {
+  /* The walkthrough pauses and plays from anywhere on it. */
+  &:has([data-figure-toggle]) .media {
+    cursor: pointer;
+  }
   &.running .p-play {
     display: none;
   }

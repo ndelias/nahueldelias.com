@@ -63,6 +63,10 @@ function init() {
             auto.pause();
           }
         });
+        // A click anywhere on the recording does the same as the button.
+        figure.querySelector('.media')?.addEventListener('click', (event) => {
+          if (!toggle.contains(event.target as Node)) toggle.click();
+        });
       }
 
       const v = figure.querySelector<HTMLVideoElement>('video[data-play="view"]');
