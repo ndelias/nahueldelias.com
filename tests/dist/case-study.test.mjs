@@ -283,9 +283,48 @@ test('part: the body places the steps and comparisons; a body without <Screens /
   assert.deepEqual(order.slice(0, 5), ['system-figure', 'body-section', 'body-section', 'steps', 'comparisons']);
   assert.equal(await page.locator('[data-steps]').count(), 1);
   assert.equal(await page.locator('[data-gallery]').count(), 0);
-  const other = await openPart('/work/vers1ons/licensing/');
+  const other = await openPart('/work/vers1ons/purchasing/');
   assert.equal(await other.page.locator('[data-gallery]').count(), 1);
   await other.ctx.close();
+  await ctx.close();
+});
+
+// A part told in tabs: each tab its own page, switched in place.
+const TABS = '/work/vers1ons/licensing/';
+const openTab = (page) => page.$eval('[data-tab-panel]', (p) => p.dataset.tabPanel);
+
+test('tabs: each tab is its own page, with only its own content in the HTML', async () => {
+  for (const [path, id] of [[TABS, 'listings'], [`${TABS}drops/`, 'drops'], [`${TABS}sheets/`, 'sheets']]) {
+    const html = await (await fetch(server.origin + path)).text();
+    assert.equal(html.match(/data-tab-panel=/g)?.length, 1, path);
+    assert.match(html, new RegExp(`data-tab-panel="${id}"`));
+    assert.match(html, new RegExp(`href="[^"]*" aria-current="page" data-tab-link="${id}"`));
+  }
+});
+
+test('tabs: a tab switches the content in place, with its URL; Back switches back', async () => {
+  const { ctx, page } = await openPart(TABS);
+  await page.waitForFunction(() => document.querySelector('[data-tabs]')?.dataset.bound === '');
+  await page.evaluate(() => (window.stayed = true));
+  await page.click('[data-tab-link="drops"]');
+  await page.waitForFunction(() => document.querySelector('[data-tab-panel]').dataset.tabPanel === 'drops');
+  assert.equal(await page.evaluate(() => window.stayed), true, 'the page reloaded');
+  assert.equal(new URL(page.url()).pathname, `${TABS}drops/`);
+  assert.equal(await page.getAttribute('[data-tab-link="drops"]', 'aria-current'), 'page');
+  assert.equal(await page.getAttribute('[data-tab-link="listings"]', 'aria-current'), null);
+  // What came in is set up: the steps have their rail.
+  await page.waitForFunction(() => document.querySelectorAll('.tab-panel [data-steps-rail] li').length > 0);
+  await page.goBack();
+  await page.waitForFunction(() => document.querySelector('[data-tab-panel]').dataset.tabPanel === 'listings');
+  assert.equal(await page.evaluate(() => window.stayed), true);
+  await ctx.close();
+});
+
+test('tabs, without JS: each tab is a link to its page', async () => {
+  const { ctx, page } = await openPart(TABS, { javaScriptEnabled: false });
+  await page.click('[data-tab-link="sheets"]');
+  await page.waitForURL(`**${TABS}sheets/`);
+  assert.equal(await openTab(page), 'sheets');
   await ctx.close();
 });
 
@@ -393,7 +432,7 @@ test('comparisons, reduced motion: the pair side by side, tabs by hand only', as
 });
 
 // The gallery, on a part page whose body doesn't place steps.
-const GALLERY = '/work/vers1ons/licensing/';
+const GALLERY = '/work/vers1ons/purchasing/';
 
 test('gallery: a screen opens full size in a dialog; arrows step, Esc closes, focus returns', async () => {
   const { ctx, page } = await openPart(GALLERY);

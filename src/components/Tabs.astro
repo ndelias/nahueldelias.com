@@ -1,0 +1,64 @@
+---
+// A part told as a few sub-stories (frontmatter `tabs`), for use in MDX:
+// the tab row, then the open tab's walkthrough and its <Tab> content.
+//
+//   <Tabs label="Three parts">
+//     <Tab id="listings">…</Tab>
+//     <Tab id="drops">…</Tab>
+//   </Tabs>
+//
+// Each tab is its own page (pages/work/[slug]/[part]/[tab].astro), so the
+// HTML holds only the open one (the HTML budget) and the row is plain links:
+// without JS they load the page. With JS (src/scripts/tabs.ts, after the
+// first paint) the other tabs are fetched once the page is idle, and a tab
+// switches the content below the row in place, with its own URL in the
+// address bar. Styles: src/styles/deferred.css (below the fold).
+import AfterLoad from './AfterLoad.astro';
+import Figure from './Figure.astro';
+import behaviour from '../scripts/tabs.ts?worker&url';
+
+interface Props {
+  label?: string;
+}
+
+const { label = 'In parts' } = Astro.props;
+const tabs = Astro.locals.tabs;
+const walk = tabs?.open.walkthrough;
+---
+{tabs && (
+  <section class="tabbed" aria-labelledby="tabbed-label" data-tabs>
+    <div class="tab-head grid">
+      <h2 class="label mono muted" id="tabbed-label">{label}</h2>
+      <nav class="tab-row" aria-labelledby="tabbed-label">
+        <ol style={`--n: ${tabs.list.length}`}>
+          {tabs.list.map((t, i) => (
+            <li>
+              <a class="tab" href={t.href} aria-current={t.id === tabs.open.id ? 'page' : undefined} data-tab-link={t.id}>
+                <span class="tab-name"><span class="tab-no mono">{String(i + 1).padStart(2, '0')}</span> {t.label}</span>
+                <span class="tab-caption muted">{t.caption}</span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+    </div>
+    <div class="tab-panel" data-tab-panel={tabs.open.id}>
+      {walk && (
+        <div class="walkthrough">
+          <Figure
+            layout="full"
+            src={walk.src}
+            alt={walk.alt}
+            video={walk.video}
+            play="auto"
+            meta={walk.caption && (walk.video ? `${walk.caption} · muted` : walk.caption)}
+            caption={walk.video ? walk.duration : undefined}
+          />
+        </div>
+      )}
+      <slot />
+    </div>
+  </section>
+)}
+
+<AfterLoad src={behaviour} />

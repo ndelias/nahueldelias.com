@@ -1,58 +1,339 @@
 ---
-# FIXTURE from docs/design/CaseStudy.dc.html (parts matrix) and the part
-# template in docs/design/SubStudy.dc.html, until the real entry replaces it.
-# Part 2 of the vers1ons hub.
-fixture: true
+# Copy drafted with Nahuel from his account of the project, partners
+# anonymous. Media from media/vers1ons/licensing.json. Told in three tabs:
+# listings, drops, sheets.
 parent: vers1ons
 title: 'Licensing'
-tagline: 'Licensor display, contributor rights and agreements.'
+tagline: 'A remix license artists can sell, buyers can trust, and vers1ons can enforce.'
+summary: 'Licenses tracked at the rights level, from the original to every remix of a remix.'
 weight: 2
 status: shipped
-role: '[Role]'
+role: 'Product lead, building with the engineering team'
 dates:
-  start: '[Years]'
-stack: []
+  start: 2025-06
+stack: ['Postgres', 'Stripe', 'Inngest', 'Redis', 'Object storage']
+standing: 'In production'
 disciplines:
   led: [product, design]
   contributed: [frontend, backend]
 decision:
-  chose: '[What was chosen.]'
-  rejected: '[What was rejected.]'
-  cost: '[What it cost.]'
-hero:
-  src: ../../../assets/fixtures/tones/tone3-wide.svg
-  alt: '[Hero: what the screen shows.]'
-  caption: '[Recording or still of the main view]'
-gallery:
-  - src: ../../../assets/fixtures/tones/tone3-desktop.svg
-    alt: '[Screen: what the desktop view shows.]'
-    caption: '[The main screen, and the one thing to notice in it.]'
-    frame: desktop
-  - src: ../../../assets/fixtures/tones/tone3-phone.svg
-    alt: '[Screen: what the phone view shows.]'
-    caption: '[Phone view of the same step.]'
-    frame: phone
-  - src: ../../../assets/fixtures/tones/tone3-detail.svg
-    alt: '[Detail: what the close-up shows.]'
-    caption: '[A detail crop: one field, one state.]'
-    frame: detail
+  intro: 'We were selling a license that exists in law but had never been sold like this: artists set their own terms on vers1ons and sell them to anyone who wants to remix the song, instead of going through a label.'
+  chose: 'Make the license a record the whole platform runs on, tracked at the rights level across the full remix chain, so every remix knows where it came from and what it''s allowed to do.'
+  rejected: 'A contract PDF attached to each sale between two people and tracked by hand, which breaks as soon as someone remixes the remix.'
+  cost: 'Time to get it right. Every feature reads from the same rights records, and because we sell to major labels, indie labels and established artists, the agreement had to hold up with their legal teams, so every legal change meant a code change.'
+tabs:
+  - id: listings
+    label: 'Listings'
+    caption: 'An artist sets the terms of a remix license, signs it and publishes it.'
+    walkthrough:
+      src: ../../../assets/work/vers1ons/licensing/listings/walkthrough.webp
+      alt: 'Review & Publish for "Night Swim": its cover art, the $40.00 price, contributors with their shares, and the license terms.'
+      video: /media/vers1ons/licensing/listings-walkthrough.mp4
+      duration: '2:22'
+      caption: 'From upload to a published listing'
+    gallery:
+      - src: ../../../assets/work/vers1ons/licensing/listings/steps/01-upload-processed.webp
+        alt: 'The first step: an original work or a licensed version, where the audio comes from, and the upload.'
+        title: 'Upload'
+        caption: 'Say whether you own the song outright or are remixing a license, and where the audio comes from. That choice decides what the listing can fill in for you.'
+      - src: ../../../assets/work/vers1ons/licensing/listings/steps/02-metadata-cover.webp
+        alt: 'Track details and cover art, with the artwork rights confirmation.'
+        title: 'Details and cover'
+        caption: 'Genre, key, BPM and an AI disclosure, then the cover art, with a box confirming you hold the rights to it.'
+      - src: ../../../assets/work/vers1ons/licensing/listings/steps/03-contributor-roles.webp
+        alt: 'Add contributor: the composition and master sides, and their roles.'
+        title: 'Who did what'
+        caption: 'Every contributor picks the side they worked on, the song or the recording, then their roles. Those are the two sides a license has to pay.'
+      - src: ../../../assets/work/vers1ons/licensing/listings/steps/04-contributors.webp
+        alt: 'Two contributors listed with their roles and shares.'
+        title: 'Contributors'
+        caption: 'Everyone on the song in one list, with what they did and the share they''re owed.'
+      - src: ../../../assets/work/vers1ons/licensing/listings/steps/05-splits.webp
+        alt: 'Splits for the recording and the composition, each with a ring at 100%.'
+        title: 'Splits'
+        caption: 'The recording and the composition each have to reach 100% before you can go on. The rings fill as you drag.'
+        clip: /media/vers1ons/licensing/clip-splits.mp4
+      - src: ../../../assets/work/vers1ons/licensing/listings/steps/06-license-terms.webp
+        alt: 'License terms: fee, quantity, subsequent remixes, where remixes may release, and the contract summary beside them.'
+        title: 'License terms'
+        caption: 'The price, how many licenses, whether remixes can be remixed again and which stores they may go to. The contract summary sits beside every field, in plain words.'
+        clip: /media/vers1ons/licensing/clip-terms.mp4
+      - src: ../../../assets/work/vers1ons/licensing/listings/steps/07-review.webp
+        alt: 'Review & Publish: the audio, song details, contributors and license pricing.'
+        title: 'Review'
+        caption: 'Everything a buyer will see, and every split, on one screen before anything is signed.'
+      - src: ../../../assets/work/vers1ons/licensing/listings/steps/08-sign-publish.webp
+        alt: 'Release timing, the licensor''s legal name and signature, and the agreements to accept.'
+        title: 'Sign and publish'
+        caption: 'The licensor signs with their legal name and accepts each term. Publish stays disabled until every box is checked.'
+        clip: /media/vers1ons/licensing/clip-publish.mp4
+      - src: ../../../assets/work/vers1ons/licensing/listings/steps/09-share-card.webp
+        alt: 'A "Remix this" share card for "Night Swim".'
+        title: 'Share it'
+        caption: 'A share card for the new listing, ready to post.'
+      - src: ../../../assets/work/vers1ons/licensing/listings/steps/10-listing.webp
+        alt: 'A published listing: the song on the left, the price, royalty shares and license terms on the right.'
+        title: 'The listing'
+        caption: 'What a buyer sees: the song on one side, the license on the other, with the price and Purchase License at the top.'
+    comparisons:
+      - title: 'The listing page'
+        why: 'The listing was one stacked column, with the price halfway down. Now the song is on the left and the license you''re buying is on the right, with the price and Purchase at the top.'
+        before:
+          src: ../../../assets/work/vers1ons/licensing/listings/before-after/listing-before.webp
+          alt: 'A listing in one column, with the price halfway down.'
+          label: 'Nov 2025'
+          caption: 'One column, the price halfway down.'
+        now:
+          src: ../../../assets/work/vers1ons/licensing/listings/before-after/listing-now.webp
+          alt: 'The listing today: the song on the left, the license on the right.'
+          label: 'Oct 2026'
+          caption: 'The song on the left, the license on the right.'
+      - title: 'License terms'
+        why: 'Artists set terms with the full contract open next to them, in legal language. Now each term is a plain field, with a summary of what it means beside it, and the full PDF one click away.'
+        before:
+          src: ../../../assets/work/vers1ons/licensing/listings/before-after/terms-before.webp
+          alt: 'License fields next to the full contract PDF.'
+          label: 'Nov 2025'
+          caption: 'Fields next to the full contract.'
+        now:
+          src: ../../../assets/work/vers1ons/licensing/listings/before-after/terms-now.webp
+          alt: 'License terms today, with a plain-language summary of the contract.'
+          label: 'Oct 2026'
+          caption: 'Plain fields, with a summary beside them.'
+      - title: 'Contributors'
+        why: 'Contributors were typed into one long form. Now each person gets their side, their roles and their share, in steps, so the splits behind a license come out right.'
+        before:
+          src: ../../../assets/work/vers1ons/licensing/listings/before-after/contributors-before.webp
+          alt: 'Contributors typed into one form.'
+          label: 'Nov 2025'
+          caption: 'One long form.'
+        now:
+          src: ../../../assets/work/vers1ons/licensing/listings/before-after/contributors-now.webp
+          alt: 'Contributors today, each with their side, roles and share.'
+          label: 'Oct 2026'
+          caption: 'Each person''s side, roles and share.'
+      - title: 'The agreement'
+        why: 'Buying asked for a checkbox under the terms. Now the buyer reads and signs the agreement before any payment, and each acknowledgement is its own line.'
+        before:
+          src: ../../../assets/work/vers1ons/licensing/listings/before-after/agreement-before.webp
+          alt: 'An early checkout step with the license terms.'
+          label: 'Nov 2025'
+          caption: 'A checkbox under the terms.'
+        now:
+          src: ../../../assets/work/vers1ons/licensing/listings/before-after/agreement-now.webp
+          alt: 'The agreement today, signed before payment.'
+          label: 'Oct 2026'
+          caption: 'Read and signed before paying.'
+  - id: drops
+    label: 'Drops'
+    caption: 'Remix contests where every entry is licensed the moment it''s made.'
+    walkthrough:
+      src: ../../../assets/work/vers1ons/licensing/drops/walkthrough.webp
+      alt: '"Bobby" is yours to remix: the receipt, with the master and the license agreement to download.'
+      video: /media/vers1ons/licensing/drops-walkthrough.mp4
+      duration: '1:12'
+      caption: 'Buying a drop license and entering a remix'
+    gallery:
+      - src: ../../../assets/work/vers1ons/licensing/drops/steps/01-drops.webp
+        alt: 'Drops: active and recent remix contests.'
+        title: 'Drops'
+        caption: 'Every open remix contest in one place, with its price and how long it has left.'
+      - src: ../../../assets/work/vers1ons/licensing/drops/steps/02-drop-public.webp
+        alt: 'The public page for the "Bobby" drop.'
+        title: 'The drop page'
+        caption: 'The artist''s drop: the stems, how many licenses are left, and when submissions close. If anything here conflicts with the agreement, the agreement wins.'
+      - src: ../../../assets/work/vers1ons/licensing/drops/steps/03-drop-app.webp
+        alt: 'The same drop seen by its host, with Manage submissions.'
+        title: 'The host''s view'
+        caption: 'The same page for the artist who runs it, with a way into the entries.'
+      - src: ../../../assets/work/vers1ons/licensing/drops/steps/04-drop-glass-harbor.webp
+        alt: 'Another drop, "Glass Harbor", with its price and Buy license.'
+        title: 'Another drop'
+        caption: 'One design for every drop, so the public and in-app pages stop drifting apart.'
+      - src: ../../../assets/work/vers1ons/licensing/drops/steps/05-order-summary.webp
+        alt: 'Order summary: who licenses it, the price and the fee.'
+        title: 'Order summary'
+        caption: 'Who is licensing it, who signs for them, and the total, before anything else.'
+      - src: ../../../assets/work/vers1ons/licensing/drops/steps/06-agreement.webp
+        alt: 'The license agreement, scrolled to the end, with acknowledgements and a signature.'
+        title: 'Sign the agreement'
+        caption: 'The buyer scrolls the whole agreement, checks each acknowledgement and signs. Payment only opens after that.'
+        clip: /media/vers1ons/licensing/clip-agreement.mp4
+      - src: ../../../assets/work/vers1ons/licensing/drops/steps/07-payment.webp
+        alt: 'Payment, with "Agreement signed" above it.'
+        title: 'Pay'
+        caption: 'Card, wallet or platform credit. The signed agreement stays pinned above it.'
+      - src: ../../../assets/work/vers1ons/licensing/drops/steps/08-licensed.webp
+        alt: '"Bobby" is yours to remix: the receipt and files.'
+        title: 'Licensed'
+        caption: 'The stems and the signed agreement, ready to download. The license is real from here.'
+      - src: ../../../assets/work/vers1ons/licensing/drops/steps/09-submit-cover.webp
+        alt: 'Submitting a remix: the cover art and primary artist.'
+        title: 'Submit the remix'
+        caption: 'The remix goes in with its own cover and credits. It''s saved as a new work that points back to the original.'
+        clip: /media/vers1ons/licensing/clip-submit.mp4
+      - src: ../../../assets/work/vers1ons/licensing/drops/steps/10-submit-ready.webp
+        alt: 'The remix details filled in, with the confirmation and Submit remix.'
+        title: 'Ready to enter'
+        caption: 'The entrant confirms it was made from the licensed stems and follows the drop''s rules.'
+      - src: ../../../assets/work/vers1ons/licensing/drops/steps/11-submissions.webp
+        alt: 'The host''s submissions page: bookmarked entries and every submission.'
+        title: 'Judging'
+        caption: 'The host plays, stars and bookmarks entries, sees which they haven''t heard yet, then announces the winners.'
+        clip: /media/vers1ons/licensing/clip-submissions.mp4
+    comparisons:
+      - title: 'The drop page'
+        why: '[Why the drop page changed between July and today.]'
+        before:
+          src: ../../../assets/work/vers1ons/licensing/drops/before-after/drop-page-before.webp
+          alt: 'The public drop page in July 2026.'
+          label: 'Jul 2026'
+        now:
+          src: ../../../assets/work/vers1ons/licensing/drops/before-after/drop-page-now.webp
+          alt: 'The public drop page today.'
+          label: 'Oct 2026'
+      - title: 'Judging'
+        why: 'The submissions page was a plain list. Now the host can play, star and bookmark entries, and see who they haven''t heard yet.'
+        before:
+          src: ../../../assets/work/vers1ons/licensing/drops/before-after/submissions-before.webp
+          alt: 'The submissions page in July 2026.'
+          label: 'Jul 2026'
+          caption: 'A plain list.'
+        now:
+          src: ../../../assets/work/vers1ons/licensing/drops/before-after/submissions-now.webp
+          alt: 'The submissions page today, with bookmarks and listening state.'
+          label: 'Oct 2026'
+          caption: 'Play, star, bookmark, heard or not.'
+  - id: sheets
+    label: 'Sheets'
+    caption: 'A free split sheet app that gets a song ready to license.'
+    walkthrough:
+      src: ../../../assets/work/vers1ons/licensing/sheets/walkthrough.webp
+      alt: 'The last step of a split sheet: download the PDF, or have signatures collected.'
+      video: /media/vers1ons/licensing/sheets-walkthrough.mp4
+      duration: '0:48'
+      caption: 'A split sheet, from the song title to the PDF'
+    gallery:
+      - src: ../../../assets/work/vers1ons/licensing/sheets/steps/01-landing.webp
+        alt: 'sheets.vers1ons.com: "Split it clean."'
+        title: 'Start'
+        caption: 'No account, no sign-up. Start a split sheet straight away.'
+      - src: ../../../assets/work/vers1ons/licensing/sheets/steps/02-song.webp
+        alt: 'What''s the title of your song?'
+        title: 'The song'
+        caption: 'One question per screen, starting with the title.'
+      - src: ../../../assets/work/vers1ons/licensing/sheets/steps/03-contributor.webp
+        alt: 'Who''s on this song: a contributor''s names and email.'
+        title: 'Who''s on it'
+        caption: 'Each person''s artist name, legal name and email: the name that signs is the legal one.'
+      - src: ../../../assets/work/vers1ons/licensing/sheets/steps/04-roles.webp
+        alt: 'What did they contribute: composition and recording roles.'
+        title: 'What they did'
+        caption: 'Roles on the composition and the recording, the same two sides as a listing.'
+      - src: ../../../assets/work/vers1ons/licensing/sheets/steps/05-contributors-list.webp
+        alt: 'Two contributors with their roles.'
+        title: 'Everyone'
+        caption: 'Everyone on the song, ready to split.'
+      - src: ../../../assets/work/vers1ons/licensing/sheets/steps/06-splits-empty.webp
+        alt: 'Who owns what: both rings empty.'
+        title: 'Who owns what'
+        caption: 'Two rings, one per side, both empty to start.'
+      - src: ../../../assets/work/vers1ons/licensing/sheets/steps/07-splits-balanced.webp
+        alt: 'Both rings full, the splits at 100%.'
+        title: 'Balanced'
+        caption: 'You can''t go on until both sides balance to 100%.'
+        clip: /media/vers1ons/licensing/clip-sheet-splits.mp4
+      - src: ../../../assets/work/vers1ons/licensing/sheets/steps/08-review.webp
+        alt: 'Review the split sheet.'
+        title: 'Review'
+        caption: 'The whole sheet on one screen before it''s made.'
+      - src: ../../../assets/work/vers1ons/licensing/sheets/steps/09-done.webp
+        alt: 'Done: download the PDF, collect signatures, or continue to list a license.'
+        title: 'Done'
+        caption: 'A free PDF, or pay to have every party sign it. Or take it to vers1ons and turn it into a license.'
+        clip: /media/vers1ons/licensing/clip-sheet-done.mp4
+      - src: ../../../assets/work/vers1ons/licensing/sheets/steps/10-pdf.webp
+        alt: 'The split sheet PDF for "Midnight Signal", with a line for each signature.'
+        title: 'The PDF'
+        caption: 'The branded split sheet, with a line for each person to sign.'
+        frame: phone
+    comparisons:
+      - title: 'The wizard'
+        why: 'The first build was one long form. Now it''s a guided wizard, one question per screen, that works the same on a phone.'
+        before:
+          src: ../../../assets/work/vers1ons/licensing/sheets/before-after/wizard-before.webp
+          alt: 'The first split sheet builder: one long form.'
+          label: 'Jun 2026'
+          caption: 'One long form.'
+        now:
+          src: ../../../assets/work/vers1ons/licensing/sheets/before-after/wizard-now.webp
+          alt: 'The guided wizard today: who''s on this song.'
+          label: 'Oct 2026'
+          caption: 'One question per screen.'
+disclaimer: 'Showcase content. Artwork belongs to its respective owners. Artist names, prices and royalty figures are fictional, and no affiliation is implied. The "Bobby" drop with Ravyn Lenae is a concept mock. Recordings come from an isolated local copy of the product running seeded data.'
 cover:
-  src: ../../../assets/fixtures/tones/tone3-desktop.svg
-  alt: '[Cover image.]'
+  src: ../../../assets/work/vers1ons/licensing/cover.webp
+  alt: 'License terms for "Night Swim", with the contract summary.'
 order: 2
 ---
 import BodySection from '../../../components/BodySection.astro';
+import SystemFigure from '../../../components/diagrams/SystemFigure.astro';
+import { licensing } from '../../../components/diagrams/specs/licensing';
 
-<Screens />
+<SystemFigure label="How it works" spec={licensing} />
 
-<BodySection label="Problem" heading="[What was broken or missing before this part.]">
-  [Who it hurt, and what it cost.]
+<BodySection label="Problem" heading="A license is only worth something if everyone can trust it, and ours couldn't yet be trusted.">
+  What a licensor set on a listing didn't always match what the system allowed, so a remix could reach a store the license didn't cover. Once a remix was remixed again, it got hard to tell who the original rights holders were and who should be paid. And setting up a listing, with its contributors, splits and terms, was easy to get wrong.
+
+  That mattered for three reasons. A release that breaks its license is a legal problem for vers1ons. Original artists only list their songs if they know they'll be credited and paid down the chain. And the license is what we sell: if it isn't true, there's nothing to sell.
 </BodySection>
 
-<BodySection label="Build" heading="[How it works.]">
-  [The rules, the integration, what the user sees. Link the code or a sample.]
-</BodySection>
+<Tabs label="Three parts">
+  <Tab id="listings">
+    <BodySection label="What I did" heading="I led the product decisions on licensing and built it with our engineering team.">
+      I worked with legal on the agreement, with labels and artists on the terms they needed, and with our founders on the license model. Then we turned the agreement into data the platform runs on. Every purchase issues a rights grant that points back to the grant it came from, so rights and royalties resolve up the chain however deep it goes. The terms a buyer signs are frozen at purchase, and one check decides where a remix may release, the same in the API, the release wizard and the delivery worker.
 
-<BodySection label="Outcome" heading="[What changed once it shipped.]">
-  [Evidence, and what you would do differently. Real numbers or none.]
+      On the screens, I designed the listing flow so an artist can set contributors, splits, terms and the stores remixes may go to, then sign and publish, without being a lawyer.
+    </BodySection>
+
+    <Steps />
+
+    <Comparisons />
+
+    <BodySection label="Outcome" heading="Live in production, with labels and artists selling licenses under these terms.">
+      Major labels, indie labels and established artists list songs on vers1ons. A remix of a remix still credits and pays the original artist, and only goes to the stores its license allows.
+    </BodySection>
+  </Tab>
+
+  <Tab id="drops">
+    <BodySection label="What I did" heading="[Drops: what I did, in one line.]">
+      [Drops: Nahuel's account of the problem, what he did across partners, backend and UI.]
+    </BodySection>
+
+    <Steps />
+
+    <Comparisons />
+
+    <BodySection label="Outcome" heading="Drops run on the same licenses, so a winning remix is cleared to release the moment it's entered.">
+      [Drops: the outcome in Nahuel's words.]
+    </BodySection>
+  </Tab>
+
+  <Tab id="sheets">
+    <BodySection label="What I did" heading="A satellite app that gets the paperwork done before a license exists.">
+      Most co-written songs have no split sheet, and without one there's no clean license to sell. So we built sheets.vers1ons.com: anyone can create a split sheet, or bring in one they already have, with no account. When it's ready, it collects signatures and the authority of everyone who owns a share, and then hands the song to vers1ons to become a license agreement.
+    </BodySection>
+
+    <Steps />
+
+    <Comparisons />
+
+    <BodySection label="Outcome" heading="Live in production as the first vers1ons satellite app.">
+      [Sheets: the outcome in Nahuel's words.]
+    </BodySection>
+  </Tab>
+</Tabs>
+
+<BodySection label="Reliability" heading="Every signature binds to the exact text that was signed.">
+  Sending a split sheet for signatures freezes a version of it, with a hash of the agreement and the document, and the server checks against that version when each person signs. Signing links are stored only as hashes. License terms are frozen at purchase, and a revoked grant stops a queued release from going live. Store scope was verified end to end across a three-deep remix chain.
 </BodySection>

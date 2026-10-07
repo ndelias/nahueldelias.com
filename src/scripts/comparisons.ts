@@ -9,9 +9,11 @@
 const BEFORE = 2500; // ms on the before screen
 const NOW = 4500; // ms on today's, fade included
 
-function init() {
+function init(scope: ParentNode = document) {
   const still = matchMedia('(prefers-reduced-motion: reduce)');
-  for (const root of document.querySelectorAll<HTMLElement>('.comparisons')) {
+  for (const root of scope.querySelectorAll<HTMLElement>('.comparisons')) {
+    if (root.dataset.bound) continue;
+    root.dataset.bound = '';
     const list = root.querySelector<HTMLElement>('[data-compare-tabs]');
     if (!list) continue;
     const tabs = [...list.querySelectorAll<HTMLButtonElement>('[data-compare-tab]')];
@@ -120,5 +122,8 @@ function init() {
 }
 
 init();
+
+// A tab swaps in new content (Tabs.astro): set up what came in with it.
+document.addEventListener('tabs:swap', (event) => init((event as CustomEvent<HTMLElement>).detail));
 
 export {}; // a module, so each script keeps its own scope

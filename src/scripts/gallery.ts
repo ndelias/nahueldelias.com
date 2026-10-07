@@ -1,8 +1,10 @@
 // Behaviour for Gallery.astro, compiled on its own and added by
 // <AfterLoad> once the page has loaded, so none of it is fetched before the
 // first paint.
-function init() {
-  for (const root of document.querySelectorAll<HTMLElement>('[data-gallery]')) {
+function init(scope: ParentNode = document) {
+  for (const root of scope.querySelectorAll<HTMLElement>('[data-gallery]')) {
+    if (root.dataset.bound) continue;
+    root.dataset.bound = '';
     const links = [...root.querySelectorAll<HTMLAnchorElement>('[data-gallery-open]')];
     const all = root.querySelector<HTMLAnchorElement>('[data-gallery-all]');
     // Every screen, on the page or viewer-only, in order.
@@ -89,5 +91,8 @@ function init() {
 }
 
 init();
+
+// A tab swaps in new content (Tabs.astro): set up what came in with it.
+document.addEventListener('tabs:swap', (event) => init((event as CustomEvent<HTMLElement>).detail));
 
 export {}; // a module, so each script keeps its own scope

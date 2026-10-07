@@ -1,0 +1,18 @@
+---
+// /work/[hub]/[part]/[tab]: a part told in tabs, open on one of its other
+// tabs. The same page as the part's own URL, with that tab's content: a
+// link to it works without JS, and Tabs.astro fetches it to switch in place.
+import type { GetStaticPaths } from 'astro';
+import PartPage from '../../../../components/PartPage.astro';
+import { entriesIn, partSlug, partsOf } from '../../../../lib/entries';
+
+export const getStaticPaths = (() =>
+  entriesIn('work').flatMap((hub) =>
+    partsOf(hub).flatMap((part) =>
+      (part.data.tabs ?? []).slice(1).map((tab) => ({ params: { slug: hub.id, part: partSlug(part), tab: tab.id }, props: { part, hub, tab } })),
+    ),
+  )) satisfies GetStaticPaths;
+
+const { part, hub, tab } = Astro.props;
+---
+<PartPage part={part} hub={hub} tab={tab} />
