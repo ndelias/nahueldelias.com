@@ -120,22 +120,10 @@
       "donor": "videos/11b-drop-owner-review.mp4"
     },
     {
-      "from": "screens/app/desktop-drop-late-bloomer.png",
+      "from": "screens/flows/_cand2/11a-drop-buy-submit/c001.png",
       "to": "work/vers1ons/licensing/drops/steps/03-drop-app.webp",
       "width": 2560,
-      "donor": "videos/11b-drop-owner-review.mp4"
-    },
-    {
-      "from": "screens/app/desktop-drop-late-bloomer--full.png",
-      "to": "work/vers1ons/licensing/drops/steps/03b-drop-details.webp",
-      "width": 2560,
-      "crop": [
-        0,
-        1600,
-        2880,
-        1800
-      ],
-      "donor": "videos/11b-drop-owner-review.mp4"
+      "donor": "videos/11a-drop-buy-submit.mp4"
     },
     {
       "from": "screens/app/desktop-drop-glass-harbor.png",
