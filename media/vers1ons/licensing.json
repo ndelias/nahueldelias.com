@@ -387,12 +387,6 @@
       "retouch": false
     },
     {
-      "from": "screens/flows/drop-remix/mobile-08-submit-remix.png",
-      "to": "work/vers1ons/licensing/drops/phone/07-submit.webp",
-      "width": 1170,
-      "retouch": false
-    },
-    {
       "from": "screens/flows/drop-remix/mobile-09-host-submissions.png",
       "to": "work/vers1ons/licensing/drops/phone/08-submissions.webp",
       "width": 1170,
