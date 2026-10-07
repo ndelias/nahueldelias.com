@@ -183,7 +183,7 @@ tabs:
         clip: /media/vers1ons/licensing/clip-submissions.mp4
     comparisons:
       - title: 'The drop page'
-        why: '[Why the drop page changed between July and today.]'
+        why: 'The public drop page and the in-app one had drifted apart. Now they''re one design, with a side rail you can close and a countdown before a drop opens.'
         before:
           src: ../../../assets/work/vers1ons/licensing/drops/before-after/drop-page-before.webp
           alt: 'The public drop page in July 2026.'
@@ -306,22 +306,24 @@ import { licensing } from '../../../components/diagrams/specs/licensing';
   </Tab>
 
   <Tab id="drops">
-    <BodySection label="What I did" heading="[Drops: what I did, in one line.]">
-      [Drops: Nahuel's account of the problem, what he did across partners, backend and UI.]
+    <BodySection label="What I did" heading="I built Drops end to end: a remix contest where no one leaves as a loser.">
+      Most remix contests run on a form and a Dropbox link. Stems leak, entries have no license, and the winning remix can't be released because nobody cleared the rights. In a drop, the license is the entry fee. The artist is paid for every license sold, and every producer leaves with a remix they're licensed to release to socials and stores, with no legal back-and-forth between teams.
+
+      I wrote the spec, designed the pages and built the backend. Each entry is saved as its own work that points back to the original, and the purchase issues a real rights grant, so a winning remix can go straight to distribution. The windows to submit, judge and release are enforced on the server, at purchase, at submission and at release. On top of that come the lifecycle emails, from the invite to the winners, and a judging page where the host plays, stars and picks entries.
     </BodySection>
 
     <Steps />
 
     <Comparisons />
 
-    <BodySection label="Outcome" heading="Drops run on the same licenses, so a winning remix is cleared to release the moment it's entered.">
-      [Drops: the outcome in Nahuel's words.]
+    <BodySection label="Outcome" heading="Shipped and working end to end, with the first drops being set up with artists now.">
+      A drop goes from create, invite, buy and submit to judge, winners and release window, on the same licenses as every listing. The buzz of a contest, with the rights already cleared.
     </BodySection>
   </Tab>
 
   <Tab id="sheets">
     <BodySection label="What I did" heading="A satellite app that gets the paperwork done before a license exists.">
-      Most co-written songs have no split sheet, and without one there's no clean license to sell. So we built sheets.vers1ons.com: anyone can create a split sheet, or bring in one they already have, with no account. When it's ready, it collects signatures and the authority of everyone who owns a share, and then hands the song to vers1ons to become a license agreement.
+      Most co-written songs have no split sheet, and without one there's no clean license to sell. So I built sheets.vers1ons.com on my own, from nothing: anyone can create a split sheet, or bring in one they already have, with no account. When it's ready, it collects signatures and the authority of everyone who owns a share, and then hands the song to vers1ons to become a license agreement.
     </BodySection>
 
     <Steps />
@@ -329,7 +331,7 @@ import { licensing } from '../../../components/diagrams/specs/licensing';
     <Comparisons />
 
     <BodySection label="Outcome" heading="Live in production as the first vers1ons satellite app.">
-      [Sheets: the outcome in Nahuel's words.]
+      Anyone can make a split sheet at sheets.vers1ons.com for free. Paying gets it signed by everyone who owns a share, and a signed sheet comes into vers1ons ready to become a license. It's how artists who've never heard of us find the marketplace.
     </BodySection>
   </Tab>
 </Tabs>
