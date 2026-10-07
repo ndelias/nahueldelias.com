@@ -149,3 +149,7 @@ export const nextEntry = (entry: Entry): Entry | undefined => {
 /** The date of the latest build log entry: the site's "Updated" date. */
 export const lastUpdated = async (): Promise<Date | undefined> =>
   (await getCollection('log')).map((e) => e.data.date).sort((a, b) => b.getTime() - a.getTime())[0];
+
+/** The stack as one line for the meta row: "Next.js · Stripe Connect · …".
+    Each item keeps its words together, so a line breaks between items. */
+export const stackLine = (stack: string[]): string => stack.map((s) => s.replaceAll(' ', ' ')).join(' · ');
