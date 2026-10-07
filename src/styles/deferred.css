@@ -325,15 +325,12 @@
   .phone .arrow {
     left: calc(220px + var(--grid-gutter) / 2);
   }
-  /* Revealing (JS, motion allowed): the two screens share one frame, sized
-     to sit within a laptop screen with the tabs. The script's canvas
-     (.reveal) covers the frame while the before screen dissolves into
-     today's; then today's shows under it and the canvas goes. The captions
-     take turns: the before's goes as the reveal starts, today's comes as
-     it lands. */
+  /* Fading (JS, motion allowed): the two screens share one frame, sized to
+     sit within a laptop screen with the tabs. Today's fades in over the
+     before, slowly and evenly; the captions take turns, the before's going
+     as the fade starts and today's coming as it lands. */
   &.is-fading {
     .pair {
-      position: relative;
       grid-template-columns: minmax(0, calc(58vh * 1.6));
     }
     .phone .pair {
@@ -342,31 +339,20 @@
     .pair > figure {
       grid-area: 1 / 1;
     }
-    .pair > figure + figure {
-      visibility: hidden;
+    .pair > figure + figure .frame {
+      opacity: 0;
+      transition: opacity 1.4s cubic-bezier(0.45, 0, 0.25, 1);
     }
-    .now .pair > figure + figure {
-      visibility: visible;
-    }
-    .reveal {
-      position: absolute;
-      z-index: 1;
-      top: 0;
-      left: 0;
-      width: 100%;
-      aspect-ratio: 16 / 10;
-    }
-    .phone .reveal {
-      aspect-ratio: 9 / 16;
+    .now .pair > figure + figure .frame {
+      opacity: 1;
     }
     .pair > figure:first-child figcaption {
-      transition: opacity 0.3s ease;
+      transition: opacity 0.4s ease;
     }
     .pair > figure + figure figcaption {
       opacity: 0;
-      transition: opacity 0.4s ease;
+      transition: opacity 0.5s ease 0.9s;
     }
-    .going .pair > figure:first-child figcaption,
     .now .pair > figure:first-child figcaption {
       opacity: 0;
     }
