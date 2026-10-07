@@ -85,7 +85,9 @@ const runKeys = Object.keys(spec.runs);
           runKeys.map((key, i) => (
             <button type="button" class={`sd-run ${i === 0 ? "sd-run-primary" : ""}`} data-run={key}>
               {i === 0 && <Icon name="play" />}
-              {spec.runs[key].label}
+              {spec.runs[key].short ? (
+                <><span class="sd-long">{spec.runs[key].label}</span><span class="sd-short" title={spec.runs[key].label}>{spec.runs[key].short}</span></>
+              ) : spec.runs[key].label}
             </button>
           ))
         }

@@ -1,8 +1,10 @@
 ---
-// Sibling navigation on a part page: every part of the hub, in build order,
-// with its thumbnail. The current part at full strength with an accent rule,
-// the others dimmed. Phones: a row of text tabs (number and title) that
-// scrolls sideways on its own, the current part scrolled into view.
+// Sibling navigation on a part page: every part of the hub, in build order.
+// At rest it's one quiet row, number and title. Pointing at it (or tabbing
+// into it) lowers the thumbnails over the page like a blind, and they roll
+// back up when you leave. The current part at full strength with an accent
+// rule, the others dimmed. Phones: a row of text tabs that scrolls sideways
+// on its own, the current part scrolled into view, no thumbnails.
 import type { Entry } from '../lib/entries';
 import { entryHref, entryNumber, parentOf, partsOf } from '../lib/entries';
 import EntryImage from './EntryImage.astro';
@@ -23,9 +25,8 @@ const parts = partsOf(hub);
           {/* Low priority: on phones these sit above the header, in view, and
               Chrome would raise them to High, where they'd compete with the
               tagline and hero for the largest paint. */}
+          <span class="name"><span class="no">{entryNumber(p)}</span> <span class="title">{p.data.title}</span></span>
           <span class="thumb"><EntryImage src={p.data.cover.src} alt="" fetchpriority="low" /></span>
-          <span class="no">{entryNumber(p)}</span>
-          <span class="title">{p.data.title}</span>
         </a>
       </li>
     ))}
@@ -56,9 +57,8 @@ const parts = partsOf(hub);
     list-style: none;
   }
   .item {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
+    position: relative;
+    display: block;
     padding-top: 10px;
     border-top: 2px solid var(--line);
     color: var(--muted);
@@ -69,34 +69,63 @@ const parts = partsOf(hub);
     border-top-color: var(--accent);
     color: var(--ink);
   }
+  .name {
+    display: flex;
+    gap: var(--space-8);
+  }
+  /* The blind: each thumbnail hangs under its title, over the page, rolled
+     up (clipped to nothing) until the row is pointed at or focused. Its
+     shadow in the page's color covers the gutters and a margin below, so
+     the thumbnails read as one panel. */
   .thumb {
-    display: block;
-    margin-bottom: var(--space-4);
+    position: absolute;
+    z-index: 2;
+    top: calc(100% + 12px);
+    left: 0;
+    width: 100%;
     aspect-ratio: 16 / 10;
     overflow: hidden;
-    opacity: 0.55;
-  }
-  .current .thumb {
-    opacity: 1;
+    background: var(--surface);
+    box-shadow: 0 0 0 calc(var(--grid-gutter) / 2) var(--bg);
+    clip-path: inset(0 0 100% 0);
+    pointer-events: none;
   }
   .thumb :global(img) {
     display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
+    opacity: 0.55;
+  }
+  .current .thumb :global(img) {
+    opacity: 1;
+  }
+  [data-parts-nav]:hover .thumb,
+  [data-parts-nav]:focus-within .thumb {
+    clip-path: inset(0 calc(var(--grid-gutter) / -2) calc(var(--grid-gutter) / -2));
+    pointer-events: auto;
   }
   .item:hover .title {
     text-decoration: underline;
     text-underline-offset: 3px;
   }
-  .item:hover .thumb {
+  .item:hover .thumb :global(img) {
     opacity: 0.8;
   }
-  .current:hover .thumb {
+  .current:hover .thumb :global(img) {
     opacity: 1;
   }
+  /* Down in 0.55s, back up a touch quicker, after a beat, so passing over
+     the row on the way somewhere else doesn't flap it. */
   @media (prefers-reduced-motion: no-preference) {
     .thumb {
+      transition: clip-path 0.45s var(--ease) 0.12s;
+    }
+    [data-parts-nav]:hover .thumb,
+    [data-parts-nav]:focus-within .thumb {
+      transition: clip-path 0.55s var(--ease);
+    }
+    .thumb :global(img) {
       transition: opacity 0.2s var(--ease);
     }
   }
@@ -118,9 +147,8 @@ const parts = partsOf(hub);
       border-bottom: 1px solid var(--line);
     }
     .item {
-      flex-direction: row;
+      display: flex;
       align-items: center;
-      gap: var(--space-8);
       min-height: 44px;
       padding: 0;
       border-top: 0;

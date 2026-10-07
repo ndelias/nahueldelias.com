@@ -1,13 +1,12 @@
 ---
-# Real copy from Nahuel's case study (~/Vers1ons/portfolio-vers1ons/
-# case-studies/01-distribution.md) and docs/design/SubStudy.dc.html, partners
-# anonymous. Still a fixture: the decision's Rejected and Cost are bracketed
-# until Nahuel writes them. Media from media/vers1ons/distribution.json.
+# Copy drafted with Nahuel from his account of the project, partners
+# anonymous. Still a fixture while the copy is being reviewed. Media from
+# media/vers1ons/distribution.json.
 fixture: true
 parent: vers1ons
 title: 'Distribution'
-tagline: 'Getting remixes onto streaming services, and keeping them correct after release.'
-summary: 'Post-release changes classified as metadata-only, full update or new UPC.'
+tagline: 'Building our own distribution, so remixes, royalties and data stay inside vers1ons.'
+summary: 'Distributors as partners, with royalties paid down the whole remix chain.'
 weight: 2
 status: shipped
 role: 'Owner, end to end'
@@ -16,13 +15,13 @@ dates:
 stack: ['Inngest', 'Postgres', 'Redis', 'Socket.IO', 'Object storage', 'ffmpeg']
 standing: 'In production'
 disciplines:
-  led: [backend, product]
-  contributed: [frontend]
+  led: [backend, product, frontend]
+  contributed: []
 decision:
-  intro: 'A distributor treats every change as a new submission.'
-  chose: 'Classify every post-release change first: metadata-only, full update, or new UPC.'
-  rejected: '[The alternative, e.g. re-submitting the release on any change.]'
-  cost: '[What the classifier cost to build and maintain.]'
+  intro: 'Remixes licensed on vers1ons had to leave for an outside distributor, and the royalties and data went with them.'
+  chose: 'Bring distributors in as partners: releases go out through their pipelines, and the data and royalties always come back through vers1ons.'
+  rejected: 'Sending artists elsewhere, where the royalties never come back, or becoming a distributor, and a competitor to our partners.'
+  cost: 'About ten months, learning each partner''s rules first, and every failed delivery is ours to catch and fix.'
 hero:
   src: ../../../assets/work/vers1ons/distribution/hero.webp
   alt: 'The release page for "Night Swim" after submitting: its cover art, Pending release, and the ISRC and UPC it was issued.'
@@ -181,10 +180,16 @@ import { distribution } from '../../../components/diagrams/specs/distribution';
 
 <SystemFigure label="How it works" spec={distribution} />
 
-<BodySection label="Problem" heading="Outside tools know nothing about the license chain, so credits come out wrong and the original artist drops off.">
-  An artist who licenses a song on vers1ons and makes a remix needs to release it to Spotify, Apple and the rest. Doing that means codes (UPC/ISRC), clean metadata, contributor credits and splits that match the license, and a delivery that can fail anywhere in the middle.
+<BodySection label="Problem" heading="Every remix that left for an outside distributor took its royalties and its data with it.">
+  vers1ons licenses the right to remix. But to get a remix onto Spotify or Apple Music, artists had to take it somewhere else. Outside distributors know nothing about the license chain, so credits came out wrong, the original artist dropped off, and the royalties never came back through us.
 
-  It's also how royalties get paid right. The splits and contributor details collected here are what let vers1ons pay everyone on the recording side down a chain of remixes, from the original to the sixth version and beyond.
+  To be worth more as a company, we needed to keep remixes, royalties and data inside vers1ons, and to pay every contributor down a chain of remixes, from the original to the sixth version and beyond.
+</BodySection>
+
+<BodySection label="What I did" heading="I owned distribution end to end, from the partner calls to the screens.">
+  I worked with our partners to learn how distribution actually works behind the scenes. Then I built our own system around one delivery partner, made so others can plug in: one Inngest function that takes a release from submission to every store, blocking for individual stores that follows each license, and royalty routing that pays everyone in the chain.
+
+  I designed and built the wizard too. Contributors, splits and metadata are hard to explain, so I turned them into steps an artist can get through without knowing any of it.
 </BodySection>
 
 <Steps />
@@ -195,6 +200,8 @@ import { distribution } from '../../../components/diagrams/specs/distribution';
   Metrics, tracing and an ops playbook. Production canaries found real bugs, all fixed: a partner's dedupe conflict, a label and parental-advisory rejection, and codes that didn't issue when the release setup failed.
 </BodySection>
 
-<BodySection label="Outcome" heading="Live in production, gated to beta users and remix buyers.">
-  Labels distribute on behalf of their roster. 116 PRs over about ten months: nine checks before any write, seven durable steps, one transaction.
+<BodySection label="Outcome" heading="Live in production: a remix no longer has to leave vers1ons to reach the stores.">
+  Beta users and remix buyers release straight to stores from vers1ons, and labels distribute on behalf of their roster. Every release's credits and splits stay with us, so royalties can follow the chain back to the original artist.
+
+  116 PRs over about ten months: nine checks before any write, seven durable steps, one transaction.
 </BodySection>

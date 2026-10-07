@@ -233,15 +233,17 @@ function initDiagram(root: HTMLElement, spec: DiagramSpec) {
     });
     dot.remove();
   };
-  const writeLog = (step: RunStep, i: number, t: number) => {
+  const writeLog = (step: RunStep, t: number) => {
     const li = document.createElement("li");
     if (step.tone) li.classList.add(`tone-${step.tone}`);
     const text = document.createElement("span");
     text.textContent = step.log;
     const time = document.createElement("time");
-    time.textContent = `${String(i + 1).padStart(2, "0")} · +${(t / 1000).toFixed(1)}s`;
+    time.textContent = `+${(t / 1000).toFixed(1)}s`;
     li.append(text, time);
     log.append(li);
+    // The newest line in view when the log scrolls (beside a wide diagram).
+    log.scrollTop = log.scrollHeight;
   };
 
   async function play(key: string) {
@@ -250,7 +252,7 @@ function initDiagram(root: HTMLElement, spec: DiagramSpec) {
     log.replaceChildren();
     root.classList.add("is-running");
     let t = 0;
-    for (const [i, step] of spec.runs[key].steps.entries()) {
+    for (const step of spec.runs[key].steps) {
       if (my !== token) return;
       for (const n of root.querySelectorAll(".is-active")) {
         n.classList.remove("is-active");
@@ -262,7 +264,7 @@ function initDiagram(root: HTMLElement, spec: DiagramSpec) {
       for (const id of step.nodes ?? []) el(id)?.classList.add("is-active");
       const hold = step.ms ?? 900;
       t += travel + hold;
-      writeLog(step, i, t);
+      writeLog(step, t);
       await wait(reduced ? 350 : hold);
     }
     if (my !== token) return;

@@ -7,7 +7,28 @@
 // section, and Pause stops it. Reduced motion: no fade and no rotation; the
 // pair sits side by side and the tabs are manual.
 const BEFORE = 2500; // ms on the before screen
-const NOW = 4500; // ms on today's, fade included
+const NOW = 4500; // ms on today's, wipe included
+
+// The wipe's mask at a frame's size, three frames wide: opaque, then a band
+// one frame wide where square blocks thin out from left to right with some
+// noise (the pixel edge), then clear. Sliding it across reveals the screen
+// under it from left to right.
+function wipeMask(w: number, h: number) {
+  const block = Math.max(8, Math.round(w / 36));
+  const cols = Math.ceil(w / block);
+  const canvas = document.createElement('canvas');
+  canvas.width = w * 3;
+  canvas.height = h;
+  const g = canvas.getContext('2d')!;
+  g.fillStyle = '#000';
+  g.fillRect(0, 0, w, h);
+  for (let c = 0; c < cols; c++) {
+    for (let y = 0; y < h; y += block) {
+      if (c / cols + (Math.random() - 0.5) * 0.7 < 0.5) g.fillRect(w + c * block, y, block, block);
+    }
+  }
+  return `url(${canvas.toDataURL()})`;
+}
 
 function init() {
   const still = matchMedia('(prefers-reduced-motion: reduce)');
@@ -40,6 +61,17 @@ function init() {
     // nobody looking closely.
     const running = () => inView && !paused && !still.matches && !(now && held);
 
+    // Each panel's mask, drawn the first time it shows, at its frame's size.
+    const masked = new WeakSet<HTMLElement>();
+    const mask = (panel: HTMLElement) => {
+      const frame = panel.querySelector<HTMLElement>('.pair > figure + figure .frame');
+      if (!frame || masked.has(panel) || !root.classList.contains('is-fading')) return;
+      const { width, height } = frame.getBoundingClientRect();
+      if (!width) return;
+      masked.add(panel);
+      panel.style.setProperty('--wipe', wipeMask(Math.round(width), Math.round(height)));
+    };
+
     const show = (i: number, focus = false) => {
       at = i;
       now = false;
@@ -49,6 +81,7 @@ function init() {
         panels[k].hidden = k !== i;
         panels[k].classList.remove('now');
       });
+      mask(panels[i]);
       if (focus) tabs[i].focus();
     };
     const schedule = () => {
@@ -58,6 +91,7 @@ function init() {
     function advance() {
       if (now) show((at + 1) % tabs.length);
       else {
+        mask(panels[at]);
         now = true;
         panels[at].classList.add('now');
       }
@@ -65,6 +99,7 @@ function init() {
     }
     const sync = () => {
       root.classList.toggle('is-fading', !still.matches);
+      mask(panels[at]);
       pause.hidden = still.matches;
       pause.setAttribute('aria-pressed', String(paused));
       pause.textContent = paused ? '(Play)' : '(Pause)';

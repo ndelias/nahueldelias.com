@@ -42,6 +42,7 @@ export interface RunStep {
 
 export interface Run {
   label: string;
+  short?: string; // for the narrow side panel beside a wide diagram
   steps: RunStep[];
 }
 

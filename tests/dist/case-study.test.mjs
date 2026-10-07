@@ -251,7 +251,7 @@ test('hub: every matrix row links to its part page, and each page exists', async
 
 test('part: sibling nav lists every part, the current one marked', async () => {
   const { ctx, page } = await openPart();
-  const items = await page.$$eval('[data-parts-nav] a', (as) => as.map((a) => ({ href: a.getAttribute('href'), current: a.getAttribute('aria-current'), opacity: getComputedStyle(a.querySelector('.thumb')).opacity })));
+  const items = await page.$$eval('[data-parts-nav] a', (as) => as.map((a) => ({ href: a.getAttribute('href'), current: a.getAttribute('aria-current'), opacity: getComputedStyle(a.querySelector('.thumb img')).opacity })));
   assert.equal(items.length, 5);
   assert.deepEqual(items.map((i) => i.current), [null, null, null, null, 'page']);
   assert.equal(items[4].opacity, '1');
@@ -273,14 +273,14 @@ test('part: prev and next cycle through the parts', async () => {
 
 test('part: the header names what it shows, led and contributed, for screen readers too', async () => {
   const { ctx, page } = await openPart();
-  assert.deepEqual(await page.$$eval('.chips li', (li) => li.map((l) => l.textContent)), ['Backend, led', 'Product, led', 'Frontend, contributed']);
+  assert.deepEqual(await page.$$eval('.chips li', (li) => li.map((l) => l.textContent)), ['Backend, led', 'Product, led', 'Frontend, led']);
   await ctx.close();
 });
 
 test('part: the body places the steps and comparisons; a body without <Screens /> gets the gallery after it', async () => {
   const { ctx, page } = await openPart();
   const order = await page.$$eval('article.body > :not(script, style)', (els) => els.map((e) => e.className.split(' ')[0]));
-  assert.deepEqual(order.slice(0, 5), ['system-figure', 'body-section', 'steps', 'comparisons', 'body-section']);
+  assert.deepEqual(order.slice(0, 5), ['system-figure', 'body-section', 'body-section', 'steps', 'comparisons']);
   assert.equal(await page.locator('[data-steps]').count(), 1);
   assert.equal(await page.locator('[data-gallery]').count(), 0);
   const other = await openPart('/work/vers1ons/licensing/');
@@ -350,10 +350,10 @@ const shown = (page) =>
   page.evaluate(() => {
     const panel = document.querySelector('[data-compare-panel]:not([hidden])');
     const [before, now] = panel.querySelectorAll('.pair > figure');
-    return { tab: document.querySelector('[role="tab"][aria-selected="true"]').textContent, now: getComputedStyle(now).opacity === '1', stacked: before.getBoundingClientRect().top === now.getBoundingClientRect().top && before.getBoundingClientRect().left === now.getBoundingClientRect().left };
+    return { tab: document.querySelector('[role="tab"][aria-selected="true"]').textContent, now: panel.classList.contains('now') && panel.style.getPropertyValue('--wipe').startsWith('url('), stacked: before.getBoundingClientRect().top === now.getBoundingClientRect().top && before.getBoundingClientRect().left === now.getBoundingClientRect().left };
   });
 
-test('comparisons: before fades into now in one frame, then the next tab; Pause stops it', async () => {
+test('comparisons: today wipes in over the before in one frame, then the next tab; Pause stops it', async () => {
   const { ctx, page } = await openPart();
   await page.waitForSelector('.comparisons.is-tabbed', { state: 'attached' });
   await page.clock.install();
@@ -364,7 +364,8 @@ test('comparisons: before fades into now in one frame, then the next tab; Pause 
   assert.equal(first.stacked, true, 'before and now side by side');
   assert.equal(first.now, false);
   await page.clock.runFor(4000);
-  await page.waitForFunction(() => getComputedStyle(document.querySelector('[data-compare-panel]:not([hidden]) .pair > figure + figure')).opacity === '1');
+  await page.waitForFunction(() => document.querySelector('[data-compare-panel]:not([hidden])').classList.contains('now'));
+  assert.equal((await shown(page)).now, true, "today's screen didn't wipe in");
   await page.clock.runFor(5000);
   assert.notEqual((await shown(page)).tab, first.tab, 'stayed on the first tab');
   await page.click('.comparisons .pause');

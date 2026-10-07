@@ -99,6 +99,7 @@ export const distribution: DiagramSpec = {
   runs: {
     release: {
       label: "Run a release",
+      short: "Release",
       steps: [
         { nodes: ["wizard"], log: "artist submits “Night Swim” · 1 track · 16 stores" },
         { nodes: ["gate"], edges: [["wizard", "gate"]], log: "5 checks passed · nothing written yet", tone: "accent" },
@@ -114,6 +115,7 @@ export const distribution: DiagramSpec = {
     },
     timeout: {
       label: "Partner times out",
+      short: "Timeout",
       steps: [
         { nodes: ["gate", "tx"], edges: [["wizard", "gate"], ["gate", "tx"]], log: "checks passed · committed" },
         { nodes: ["job.ids", "job.setup", "job.stage", "job.assemble"], edges: [["tx", "job.ids"]], log: "steps 1–4 finished" },
@@ -125,6 +127,7 @@ export const distribution: DiagramSpec = {
     },
     refused: {
       label: "License doesn't cover a store",
+      short: "No license",
       steps: [
         { nodes: ["wizard"], log: "artist picks every store, including Spotify" },
         { nodes: ["gate"], edges: [["wizard", "gate"]], log: "rights scope: this license excludes Spotify", tone: "warn" },
