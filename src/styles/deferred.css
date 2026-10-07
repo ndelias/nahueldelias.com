@@ -994,6 +994,13 @@
       grid-row: 1 / span 2;
       align-self: start;
       container-type: inline-size;
+      /* Tall enough for the panel beside it: a short diagram still leaves
+         room for several log lines and the longest inspector note,
+         with the diagram centred in it. */
+      min-height: 640px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
       padding: 40px;
       border: 1px solid var(--sd-line);
       border-radius: 4px;
@@ -1026,9 +1033,10 @@
       padding: 12px;
     }
     /* One row: short names, compact buttons; Reset in the same row, muted
-       and unboxed. */
+       and unboxed (it wraps to its own line, at the right, rather than
+       leave the box). */
     .sd-controls {
-      flex-wrap: nowrap;
+      flex-wrap: wrap;
       gap: 4px;
       margin-bottom: 10px;
     }

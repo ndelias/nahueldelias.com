@@ -83,7 +83,7 @@ export const licensingSheets: DiagramSpec = {
   runs: {
     into: {
       label: "Into vers1ons",
-      short: "Into vers1ons",
+      short: "Signed",
       steps: [
         { nodes: ["search"], log: "someone searches for a split sheet" },
         { nodes: ["sheet"], edges: [["search", "sheet"]], log: "lands on sheets.vers1ons.com · no account" },
@@ -105,7 +105,7 @@ export const licensingSheets: DiagramSpec = {
     },
     edit: {
       label: "A split changes after sending",
-      short: "An edit",
+      short: "Edit",
       steps: [
         { nodes: ["sign"], edges: [["pay", "sign"]], log: "sent for signatures · one person has signed" },
         { nodes: ["sheet"], log: "a split is changed", tone: "warn" },

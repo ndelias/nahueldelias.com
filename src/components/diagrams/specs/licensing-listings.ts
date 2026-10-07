@@ -94,7 +94,7 @@ export const licensingListings: DiagramSpec = {
   runs: {
     sale: {
       label: "Run a sale",
-      short: "A sale",
+      short: "Sale",
       steps: [
         { nodes: ["original"], log: "“Night Swim” uploaded · splits at 100%" },
         { nodes: ["terms"], edges: [["original", "terms"]], log: "terms set · remixes may release on 16 stores" },
@@ -108,7 +108,7 @@ export const licensingListings: DiagramSpec = {
     },
     chain: {
       label: "A remix of a remix",
-      short: "The chain",
+      short: "Chain",
       steps: [
         { nodes: ["remix"], log: "the remix is a work of its own" },
         { nodes: ["listing"], edges: [["remix", "listing"]], log: "its producer lists it, with their own terms", tone: "accent" },

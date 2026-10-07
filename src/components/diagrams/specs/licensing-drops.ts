@@ -117,7 +117,7 @@ export const licensingDrops: DiagramSpec = {
     },
     early: {
       label: "Drop not open yet",
-      short: "Not open",
+      short: "Early",
       steps: [
         { nodes: ["page"], log: "a producer opens the drop before its start date" },
         { nodes: ["buy"], edges: [["page", "buy"]], log: "purchase refused, before any payment", tone: "warn" },
