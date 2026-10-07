@@ -15,6 +15,8 @@ interface Props {
 const { entry } = Astro.props;
 const { title, tagline, disciplines } = entry.data;
 const hub = parentOf(entry);
+// vers1ons' numbers carry its own color.
+const brand = (hub ?? entry).id === 'vers1ons';
 const NAMES: Record<Discipline, string> = { product: 'Product', design: 'Design', frontend: 'Frontend', backend: 'Backend' };
 const chips = hub && disciplines
   ? [
@@ -26,7 +28,7 @@ const chips = hub && disciplines
 <header class:list={['entry-header grid', { part: hub }]} data-entry-header>
   <div class="inner">
     <p class="meta mono muted">
-      <span class="no">({entryNumber(entry)})</span><span>{hub ? hub.data.title : SECTION_LABELS[entry.collection]} · {entryYears(entry)}</span>
+      <span class:list={['no', { brand }]}>({entryNumber(entry)})</span><span>{hub ? hub.data.title : SECTION_LABELS[entry.collection]} · {entryYears(entry)}</span>
       <StatusBadge entry={entry} />
     </p>
     <h1 class="title">{title}</h1>
@@ -60,6 +62,9 @@ const chips = hub && disciplines
   }
   .no {
     color: var(--ink);
+  }
+  .no.brand {
+    color: var(--vers1ons);
   }
   .title {
     margin: 0;

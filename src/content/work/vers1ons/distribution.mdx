@@ -1,93 +1,205 @@
 ---
-# FIXTURE, the real copy from docs/design/SubStudy.dc.html with its brackets,
-# until the real entry replaces it. Part 5 of the vers1ons hub.
-fixture: true
+# Copy drafted with Nahuel from his account of the project, partners
+# anonymous. Media from media/vers1ons/distribution.json.
 parent: vers1ons
 title: 'Distribution'
-tagline: 'Getting remixes onto streaming services, and keeping them correct after release.'
-summary: 'Post-release changes classified as metadata-only, full update or new UPC.'
+tagline: 'Building our own distribution, so remixes, royalties and data stay inside vers1ons.'
+summary: 'Distributors as partners, with royalties paid down the whole remix chain.'
 weight: 2
 status: shipped
-role: '[Your part: spec, integration, admin UI]'
+role: 'Owner, end to end'
 dates:
-  start: '[Years]'
-stack: ['[APIs · queue · database]']
-partners: ['NueMeta', 'Soundcharts']
+  start: 2025-11
+stack: ['Inngest', 'Postgres', 'Redis', 'Socket.IO', 'Object storage', 'ffmpeg']
 standing: 'In production'
 disciplines:
-  led: [backend, product]
-  contributed: [frontend]
+  led: [backend, product, frontend]
+  contributed: []
 decision:
-  intro: 'A distributor treats every change as a new submission.'
-  chose: 'Classify every post-release change first: metadata-only, full update, or new UPC.'
-  rejected: '[The alternative, e.g. re-submitting the release on any change.]'
-  cost: '[What the classifier cost to build and maintain.]'
+  intro: 'Remixes licensed on vers1ons had to leave for an outside distributor, and the royalties and data went with them.'
+  chose: 'Bring distributors in as partners: releases go out through their pipelines, and the data and royalties always come back through vers1ons.'
+  rejected: 'Sending artists elsewhere, where the royalties never come back, or becoming a distributor, and a competitor to our partners.'
+  cost: 'About ten months, learning each partner''s rules first, and every failed delivery is ours to catch and fix.'
 hero:
-  # Raster, generated with the posters (scripts/fixture-posters.mjs), so
-  # the hero's AVIF path and budget run on the page Lighthouse measures.
-  src: ../../../assets/fixtures/posters/distribution-hero.png
-  dark: ../../../assets/fixtures/posters/distribution-hero-dark.png
-  alt: '[Hero: what the admin view shows.]'
-  caption: '[Recording or still of the admin view]'
+  src: ../../../assets/work/vers1ons/distribution/hero.webp
+  alt: 'The release page for "Night Swim" after submitting: its cover art, Pending release, and the ISRC and UPC it was issued.'
+  video: /media/vers1ons/distribution/walkthrough.mp4
+  duration: '2:11'
+  caption: 'From source pick to pending release'
 gallery:
-  - src: ../../../assets/fixtures/tones/tone4-desktop.svg
-    alt: '[Screen: the main screen of the flow.]'
-    caption: '[The main screen, and the one thing to notice in it.]'
+  - src: ../../../assets/work/vers1ons/distribution/gallery/01-source.webp
+    alt: 'The source step.'
+    title: 'Pick the source'
+    caption: 'Start from a brand-new upload or a track you already licensed. A licensed track brings its listing''s audio and details with it, so there''s less to type and nothing to contradict.'
     frame: desktop
-  - src: ../../../assets/fixtures/tones/tone1-phone.svg
-    alt: '[Screen: the same step on a phone.]'
-    caption: '[Phone view of the same step.]'
+    clip: /media/vers1ons/distribution/clip-source.mp4
+  - src: ../../../assets/work/vers1ons/distribution/gallery/03-track.webp
+    alt: 'Track setup with the waveform preview picker.'
+    title: 'Track details'
+    caption: 'Pick the store preview by dragging across the real waveform; stores play that 30-second clip before purchase. Choose none, and stores pick their own.'
+    frame: desktop
+    clip: /media/vers1ons/distribution/clip-track.mp4
+  - src: ../../../assets/work/vers1ons/distribution/gallery/04-audio-processed.webp
+    alt: 'Track setup, audio processed.'
+    title: 'Audio checked'
+    caption: 'The upload is checked and normalized before you go on, so a file a store would reject never gets that far.'
+    frame: desktop
+  - src: ../../../assets/work/vers1ons/distribution/gallery/05-contributors.webp
+    alt: 'Contributors, locked from the listing.'
+    title: 'Contributors'
+    caption: 'When the track comes from a published listing, its contributors arrive locked from the signed split sheet. The release can''t contradict the license.'
+    frame: desktop
+  - src: ../../../assets/work/vers1ons/distribution/gallery/06-splits.webp
+    alt: 'Splits for master and publishing.'
+    title: 'Splits'
+    caption: 'Master and publishing each stay at 100% while you edit. Next stays greyed out, and says why, until both add up.'
+    frame: desktop
+  - src: ../../../assets/work/vers1ons/distribution/gallery/07-release-details.webp
+    alt: 'Release details.'
+    title: 'Release details'
+    caption: 'Date, label, copyright lines, territories and pricing in one step. Errors read as sentences the artist can act on, not a partner''s field names.'
+    frame: desktop
+    clip: /media/vers1ons/distribution/clip-release.mp4
+  - src: ../../../assets/work/vers1ons/distribution/gallery/08-stores.webp
+    alt: 'The store picker.'
+    title: 'Stores'
+    caption: 'Stores are grouped by delivery route. Some only travel together, so the picker groups them instead of offering switches we can''t honor.'
+    frame: desktop
+  - src: ../../../assets/work/vers1ons/distribution/gallery/10-cover-art.webp
+    alt: 'The cover art step.'
+    title: 'Cover art'
+    caption: 'The art''s requirements sit beside the drop area: what the image can''t contain, and the sizes stores accept.'
+    frame: desktop
+  - src: ../../../assets/work/vers1ons/distribution/gallery/11-review.webp
+    alt: 'Review and submit.'
+    title: 'Review'
+    caption: 'The release the way stores will show it, cover art first, with every step one click away to edit.'
+    frame: desktop
+  - src: ../../../assets/work/vers1ons/distribution/gallery/12-attestations.webp
+    alt: 'The attestations, all checked.'
+    title: 'Attestations'
+    caption: 'What the artist confirms before anything is sent. Distribute stays disabled until every box is checked.'
+    frame: desktop
+    clip: /media/vers1ons/distribution/clip-attest.mp4
+  - src: ../../../assets/work/vers1ons/distribution/gallery/13-submitted.webp
+    alt: 'Submission received.'
+    title: 'Submitted'
+    caption: 'From here a durable job takes over: codes, staging, delivery, confirmation. Each step can resume on its own.'
+    frame: desktop
+    clip: /media/vers1ons/distribution/clip-submit.mp4
+  - src: ../../../assets/work/vers1ons/distribution/gallery/14-processing.webp
+    alt: 'The release page, processing.'
+    title: 'Live status'
+    caption: 'The release page updates as the job runs, with no polling: processing, then pending release once the codes are issued.'
+    frame: desktop
+    clip: /media/vers1ons/distribution/clip-live.mp4
+  - src: ../../../assets/work/vers1ons/distribution/gallery/15-credits.webp
+    alt: 'The release''s codes and credits.'
+    title: 'Credits on the release'
+    caption: 'The issued codes, credits and splits on the release, as the stores receive them.'
+    frame: desktop
+  - src: ../../../assets/work/vers1ons/distribution/release-states-poster.webp
+    alt: 'A failed release with Fix & retry.'
+    title: 'When delivery fails'
+    caption: 'A failed delivery says why and offers Fix & retry. A pending release shows what can still change.'
+    frame: desktop
+    clip: /media/vers1ons/distribution/release-states.mp4
+comparisons:
+  - title: 'Starting a release'
+    why: 'In November 2025 a release began as an empty project shell: name a project, then a release, then a track. Most remixes are one track from one license, so today it starts from the track, with a shortcut from a licensed listing.'
+    before:
+      src: ../../../assets/work/vers1ons/distribution/before-after/start-before.webp
+      alt: 'An empty "Choose project" step: new project or existing project.'
+      label: 'Nov 2025'
+      caption: 'An empty "Choose project" form.'
+    now:
+      src: ../../../assets/work/vers1ons/distribution/before-after/start-now.webp
+      alt: 'The first step today: original work or licensed version, new upload or a listing.'
+      label: 'Oct 2026'
+      caption: 'A new upload or a licensed track.'
+  - title: 'Track details'
+    why: 'The long form asked everything up front, including whether this was a remix, which the license already knew. Now the listing fills in what it can, and the form keeps what only the artist knows, like the preview clip.'
+    before:
+      src: ../../../assets/work/vers1ons/distribution/before-after/track-before.webp
+      alt: 'A long track form that starts with "Is this a remix?"'
+      label: 'Mar 2026'
+      caption: 'A long form that starts with "Is this a remix?"'
+    now:
+      src: ../../../assets/work/vers1ons/distribution/before-after/track-now.webp
+      alt: 'Track setup today, filled from the listing, with the waveform preview picker.'
+      label: 'Oct 2026'
+      caption: 'Filled from the listing, preview clip on the waveform.'
+  - title: 'Credits'
+    why: 'Typing credits by hand let a release disagree with the license it came from. Now contributors get their own step, and when the source listing is published they arrive from its signed split sheet, locked.'
+    before:
+      src: ../../../assets/work/vers1ons/distribution/before-after/credits-before.webp
+      alt: 'Track credits typed in by hand, one artist at a time.'
+      label: 'Jul 2026'
+      caption: 'Every credit typed in by hand.'
+    now:
+      src: ../../../assets/work/vers1ons/distribution/before-after/credits-now.webp
+      alt: 'Contributors and splits arriving locked from the license.'
+      label: 'Oct 2026'
+      caption: 'Contributors and splits arrive locked from the license.'
+  - title: 'On a phone'
+    why: 'The phone flow was the desktop one, squeezed, in small caps. Today the same steps ask one plain question per screen, with touch targets built into the components.'
     frame: phone
-  - src: ../../../assets/fixtures/tones/tone5-desktop.svg
-    alt: '[Screen: a held change in the admin.]'
-    caption: '[A held change, as the admin sees it.]'
-    frame: desktop
-  - src: ../../../assets/fixtures/tones/tone3-detail.svg
-    alt: '[Detail: one field in one state.]'
-    caption: '[A detail crop: one field, one state.]'
-    frame: detail
+    before:
+      src: ../../../assets/work/vers1ons/distribution/before-after/phone-before.webp
+      alt: '"Set up the project shell" on a phone, in small caps.'
+      label: 'Nov 2025'
+      caption: '"Set up the project shell", in all caps.'
+    now:
+      src: ../../../assets/work/vers1ons/distribution/before-after/phone-now.webp
+      alt: 'The first step on a phone today.'
+      label: 'Oct 2026'
+      caption: 'One plain question to start.'
+  - title: 'Library'
+    why: 'One card per song, with no states. As distribution shipped, releases, scheduled, pending, drafts and archived became real states, all on one set of tabs and rows.'
+    before:
+      src: ../../../assets/work/vers1ons/distribution/before-after/library-before.webp
+      alt: 'The library with one song card.'
+      label: 'Nov 2025'
+      caption: 'One song card, no release states.'
+    now:
+      src: ../../../assets/work/vers1ons/distribution/before-after/library-now.webp
+      alt: 'The library today with releases, scheduled, pending, drafts and archived.'
+      label: 'Oct 2026'
+      caption: 'Releases, scheduled, pending, drafts and archived.'
+disclaimer: 'Showcase content. Artwork belongs to its respective owners. Artist names, prices and royalty figures are fictional, and no affiliation is implied. Recordings come from an isolated local copy of the product running seeded data; the delivery to stores is staged.'
 cover:
-  src: ../../../assets/fixtures/tones/tone2-desktop.svg
-  alt: '[Cover image.]'
+  src: ../../../assets/work/vers1ons/distribution/cover.webp
+  alt: 'The store picker, grouped by route.'
 order: 5
 ---
 import BodySection from '../../../components/BodySection.astro';
-import ClassifierDiagram from '../../../components/ClassifierDiagram.astro';
-import DataTable from '../../../components/DataTable.astro';
+import SystemFigure from '../../../components/diagrams/SystemFigure.astro';
+import { distribution } from '../../../components/diagrams/specs/distribution';
 
-<ClassifierDiagram
-  label="Fig. 1"
-  intro="Every change to a live release goes through one classifier before anything reaches the distributor."
-  input={{ label: 'Input', text: 'A change to a live release' }}
-  classifier={{ label: 'Classifier', text: 'Which fields changed, and does the distributor treat them as identity?' }}
-  lanes={[
-    { name: 'Metadata-only update', what: 'Credits, tags and text. The release stays live and keeps its IDs.' },
-    { name: 'Full update', what: 'Changes the distributor must re-review. [What triggers it.]' },
-    { name: 'New UPC', what: 'Changes that make it a different release. [What triggers it.]' },
-  ]}
-/>
+<SystemFigure label="How it works" spec={distribution} />
 
-<DataTable
-  label="Table 1"
-  intro="Who gets tagged on a streaming profile depends on their role on the remix."
-  columns={['Contributor role', 'On streaming services']}
-  rows={[
-    ['Performer, Featured', 'Tagged to their artist profile'],
-    ['Writer, Producer', 'Metadata credit only'],
-    ['Original artist', 'Writer/Producer credit at release; can approve tagging later, which sends a metadata-only update'],
-  ]}
-/>
+<BodySection label="Problem" heading="Every remix that left for an outside distributor took its royalties and its data with it.">
+  vers1ons licenses the right to remix. But to get a remix onto Spotify or Apple Music, artists had to take it somewhere else. Outside distributors know nothing about the license chain, so credits came out wrong, the original artist dropped off, and the royalties never came back through us.
 
-<Screens />
-
-<BodySection label="Problem" heading="[Why a simple edit could take a remix down.]">
-  [What happened when a credit or tag changed after release, before the classifier existed. Who noticed, and what it cost.]
+  To be worth more as a company, we needed to keep remixes, royalties and data inside vers1ons, and to pay every contributor down a chain of remixes, from the original to the sixth version and beyond.
 </BodySection>
 
-<BodySection label="Build" heading="[How the classifier and the integration work.]">
-  [The field-by-field rules, how Soundcharts data is reconciled on ingest, and what the admin sees when a change is held. Link the code or a sample payload.]
+<BodySection label="What I did" heading="I owned distribution end to end, from the partner calls to the screens.">
+  I worked with our partners to learn how distribution actually works behind the scenes. Then I built our own system around one delivery partner, made so others can plug in: one Inngest function that takes a release from submission to every store, blocking for individual stores that follows each license, and royalty routing that pays everyone in the chain.
+
+  I designed and built the wizard too. Contributors, splits and metadata are hard to explain, so I turned them into steps an artist can get through without knowing any of it.
 </BodySection>
 
-<BodySection label="Outcome" heading="[What changed once it shipped.]">
-  [Evidence, and what you would do differently. Real numbers or none.]
+<Steps />
+
+<Comparisons />
+
+<BodySection label="Reliability" heading="245+ unit tests plus adversarial endpoint coverage.">
+  Metrics, tracing and an ops playbook. Production canaries found real bugs, all fixed: a partner's dedupe conflict, a label and parental-advisory rejection, and codes that didn't issue when the release setup failed.
+</BodySection>
+
+<BodySection label="Outcome" heading="Live in production: a remix no longer has to leave vers1ons to reach the stores.">
+  Beta users and remix buyers release straight to stores from vers1ons, and labels distribute on behalf of their roster. Every release's credits and splits stay with us, so royalties can follow the chain back to the original artist.
+
+  116 PRs over about ten months: nine checks before any write, seven durable steps, one transaction.
 </BodySection>

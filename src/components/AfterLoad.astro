@@ -1,0 +1,18 @@
+---
+// Runs a behaviour script once the first content has painted (afterPaint,
+// defined in Base.astro), so it never competes with the first paint. `src`
+// is a script compiled on its own by Vite (import … from
+// '../scripts/x.ts?worker&url': a self-contained bundle with no imports;
+// "worker" is only the build mode, it runs on the page). The tag added here
+// is the only reference to it.
+interface Props {
+  src: string;
+}
+const { src } = Astro.props;
+---
+<script is:inline define:vars={{ src }}>
+  afterPaint(function () {
+    if (document.querySelector('script[src="' + src + '"]')) return;
+    var s = document.createElement('script'); s.src = src; document.head.append(s);
+  });
+</script>

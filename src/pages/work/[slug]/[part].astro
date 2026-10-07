@@ -7,16 +7,20 @@
 import type { GetStaticPaths } from 'astro';
 import { render } from 'astro:content';
 import DecisionBlock from '../../../components/DecisionBlock.astro';
+import DeferredStyles from '../../../components/DeferredStyles.astro';
 import EntryHeader from '../../../components/EntryHeader.astro';
 import Facts from '../../../components/Facts.astro';
 import Figure from '../../../components/Figure.astro';
 import Frame from '../../../components/Frame.astro';
+import Comparisons from '../../../components/Comparisons.astro';
 import Gallery from '../../../components/Gallery.astro';
+import Steps from '../../../components/Steps.astro';
 import Icon from '../../../components/Icon.astro';
 import PartPager from '../../../components/PartPager.astro';
 import PartsNav from '../../../components/PartsNav.astro';
 import Base from '../../../layouts/Base.astro';
-import { entriesIn, entryHref, entryNumber, lastUpdated, partSlug, partsOf } from '../../../lib/entries';
+import { HERO_INSET_SIZES } from '../../../lib/posters';
+import { entriesIn, entryHref, lastUpdated, partSlug, partsOf } from '../../../lib/entries';
 
 export const getStaticPaths = (() =>
   entriesIn('work').flatMap((hub) =>
@@ -26,10 +30,13 @@ export const getStaticPaths = (() =>
 const { part, hub } = Astro.props;
 const { data } = part;
 Astro.locals.gallery = data.gallery;
+Astro.locals.comparisons = data.comparisons;
 const { Content } = await render(part);
-// A body that doesn't place <Screens /> gets them after it: every part shows
-// its gallery (§3 hub and parts).
-const placesScreens = /<Screens\b/.test(part.body ?? '');
+// A body that doesn't place its screens (<Screens /> as a gallery, or
+// <Steps /> as the flow step by step) or <Comparisons /> gets them after it:
+// every part shows its gallery (§3 hub and parts).
+const placesScreens = /<(Screens|Steps)\b/.test(part.body ?? '');
+const placesComparisons = /<Comparisons\b/.test(part.body ?? '');
 const updated = await lastUpdated();
 const hero = data.hero;
 const heroMeta = hero && hero.caption && (hero.video ? `${hero.caption} · muted` : hero.caption);
@@ -38,9 +45,10 @@ const hubHref = entryHref(hub)!;
 {/* Faces preloaded: the tagline's (sans 400, the LCP element until a hero
     outgrows it) and the title's (sans 500). Mono loads on use. */}
 <Base title={`${data.title} — ${hub.data.title} — Nahuel D'Elias`} description={data.tagline} noindex={data.fixture} preload={['sans-400', 'sans-500']}>
+  <DeferredStyles slot="head" />
   <Frame>
     <a slot="top-center" class="back" href={hubHref}>(<Icon name="arrow-left" /> {hub.data.title})</a>
-    <main class="case container">
+    <main class="case container part-page">
       <PartsNav part={part} />
       {data.fixture && <p class="fixture mono muted">Fixture · a test entry for the templates, not real work</p>}
       <div class="header"><EntryHeader entry={part} /></div>
@@ -63,10 +71,10 @@ const hubHref = entryHref(hub)!;
             dark={hero.dark}
             alt={hero.alt}
             video={hero.video}
-            play="click"
+            play="auto"
             meta={heroMeta}
             caption={hero.video ? hero.duration : undefined}
-            label={`${entryNumber(part)} · Hero`}
+            sizes={HERO_INSET_SIZES}
           />
         </div>
       )}
@@ -78,9 +86,12 @@ const hubHref = entryHref(hub)!;
       )}
 
       <article class="body">
-        <Content components={{ Screens: Gallery }} />
+        <Content components={{ Screens: Gallery, Steps, Comparisons }} />
         {!placesScreens && <Gallery />}
+        {!placesComparisons && <Comparisons />}
       </article>
+
+      {data.disclaimer && <p class="disclaimer muted">{data.disclaimer}</p>}
 
       <div class="pager defer" style="--defer-size: 110px"><PartPager part={part} /></div>
     </main>
@@ -109,27 +120,33 @@ const hubHref = entryHref(hub)!;
   .fixture {
     margin: var(--space-48) 0 0;
   }
+  /* A rule in ink divides the hub's other parts from this one. */
   .header {
-    padding-top: 112px;
+    margin-top: var(--space-32);
+    padding-top: var(--space-48);
+    border-top: 1px solid var(--ink);
   }
-  .fixture + .header {
-    padding-top: calc(112px - var(--space-48) - 14px);
-  }
+  /* The walkthrough sits centered on eight columns, not the full width: a
+     screen recording blown up past its own size only gets softer. */
   .hero {
     margin-top: 56px;
+  }
+  @media (min-width: 640px) {
+    .hero {
+      display: grid;
+      grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+      column-gap: var(--grid-gutter);
+    }
+    .hero > :global(figure) {
+      grid-column: 3 / span 8;
+    }
   }
   .decision {
     margin-top: 88px;
   }
-  /* Body blocks are 96px apart; the screens take 112 either side, and
-     numbered sections 64 between them. */
-  .body {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-96);
-    padding-top: var(--space-96);
-    counter-reset: body-section;
-  }
+  /* The body's spacing, the disclaimer and the pager are styled in
+     src/styles/deferred.css (.part-page), loaded after the first paint;
+     they're all below the fold. */
   /* Every body block is below the fold: deferred (see .defer in base.css),
      with the mock's heights at 1440 as the first estimate. */
   .body > :global(:not(script, style)) {
@@ -146,15 +163,14 @@ const hubHref = entryHref(hub)!;
   .body > :global([data-gallery]) {
     contain-intrinsic-block-size: auto 1774px;
   }
-  .body > :global([data-gallery]),
-  .body > :global([data-gallery] ~ .body-section) {
-    margin-top: 16px;
+  .body > :global(.system-figure) {
+    contain-intrinsic-block-size: auto 1072px;
   }
-  .body > :global(.body-section + .body-section) {
-    margin-top: -32px;
+  .body > :global(.steps) {
+    contain-intrinsic-block-size: auto 763px;
   }
-  .pager {
-    margin-top: 140px;
+  .body > :global(.comparisons) {
+    contain-intrinsic-block-size: auto 838px;
   }
   @media (max-width: 639.98px) {
     /* A 44px line box, not inline-flex: flex would trim the space after
@@ -170,29 +186,17 @@ const hubHref = entryHref(hub)!;
     .fixture {
       margin-top: var(--space-24);
     }
-    .header,
-    .fixture + .header {
+    /* The tab row has its own rule on a phone. */
+    .header {
+      margin-top: 0;
       padding-top: var(--space-32);
+      border-top: 0;
     }
     .hero {
       margin-top: var(--space-32);
     }
     .decision {
       margin-top: var(--space-64);
-    }
-    .body {
-      gap: var(--space-64);
-      padding-top: var(--space-64);
-    }
-    .body > :global([data-gallery]),
-    .body > :global([data-gallery] ~ .body-section) {
-      margin-top: 0;
-    }
-    .body > :global(.body-section + .body-section) {
-      margin-top: -16px;
-    }
-    .pager {
-      margin-top: var(--space-96);
     }
   }
 </style>

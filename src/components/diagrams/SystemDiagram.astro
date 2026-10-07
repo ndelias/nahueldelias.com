@@ -1,0 +1,108 @@
+---
+// A system diagram you can run (by Nahuel, ported from the vers1ons archive's
+// web-export). Boxes sit on a CSS grid; wires are routed from the rendered
+// boxes at runtime (and again on resize), so arrows always land on their
+// targets. Hover, focus or tap a box to read what happens there; Run plays a
+// scenario through it: the diagram's motion happens only on that press (§7.5
+// motion budget c), and under reduced motion the steps change without
+// travelling pulses.
+//
+// Ported to the site: its colors are the site's tokens (the active path in
+// ink, since the accent is only for links and focus; done in --money,
+// failures in --warn), its type the site's two families at 400/500, ← → as
+// icons, and the header can be left to the page (header={false}) when the
+// page sets its own label and title beside it.
+import AfterLoad from '../AfterLoad.astro';
+import behaviour from '../../scripts/system-diagram.ts?worker&url';
+import type { DiagramSpec } from "./types";
+import Icon from "../Icon.astro";
+import Text from "../Text.astro";
+
+interface Props {
+  spec: DiagramSpec;
+  header?: boolean;
+}
+const { spec, header = true } = Astro.props;
+const runKeys = Object.keys(spec.runs);
+// The script loads the spec itself, by id, once the page has loaded (its
+// edges, runs and the inspector's text), so none of that is in the HTML.
+// Styles: src/styles/deferred.css (loaded after first paint; this
+// component only renders below the fold).
+---
+
+<section class="sd" data-sd={spec.id} aria-labelledby={`sd-${spec.id}-title`}>
+  {header ? (
+    <header class="sd-head">
+      <p class="sd-eyebrow">{spec.eyebrow}</p>
+      <h3 id={`sd-${spec.id}-title`} class="sd-title">{spec.title}</h3>
+      <p class="sd-sub">{spec.subtitle}</p>
+    </header>
+  ) : (
+    <h3 id={`sd-${spec.id}-title`} class="visually-hidden">{spec.title}</h3>
+  )}
+
+  <div class="sd-stage" data-sd-stage>
+    <div class="sd-grid" style={`--cols: ${spec.columns}`}>
+      {
+        spec.nodes.map((n) => (
+          <div
+            class={`sd-node sd-kind-${n.kind ?? "step"}`}
+            data-node={n.id}
+            tabindex="0"
+            style={`--c: ${n.col}; --r: ${n.row}; --cs: ${n.colSpan ?? 1}; --rs: ${n.rowSpan ?? 1}`}
+          >
+            {n.zone && <span class="sd-zone">{n.zone}</span>}
+            <span class="sd-node-title">{n.title}</span>
+            {n.steps && (
+              <ol class={`sd-steps ${n.stepsLayout === "row" ? "sd-steps-row" : ""}`}>
+                {n.steps.map((s, i) => (
+                  <li data-node={`${n.id}.${s.id}`}>
+                    <span class="sd-idx">{i + 1}</span>
+                    {s.label}
+                  </li>
+                ))}
+              </ol>
+            )}
+            {n.body && (
+              <span class="sd-body">
+                {n.body.map((line) => (
+                  <span><Text text={line} /></span>
+                ))}
+              </span>
+            )}
+          </div>
+        ))
+      }
+    </div>
+    <svg class="sd-wires" aria-hidden="true" data-sd-wires></svg>
+    <div class="sd-labels" aria-hidden="true" data-sd-labels></div>
+  </div>
+
+  <div class="sd-panel">
+    <div class="sd-console">
+      <div class="sd-controls">
+        {
+          runKeys.map((key, i) => (
+            <button type="button" class={`sd-run ${i === 0 ? "sd-run-primary" : ""}`} data-run={key}>
+              {i === 0 && <Icon name="play" />}
+              {spec.runs[key].short ? (
+                <><span class="sd-long">{spec.runs[key].label}</span><span class="sd-short" title={spec.runs[key].label}>{spec.runs[key].short}</span></>
+              ) : spec.runs[key].label}
+            </button>
+          ))
+        }
+        <button type="button" class="sd-run sd-reset" data-reset>Reset</button>
+      </div>
+      <ol class="sd-log" aria-live="polite" data-sd-log>
+        <li class="sd-log-idle">ready · press run, or hover any part of the system</li>
+      </ol>
+    </div>
+    <aside class="sd-inspect" data-sd-inspect>
+      <p class="sd-inspect-title">Inspect</p>
+      <p class="sd-inspect-body">Hover, tap or tab to any box to see what happens there and why.</p>
+    </aside>
+  </div>
+</section>
+
+
+<AfterLoad src={behaviour} />

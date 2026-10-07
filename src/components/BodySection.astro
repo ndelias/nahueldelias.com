@@ -14,6 +14,8 @@ interface Props {
 }
 
 const { label, heading, note } = Astro.props;
+// Styles: src/styles/deferred.css (loaded after the page has; this
+// component only renders below the fold).
 ---
 <section class="body-section grid">
   <p class="margin mono muted"><span class="no" aria-hidden="true"></span><span class="label">{label}</span></p>
@@ -28,75 +30,3 @@ const { label, heading, note } = Astro.props;
     </aside>
   )}
 </section>
-
-<style>
-  .body-section {
-    counter-increment: body-section;
-  }
-  .margin {
-    display: flex;
-    gap: var(--space-12);
-    align-items: baseline;
-    margin: 0;
-    line-height: normal;
-  }
-  .no::before {
-    content: counter(body-section, decimal-leading-zero);
-  }
-  .label {
-    color: var(--ink);
-  }
-  .prose {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-16);
-  }
-  .heading {
-    margin: 0;
-    font-size: var(--text-h3);
-    line-height: var(--leading-h3);
-    letter-spacing: var(--tracking-h3);
-    text-wrap: balance;
-  }
-  .prose :global(p) {
-    margin: 0;
-    font-size: var(--text-prose);
-    line-height: var(--leading-prose);
-  }
-  .note {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-  .note .mono {
-    font-size: var(--text-mono-sm);
-    line-height: normal;
-  }
-  .note p {
-    margin: 0;
-    font-size: var(--text-caption);
-    line-height: var(--leading-small);
-  }
-  @media (min-width: 640px) {
-    .margin {
-      grid-column: span 3;
-      align-self: start;
-    }
-    .prose {
-      grid-column: 4 / span 6;
-    }
-    .note {
-      grid-column: 10 / span 3;
-      padding-top: 52px;
-    }
-  }
-  /* Phone: label row, then heading and prose, then the note. */
-  @media (max-width: 639.98px) {
-    .margin {
-      margin-bottom: var(--space-12);
-    }
-    .note {
-      margin-top: var(--space-24);
-    }
-  }
-</style>

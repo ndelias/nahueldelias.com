@@ -1,8 +1,11 @@
 ---
-// Sibling navigation on a part page: every part of the hub, in build order,
-// with its thumbnail. The current part at full strength with an accent rule,
-// the others dimmed. Phones: a row of text tabs (number and title) that
-// scrolls sideways on its own, the current part scrolled into view.
+// Sibling navigation on a part page: every part of the hub, in build order.
+// At rest it's one quiet row, number and title. Pointing at it (or tabbing
+// into it) lowers the thumbnails like a blind, pushing the page down, and
+// they roll back up a moment after you leave, so brushing off the edge
+// doesn't snap it shut. The current part at full strength with an accent
+// rule, the others dimmed. Phones: a row of text tabs that scrolls sideways
+// on its own, the current part scrolled into view, no thumbnails.
 import type { Entry } from '../lib/entries';
 import { entryHref, entryNumber, parentOf, partsOf } from '../lib/entries';
 import EntryImage from './EntryImage.astro';
@@ -14,6 +17,8 @@ interface Props {
 const { part } = Astro.props;
 const hub = parentOf(part)!;
 const parts = partsOf(hub);
+// vers1ons' numbers carry its own color.
+const brand = hub.id === 'vers1ons';
 ---
 <nav class="parts-nav" aria-label={`Parts of ${hub.data.title}`} data-parts-nav>
   <ol style={`--n: ${parts.length}`}>
@@ -23,9 +28,8 @@ const parts = partsOf(hub);
           {/* Low priority: on phones these sit above the header, in view, and
               Chrome would raise them to High, where they'd compete with the
               tagline and hero for the largest paint. */}
-          <span class="thumb"><EntryImage src={p.data.cover.src} alt="" fetchpriority="low" /></span>
-          <span class="no">{entryNumber(p)}</span>
-          <span class="title">{p.data.title}</span>
+          <span class="name"><span class:list={['no', { brand }]}>{entryNumber(p)}</span> <span class="title">{p.data.title}</span></span>
+          <span class="blind"><span class="thumb"><EntryImage src={p.data.cover.src} alt="" fetchpriority="low" /></span></span>
         </a>
       </li>
     ))}
@@ -56,9 +60,8 @@ const parts = partsOf(hub);
     list-style: none;
   }
   .item {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
+    position: relative;
+    display: block;
     padding-top: 10px;
     border-top: 2px solid var(--line);
     color: var(--muted);
@@ -69,34 +72,71 @@ const parts = partsOf(hub);
     border-top-color: var(--accent);
     color: var(--ink);
   }
+  .name {
+    display: flex;
+    gap: var(--space-8);
+  }
+  .no.brand {
+    color: var(--vers1ons);
+  }
+  /* The blind: each thumbnail sits under its title in a row that's rolled
+     up to nothing (0fr) until the row is pointed at or focused, when it
+     unrolls to the thumbnail's height (1fr) and the page moves down with it. */
+  .blind {
+    display: grid;
+    grid-template-rows: 0fr;
+  }
   .thumb {
     display: block;
-    margin-bottom: var(--space-4);
-    aspect-ratio: 16 / 10;
+    min-height: 0;
     overflow: hidden;
-    opacity: 0.55;
-  }
-  .current .thumb {
-    opacity: 1;
   }
   .thumb :global(img) {
     display: block;
     width: 100%;
-    height: 100%;
+    height: auto;
+    margin-top: 12px;
+    aspect-ratio: 16 / 10;
     object-fit: cover;
+    background: var(--surface);
+    opacity: 0.55;
+  }
+  .current .thumb :global(img) {
+    opacity: 1;
+  }
+  [data-parts-nav]:hover .blind,
+  [data-parts-nav]:focus-within .blind {
+    grid-template-rows: 1fr;
   }
   .item:hover .title {
     text-decoration: underline;
     text-underline-offset: 3px;
   }
-  .item:hover .thumb {
+  .item:hover .thumb :global(img) {
     opacity: 0.8;
   }
-  .current:hover .thumb {
+  .current:hover .thumb :global(img) {
     opacity: 1;
   }
+  /* Down in 0.6s; back up only after the pointer has been gone for 0.7s,
+     so slipping off an edge or crossing a gutter doesn't close it. Under
+     reduced motion it opens and closes at once, still after the pause. */
+  .blind {
+    transition: grid-template-rows 0s 0.7s;
+  }
+  [data-parts-nav]:hover .blind,
+  [data-parts-nav]:focus-within .blind {
+    transition: grid-template-rows 0s;
+  }
   @media (prefers-reduced-motion: no-preference) {
-    .thumb {
+    .blind {
+      transition: grid-template-rows 0.5s var(--ease) 0.7s;
+    }
+    [data-parts-nav]:hover .blind,
+    [data-parts-nav]:focus-within .blind {
+      transition: grid-template-rows 0.6s var(--ease);
+    }
+    .thumb :global(img) {
       transition: opacity 0.2s var(--ease);
     }
   }
@@ -118,9 +158,8 @@ const parts = partsOf(hub);
       border-bottom: 1px solid var(--line);
     }
     .item {
-      flex-direction: row;
+      display: flex;
       align-items: center;
-      gap: var(--space-8);
       min-height: 44px;
       padding: 0;
       border-top: 0;
@@ -132,7 +171,7 @@ const parts = partsOf(hub);
     .item.current {
       border-bottom-color: var(--accent);
     }
-    .thumb {
+    .blind {
       display: none;
     }
   }

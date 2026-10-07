@@ -1,19 +1,22 @@
 #!/usr/bin/env node
-// HTML budget: every built page's HTML must stay under 13.6KB gzipped. The
-// HTML carries the page's CSS inline (astro.config.mjs) and is the one
-// request every page's first paint waits on, so its size is the floor of
-// every LCP. The gate is about 20% above the largest page when it was set
-// (Distribution, 11.4KB on 2026-09-29); raise it on purpose, in CLAUDE.md
-// too, not to make a page fit. Gzip at the default level, like the JS
-// budget: Vercel serves brotli where it can, which is smaller.
-// Dependency-free.
+// HTML budget: every built page's HTML must stay under 14.0KB gzipped. The
+// HTML carries the page's critical CSS inline (astro.config.mjs) and is the
+// one request every page's first paint waits on. 14KB is about what TCP's
+// first round trip carries (initial window: 10 packets of ~1460 bytes, less
+// headers): a page that fits arrives in one round trip; one byte over needs
+// a second, which costs ~150ms of LCP on Lighthouse's mobile 4G (measured
+// 2026-10-06: Distribution at 14.8KB went from 1053ms to 1202ms). So this
+// gate is that limit, not a margin over the largest page. Keep pages under
+// it by moving below-the-fold styles and behaviour out of the HTML
+// (deferred.css, AfterLoad), not by raising it. Gzip at the default level,
+// like the JS budget. Dependency-free.
 
 import { readFile, readdir, appendFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { join, relative, resolve, sep } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
-const BUDGET = 13_600; // bytes, gzipped
+const BUDGET = 14_000; // bytes, gzipped: TCP's first round trip
 const DIST = resolve(process.argv[2] ?? 'dist');
 const kb = (n) => `${(n / 1000).toFixed(1)} KB`;
 

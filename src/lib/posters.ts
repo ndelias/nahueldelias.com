@@ -48,6 +48,8 @@ export async function posterOf(entry: Entry): Promise<{ light: Srcsets; dark?: S
 // up to 1344 wide (1x) and 120KB at 2688 (2x).
 export const HERO_WIDTHS = [672, 1344, 2688] as const;
 export const HERO_SIZES = '(min-width: 640px) calc(100vw - 96px), calc(100vw - 32px)';
+/** A part page's walkthrough, centered on eight columns (3 / span 8). */
+export const HERO_INSET_SIZES = '(min-width: 640px) 62vw, calc(100vw - 32px)';
 
 export interface HeroSources {
   avif: string;

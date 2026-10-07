@@ -11,6 +11,8 @@ interface Props {
 
 const { label, intro, columns, rows } = Astro.props;
 const id = `table-${label.toLowerCase().replace(/\W+/g, '-')}`;
+// Styles: src/styles/deferred.css (loaded after first paint; this
+// component only renders below the fold).
 ---
 <section class="data-table grid" aria-labelledby={`${id}-label`}>
   <div class="intro">
@@ -30,85 +32,3 @@ const id = `table-${label.toLowerCase().replace(/\W+/g, '-')}`;
     </tbody>
   </table>
 </section>
-
-<style>
-  .intro {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-8);
-  }
-  .label {
-    margin: 0;
-    font-weight: var(--weight-regular);
-    line-height: normal;
-  }
-  .intro p {
-    margin: 0;
-    font-size: var(--text-small);
-    line-height: var(--leading-small);
-  }
-  table {
-    border-collapse: collapse;
-    font-size: var(--text-meta);
-    line-height: normal;
-  }
-  th,
-  td {
-    text-align: left;
-    font-weight: var(--weight-regular);
-  }
-  thead th {
-    padding: 0 0 10px;
-    font-size: var(--text-mono-sm);
-  }
-  tbody th,
-  tbody td {
-    padding: 12px 0;
-  }
-  tbody tr {
-    border-top: 1px solid var(--line);
-  }
-  tbody tr:last-child {
-    border-bottom: 1px solid var(--line);
-  }
-  @media (min-width: 640px) {
-    .intro {
-      grid-column: span 3;
-    }
-    table {
-      grid-column: 4 / span 6;
-    }
-  }
-  /* Phone: stacked rows. The header row is kept for screen readers. */
-  @media (max-width: 639.98px) {
-    .intro {
-      margin-bottom: var(--space-24);
-    }
-    table,
-    tbody,
-    tr {
-      display: block;
-    }
-    thead {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      overflow: hidden;
-      clip-path: inset(50%);
-    }
-    tbody th,
-    tbody td {
-      display: block;
-      padding: 0;
-    }
-    tbody tr {
-      padding: 12px 0;
-    }
-    tbody td {
-      margin-top: var(--space-4);
-      color: var(--muted);
-      font-size: var(--text-small);
-      line-height: var(--leading-small);
-    }
-  }
-</style>

@@ -1,0 +1,70 @@
+---
+// The flow, step by step: every gallery item as one step of a sideways
+// track, one at a time. The screen (or a short muted clip of it, playing
+// while that step is showing and in view), its number and name, and two or
+// three lines on what happens there and why. Usable in MDX; part pages place
+// it with <Steps />.
+//
+// Without JS it's a scroll-snapping track you swipe or scroll. With JS
+// (src/scripts/steps.ts, after the first paint): the steps advance on their
+// own while in view (a still for a few seconds, a clip once through), the
+// rail marks the current step, and Prev / Next and the numbers jump. Pause
+// stops the advancing and the clips (WCAG 2.2.2). Reduced motion: no clips,
+// no advancing, no smooth scrolling.
+//
+// Styles: src/styles/deferred.css (this component only renders below the fold).
+import type { ImageMetadata } from 'astro';
+import type { FrameType } from '../lib/model';
+import AfterLoad from './AfterLoad.astro';
+import EntryImage from './EntryImage.astro';
+import Icon from './Icon.astro';
+import behaviour from '../scripts/steps.ts?worker&url';
+
+interface Props {
+  items?: { src: ImageMetadata; alt: string; caption?: string; frame: FrameType; title?: string; clip?: string }[];
+  label?: string;
+}
+
+const { items = Astro.locals.gallery ?? [], label = 'The flow, step by step' } = Astro.props;
+const meta = (src: ImageMetadata) => (src as ImageMetadata & { clone?: ImageMetadata }).clone ?? src;
+const steps = items.map((item, i) => ({ ...item, no: String(i + 1).padStart(2, '0') }));
+---
+{steps.length > 0 && (
+  <section class="steps grid" aria-labelledby="steps-label" data-steps>
+    <div class="intro">
+      <h2 class="label mono muted" id="steps-label">{label}</h2>
+      <p class="muted">{steps.length} steps, one screen at a time.</p>
+    </div>
+    <div class="body">
+      <ol class="track" tabindex="0" aria-label="Steps of the flow" data-steps-track>
+        {steps.map((s) => (
+          <li class="step" id={`step-${s.no}`} data-step>
+            <figure>
+              <div class:list={['media', s.frame]}>
+                <EntryImage class="still" src={s.src} alt={s.alt} width={Math.min(s.frame === 'phone' ? 960 : 1280, meta(s.src).width)} />
+                {s.clip && <video class="clip" data-src={s.clip} muted playsinline loop preload="none" aria-hidden="true"></video>}
+              </div>
+              <figcaption>
+                <span class="no mono">{s.no}</span>
+                {s.title && <span class="title">{s.title}</span>}
+                {s.caption && <span class="text muted">{s.caption}</span>}
+              </figcaption>
+            </figure>
+          </li>
+        ))}
+      </ol>
+      {/* The numbered rail is built by the script: it's navigation for the
+          JS version; without JS the track scrolls and swipes on its own. */}
+      <div class="foot mono">
+        <ol class="rail" aria-label="Go to a step" data-steps-rail></ol>
+        <div class="controls">
+          <button type="button" data-steps-prev aria-label="Previous step">(<Icon name="arrow-left" /> Prev)</button>
+          <button type="button" data-steps-next aria-label="Next step">(Next <Icon name="arrow-right" />)</button>
+          <button type="button" class="pause" data-steps-pause aria-pressed="false">(Pause)</button>
+        </div>
+      </div>
+    </div>
+  </section>
+)}
+
+<AfterLoad src={behaviour} />

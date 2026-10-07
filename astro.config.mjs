@@ -5,6 +5,10 @@ import mdx from '@astrojs/mdx';
 export default defineConfig({
   site: 'https://nahueldelias.com',
   output: 'static',
+  // Scope component styles with a short class, not a data-astro-cid-*
+  // attribute on every element: same specificity, fewer bytes in each
+  // page's HTML (the HTML budget).
+  scopedStyleStrategy: 'class',
   integrations: [mdx()],
   // Inline all CSS. It's a few KB per page, and a separate stylesheet would
   // put a render-blocking round trip in front of LCP. The default inlines

@@ -97,9 +97,34 @@ const entrySchema = ({ image }: SchemaContext) => {
             alt: z.string({ error: 'Required: describe what the screen shows.' }).min(1, 'Required: describe what the screen shows.'),
             caption: z.string().min(1).optional(),
             frame: z.enum(FRAMES).default('desktop'),
+            // Only in the full-size viewer ("See all"), not on the page: keeps
+            // the page's HTML inside the first round trip (the HTML budget).
+            more: z.boolean().default(false),
+            // As a step of the flow (<Steps />): its name, and a muted clip
+            // that plays while the step is showing (a path under public/).
+            // The caption is the step's two or three lines.
+            title: z.string().min(1).optional(),
+            clip: z.string().min(1).optional(),
           }),
         )
         .optional(),
+      // Before → now: the same part of the product in an early build and
+      // today. The before screen fades into the now one in the same frame.
+      comparisons: z
+        .array(
+          z.object({
+            title: z.string().min(1),
+            // Why it changed, in two or three lines.
+            why: z.string().min(1).optional(),
+            frame: z.enum(FRAMES).default('desktop'),
+            before: imageRef.extend({ label: z.string().min(1), caption: z.string().min(1).optional() }),
+            now: imageRef.extend({ label: z.string().min(1), caption: z.string().min(1).optional() }),
+          }),
+        )
+        .optional(),
+      // Shown at the end of the page: whose artwork it is, what's fictional,
+      // what's staged. Required wording lives with the content, not the template.
+      disclaimer: z.string().min(1).optional(),
       // Slug of the hub entry. Set on parts (vers1ons/licensing…), which live
       // in the hub's folder: src/content/work/vers1ons/licensing.mdx.
       parent: z.string().min(1).optional(),

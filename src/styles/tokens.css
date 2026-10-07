@@ -22,6 +22,14 @@
   --ink: light-dark(#1B1A18, #EDEBE6);
   --accent: light-dark(#2447F0, #7D93FF);
 
+  /* Semantic, separate from the accent (§7.1): money that landed or a step
+     that finished, and something that failed. Used by system diagrams. */
+  --money: light-dark(#18703E, #3DDC84);
+  --warn: light-dark(#B0281F, #F08A80);
+  /* vers1ons' own color, from its product's lavender: the numbers of the
+     hub and its parts, so the project reads apart from the rest. */
+  --vers1ons: light-dark(#6A4CD3, #A48FFF);
+
   /* Type. Instrument Sans for reading, DM Mono for all metadata. Sizes in rem
      so they follow the reader's font size; the px values are from the canvas. */
   --font-sans: "Instrument Sans", "Instrument Sans Fallback", system-ui, sans-serif;
