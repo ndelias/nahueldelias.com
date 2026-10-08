@@ -45,7 +45,8 @@ test('parts matrix: one row per part, each dot named for screen readers', async 
   assert.deepEqual(rows.map((r) => r.part), ['Design system', 'Licensing', 'Purchasing', 'Wallet & payouts', 'Distribution']);
   // Columns: Product, Design, Frontend, Backend.
   assert.deepEqual(rows[0].cells, ['Contributed', 'Led', 'Led', 'Not involved']);
-  assert.deepEqual(rows[3].cells, ['Led', 'Not involved', 'Contributed', 'Led']);
+  // Purchasing, a fixture part: led product and frontend, contributed design and backend.
+  assert.deepEqual(rows[2].cells, ['Led', 'Contributed', 'Led', 'Contributed']);
   const headers = await page.$$eval('.matrix thead th', (ths) => ths.map((th) => th.textContent.trim()));
   assert.deepEqual(headers, ['No.', 'Preview', 'Part', 'Product', 'Design', 'Frontend', 'Backend', 'Link']);
   // The dots themselves are decoration: the text is what's read.

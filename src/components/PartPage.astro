@@ -44,6 +44,7 @@ const partHref = `${hubHref}${partSlug(part)}/`;
 // <Comparisons /> in its <Tab> render them.
 Astro.locals.gallery = tab?.gallery ?? data.gallery;
 Astro.locals.comparisons = tab?.comparisons ?? data.comparisons;
+Astro.locals.phones = tab ? tab.phones : data.phones;
 if (tab && data.tabs) {
   Astro.locals.tabs = {
     open: tab,

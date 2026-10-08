@@ -1,0 +1,194 @@
+{
+  "archive": "~/Vers1ons/portfolio-vers1ons",
+  "images": [
+    {
+      "from": "videos/17-money-walkthrough.mp4",
+      "to": "work/vers1ons/wallet-payouts/hero.webp",
+      "width": 2688,
+      "at": 0.5,
+      "restore": [
+        {
+          "rect": [
+            1390,
+            856,
+            100,
+            38
+          ],
+          "from": [
+            -10,
+            454
+          ]
+        }
+      ]
+    },
+    {
+      "from": "screens/flows/money/04a-claim-page.png",
+      "to": "work/vers1ons/wallet-payouts/cover.webp",
+      "width": 1600,
+      "donor": "videos/17-money-walkthrough.mp4"
+    },
+    {
+      "from": "screens/app/desktop-wallet.png",
+      "to": "work/vers1ons/wallet-payouts/steps/01-wallet.webp",
+      "width": 2560,
+      "donor": "videos/06-wallet-withdraw.mp4"
+    },
+    {
+      "from": "videos/06-wallet-withdraw.mp4",
+      "to": "work/vers1ons/wallet-payouts/steps/02-withdraw.webp",
+      "width": 2560,
+      "at": 12.9
+    },
+    {
+      "from": "videos/17-money-walkthrough.mp4",
+      "to": "work/vers1ons/wallet-payouts/steps/03-shares.webp",
+      "width": 2560,
+      "at": 28
+    },
+    {
+      "from": "screens/flows/money/02b-how-royalties-work.png",
+      "to": "work/vers1ons/wallet-payouts/steps/04-how-royalties-work.webp",
+      "width": 2560
+    },
+    {
+      "from": "screens/flows/money/04a-claim-page.png",
+      "to": "work/vers1ons/wallet-payouts/steps/05-claim.webp",
+      "width": 2560,
+      "donor": "videos/17-money-walkthrough.mp4"
+    },
+    {
+      "from": "screens/flows/money/connect/01-after-signup-payouts-later.png",
+      "to": "work/vers1ons/wallet-payouts/steps/06-connect-later.webp",
+      "width": 2560
+    },
+    {
+      "from": "screens/flows/money/07a-credit-plus-card-summary.png",
+      "to": "work/vers1ons/wallet-payouts/steps/07-credit-plus-card.webp",
+      "width": 2560
+    },
+    {
+      "from": "screens/flows/money/07e-credit-covered-confirm.png",
+      "to": "work/vers1ons/wallet-payouts/steps/08-credit-covered.webp",
+      "width": 2560
+    },
+    {
+      "from": "screens/app/desktop-analytics.png",
+      "to": "work/vers1ons/wallet-payouts/steps/09-earnings.webp",
+      "width": 2560
+    },
+    {
+      "from": "screens/eras/dec25/flows/onboarding/desktop-08-payout-setup.png",
+      "to": "work/vers1ons/wallet-payouts/before-after/signup-before.webp",
+      "width": 2000
+    },
+    {
+      "from": "screens/flows/money/connect/01-after-signup-payouts-later.png",
+      "to": "work/vers1ons/wallet-payouts/before-after/signup-now.webp",
+      "width": 2000
+    },
+    {
+      "from": "screens/eras/jul26/flows/connect/02-before-release.png",
+      "to": "work/vers1ons/wallet-payouts/before-after/new-listing-before.webp",
+      "width": 2000
+    },
+    {
+      "from": "screens/flows/money/connect/03-after-release.png",
+      "to": "work/vers1ons/wallet-payouts/before-after/new-listing-now.webp",
+      "width": 2000
+    },
+    {
+      "from": "screens/eras/nov25/desktop-wallet.png",
+      "to": "work/vers1ons/wallet-payouts/before-after/wallet-before.webp",
+      "width": 2000
+    },
+    {
+      "from": "screens/eras/today/desktop-wallet.png",
+      "to": "work/vers1ons/wallet-payouts/before-after/wallet-now.webp",
+      "width": 2000
+    },
+    {
+      "from": "screens/eras/dec25/flows/checkout/desktop-checkout-1.png",
+      "to": "work/vers1ons/wallet-payouts/before-after/checkout-before.webp",
+      "width": 2000
+    },
+    {
+      "from": "screens/flows/money/07a-credit-plus-card-summary.png",
+      "to": "work/vers1ons/wallet-payouts/before-after/checkout-now.webp",
+      "width": 2000
+    },
+    {
+      "from": "screens/flows/money/mobile-01-contributor-wallet.png",
+      "to": "work/vers1ons/wallet-payouts/phone/01-wallet.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/money/mobile-03-withdraw-confirm.png",
+      "to": "work/vers1ons/wallet-payouts/phone/02-withdraw-confirm.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/money/mobile-05-checkout-credit.png",
+      "to": "work/vers1ons/wallet-payouts/phone/03-checkout-credit.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/money/mobile-02-withdraw-amount.png",
+      "to": "work/vers1ons/wallet-payouts/phone/04-withdraw-amount.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/money/mobile-04-claim-page.png",
+      "to": "work/vers1ons/wallet-payouts/phone/05-claim.webp",
+      "width": 1170,
+      "retouch": false
+    }
+  ],
+  "videos": [
+    {
+      "from": "videos/17-money-walkthrough.mp4",
+      "to": "media/vers1ons/wallet-payouts/walkthrough.mp4",
+      "kind": "hero",
+      "width": 1344,
+      "start": 0,
+      "duration": 62
+    },
+    {
+      "from": "videos/06-wallet-withdraw.mp4",
+      "to": "media/vers1ons/wallet-payouts/clip-withdraw.mp4",
+      "kind": "inline",
+      "width": 1344,
+      "start": 6.5,
+      "duration": 12.5
+    },
+    {
+      "from": "videos/17-money-walkthrough.mp4",
+      "to": "media/vers1ons/wallet-payouts/clip-shares.mp4",
+      "kind": "inline",
+      "width": 1344,
+      "start": 24,
+      "duration": 8
+    },
+    {
+      "from": "videos/18-claim.mp4",
+      "to": "media/vers1ons/wallet-payouts/clip-claim.mp4",
+      "kind": "inline",
+      "width": 1344
+    },
+    {
+      "from": "videos/19-connect-prompt.mp4",
+      "to": "media/vers1ons/wallet-payouts/clip-connect.mp4",
+      "kind": "inline",
+      "width": 1344
+    },
+    {
+      "from": "videos/20-credit-checkout.mp4",
+      "to": "media/vers1ons/wallet-payouts/clip-credit.mp4",
+      "kind": "inline",
+      "width": 1344
+    }
+  ]
+}

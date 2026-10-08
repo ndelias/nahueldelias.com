@@ -1,58 +1,176 @@
 ---
-# FIXTURE from docs/design/CaseStudy.dc.html (parts matrix) and the part
-# template in docs/design/SubStudy.dc.html, until the real entry replaces it.
-# Part 4 of the vers1ons hub.
-fixture: true
+# Copy drafted with Nahuel from his account of the project, partners
+# anonymous. Media from media/vers1ons/wallet-payouts.json.
 parent: vers1ons
 title: 'Wallet & payouts'
-tagline: 'Balances and contributor payouts, connected through Stripe.'
+tagline: 'Money follows the rights.'
+summary: 'Paying every contributor directly, with nothing in the way.'
 weight: 2
 status: shipped
-role: '[Role]'
+role: 'Product and UX lead; platform credit end to end'
 dates:
-  start: '[Years]'
-stack: []
+  start: 2025-12
+stack: ['Next.js', 'tRPC', 'Stripe Connect', 'Postgres', 'Inngest']
+standing: 'In production'
 disciplines:
-  led: [backend, product]
-  contributed: [frontend]
+  led: [product, design, frontend]
+  contributed: [backend]
 decision:
-  chose: '[What was chosen.]'
-  rejected: '[What was rejected.]'
-  cost: '[What it cost.]'
+  intro: 'A license sale owes money to everyone on the song, and to everyone up the remix chain.'
+  chose: 'Let the money follow the rights: vers1ons pays each contributor their share directly, and every sale is a real transaction, even a free one.'
+  rejected: 'Paying the artist a lump sum and leaving them to split it by hand.'
+  cost: 'We own every payout. Everything around it had to be built to match: a Stripe account for each contributor, and a real ledger for credit.'
 hero:
-  src: ../../../assets/fixtures/tones/tone2-wide.svg
-  alt: '[Hero: what the screen shows.]'
-  caption: '[Recording or still of the main view]'
+  src: ../../../assets/work/vers1ons/wallet-payouts/hero.webp
+  alt: 'The "Night Swim" listing a buyer is about to purchase: cover art, the $60.00 price and the royalty shares.'
+  video: /media/vers1ons/wallet-payouts/walkthrough.mp4
+  duration: '1:02'
+  caption: 'One sale, from checkout to a contributor with no account'
 gallery:
-  - src: ../../../assets/fixtures/tones/tone2-desktop.svg
-    alt: '[Screen: what the desktop view shows.]'
-    caption: '[The main screen, and the one thing to notice in it.]'
-    frame: desktop
-  - src: ../../../assets/fixtures/tones/tone2-phone.svg
-    alt: '[Screen: what the phone view shows.]'
-    caption: '[Phone view of the same step.]'
-    frame: phone
-  - src: ../../../assets/fixtures/tones/tone2-detail.svg
-    alt: '[Detail: what the close-up shows.]'
-    caption: '[A detail crop: one field, one state.]'
-    frame: detail
+  - src: ../../../assets/work/vers1ons/wallet-payouts/steps/01-wallet.webp
+    alt: 'The wallet: platform credit, the available balance and recent earnings.'
+    title: 'Wallet'
+    caption: 'What you''ve earned and from which sale, with credit kept apart: it can be spent at checkout, never withdrawn.'
+  - src: ../../../assets/work/vers1ons/wallet-payouts/steps/02-withdraw.webp
+    alt: 'Confirm Withdrawal: $250, instant, the fee and what arrives.'
+    title: 'Withdraw'
+    caption: 'Pick an amount, instant or standard, and see the fee and what will arrive before confirming.'
+    clip: /media/vers1ons/wallet-payouts/clip-withdraw.mp4
+  - src: ../../../assets/work/vers1ons/wallet-payouts/steps/03-shares.webp
+    alt: 'A listing''s earnings by contributor: the artist''s share, and Mara Quinn''s share held, not invited yet, with Resend invite.'
+    title: 'Every contributor''s share'
+    caption: 'Each sale is split the way the license says. A contributor without an account has their share held, and the artist can send the invite again.'
+    clip: /media/vers1ons/wallet-payouts/clip-shares.mp4
+  - src: ../../../assets/work/vers1ons/wallet-payouts/steps/04-how-royalties-work.webp
+    alt: 'How Royalties Work: primary, subsequent and sync royalties explained.'
+    title: 'How royalties work'
+    caption: 'Before anyone buys, the listing explains who earns what: on the first sale, on remixes of the remix, and on sync.'
+  - src: ../../../assets/work/vers1ons/wallet-payouts/steps/05-claim.webp
+    alt: 'The claim page: a share waiting, with Connect, create an account, or use a different account.'
+    title: 'Claim by email'
+    caption: 'From the email, a contributor sees what''s waiting and claims it: a new account, or one they already have, confirmed with a code.'
+    clip: /media/vers1ons/wallet-payouts/clip-claim.mp4
+  - src: ../../../assets/work/vers1ons/wallet-payouts/steps/06-connect-later.webp
+    alt: 'After sign-up: set up your bank account, with Complete now or Complete later.'
+    title: 'Bank details, later'
+    caption: 'Sign-up has no bank step. Payout setup can wait, and comes back where money moves: withdrawing, selling, distributing.'
+    clip: /media/vers1ons/wallet-payouts/clip-connect.mp4
+  - src: ../../../assets/work/vers1ons/wallet-payouts/steps/07-credit-plus-card.webp
+    alt: 'Order summary with platform credit applied and the rest paid by card.'
+    title: 'Credit and card'
+    caption: 'Credit is applied first, as much as you choose; the card pays only what''s left.'
+  - src: ../../../assets/work/vers1ons/wallet-payouts/steps/08-credit-covered.webp
+    alt: 'Covered by your credit: no card needed.'
+    title: 'Covered by credit'
+    caption: 'When credit covers it all, there''s no card form. It''s still a real sale, so the rights transfer.'
+    clip: /media/vers1ons/wallet-payouts/clip-credit.mp4
+  - src: ../../../assets/work/vers1ons/wallet-payouts/steps/09-earnings.webp
+    alt: 'Analytics: revenue, direct sales and royalties, and earnings by song.'
+    title: 'Earnings by song'
+    caption: 'Revenue, sales and royalties at a glance, and every song''s earnings one click away.'
+comparisons:
+  - title: 'Signing up'
+    why: 'In December 2025, "Get paid" was a sign-up step: connect Stripe before you''d made anything. Today sign-up ends without it, and payout setup can wait until there''s money to move.'
+    before:
+      src: ../../../assets/work/vers1ons/wallet-payouts/before-after/signup-before.webp
+      alt: 'A sign-up step asking to connect Stripe to get paid.'
+      label: 'Dec 2025'
+      caption: '"Get paid" during sign-up.'
+    now:
+      src: ../../../assets/work/vers1ons/wallet-payouts/before-after/signup-now.webp
+      alt: 'After sign-up, an optional prompt to set up a bank account later.'
+      label: 'Oct 2026'
+      caption: 'Optional, after sign-up.'
+  - title: 'A first listing'
+    why: 'In July 2026, choosing New Listing hit a wall until bank details were in. Now the wizard opens straight away; payouts are asked for when the listing goes on sale.'
+    before:
+      src: ../../../assets/work/vers1ons/wallet-payouts/before-after/new-listing-before.webp
+      alt: 'New Listing blocked by a Complete Account Setup prompt.'
+      label: 'Jul 2026'
+      caption: 'Blocked until payouts were set up.'
+    now:
+      src: ../../../assets/work/vers1ons/wallet-payouts/before-after/new-listing-now.webp
+      alt: 'New opens the upload wizard directly.'
+      label: 'Oct 2026'
+      caption: 'Straight into the wizard.'
+  - title: 'The wallet'
+    why: 'The wallet was a balance and a transfer form. Today it separates credit from money you can withdraw, shows pending earnings, and lists every sale and royalty it came from.'
+    before:
+      src: ../../../assets/work/vers1ons/wallet-payouts/before-after/wallet-before.webp
+      alt: 'The wallet in November 2025.'
+      label: 'Nov 2025'
+      caption: 'A balance and a transfer form.'
+    now:
+      src: ../../../assets/work/vers1ons/wallet-payouts/before-after/wallet-now.webp
+      alt: 'The wallet today, with credit, available balance and recent earnings.'
+      label: 'Oct 2026'
+      caption: 'Credit, balance and every earning.'
+  - title: 'Checkout'
+    why: 'Checkout took a card and nothing else. Now platform credit comes off first, and the card covers what''s left, or nothing at all.'
+    before:
+      src: ../../../assets/work/vers1ons/wallet-payouts/before-after/checkout-before.webp
+      alt: 'The order summary in December 2025.'
+      label: 'Dec 2025'
+      caption: 'Card only.'
+    now:
+      src: ../../../assets/work/vers1ons/wallet-payouts/before-after/checkout-now.webp
+      alt: 'The order summary today with platform credit applied.'
+      label: 'Oct 2026'
+      caption: 'Credit first, card for the rest.'
+phones:
+  - src: ../../../assets/work/vers1ons/wallet-payouts/phone/01-wallet.webp
+    alt: 'A contributor''s wallet on a phone.'
+    caption: 'A contributor''s own share, in her own wallet.'
+  - src: ../../../assets/work/vers1ons/wallet-payouts/phone/02-withdraw-confirm.webp
+    alt: 'Confirm Withdrawal on a phone.'
+    caption: 'The fee and what arrives, before confirming.'
+  - src: ../../../assets/work/vers1ons/wallet-payouts/phone/03-checkout-credit.webp
+    alt: 'Checkout on a phone with credit applied.'
+    caption: 'Credit first, card for the rest.'
+  - src: ../../../assets/work/vers1ons/wallet-payouts/phone/04-withdraw-amount.webp
+    alt: 'Transfer to Bank on a phone.'
+    caption: 'Withdraw in two taps.'
+    more: true
+  - src: ../../../assets/work/vers1ons/wallet-payouts/phone/05-claim.webp
+    alt: 'The claim page on a phone.'
+    caption: 'Claiming a share from the email.'
+    more: true
+disclaimer: 'Showcase content. Artwork belongs to its respective owners. Artist names, prices and royalty figures are fictional, and no affiliation is implied. Recordings come from an isolated local copy of the product running seeded data; payouts and withdrawals are staged.'
 cover:
-  src: ../../../assets/fixtures/tones/tone2-desktop.svg
-  alt: '[Cover image.]'
+  src: ../../../assets/work/vers1ons/wallet-payouts/cover.webp
+  alt: 'A claim page: a share waiting for a contributor, with ways to collect it.'
 order: 4
 ---
 import BodySection from '../../../components/BodySection.astro';
+import SystemFigure from '../../../components/diagrams/SystemFigure.astro';
+import { walletPayouts } from '../../../components/diagrams/specs/wallet-payouts';
 
-<Screens />
+<SystemFigure label="How it works" spec={walletPayouts} />
 
-<BodySection label="Problem" heading="[What was broken or missing before this part.]">
-  [Who it hurt, and what it cost.]
+<BodySection label="Problem" heading="The rights followed the chain. The money didn't.">
+  A license knew everyone who owned a share of a song, but when it sold, the money went to one artist as a lump sum, and they had to split it themselves. New artists were asked for bank details before they'd made anything, and many left right there. And when we wanted to give licenses away, a coupon couldn't do it: transferring rights takes a real transaction.
+
+  None of that scales by hand as sales and remixes grow, and artists and labels only stay if they trust that everyone gets paid right.
 </BodySection>
 
-<BodySection label="Build" heading="[How it works.]">
-  [The rules, the integration, what the user sees. Link the code or a sample.]
+<BodySection label="What I did" heading="I made the product and UX calls, and built platform credit myself.">
+  With a teammate's payout groundwork in place, I made the call to pay every contributor their share directly, and designed how artists see it: the wallet, what they've earned, and withdrawing to their bank. I moved Stripe Connect out of sign-up, to the moment money actually moves, so people can start right away and connect once they're using the app.
+
+  A contributor doesn't need an account to be owed money. When an uploader adds someone by email, that person is emailed that they have a share waiting. They can create a vers1ons account, or connect the one they already have, even under a different email, and claim it there.
+
+  Platform credit was mine end to end: a balance kept on a ledger, so a giveaway is a real purchase that transfers rights, with credit and card together at checkout, and a reversal when a sale doesn't go through. The team wired up the Stripe API; I worked closely with it, and with how every payout and money check works behind the screens.
 </BodySection>
 
-<BodySection label="Outcome" heading="[What changed once it shipped.]">
-  [Evidence, and what you would do differently. Real numbers or none.]
+<Steps label="Feature by feature" />
+
+<MobileDesign />
+
+<Comparisons />
+
+<BodySection label="Reliability" heading="Credit can't be spent twice, and a failed sale gives it back.">
+  The balance is the sum of its ledger rows; nothing is edited in place. A sale paid entirely with credit has no card charge to wait for, so it settles as its own event, with a scheduled check behind it, and a spend that never becomes a sale is reversed in the same transaction that marks it failed.
+</BodySection>
+
+<BodySection label="Outcome" heading="Live: every contributor is paid directly, and no one hits a bank form to sign up.">
+  Artists see their balance and withdraw it, and every contributor gets their share without the artist doing the math. Someone added by email is told they have a share waiting, and can claim it with a new or existing account. Giveaway licenses run on platform credit, as real sales.
 </BodySection>

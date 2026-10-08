@@ -6,9 +6,10 @@
 //   node scripts/import-media.mjs media/vers1ons/distribution.json [--check]
 //
 // Images → src/assets/…, as high-quality WebP no wider than `width` (Astro
-//   makes the AVIF and WebP sizes the pages use from these). The capture
-//   rig's demo cursor, a flat light disc with a dark halo, is found and
-//   removed unless the pick says "retouch": false: patched from a frame of
+//   makes the AVIF and WebP sizes the pages use from these). A pick can be
+//   a frame of a recording instead: { from: "videos/x.mp4", at: seconds }.
+//   The capture rig's demo cursor, a flat light disc with a dark halo, is
+//   found and removed unless the pick says "retouch": false: patched from a frame of
 //   the pick's "donor" recording where that spot is clean, or else painted
 //   out from its surroundings. Every retouch is listed, and a before/after
 //   crop of each goes to .media-review/ to look at.
@@ -363,8 +364,18 @@ function clonePatch(d, W, H, C, cursor, rect, win) {
 // --- images -----------------------------------------------------------------
 
 async function importImage(pick) {
-  const from = source(pick.from);
-  if (!IMAGE_TYPES.has(extname(from).toLowerCase())) throw new Error(`${pick.from}: not an image`);
+  let from = source(pick.from);
+  // A still from a recording: { from: "videos/x.mp4", at: seconds }. The
+  // frame is cut losslessly first, then treated like any capture (its own
+  // recording is the donor for the cursor, unless the pick names another).
+  if (VIDEO_TYPES.has(extname(from).toLowerCase()) && pick.at != null) {
+    mkdirSync(REVIEW, { recursive: true });
+    const frame = join(REVIEW, `${basename(pick.to, extname(pick.to))}-frame.png`);
+    execFileSync('ffmpeg', ['-v', 'error', '-y', '-ss', String(pick.at), '-i', from, '-frames:v', '1', frame]);
+    pick = { donor: pick.from, ...pick };
+    from = frame;
+  }
+  if (!IMAGE_TYPES.has(extname(from).toLowerCase())) throw new Error(`${pick.from}: not an image (a recording needs "at")`);
   const to = join(ROOT, 'src/assets', pick.to);
   let img = sharp(from).removeAlpha();
   if (pick.crop) img = img.extract({ left: pick.crop[0], top: pick.crop[1], width: pick.crop[2], height: pick.crop[3] });
