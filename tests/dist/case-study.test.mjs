@@ -355,6 +355,10 @@ test('steps: they advance on their own in view; Pause stops it, and the page nev
   // The below-the-fold styles too: when they arrive the blocks above the
   // steps take their real heights, which moves the page, not the steps.
   await page.waitForFunction(() => [...document.styleSheets].some((s) => s.href?.includes('/deferred') && s.cssRules.length > 0));
+  // And every block at its real height: skipped blocks (content-visibility)
+  // take it as they near the screen, and the page corrects its scroll for
+  // them, which isn't the steps moving it.
+  await page.addStyleTag({ content: '.body > *, .tab-panel > * { content-visibility: visible !important; }' });
   await page.clock.install();
   await showSteps(page);
   await page.mouse.move(1, 1);
