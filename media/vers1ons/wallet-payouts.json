@@ -5,21 +5,8 @@
       "from": "videos/17-money-walkthrough.mp4",
       "to": "work/vers1ons/wallet-payouts/hero.webp",
       "width": 2688,
-      "at": 0.5,
-      "restore": [
-        {
-          "rect": [
-            1390,
-            856,
-            100,
-            38
-          ],
-          "from": [
-            -10,
-            454
-          ]
-        }
-      ]
+      "at": 21,
+      "method": "paint"
     },
     {
       "from": "screens/flows/money/04a-claim-page.png",
@@ -46,11 +33,6 @@
       "at": 28
     },
     {
-      "from": "screens/flows/money/02b-how-royalties-work.png",
-      "to": "work/vers1ons/wallet-payouts/steps/04-how-royalties-work.webp",
-      "width": 2560
-    },
-    {
       "from": "screens/flows/money/04a-claim-page.png",
       "to": "work/vers1ons/wallet-payouts/steps/05-claim.webp",
       "width": 2560,
@@ -59,11 +41,6 @@
     {
       "from": "screens/flows/money/connect/01-after-signup-payouts-later.png",
       "to": "work/vers1ons/wallet-payouts/steps/06-connect-later.webp",
-      "width": 2560
-    },
-    {
-      "from": "screens/flows/money/07a-credit-plus-card-summary.png",
-      "to": "work/vers1ons/wallet-payouts/steps/07-credit-plus-card.webp",
       "width": 2560
     },
     {
@@ -107,16 +84,6 @@
       "width": 2000
     },
     {
-      "from": "screens/eras/dec25/flows/checkout/desktop-checkout-1.png",
-      "to": "work/vers1ons/wallet-payouts/before-after/checkout-before.webp",
-      "width": 2000
-    },
-    {
-      "from": "screens/flows/money/07a-credit-plus-card-summary.png",
-      "to": "work/vers1ons/wallet-payouts/before-after/checkout-now.webp",
-      "width": 2000
-    },
-    {
       "from": "screens/flows/money/mobile-01-contributor-wallet.png",
       "to": "work/vers1ons/wallet-payouts/phone/01-wallet.webp",
       "width": 1170,
@@ -125,12 +92,6 @@
     {
       "from": "screens/flows/money/mobile-03-withdraw-confirm.png",
       "to": "work/vers1ons/wallet-payouts/phone/02-withdraw-confirm.webp",
-      "width": 1170,
-      "retouch": false
-    },
-    {
-      "from": "screens/flows/money/mobile-05-checkout-credit.png",
-      "to": "work/vers1ons/wallet-payouts/phone/03-checkout-credit.webp",
       "width": 1170,
       "retouch": false
     },
@@ -153,8 +114,8 @@
       "to": "media/vers1ons/wallet-payouts/walkthrough.mp4",
       "kind": "hero",
       "width": 1344,
-      "start": 0,
-      "duration": 62
+      "start": 20.4,
+      "duration": 41.6
     },
     {
       "from": "videos/06-wallet-withdraw.mp4",
