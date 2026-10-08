@@ -117,6 +117,9 @@ const entrySchema = ({ image }: SchemaContext) => {
       // Before → now: the same part of the product in an early build and
       // today. The before screen fades into the now one in the same frame.
       comparisons: z.array(comparison).optional(),
+      // The flow on a phone (<MobileDesign />): a few on the page, the rest
+      // (`more`) only in the full-size viewer. A part in tabs has these per tab.
+      phones: z.array(galleryItem).optional(),
       // A part told as a few sub-stories (Licensing: listings, drops,
       // sheets), as tabs below its shared sections. Each tab has its own
       // walkthrough, steps (its gallery) and before → now. Only the open tab

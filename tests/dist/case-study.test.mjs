@@ -45,7 +45,8 @@ test('parts matrix: one row per part, each dot named for screen readers', async 
   assert.deepEqual(rows.map((r) => r.part), ['Design system', 'Licensing', 'Purchasing', 'Wallet & payouts', 'Distribution']);
   // Columns: Product, Design, Frontend, Backend.
   assert.deepEqual(rows[0].cells, ['Contributed', 'Led', 'Led', 'Not involved']);
-  assert.deepEqual(rows[3].cells, ['Led', 'Not involved', 'Contributed', 'Led']);
+  // Purchasing, a fixture part: led product and frontend, contributed design and backend.
+  assert.deepEqual(rows[2].cells, ['Led', 'Contributed', 'Led', 'Contributed']);
   const headers = await page.$$eval('.matrix thead th', (ths) => ths.map((th) => th.textContent.trim()));
   assert.deepEqual(headers, ['No.', 'Preview', 'Part', 'Product', 'Design', 'Frontend', 'Backend', 'Link']);
   // The dots themselves are decoration: the text is what's read.
@@ -354,6 +355,10 @@ test('steps: they advance on their own in view; Pause stops it, and the page nev
   // The below-the-fold styles too: when they arrive the blocks above the
   // steps take their real heights, which moves the page, not the steps.
   await page.waitForFunction(() => [...document.styleSheets].some((s) => s.href?.includes('/deferred') && s.cssRules.length > 0));
+  // And every block at its real height: skipped blocks (content-visibility)
+  // take it as they near the screen, and the page corrects its scroll for
+  // them, which isn't the steps moving it.
+  await page.addStyleTag({ content: '.body > *, .tab-panel > * { content-visibility: visible !important; }' });
   await page.clock.install();
   await showSteps(page);
   await page.mouse.move(1, 1);
