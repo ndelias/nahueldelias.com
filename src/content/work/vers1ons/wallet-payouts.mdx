@@ -143,8 +143,8 @@ import { walletPayouts } from '../../../components/diagrams/specs/wallet-payouts
 
 <Comparisons />
 
-<BodySection label="Reliability" heading="Credit can't be spent twice, and a failed sale gives it back.">
-  The balance is the sum of its ledger rows; nothing is edited in place. A sale paid entirely with credit has no card charge to wait for, so it settles as its own event, with a scheduled check behind it, and a spend that never becomes a sale is reversed in the same transaction that marks it failed.
+<BodySection label="Reliability" heading="Every money check runs on the server, and fails safe.">
+  Payouts go to one Stripe account per person, and if a lookup ever finds two, it refuses instead of guessing. A contributor's share stays held until they claim it, and claiming it into a different account takes a code sent to the email they were credited under. Payout setup is checked on the server everywhere money moves, and the app responds to a stable reason, not to the wording of an error. Credit lives on a ledger where nothing is edited: it can't be spent twice, and a sale that never completes gives it back in the same step.
 </BodySection>
 
 <BodySection label="Outcome" heading="Live: every contributor is paid directly, and no one hits a bank form to sign up.">
