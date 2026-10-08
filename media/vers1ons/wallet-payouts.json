@@ -114,8 +114,32 @@
       "to": "media/vers1ons/wallet-payouts/walkthrough.mp4",
       "kind": "hero",
       "width": 1344,
-      "start": 20.4,
-      "duration": 41.6
+      "segments": [
+        [
+          20.4,
+          31.4
+        ],
+        [
+          34.2,
+          35.5
+        ],
+        [
+          40.0,
+          41.8
+        ],
+        [
+          47.0,
+          50.5
+        ],
+        [
+          53.0,
+          55.0
+        ],
+        [
+          58.5,
+          62.0
+        ]
+      ]
     },
     {
       "from": "videos/06-wallet-withdraw.mp4",

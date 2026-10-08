@@ -14,8 +14,8 @@
 //   out from its surroundings. Every retouch is listed, and a before/after
 //   crop of each goes to .media-review/ to look at.
 // Videos → public/media/…, re-encoded with ffmpeg: H.264, no audio track,
-//   fast start, trimmed with start/duration, under the budget in the
-//   manifest entry (or the defaults below).
+//   fast start, trimmed with start/duration (or joined from "segments"),
+//   under the budget in the manifest entry (or the defaults below).
 //
 // The archive is never copied wholesale: only listed files, only image and
 // video types, and nothing that looks like a dotfile, key or secret. Needs
@@ -463,11 +463,19 @@ function importVideo(pick) {
   // recording gets there itself. { rect: [x, y, w, h], at: seconds }; the
   // box must not move in between.
   const scale = `scale=${pick.width ?? 1344}:-2:flags=lanczos,format=yuv420p`;
-  const hold = pick.hold
+  // Segments: several stretches of one recording joined in order, to cut a
+  // passage out (a screen the capture lingered or zoomed on). [[from, to], …]
+  // in seconds; replaces start/duration.
+  const segments = pick.segments
+    ? ['-filter_complex',
+       pick.segments.map(([a, b], i) => `[0:v]trim=start=${a}:end=${b},setpts=PTS-STARTPTS[s${i}]`).join(';') +
+       `;${pick.segments.map((_, i) => `[s${i}]`).join('')}concat=n=${pick.segments.length}:v=1:a=0,${scale}`]
+    : undefined;
+  const hold = segments ?? (pick.hold
     ? ['-ss', String(pick.hold.at), '-i', from, '-filter_complex',
        `[1:v]trim=end_frame=1,crop=${pick.hold.rect[2]}:${pick.hold.rect[3]}:${pick.hold.rect[0]}:${pick.hold.rect[1]},loop=-1:1,setpts=N/FRAME_RATE/TB[h];` +
        `[0:v][h]overlay=${pick.hold.rect[0]}:${pick.hold.rect[1]}:shortest=1:enable='lt(t,${pick.hold.at - (pick.start ?? 0)})',${scale}`]
-    : ['-vf', scale];
+    : ['-vf', scale]);
   const encode = (crf) =>
     execFileSync('ffmpeg', [
       '-v', 'error', '-y',

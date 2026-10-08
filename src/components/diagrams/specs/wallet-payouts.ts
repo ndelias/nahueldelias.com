@@ -6,7 +6,7 @@ export const walletPayouts: DiagramSpec = {
   id: "wallet-payouts",
   eyebrow: "vers1ons · wallet & payouts",
   title: "Money follows the rights",
-  subtitle: "A sale is split the way the license says, and each share goes to its owner: the artist, every contributor, and the original artist up the chain. Bank details are asked for only when someone withdraws.",
+  subtitle: "A sale is split the way the license says, and each share goes to its owner: the artist, every contributor, and the original artist up the chain. Bank details come in where selling starts, never at sign-up.",
   columns: 4,
   nodes: [
     {
@@ -73,9 +73,9 @@ export const walletPayouts: DiagramSpec = {
     {
       id: "withdraw",
       zone: "money",
-      title: "Withdraw · Connect",
-      body: ["bank details asked for here", "not at sign-up"],
-      detail: "Sign-up has no bank step. Payout setup comes up where money moves: withdrawing, publishing for sale, distributing.",
+      title: "Withdraw",
+      body: ["to the bank account", "set up through Stripe Connect"],
+      detail: "Sign-up has no bank step. An artist connects Stripe when they first publish a listing or distribute, or from the wallet, so by the time a sale pays them it's in place. A contributor who claims sets it up from their wallet.",
       col: 1,
       row: 2,
     },
@@ -100,7 +100,7 @@ export const walletPayouts: DiagramSpec = {
         { nodes: ["split"], edges: [["sale", "split"]], log: "split by the listing's signed splits", tone: "accent" },
         { nodes: ["payees"], edges: [["split", "payees"]], log: "Cato's share, Mara's share, each paid directly", tone: "money" },
         { nodes: ["wallet"], edges: [["payees", "wallet"]], log: "Cato's wallet shows his share, by sale" },
-        { nodes: ["withdraw"], edges: [["wallet", "withdraw"]], log: "he withdraws to his bank", tone: "money" },
+        { nodes: ["withdraw"], edges: [["wallet", "withdraw"]], log: "he withdraws · his payouts were set up when he published", tone: "money" },
       ],
     },
     claim: {
@@ -110,7 +110,7 @@ export const walletPayouts: DiagramSpec = {
         { nodes: ["split", "payees"], edges: [["sale", "split"], ["split", "payees"]], log: "Mara was added by email · no account yet" },
         { nodes: ["claim"], edges: [["payees", "claim"]], log: "her share is held · she's emailed that it's waiting", tone: "accent" },
         { nodes: ["claim"], log: "she claims it: a new account, or one she already has" },
-        { nodes: ["wallet"], edges: [["claim", "wallet"]], log: "it shows in her wallet, waiting for payouts to be set up" },
+        { nodes: ["wallet"], edges: [["claim", "wallet"]], log: "it shows in her wallet, waiting until she sets up payouts there" },
       ],
     },
     credit: {
