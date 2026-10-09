@@ -114,17 +114,7 @@
       "from": "videos/21-purchase-walkthrough.mp4",
       "to": "media/vers1ons/purchasing/walkthrough.mp4",
       "kind": "hero",
-      "width": 1344,
-      "segments": [
-        [
-          0,
-          14.0
-        ],
-        [
-          17.2,
-          25.2
-        ]
-      ]
+      "width": 1344
     },
     {
       "from": "videos/21-purchase-walkthrough.mp4",
@@ -132,31 +122,31 @@
       "kind": "inline",
       "width": 1344,
       "start": 0,
-      "duration": 4.5
+      "duration": 7.6
     },
     {
       "from": "videos/21-purchase-walkthrough.mp4",
       "to": "media/vers1ons/purchasing/clip-royalties.mp4",
       "kind": "inline",
       "width": 1344,
-      "start": 4.5,
-      "duration": 3.2
+      "start": 7.4,
+      "duration": 5.6
     },
     {
       "from": "videos/21-purchase-walkthrough.mp4",
       "to": "media/vers1ons/purchasing/clip-sign-then-pay.mp4",
       "kind": "inline",
       "width": 1344,
-      "start": 10.2,
-      "duration": 3.8
+      "start": 29.5,
+      "duration": 10.0
     },
     {
       "from": "videos/21-purchase-walkthrough.mp4",
       "to": "media/vers1ons/purchasing/clip-files.mp4",
       "kind": "inline",
       "width": 1344,
-      "start": 19.5,
-      "duration": 5.7
+      "start": 45.8,
+      "duration": 8.0
     },
     {
       "from": "videos/22-library-receipt.mp4",
