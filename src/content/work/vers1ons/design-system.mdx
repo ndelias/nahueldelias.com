@@ -22,10 +22,8 @@ decision:
   cost: 'Every screen had to move onto the system. We dropped light mode, and rolled the change out in waves so nothing broke along the way.'
 hero:
   src: ../../../assets/work/vers1ons/design-system/hero.webp
-  alt: 'Discover on the system: a featured drop banner, Featured Songs cards and a row of new releases with green price pills.'
-  video: /media/vers1ons/design-system/walkthrough.mp4
-  duration: '0:56'
-  caption: 'Discover, search, an artist, the library and the upload wizard, on one system'
+  alt: 'The design system on one sheet: color tokens, type styles, buttons, badges, price pills, cards, and radii, shadows, motion and layers.'
+  caption: 'The system on one sheet, rendered from the app''s own tokens and components'
 gallery:
   - src: ../../../assets/work/vers1ons/design-system/steps/01-color.webp
     alt: 'Discover: lavender for actions and the active nav item, green only on the price pills, cover art on warm black.'
@@ -124,6 +122,8 @@ order: 1
 import BodySection from '../../../components/BodySection.astro';
 import SystemFigure from '../../../components/diagrams/SystemFigure.astro';
 import { designSystem } from '../../../components/diagrams/specs/design-system';
+import Figure from '../../../components/Figure.astro';
+import tour from '../../../assets/work/vers1ons/design-system/tour.webp';
 
 <SystemFigure label="How it works" spec={designSystem} />
 
@@ -140,6 +140,8 @@ import { designSystem } from '../../../components/diagrams/specs/design-system';
 
   I designed or shaped most of the app's UI along the way, including the cards in use today. The team helped build them.
 </BodySection>
+
+<Figure src={tour} alt="Discover on the system, with featured cards and new releases." video="/media/vers1ons/design-system/walkthrough.mp4" caption="A tour on the system: Discover, search, an artist, the library and the upload wizard (0:56)" />
 
 <Steps label="Piece by piece" />
 

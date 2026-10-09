@@ -2,8 +2,14 @@
   "archive": "~/Vers1ons/portfolio-vers1ons",
   "images": [
     {
-      "from": "videos/23-system-tour.mp4",
+      "from": "screens/flows/design-system/00-header-design-system.png",
       "to": "work/vers1ons/design-system/hero.webp",
+      "width": 2688,
+      "retouch": false
+    },
+    {
+      "from": "videos/23-system-tour.mp4",
+      "to": "work/vers1ons/design-system/tour.webp",
       "width": 2688,
       "at": 0.5,
       "retouch": false,
