@@ -45,8 +45,8 @@ test('parts matrix: one row per part, each dot named for screen readers', async 
   assert.deepEqual(rows.map((r) => r.part), ['Design system', 'Licensing', 'Purchasing', 'Wallet & payouts', 'Distribution']);
   // Columns: Product, Design, Frontend, Backend.
   assert.deepEqual(rows[0].cells, ['Contributed', 'Led', 'Led', 'Not involved']);
-  // Purchasing, a fixture part: led product and frontend, contributed design and backend.
-  assert.deepEqual(rows[2].cells, ['Led', 'Contributed', 'Led', 'Contributed']);
+  // Purchasing: his UI and UX; the backend behind it was the team's.
+  assert.deepEqual(rows[2].cells, ['Led', 'Led', 'Led', 'Not involved']);
   const headers = await page.$$eval('.matrix thead th', (ths) => ths.map((th) => th.textContent.trim()));
   assert.deepEqual(headers, ['No.', 'Preview', 'Part', 'Product', 'Design', 'Frontend', 'Backend', 'Link']);
   // The dots themselves are decoration: the text is what's read.
@@ -284,7 +284,7 @@ test('part: the body places the steps and comparisons; a body without <Screens /
   assert.deepEqual(order.slice(0, 5), ['system-figure', 'body-section', 'body-section', 'steps', 'comparisons']);
   assert.equal(await page.locator('[data-steps]').count(), 1);
   assert.equal(await page.locator('[data-gallery]').count(), 0);
-  const other = await openPart('/work/vers1ons/purchasing/');
+  const other = await openPart('/work/vers1ons/design-system/');
   assert.equal(await other.page.locator('[data-gallery]').count(), 1);
   await other.ctx.close();
   await ctx.close();
@@ -440,7 +440,7 @@ test('comparisons, reduced motion: the pair side by side, tabs by hand only', as
 });
 
 // The gallery, on a part page whose body doesn't place steps.
-const GALLERY = '/work/vers1ons/purchasing/';
+const GALLERY = '/work/vers1ons/design-system/';
 
 test('gallery: a screen opens full size in a dialog; arrows step, Esc closes, focus returns', async () => {
   const { ctx, page } = await openPart(GALLERY);

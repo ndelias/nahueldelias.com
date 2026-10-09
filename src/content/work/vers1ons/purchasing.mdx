@@ -1,58 +1,157 @@
 ---
-# FIXTURE from docs/design/CaseStudy.dc.html (parts matrix) and the part
-# template in docs/design/SubStudy.dc.html, until the real entry replaces it.
-# Part 3 of the vers1ons hub.
-fixture: true
+# Copy drafted with Nahuel from his account of the project, partners
+# anonymous. Media from media/vers1ons/purchasing.json.
 parent: vers1ons
 title: 'Purchasing'
-tagline: '[From finding a track to holding a signed license.]'
+tagline: 'Buying a license should be as easy as buying a song.'
+summary: 'Buying a license feels the same on your phone as on your desktop.'
 weight: 2
 status: shipped
-role: '[Role]'
+role: 'Product and UX lead on the purchase flow'
 dates:
-  start: '[Years]'
-stack: []
+  start: 2026-04
+stack: ['Next.js', 'React', 'Tailwind CSS', 'Stripe Elements']
+standing: 'In production'
 disciplines:
-  led: [product, frontend]
-  contributed: [design, backend]
+  led: [product, design, frontend]
+  contributed: []
 decision:
-  chose: '[What was chosen.]'
-  rejected: '[What was rejected.]'
-  cost: '[What it cost.]'
+  intro: 'A remix license is a legal purchase, and the buyer signs an agreement before they pay. Most people find music on their phone.'
+  chose: 'One purchase flow that works on a phone from start to finish, with the agreement kept whole. You read and sign, then pay, then get your files.'
+  rejected: 'Telling phone buyers to finish on a desktop.'
+  cost: 'Every step had to be redesigned for a small screen, including a long legal agreement and the card form, without cutting anything the license needs.'
 hero:
-  src: ../../../assets/fixtures/tones/tone4-wide.svg
-  alt: '[Hero: what the screen shows.]'
-  caption: '[Recording or still of the main view]'
+  src: ../../../assets/work/vers1ons/purchasing/hero.webp
+  alt: 'The listing for "Golden Static": $60.00 and Purchase License at the top, the royalty shares, where a remix can be released, and the license summary.'
+  video: /media/vers1ons/purchasing/walkthrough.mp4
+  duration: '0:54'
+  caption: 'From the listing to your files'
 gallery:
-  - src: ../../../assets/fixtures/tones/tone4-desktop.svg
-    alt: '[Screen: what the desktop view shows.]'
-    caption: '[The main screen, and the one thing to notice in it.]'
-    frame: desktop
-  - src: ../../../assets/fixtures/tones/tone4-phone.svg
-    alt: '[Screen: what the phone view shows.]'
-    caption: '[Phone view of the same step.]'
+  - src: ../../../assets/work/vers1ons/purchasing/steps/01-listing.webp
+    alt: 'The listing: the price and Purchase License at the top, the royalty shares, the release platforms and the license summary.'
+    title: 'Know what you''re buying'
+    caption: 'The price and Purchase sit at the top, next to a plain summary of the license. What you can do, what you can''t, and where your remix can be released, before you open the full agreement.'
+    clip: /media/vers1ons/purchasing/clip-listing.mp4
+  - src: ../../../assets/work/vers1ons/purchasing/steps/02-royalties.webp
+    alt: 'How Royalties Work: primary, subsequent and sync royalties, each with a worked example of who gets what.'
+    title: 'How royalties work'
+    caption: 'Royalties are one short line on the listing. The worked example opens in a dialog, so the page stays light and the detail is still there.'
+    clip: /media/vers1ons/purchasing/clip-royalties.mp4
+  - src: ../../../assets/work/vers1ons/purchasing/steps/03-summary.webp
+    alt: 'The order summary: the licensor, the master and two stems, where the remix can be released, and $69.00 with the fee.'
+    title: 'Order summary'
+    caption: 'What you''re getting, the fee and the total, on one screen. If you have platform credit, it''s applied here first.'
+  - src: ../../../assets/work/vers1ons/purchasing/steps/04-sign-then-pay.webp
+    alt: 'Agreement signed, folded at the top, with the payment form open below it.'
+    title: 'Sign, then pay'
+    caption: 'You read and sign the agreement first. Once it''s signed, it folds away and payment opens below it, so you always know which step you''re on.'
+    clip: /media/vers1ons/purchasing/clip-sign-then-pay.mp4
+  - src: ../../../assets/work/vers1ons/purchasing/steps/05-pay-your-way.webp
+    alt: 'Payment with platform credit applied above the card form, which covers only the rest.'
+    title: 'Pay your way'
+    caption: 'Pay by card, with credit, or both. Credit covers what it can, and the card only pays the rest.'
+  - src: ../../../assets/work/vers1ons/purchasing/steps/06-licensed.webp
+    alt: 'You''re licensed: the song, who it was licensed by and paid to, and the total paid.'
+    title: 'Licensed'
+    caption: 'Right after paying you see what you bought, what you paid, and who was paid. A receipt goes to your email.'
+  - src: ../../../assets/work/vers1ons/purchasing/steps/07-files.webp
+    alt: 'Your Files: the master, two stems and the license agreement, each with a download, and Download All.'
+    title: 'Your files'
+    caption: 'The license comes with its files. You get the master recording, a PDF of the signed agreement, and the stems when the artist uploaded them. Download them one at a time or all at once.'
+    clip: /media/vers1ons/purchasing/clip-files.mp4
+  - src: ../../../assets/work/vers1ons/purchasing/steps/08-library.webp
+    alt: 'Library, Purchases: each license with its price, date, and Audio, Stems and Contract downloads.'
+    title: 'Your library'
+    caption: 'Every purchase stays in your library, with its files and the agreement a click away. On the song''s page, View Purchase opens the receipt as a small dialog, not a whole page.'
+    clip: /media/vers1ons/purchasing/clip-library.mp4
+comparisons:
+  - title: 'Checkout on a phone'
+    why: 'In November 2025, checkout wasn''t built for a phone. Text ran off the screen and the price was cut off, so buyers finished on desktop. Now every step has its own phone layout, with the next action fixed at the bottom.'
     frame: phone
-  - src: ../../../assets/fixtures/tones/tone4-detail.svg
-    alt: '[Detail: what the close-up shows.]'
-    caption: '[A detail crop: one field, one state.]'
-    frame: detail
+    before:
+      src: ../../../assets/work/vers1ons/purchasing/before-after/phone-before.webp
+      alt: 'An order summary on a phone with text running off the right edge and the price cut off.'
+      label: 'Nov 2025'
+      caption: 'A desktop layout, squeezed.'
+    now:
+      src: ../../../assets/work/vers1ons/purchasing/before-after/phone-now.webp
+      alt: 'The order summary on a phone: the song, where it can be released, the total and Continue to Agreement.'
+      label: 'Oct 2026'
+      caption: 'Its own phone layout.'
+  - title: 'Order summary'
+    why: 'The order summary looked like a cart, with "Remove from cart" and a cover that didn''t load. Now it shows what you''re getting and who you''re licensing from, and how you''re paying, with the total and the next step beside it.'
+    before:
+      src: ../../../assets/work/vers1ons/purchasing/before-after/summary-before.webp
+      alt: 'A cart-style order summary with Remove from cart, a fee and Continue.'
+      label: 'Dec 2025'
+      caption: 'A cart.'
+    now:
+      src: ../../../assets/work/vers1ons/purchasing/before-after/summary-now.webp
+      alt: 'Today''s order summary: what you''re getting, platform credit applied, and the rest paid by card.'
+      label: 'Oct 2026'
+      caption: 'What you''re getting, and how it''s paid.'
+  - title: 'After you buy'
+    why: 'Viewing a purchase opened a whole page, with a progress tracker, buyer and seller cards and no way back. Now it''s a small receipt with the files and the agreement.'
+    before:
+      src: ../../../assets/work/vers1ons/purchasing/before-after/receipt-before.webp
+      alt: 'A full Transaction Progress page with a four-step tracker, buyer and seller cards and transaction details.'
+      label: 'Jul 2026'
+      caption: 'A whole page per purchase.'
+    now:
+      src: ../../../assets/work/vers1ons/purchasing/before-after/receipt-now.webp
+      alt: 'The Your purchase dialog over the listing: price, dates, licensor, licensee, transaction ID, and Agreement and Audio downloads.'
+      label: 'Oct 2026'
+      caption: 'A small receipt on the song''s page.'
+phones:
+  - src: ../../../assets/work/vers1ons/purchasing/phone/01-listing.webp
+    alt: 'The license terms on a phone, with the price and Purchase License fixed at the bottom.'
+    caption: 'The price and Purchase stay fixed at the bottom while you read the terms.'
+  - src: ../../../assets/work/vers1ons/purchasing/phone/02-sign.webp
+    alt: 'Acknowledgements ticked and the electronic signature on a phone.'
+    caption: 'The agreement and your signature, in one column.'
+  - src: ../../../assets/work/vers1ons/purchasing/phone/03-pay.webp
+    alt: 'Payment on a phone: a saved card, other ways to pay, the total and Complete Purchase & Sign.'
+    caption: 'Payment opens below the signed agreement, with the total and the button in reach.'
+  - src: ../../../assets/work/vers1ons/purchasing/phone/04-files.webp
+    alt: 'Your Files on a phone: the master, two stems and the license agreement.'
+    caption: 'Your files and the agreement, on your phone.'
+    more: true
+disclaimer: 'Showcase content. Artwork belongs to its respective owners. Artist names, prices and royalty figures are fictional, and no affiliation is implied. Recordings come from an isolated local copy of the product running seeded data and Stripe''s test mode; the stems on "Golden Static" were added for the recording.'
 cover:
-  src: ../../../assets/fixtures/tones/tone4-desktop.svg
-  alt: '[Cover image.]'
+  src: ../../../assets/work/vers1ons/purchasing/cover.webp
+  alt: 'You''re licensed: "Golden Static" is yours to remix.'
 order: 3
 ---
 import BodySection from '../../../components/BodySection.astro';
+import SystemFigure from '../../../components/diagrams/SystemFigure.astro';
+import { purchasing } from '../../../components/diagrams/specs/purchasing';
 
-<Screens />
+<SystemFigure label="How it works" spec={purchasing} />
 
-<BodySection label="Problem" heading="[What was broken or missing before this part.]">
-  [Who it hurt, and what it cost.]
+<BodySection label="Problem" heading="Buying a license was harder than it should have been.">
+  The listing buried what mattered most. The price sat halfway down the page, and the royalties read like legal text. The checkout itself didn't feel like a place you'd want to spend money. It was hard to follow and didn't look the part. On top of that, checkout was desktop-only. A buyer who found a song on their phone had to go back to the desktop app to finish, and that was a friction point for our users.
+
+  A license isn't a cart item. It comes with terms, an agreement to sign and royalties, and the buyer has to understand all of that before paying. Making it easy couldn't mean hiding any of it.
 </BodySection>
 
-<BodySection label="Build" heading="[How it works.]">
-  [The rules, the integration, what the user sees. Link the code or a sample.]
+<BodySection label="What I did" heading="I redesigned the purchase flow, on desktop and on phones.">
+  I redesigned the listing so the song is on one side and the license you're buying is on the other, with the price and Purchase at the top. A purchase bar stays with you as you scroll. Royalties are a short summary, with a worked example one tap away.
+
+  I also redesigned the checkout itself, from the order summary to the agreement and payment. On phones, I took the desktop gate out and rebuilt every step for a small screen. Signing and paying became two steps. You read and sign the agreement first, then payment opens right below it. After buying, the receipt is a small dialog instead of a whole page, and your purchases live in your library with the files and the signed agreement.
+
+  The team built what's behind the screens, like the agreement signing, payments and the rights each purchase grants.
 </BodySection>
 
-<BodySection label="Outcome" heading="[What changed once it shipped.]">
-  [Evidence, and what you would do differently. Real numbers or none.]
+<Steps label="Step by step" />
+
+<MobileDesign />
+
+<Comparisons />
+
+<BodySection label="Reliability" heading="You can't pay for terms you haven't signed.">
+  Payment opens only after the agreement is signed, and each signed agreement keeps its own terms. If an artist changes the price later, licenses already sold don't change. The parts of a live listing that the rest of the platform depends on, like where remixes can be released and the master recording, are locked once it's on sale. The receipt waits for the signed PDF and shows the download as soon as it's ready. When we opened buying to limited accounts, tests covered every closed route, so nothing opened by accident.
+</BodySection>
+
+<BodySection label="Outcome" heading="Buying a license now feels as simple as buying a song, on any screen.">
+  The listing puts the price, the terms and the royalties up front, where buyers look first. The checkout is clean and easy to follow, from the order summary to the signed agreement. And it works the same on a phone as on desktop, so nobody has to switch devices to finish. What you bought, with the files and the signed agreement, is waiting in your library.
 </BodySection>
