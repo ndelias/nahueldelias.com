@@ -278,13 +278,13 @@ test('part: the header names what it shows, led and contributed, for screen read
   await ctx.close();
 });
 
-test('part: the body places the steps and comparisons; a body without <Screens /> gets the gallery after it', async () => {
+test('part: the body places the steps and comparisons; the Mobile design row is the only gallery', async () => {
   const { ctx, page } = await openPart();
   const order = await page.$$eval('article.body > :not(script, style)', (els) => els.map((e) => e.className.split(' ')[0]));
   assert.deepEqual(order.slice(0, 5), ['system-figure', 'body-section', 'body-section', 'steps', 'comparisons']);
   assert.equal(await page.locator('[data-steps]').count(), 1);
   assert.equal(await page.locator('[data-gallery]').count(), 0);
-  const other = await openPart('/work/vers1ons/design-system/');
+  const other = await openPart(GALLERY);
   assert.equal(await other.page.locator('[data-gallery]').count(), 1);
   await other.ctx.close();
   await ctx.close();
@@ -439,8 +439,9 @@ test('comparisons, reduced motion: the pair side by side, tabs by hand only', as
   await ctx.close();
 });
 
-// The gallery, on a part page whose body doesn't place steps.
-const GALLERY = '/work/vers1ons/design-system/';
+// The gallery viewer, on a part's Mobile design row: three phones on the
+// page, a fourth only in the viewer (`more`).
+const GALLERY = '/work/vers1ons/wallet-payouts/';
 
 test('gallery: a screen opens full size in a dialog; arrows step, Esc closes, focus returns', async () => {
   const { ctx, page } = await openPart(GALLERY);
@@ -449,17 +450,17 @@ test('gallery: a screen opens full size in a dialog; arrows step, Esc closes, fo
   await opener.click();
   assert.equal(await page.evaluate(() => document.querySelector('[data-gallery-viewer]').open), true);
   assert.equal(await page.evaluate(() => document.activeElement?.hasAttribute('data-viewer-close')), true, 'focus not on Close');
-  assert.equal(await page.textContent('[data-viewer-count]'), '02 / 03');
+  assert.equal(await page.textContent('[data-viewer-count]'), '02 / 04');
   const src1 = await page.getAttribute('[data-viewer-img]', 'src');
   assert.equal(src1, await opener.getAttribute('href'), 'shows the full-size file the link points to');
-  assert.equal(await page.getAttribute('[data-viewer-img]', 'alt'), '[Screen: what the phone view shows.]');
+  assert.equal(await page.getAttribute('[data-viewer-img]', 'alt'), 'Confirm Withdrawal on a phone.');
   await page.keyboard.press('ArrowRight');
-  assert.equal(await page.textContent('[data-viewer-count]'), '03 / 03');
+  assert.equal(await page.textContent('[data-viewer-count]'), '03 / 04');
   await page.keyboard.press('ArrowLeft');
   await page.keyboard.press('ArrowLeft');
-  assert.equal(await page.textContent('[data-viewer-count]'), '01 / 03');
-  await page.keyboard.press('ArrowLeft'); // wraps
-  assert.equal(await page.textContent('[data-viewer-count]'), '03 / 03');
+  assert.equal(await page.textContent('[data-viewer-count]'), '01 / 04');
+  await page.keyboard.press('ArrowLeft'); // wraps, to the viewer-only screen (fetched on first need)
+  await page.waitForFunction(() => document.querySelector('[data-viewer-count]').textContent === '04 / 04', null, { timeout: 5000 });
   await page.keyboard.press('Escape');
   assert.equal(await page.evaluate(() => document.querySelector('[data-gallery-viewer]').open), false);
   assert.equal(await page.evaluate(() => document.activeElement?.getAttribute('data-gallery-open')), '1', 'focus did not return to the screen');
@@ -548,7 +549,7 @@ for (const [path, id] of [
   [HUB, 'parts-label'],
   [HUB, 'versions-label'],
   [PART, 'steps-label'],
-  [GALLERY, 'gallery-screens-label'],
+  [GALLERY, 'gallery-mobile-design-label'],
   [PART, 'comparisons-label'],
 ]) {
   test(`deferred blocks: an in-page link to #${id} lands on it`, async () => {
