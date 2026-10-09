@@ -1,0 +1,168 @@
+{
+  "archive": "~/Vers1ons/portfolio-vers1ons",
+  "images": [
+    {
+      "from": "screens/flows/purchase/01-listing-top.png",
+      "to": "work/vers1ons/purchasing/hero.webp",
+      "width": 2688
+    },
+    {
+      "from": "screens/flows/purchase/05-licensed.png",
+      "to": "work/vers1ons/purchasing/cover.webp",
+      "width": 1600
+    },
+    {
+      "from": "screens/flows/purchase/01-listing-top.png",
+      "to": "work/vers1ons/purchasing/steps/01-listing.webp",
+      "width": 2560
+    },
+    {
+      "from": "screens/flows/money/02b-how-royalties-work.png",
+      "to": "work/vers1ons/purchasing/steps/02-royalties.webp",
+      "width": 2560
+    },
+    {
+      "from": "screens/flows/purchase/03-summary.png",
+      "to": "work/vers1ons/purchasing/steps/03-summary.webp",
+      "width": 2560
+    },
+    {
+      "from": "screens/flows/purchase/04-signed-payment.png",
+      "to": "work/vers1ons/purchasing/steps/04-sign-then-pay.webp",
+      "width": 2560
+    },
+    {
+      "from": "screens/flows/money/07b-credit-plus-card-payment.png",
+      "to": "work/vers1ons/purchasing/steps/05-pay-your-way.webp",
+      "width": 2560
+    },
+    {
+      "from": "screens/flows/purchase/05-licensed.png",
+      "to": "work/vers1ons/purchasing/steps/06-licensed.webp",
+      "width": 2560
+    },
+    {
+      "from": "screens/flows/purchase/06-files.png",
+      "to": "work/vers1ons/purchasing/steps/07-files.webp",
+      "width": 2560,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/purchase/07-library-purchases.png",
+      "to": "work/vers1ons/purchasing/steps/08-library.webp",
+      "width": 2560
+    },
+    {
+      "from": "screens/eras/nov25/mobile-checkout-1.png",
+      "to": "work/vers1ons/purchasing/before-after/phone-before.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/eras/today/mobile-checkout-1.png",
+      "to": "work/vers1ons/purchasing/before-after/phone-now.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/eras/dec25/flows/checkout/desktop-checkout-1.png",
+      "to": "work/vers1ons/purchasing/before-after/summary-before.webp",
+      "width": 2000
+    },
+    {
+      "from": "screens/flows/money/07a-credit-plus-card-summary.png",
+      "to": "work/vers1ons/purchasing/before-after/summary-now.webp",
+      "width": 2000
+    },
+    {
+      "from": "screens/eras/jul26/flows/purchase/before-transaction-page.png",
+      "to": "work/vers1ons/purchasing/before-after/receipt-before.webp",
+      "width": 2000
+    },
+    {
+      "from": "screens/flows/purchase/08-receipt-dialog.png",
+      "to": "work/vers1ons/purchasing/before-after/receipt-now.webp",
+      "width": 2000
+    },
+    {
+      "from": "screens/flows/purchase/mobile-01-listing-bar.png",
+      "to": "work/vers1ons/purchasing/phone/01-listing.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/purchase/mobile-02-sign.png",
+      "to": "work/vers1ons/purchasing/phone/02-sign.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/purchase/mobile-03-pay-sheet.png",
+      "to": "work/vers1ons/purchasing/phone/03-pay.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/purchase/mobile-04-licensed-files.png",
+      "to": "work/vers1ons/purchasing/phone/04-files.webp",
+      "width": 1170,
+      "retouch": false
+    }
+  ],
+  "videos": [
+    {
+      "from": "videos/21-purchase-walkthrough.mp4",
+      "to": "media/vers1ons/purchasing/walkthrough.mp4",
+      "kind": "hero",
+      "width": 1344,
+      "segments": [
+        [
+          0,
+          14.0
+        ],
+        [
+          17.2,
+          25.2
+        ]
+      ]
+    },
+    {
+      "from": "videos/21-purchase-walkthrough.mp4",
+      "to": "media/vers1ons/purchasing/clip-listing.mp4",
+      "kind": "inline",
+      "width": 1344,
+      "start": 0,
+      "duration": 4.5
+    },
+    {
+      "from": "videos/21-purchase-walkthrough.mp4",
+      "to": "media/vers1ons/purchasing/clip-royalties.mp4",
+      "kind": "inline",
+      "width": 1344,
+      "start": 4.5,
+      "duration": 3.2
+    },
+    {
+      "from": "videos/21-purchase-walkthrough.mp4",
+      "to": "media/vers1ons/purchasing/clip-sign-then-pay.mp4",
+      "kind": "inline",
+      "width": 1344,
+      "start": 10.2,
+      "duration": 3.8
+    },
+    {
+      "from": "videos/21-purchase-walkthrough.mp4",
+      "to": "media/vers1ons/purchasing/clip-files.mp4",
+      "kind": "inline",
+      "width": 1344,
+      "start": 19.5,
+      "duration": 5.7
+    },
+    {
+      "from": "videos/22-library-receipt.mp4",
+      "to": "media/vers1ons/purchasing/clip-library.mp4",
+      "kind": "inline",
+      "width": 1344
+    }
+  ]
+}
