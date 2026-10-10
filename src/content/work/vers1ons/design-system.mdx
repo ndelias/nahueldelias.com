@@ -1,58 +1,158 @@
 ---
-# FIXTURE from docs/design/CaseStudy.dc.html (parts matrix) and the part
-# template in docs/design/SubStudy.dc.html, until the real entry replaces it.
-# Part 1 of the vers1ons hub.
-fixture: true
+# Copy drafted with Nahuel from his account of the project, partners
+# anonymous. Media from media/vers1ons/design-system.json.
 parent: vers1ons
 title: 'Design system'
-tagline: '[The system every other part is built from.]'
+tagline: 'One cohesive product.'
+summary: 'A messy app turned into one brand, built from shared parts and held in place by CI.'
 weight: 2
 status: shipped
-role: '[Role]'
+role: 'Design lead, system end to end'
 dates:
-  start: '[Years]'
-stack: []
+  start: 2025-11
+stack: ['React', 'Tailwind CSS', 'CSS variables', 'Figma']
+standing: 'In production'
 disciplines:
   led: [design, frontend]
   contributed: [product]
 decision:
-  chose: '[What was chosen.]'
-  rejected: '[What was rejected.]'
-  cost: '[What it cost.]'
+  intro: 'vers1ons grew one screen at a time, and it showed. Each new feature brought its own colors, buttons and badges.'
+  chose: 'Rebuild the app on one system with one brand. Dark only, one accent for the brand, green only for money, and shared components every screen is built from, with CI enforcing the rules.'
+  rejected: 'Polishing screens one at a time, which looks better for a week and then drifts again.'
+  cost: 'Every screen had to move onto the system. We dropped light mode, and rolled the change out in waves so nothing broke along the way.'
 hero:
-  src: ../../../assets/fixtures/tones/tone1-wide.svg
-  alt: '[Hero: what the screen shows.]'
-  caption: '[Recording or still of the main view]'
+  src: ../../../assets/work/vers1ons/design-system/hero.webp
+  alt: 'The design system on one sheet: color tokens, type styles, buttons, badges, price pills, cards, and radii, shadows, motion and layers.'
+  caption: 'The system on one sheet, rendered from the app''s own tokens and components'
 gallery:
-  - src: ../../../assets/fixtures/tones/tone1-desktop.svg
-    alt: '[Screen: what the desktop view shows.]'
-    caption: '[The main screen, and the one thing to notice in it.]'
-    frame: desktop
-  - src: ../../../assets/fixtures/tones/tone1-phone.svg
-    alt: '[Screen: what the phone view shows.]'
-    caption: '[Phone view of the same step.]'
+  - src: ../../../assets/work/vers1ons/design-system/steps/01-color.webp
+    alt: 'Discover: lavender for actions and the active nav item, green only on the price pills, cover art on warm black.'
+    title: 'Color means something'
+    caption: 'Lavender is the brand, the actions and focus. Green is only ever money, so the price is the thing you can always find. Everything else steps back on warm black, so the cover art leads.'
+  - src: ../../../assets/work/vers1ons/design-system/steps/02-words-and-data.webp
+    alt: 'Search results: titles in Inter, and prices, BPM and keys in mono, with a filter column on the right.'
+    title: 'Words and data'
+    caption: 'Inter for words, Red Hat Mono for data. Prices, BPM, keys and dates line up in columns and read as numbers, while titles and copy stay easy to read.'
+  - src: ../../../assets/work/vers1ons/design-system/steps/03-shared-parts.webp
+    alt: 'A listing: the play button on the cover art, metadata chips, and section headers for price, release platforms and license terms.'
+    title: 'Shared parts'
+    caption: 'One play button, one price pill, one status badge, one section header. Each replaced several hand-built copies, so a change in one place shows up everywhere.'
+  - src: ../../../assets/work/vers1ons/design-system/steps/04-card-family.webp
+    alt: 'Listing cards with genre, BPM and price pills, and a row of artist cards with follower and track counts.'
+    title: 'The card family'
+    caption: 'Listing, featured, compact, artist, genre, purchase and drop cards all follow the same rules. The price is always the same pill, play always sits on the art, and every card lifts the same way on hover.'
+    clip: /media/vers1ons/design-system/clip-cards.mp4
+  - src: ../../../assets/work/vers1ons/design-system/steps/05-discover.webp
+    alt: 'Discover after loading: the featured cards and new releases in place.'
+    title: 'Discover'
+    caption: 'Discover was where the system first came together. Featured songs sit on a blurred backdrop of their own cover art, and the key, BPM and genre ride on the art itself. While it loads, each placeholder has the shape of the card it becomes, so nothing jumps, and a section with nothing in it doesn''t show at all.'
+    clip: /media/vers1ons/design-system/clip-discover.mp4
+  - src: ../../../assets/work/vers1ons/design-system/steps/06-wizards.webp
+    alt: 'The upload wizard: a step rail with Upload done and Metadata current, a form, and the footer with Previous, Save & exit and Next.'
+    title: 'Wizards on one spec'
+    caption: 'The upload and distribution wizards were built separately and looked it. Now they share one set of step states, done, current, to do and error, plus one footer, one field style and one place to drop files. Going from one to the other feels like the same app.'
+    clip: /media/vers1ons/design-system/clip-wizards.mp4
+  - src: ../../../assets/work/vers1ons/design-system/steps/07-phones.webp
+    alt: 'How Royalties Work as a bottom sheet on a phone.'
+    title: 'Built for phones'
+    caption: 'On a phone, touch sizes come from the components, not from each screen. Desktop stays exactly as it was while every control on mobile is big enough to tap, sheets replace pop-ups, and inputs are sized so iOS doesn''t zoom in when you type.'
     frame: phone
-  - src: ../../../assets/fixtures/tones/tone1-detail.svg
-    alt: '[Detail: what the close-up shows.]'
-    caption: '[A detail crop: one field, one state.]'
-    frame: detail
+  - src: ../../../assets/work/vers1ons/design-system/steps/08-it-holds.webp
+    alt: 'A terminal running the design check: surfaces from tokens fails on a bg-zinc-900 class, and conformance FAILED with exit code 1.'
+    title: 'It holds'
+    caption: 'A design check runs in CI on every change. It blocks off-system colors, raw layering values and off-token motion, so nothing drifts without a reviewer having to catch it. Rules that a simple check can''t judge reliably only warn, because a gate that cries wolf gets ignored.'
+comparisons:
+  - title: 'Discover'
+    why: 'In March, Discover was flat cards on plain black, with monospace on everything and prices in an emerald green of their own. Now featured songs sit on their own cover art, words are in Inter and data in mono, and every card has the same price pill and a "Licensed by" line.'
+    before:
+      src: ../../../assets/work/vers1ons/design-system/before-after/discover-before.webp
+      alt: 'Discover in March 2026: image-only featured cards, monospace titles and emerald prices.'
+      label: 'Mar 2026'
+      caption: 'Flat cards, mono everywhere.'
+    now:
+      src: ../../../assets/work/vers1ons/design-system/before-after/discover-now.webp
+      alt: 'Discover today: a drop banner, featured cards on their cover art, and listing cards with price pills.'
+      label: 'Oct 2026'
+      caption: 'The art leads, one accent.'
+  - title: 'Discover on a phone'
+    why: 'In November, the phone app was the desktop squeezed down, with small caps everywhere, an orange tab underline and two competing buttons at the top. Now there''s one lavender accent, a featured poster made for the screen and cards with a clear order. The early seed had no cover art, so its tiles are placeholders.'
+    frame: phone
+    before:
+      src: ../../../assets/work/vers1ons/design-system/before-after/phone-before.webp
+      alt: 'Discover on a phone in November 2025: small-caps headings, Distribute and Upload Song buttons, and green placeholder tiles.'
+      label: 'Nov 2025'
+      caption: 'The desktop, squeezed.'
+    now:
+      src: ../../../assets/work/vers1ons/design-system/before-after/phone-now.webp
+      alt: 'Discover on a phone today: a drop banner, a featured poster and new releases, with a lavender bottom nav.'
+      label: 'Oct 2026'
+      caption: 'Made for the phone.'
+  - title: 'Search'
+    why: 'Search results were a list of rows with filters squeezed into the top bar. Now filters have their own column, every row reads the same way with its data in mono, and the price is the one green thing on the line.'
+    before:
+      src: ../../../assets/work/vers1ons/design-system/before-after/search-before.webp
+      alt: 'Search in March 2026: large rows, with filters in the top bar.'
+      label: 'Mar 2026'
+      caption: 'Filters in the top bar.'
+    now:
+      src: ../../../assets/work/vers1ons/design-system/before-after/search-now.webp
+      alt: 'Search today: compact rows with data in mono and green prices, and a filter column.'
+      label: 'Oct 2026'
+      caption: 'One way to read a row.'
+phones:
+  - src: ../../../assets/work/vers1ons/design-system/phone/01-search.webp
+    alt: 'Search results on a phone, each row with a play button, data in mono and a green price.'
+    caption: 'The same rows and price as desktop, sized for a thumb.'
+  - src: ../../../assets/work/vers1ons/design-system/phone/02-artist.webp
+    alt: 'An artist profile on a phone with Follow and their songs.'
+    caption: 'An artist, on the same parts as everything else.'
+  - src: ../../../assets/work/vers1ons/design-system/phone/03-library.webp
+    alt: 'The library on a phone: Releases, Favorites, Purchases and Contributors tabs, and a list of releases.'
+    caption: 'Your library, in the same tabs and rows.'
+  - src: ../../../assets/work/vers1ons/design-system/phone/04-create.webp
+    alt: 'The create menu opened from the bottom nav: New Listing and Release to Streaming.'
+    caption: 'Create from anywhere, one tap from the nav.'
+    more: true
+disclaimer: 'Showcase content. Artwork belongs to its respective owners. Artist names, prices and figures are fictional, and no affiliation is implied. Recordings come from an isolated local copy of the product running seeded data; the Discover loading clip was recorded on a throttled connection. Earlier builds ran on their own seed data, and the November 2025 seed had no cover art.'
 cover:
-  src: ../../../assets/fixtures/tones/tone1-desktop.svg
-  alt: '[Cover image.]'
+  src: ../../../assets/work/vers1ons/design-system/cover.webp
+  alt: 'The design system on one sheet: color tokens, type styles, buttons, badges, price pills and cards.'
 order: 1
 ---
 import BodySection from '../../../components/BodySection.astro';
+import SystemFigure from '../../../components/diagrams/SystemFigure.astro';
+import { designSystem } from '../../../components/diagrams/specs/design-system';
+import Figure from '../../../components/Figure.astro';
+import tour from '../../../assets/work/vers1ons/design-system/tour.webp';
 
-<Screens />
+<SystemFigure label="How it works" spec={designSystem} />
 
-<BodySection label="Problem" heading="[What was broken or missing before this part.]">
-  [Who it hurt, and what it cost.]
+<BodySection label="Problem" heading="The app looked like it was built by a different team every week.">
+  vers1ons grew screen by screen. There were seven different status badges, a dozen hand-built play buttons and prices in three different greens. Orange and pink accents competed with the brand, and none of it said who we were. The app didn't feel cohesive, and it felt amateur.
+
+  Fixes didn't stick either. A color changed in one place stayed wrong in ten others, and every new screen started from scratch. For a product asking labels and artists to trust it with their music, looking unfinished was a real cost.
 </BodySection>
 
-<BodySection label="Build" heading="[How it works.]">
-  [The rules, the integration, what the user sees. Link the code or a sample.]
+<BodySection label="What I did" heading="I designed the system and moved the whole app onto it.">
+  I set the visual direction. Dark only, warm black surfaces so cover art stands out, lavender for the brand and actions, and green only for money, so the price is always the thing you can find. Inter for words, Red Hat Mono for data like prices, BPM and dates.
+
+  Underneath, I built the tokens and the shared components, like the play button, the price pill and one status badge in place of seven. I redesigned Discover on them, and moved the rest of the app across in five waves, from the shell and wizards to the player and the smaller apps around it. Then I made it hold. A design check in CI blocks off-system colors, layering and motion, and a mobile spec builds touch sizes into the components themselves.
+
+  I designed or shaped most of the app's UI along the way, including the cards in use today. The team helped build them.
 </BodySection>
 
-<BodySection label="Outcome" heading="[What changed once it shipped.]">
-  [Evidence, and what you would do differently. Real numbers or none.]
+<Figure src={tour} alt="Discover on the system, with featured cards and new releases." video="/media/vers1ons/design-system/walkthrough.mp4" caption="A tour on the system: Discover, search, an artist, the library and the upload wizard (0:56)" />
+
+<Steps label="Piece by piece" />
+
+<MobileDesign />
+
+<Comparisons />
+
+<BodySection label="Reliability" heading="The rules live in code, so they hold.">
+  Colors, type, spacing, layering and motion all come from tokens, and every screen builds on the same shared components instead of copying them. A check in CI fails any change that uses an off-system color, a raw layering value or off-token motion. Each exception it allows is listed in the check with a reason. Every control has a visible focus ring from its component, and touch sizes on mobile come from the components too, so a new screen gets them for free.
+</BodySection>
+
+<BodySection label="Outcome" heading="vers1ons looks like one product, and it stays that way.">
+  Every surface runs on the same system, from the app and its wizards to the landing page and the smaller apps around it. New screens are put together from parts instead of designed from scratch, and CI keeps them on brand without a reviewer. People noticed. Labels told us it felt like a product they could trust, artists said it looked really good, and investors came back saying everything looked a lot better.
 </BodySection>

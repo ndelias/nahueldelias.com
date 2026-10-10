@@ -1,0 +1,171 @@
+{
+  "archive": "~/Vers1ons/portfolio-vers1ons",
+  "images": [
+    {
+      "from": "screens/flows/design-system/00-header-design-system.png",
+      "to": "work/vers1ons/design-system/hero.webp",
+      "width": 2688,
+      "retouch": false
+    },
+    {
+      "from": "videos/23-system-tour.mp4",
+      "to": "work/vers1ons/design-system/tour.webp",
+      "width": 2688,
+      "at": 0.5,
+      "retouch": false,
+      "graft": [
+        {
+          "from": "videos/23-system-tour.mp4",
+          "at": 1.5,
+          "rect": [
+            1940,
+            160,
+            120,
+            120
+          ]
+        }
+      ]
+    },
+    {
+      "from": "screens/flows/design-system/00-header-design-system.png",
+      "to": "work/vers1ons/design-system/cover.webp",
+      "width": 1600,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/design-system/01-discover.png",
+      "to": "work/vers1ons/design-system/steps/01-color.webp",
+      "width": 2560
+    },
+    {
+      "from": "screens/flows/design-system/02-search-songs.png",
+      "to": "work/vers1ons/design-system/steps/02-words-and-data.webp",
+      "width": 2560
+    },
+    {
+      "from": "screens/flows/purchase/01-listing-top.png",
+      "to": "work/vers1ons/design-system/steps/03-shared-parts.webp",
+      "width": 2560
+    },
+    {
+      "from": "screens/flows/design-system/05-card-family.png",
+      "to": "work/vers1ons/design-system/steps/04-card-family.webp",
+      "width": 2200,
+      "crop": [
+        440,
+        1150,
+        2200,
+        1375
+      ]
+    },
+    {
+      "from": "videos/24-discover-loading.mp4",
+      "to": "work/vers1ons/design-system/steps/05-discover.webp",
+      "width": 2560,
+      "at": 9.5
+    },
+    {
+      "from": "screens/flows/design-system/06-wizard-step.png",
+      "to": "work/vers1ons/design-system/steps/06-wizards.webp",
+      "width": 2560
+    },
+    {
+      "from": "screens/flows/design-system/mobile-07-sheet.png",
+      "to": "work/vers1ons/design-system/steps/07-phones.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/design-system/08a-lint-fail.png",
+      "to": "work/vers1ons/design-system/steps/08-it-holds.webp",
+      "width": 2560,
+      "retouch": false
+    },
+    {
+      "from": "screens/eras/mar26/desktop-discover.png",
+      "to": "work/vers1ons/design-system/before-after/discover-before.webp",
+      "width": 2000
+    },
+    {
+      "from": "screens/eras/today/desktop-discover.png",
+      "to": "work/vers1ons/design-system/before-after/discover-now.webp",
+      "width": 2000
+    },
+    {
+      "from": "screens/eras/nov25/mobile-discover.png",
+      "to": "work/vers1ons/design-system/before-after/phone-before.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/eras/today/mobile-discover.png",
+      "to": "work/vers1ons/design-system/before-after/phone-now.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/eras/mar26/desktop-search-songs.png",
+      "to": "work/vers1ons/design-system/before-after/search-before.webp",
+      "width": 2000
+    },
+    {
+      "from": "screens/eras/today/desktop-search-songs.png",
+      "to": "work/vers1ons/design-system/before-after/search-now.webp",
+      "width": 2000
+    },
+    {
+      "from": "screens/eras/today/mobile-search-songs.png",
+      "to": "work/vers1ons/design-system/phone/01-search.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/eras/today/mobile-artist.png",
+      "to": "work/vers1ons/design-system/phone/02-artist.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/eras/today/mobile-library.png",
+      "to": "work/vers1ons/design-system/phone/03-library.webp",
+      "width": 1170,
+      "retouch": false
+    },
+    {
+      "from": "screens/flows/design-system/mobile-07b-create-menu.png",
+      "to": "work/vers1ons/design-system/phone/04-create.webp",
+      "width": 1170,
+      "retouch": false
+    }
+  ],
+  "videos": [
+    {
+      "from": "videos/23-system-tour.mp4",
+      "to": "media/vers1ons/design-system/walkthrough.mp4",
+      "kind": "hero",
+      "width": 1344
+    },
+    {
+      "from": "videos/23-system-tour.mp4",
+      "to": "media/vers1ons/design-system/clip-cards.mp4",
+      "kind": "inline",
+      "width": 1344,
+      "start": 3.8,
+      "duration": 10.5
+    },
+    {
+      "from": "videos/24-discover-loading.mp4",
+      "to": "media/vers1ons/design-system/clip-discover.mp4",
+      "kind": "inline",
+      "width": 1344
+    },
+    {
+      "from": "videos/23-system-tour.mp4",
+      "to": "media/vers1ons/design-system/clip-wizards.mp4",
+      "kind": "inline",
+      "width": 1344,
+      "start": 39.6,
+      "duration": 16.3
+    }
+  ]
+}
