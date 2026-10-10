@@ -27,9 +27,10 @@
       ]
     },
     {
-      "from": "screens/flows/design-system/01-discover.png",
+      "from": "screens/flows/design-system/00-header-design-system.png",
       "to": "work/vers1ons/design-system/cover.webp",
-      "width": 1600
+      "width": 1600,
+      "retouch": false
     },
     {
       "from": "screens/flows/design-system/01-discover.png",
