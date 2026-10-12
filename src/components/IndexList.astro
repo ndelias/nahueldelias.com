@@ -8,8 +8,12 @@
 // link is stretched over the row). With the filmstrip island running, the
 // active row is the strip's focused entry instead (data-active, set on rows
 // of a data-synced list), so the two views agree.
+//
+// A hub's parts are rows under it, number and title. Without the island
+// they're always there; with it they come down while the hub is the active
+// row (data-open, set by the island).
 import EntryImage from './EntryImage.astro';
-import { SECTION_LABELS, entryHref, entryNumber, entryYears, homepageEntries } from '../lib/entries';
+import { SECTION_LABELS, entryHref, entryNumber, entryYears, homepageEntries, partsOf } from '../lib/entries';
 import StatusBadge from './StatusBadge.astro';
 
 const rows = homepageEntries().map((entry) => ({
@@ -17,6 +21,7 @@ const rows = homepageEntries().map((entry) => ({
   number: entryNumber(entry),
   href: entryHref(entry),
   years: entryYears(entry),
+  parts: partsOf(entry).map((part) => ({ number: entryNumber(part), title: part.data.title, href: entryHref(part) })),
 }));
 
 // Which preview shows: the first by default; while a row is hovered or
@@ -31,7 +36,7 @@ const previewRules =
 ---
 <div class="index">
   <ol class="rows" aria-label="Projects">
-    {rows.map(({ entry, number, href, years }) => (
+    {rows.map(({ entry, number, href, years, parts }) => (
       <li class="row" data-row>
         <span class="no mono">{number}</span>
         <h2 class="title">{href ? <a href={href}>{entry.data.title}</a> : entry.data.title}</h2>
@@ -39,6 +44,18 @@ const previewRules =
         <span class="section mono">{SECTION_LABELS[entry.collection]}</span>
         <span class="badge"><StatusBadge entry={entry} /></span>
         <span class="year mono">{years}</span>
+        {parts.length > 0 && (
+          <div class="subs">
+            <ol aria-label={`Parts of ${entry.data.title}`}>
+              {parts.map((part) => (
+                <li class="sub">
+                  <span class="sub-no mono">{part.number}</span>
+                  <a class="sub-title" href={part.href}>{part.title}</a>
+                </li>
+              ))}
+            </ol>
+          </div>
+        )}
       </li>
     ))}
   </ol>
@@ -168,6 +185,64 @@ const previewRules =
     letter-spacing: normal;
   }
 
+  /* A hub's parts: rows of their own under it, on the number and title
+     columns, over the hub row's stretched link. */
+  .subs {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-rows: 1fr;
+  }
+  .subs ol {
+    min-height: 0;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .sub {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr);
+    column-gap: var(--space-16);
+    align-items: baseline;
+    padding-block: 6px;
+  }
+  .sub:first-child {
+    margin-top: 10px;
+  }
+  .sub-no {
+    color: var(--vers1ons);
+    font-size: var(--text-mono-sm);
+  }
+  .sub-title {
+    font-size: var(--text-small);
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .sub-title:hover,
+  .sub-title:focus-visible {
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+  .rows[data-synced] .subs {
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition:
+      grid-template-rows 0.35s var(--ease),
+      opacity 0.25s ease;
+  }
+  .rows[data-synced] .row[data-open] .subs,
+  .rows[data-synced] .row:focus-within .subs {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    transition:
+      grid-template-rows 0.6s var(--ease),
+      opacity 0.4s ease 0.1s;
+  }
+
   .previews {
     grid-column: 10 / span 3;
     display: grid;
@@ -202,6 +277,14 @@ const previewRules =
   /* Below 960px, and on phones: number, then title with the year, tagline,
      section and badge. */
   @media (max-width: 959.98px) {
+    .subs {
+      grid-column: 1 / -1;
+    }
+    .sub {
+      grid-template-columns: 40px minmax(0, 1fr);
+      column-gap: var(--space-12);
+      padding-block: 10px;
+    }
     .row {
       grid-template-columns: 40px auto minmax(0, 1fr) auto;
       grid-template-areas:

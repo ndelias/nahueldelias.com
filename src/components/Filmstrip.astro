@@ -8,13 +8,36 @@
 // the script runs and its poster (the LCP element) is in the HTML. Two
 // copies of the ring are enough to fill any screen at first paint; the
 // island adds more when it needs room to wrap off-screen (src/lib/strip.ts).
-import { SECTION_LABELS, entryHref, entryNumber, entryYears, homepageEntries } from '../lib/entries';
+//
+// A hub lands on its own. Rest on it (pointer, keyboard focus, or on touch
+// once it's swiped to): its recording starts, and a beat later the hub
+// glides up and its parts slide in underneath, compact rows (cover, number,
+// title, line), each to its page, in a box that scrolls in place. Moving
+// down the rows scrolls the box along to the next ones. The page itself
+// never scrolls. Another entry, or leaving it for a moment, folds them
+// away. The hub stays the focused frame throughout.
+import { getImage } from 'astro:assets';
+import { SECTION_LABELS, entryHref, entryNumber, entryYears, homepageEntries, partsOf, type Entry } from '../lib/entries';
 import { POSTER, posterOf } from '../lib/posters';
 import { isReal, layout } from '../lib/strip';
 import Icon from './Icon.astro';
 import StatusBadge from './StatusBadge.astro';
 
 const COPIES = 2;
+const THUMB = 112; // a part's cover, CSS px
+// ms on a hub before its parts open: the recording starts at 250, the hub
+// moves a beat after.
+const DWELL = 500;
+
+// Like the other posters, a part's cover gets its sources from the island
+// once W01 has painted (data-src, data-srcset).
+const thumb = async (part: Entry) => {
+  const src = part.data.cover.src;
+  // Read from a clone: reading the import itself ships the original too.
+  if (((src as typeof src & { clone?: typeof src }).clone ?? src).format === 'svg') return { src: src.src };
+  const img = await getImage({ src, widths: [THUMB, THUMB * 2], format: 'webp' });
+  return { src: img.src, srcset: img.srcSet.attribute };
+};
 
 const entries = await Promise.all(
   homepageEntries().map(async (entry) => ({
@@ -24,6 +47,15 @@ const entries = await Promise.all(
     href: entryHref(entry),
     years: entryYears(entry),
     poster: await posterOf(entry),
+    parts: await Promise.all(
+      partsOf(entry).map(async (part) => ({
+        number: entryNumber(part),
+        title: part.data.title,
+        summary: part.data.summary ?? part.data.tagline,
+        href: entryHref(part),
+        thumb: await thumb(part),
+      })),
+    ),
   })),
 );
 const n = entries.length;
@@ -31,7 +63,7 @@ const weights = entries.map(({ entry }) => entry.data.weight);
 const slots = layout(weights, n * COPIES, 0);
 const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
 ---
-<section class="filmstrip" data-strip-ui data-filmstrip aria-label="Projects">
+<section class="filmstrip" data-strip-ui data-filmstrip aria-label="Projects" data-dwell-ms={DWELL}>
   <div class="metas">
     {entries.map(({ entry, number, section, href, years }, i) => (
       <div class:list={['meta', { on: i === 0 }]} data-meta inert={i !== 0}>
@@ -64,6 +96,7 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
             class:list={['frame', { on }]}
             data-frame
             data-video={j < n ? entry.data.video : undefined}
+            data-no={number}
             aria-hidden={isReal(offset, n) ? undefined : 'true'}
             style={`--x:${x};--w:${w};--h:${h}`}
           >
@@ -89,7 +122,6 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
                   alt=""
                 />
               </picture>
-              <span class="label mono" aria-hidden="true">{number}</span>
               {entry.data.video && (
                 <span class="hud mono" aria-hidden="true">
                   <span class="playing"><Icon name="dot" /> Playing · muted</span>
@@ -101,6 +133,26 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
         );
       })}
     </ul>
+  </div>
+  <div class="hub-parts">
+    {entries.map(({ entry, parts }, i) => parts.length > 0 && (
+      <div class="parts" data-parts={i} inert>
+        <ol class="scroller" aria-label={`Parts of ${entry.data.title}`} data-at-top data-scroller>
+          {parts.map(({ number, title, summary, href, thumb }, k) => (
+            <li style={`--i: ${k}`}>
+              <a class="part" href={href}>
+                <img data-src={thumb.src} data-srcset={thumb.srcset} sizes={`${THUMB}px`} width={THUMB} height={THUMB * 10 / 16} alt="" loading="lazy" decoding="async" />
+                <span class="text">
+                  <span class="no mono">{number}</span>
+                  <span class="name">{title}</span>
+                  <span class="summary">{summary}</span>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </div>
+    ))}
   </div>
   <p class="visually-hidden" aria-live="polite" data-strip-status></p>
 </section>
@@ -135,15 +187,96 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
     const frames = [...strip.children] as HTMLElement[];
     const originals = frames.slice(0, n);
     const metas = [...root.querySelectorAll<HTMLElement>('[data-meta]')];
+    const parts = [...root.querySelectorAll<HTMLElement>('[data-parts]')];
     const titles = metas.map((m) => m.querySelector('h2')!.textContent!.trim());
     const status = root.querySelector('[data-strip-status]')!;
     const rows = [...document.querySelectorAll<HTMLElement>('[data-row]')];
-    const count = document.querySelector('[data-strip-count]');
     const toggle = document.querySelector<HTMLButtonElement>('[data-view-toggle]');
     const hit = (f: HTMLElement) => f.firstElementChild as HTMLElement;
     const frameOf = (t: EventTarget | null) => frames.indexOf((t as Element | null)?.closest?.('[data-frame]') as HTMLElement);
 
     let p = 0; // the focused frame
+    let inRows = false; // the pointer is over the Index list
+    const dwellMs = Number(root.dataset.dwellMs);
+
+    // A hub's parts: closed on landing; opened by resting on the hub.
+    let opened = false;
+    let dwellTimer = 0;
+    let closeTimer = 0;
+    let touched = false; // the last move came from touch
+    const hubAt = (a: number) => parts.find((l) => Number(l.dataset.parts) === a);
+    function setOpen(open: boolean) {
+      const l = hubAt(active());
+      opened = open && !!l && html.dataset.homeView !== 'index';
+      root.toggleAttribute('data-open', opened);
+      html.toggleAttribute('data-parts-down', opened);
+      parts.forEach((x) => {
+        const on = opened && x === l;
+        if (on && !x.classList.contains('on')) x.querySelector('ol')!.scrollTop = 0;
+        x.classList.toggle('on', on);
+        x.inert = !on;
+      });
+    }
+    function arm() {
+      if (opened || dwellTimer || !hubAt(active())) return;
+      dwellTimer = window.setTimeout(() => {
+        dwellTimer = 0;
+        setOpen(true);
+      }, dwellMs);
+    }
+    function disarm() {
+      clearTimeout(dwellTimer);
+      dwellTimer = 0;
+    }
+    // On the hub or its parts: keep (or start) it. Off both: stop the dwell,
+    // and fold the parts a moment later.
+    const onHub = (t: EventTarget | null) => {
+      const el = t as Element | null;
+      return !!el?.closest?.('[data-parts].on') || frameOf(el) === p;
+    };
+    function presence(inside: boolean) {
+      if (inside) {
+        clearTimeout(closeTimer);
+        closeTimer = 0;
+        arm();
+      } else {
+        disarm();
+        if (opened && !closeTimer) closeTimer = window.setTimeout(() => ((closeTimer = 0), setOpen(false)), 900);
+      }
+    }
+    document.addEventListener('pointermove', (e) => e.pointerType === 'mouse' && presence(onHub(e.target)));
+    document.addEventListener('pointerdown', (e) => (touched = e.pointerType !== 'mouse'), true);
+    document.addEventListener('keydown', () => (touched = false), true);
+    document.documentElement.addEventListener('pointerleave', () => presence(false));
+    root.addEventListener('focusin', (e) => presence(onHub(e.target)));
+    root.addEventListener('focusout', (e) => !onHub(e.relatedTarget) && presence(false));
+    // The box scrolls in place; its edges fade only where there's more.
+    for (const box of root.querySelectorAll<HTMLElement>('[data-scroller]')) {
+      const edges = () => {
+        box.toggleAttribute('data-at-top', box.scrollTop <= 1);
+        box.toggleAttribute('data-at-end', box.scrollTop + box.clientHeight >= box.scrollHeight - 1);
+      };
+      box.addEventListener('scroll', edges, { passive: true });
+      new ResizeObserver(edges).observe(box);
+      // Moving down the rows brings the next ones up: the row you're on
+      // eases toward the middle of the box. Only for a pointer that moved
+      // (or focus), so rows sliding under a still pointer don't chain.
+      let last: Element | null = null;
+      const follow = (row: HTMLElement) => {
+        if (row === last) return;
+        last = row;
+        box.scrollTo({ top: row.offsetTop + row.offsetHeight / 2 - box.clientHeight / 2, behavior: 'smooth' });
+      };
+      box.addEventListener('pointermove', (e) => {
+        const row = (e.target as Element).closest<HTMLElement>('li');
+        if (row && e.pointerType === 'mouse' && (e.movementX || e.movementY)) follow(row);
+      });
+      box.addEventListener('focusin', (e) => {
+        const row = (e.target as Element).closest<HTMLElement>('li');
+        if (row) follow(row);
+      });
+      box.addEventListener('pointerleave', () => (last = null));
+    }
     let offsets: number[] = [];
     const active = () => p % n;
 
@@ -177,8 +310,19 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
         m.classList.toggle('on', i === a);
         m.inert = i !== a;
       });
-      rows.forEach((r, i) => r.toggleAttribute('data-active', i === a));
-      if (count) count.textContent = String(a + 1).padStart(2, '0');
+      rows.forEach((r, i) => {
+        r.toggleAttribute('data-active', i === a);
+        // A hub's parts in the Index stay down while the pointer is in the
+        // list: folding them up would pull the rows under it.
+        if (i === a || !inRows) r.toggleAttribute('data-open', i === a);
+      });
+      // A new entry starts closed. On touch there's no hover: resting on a
+      // hub after a swipe or tap is the dwell.
+      if (delta || instant) {
+        disarm();
+        setOpen(false);
+        if (touched) arm();
+      }
       play();
     }
 
@@ -255,7 +399,8 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
           });
         }
         player.src = src;
-        hit(f).prepend(player);
+        // Over the poster, under the label and the HUD.
+        hit(f).querySelector('picture')!.after(player);
         player.play().catch(() => {});
       }, 250);
     }
@@ -329,7 +474,13 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
       r.addEventListener('pointerenter', (e) => e.pointerType === 'mouse' && toEntry(i));
       r.addEventListener('focusin', () => toEntry(i));
     });
-    rows[0]?.parentElement?.setAttribute('data-synced', '');
+    const list = rows[0]?.parentElement;
+    list?.setAttribute('data-synced', '');
+    list?.addEventListener('pointerenter', () => (inRows = true));
+    list?.addEventListener('pointerleave', () => {
+      inRows = false;
+      rows.forEach((r) => r.toggleAttribute('data-open', r.hasAttribute('data-active')));
+    });
 
     toggle?.addEventListener('click', () => {
       const view = toggle.dataset.view === 'strip' ? 'index' : 'strip';
@@ -337,6 +488,7 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
       toggle.setAttribute('aria-label', view === 'strip' ? 'Show as an index' : 'Show as a filmstrip');
       if (view === 'index') html.dataset.homeView = 'index';
       else delete html.dataset.homeView;
+      setOpen(false);
       play();
     });
 
@@ -348,7 +500,7 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
 
     // The other posters.
     const posters = () =>
-      strip.querySelectorAll<HTMLElement>('[data-src], [data-srcset]').forEach((el) => {
+      root.querySelectorAll<HTMLElement>('[data-src], [data-srcset]').forEach((el) => {
         for (const name of ['src', 'srcset']) {
           const value = el.dataset[name];
           if (value) {
@@ -396,6 +548,7 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
     /* The strip is centred in the screen, as in the mock at 900px tall, and
        never climbs into the meta's room under the header. */
     --strip-top: max(round(calc(50% - 162px), 1px), 250px);
+    --strip-h: round(calc(325 * var(--u)), 1px);
     position: absolute;
     inset: 0;
     /* The layer spans the frame; only its parts take the pointer. */
@@ -466,6 +619,129 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
     text-underline-offset: 3px;
   }
 
+  /* Its parts open: the hub glides up to make room under it. */
+  .filmstrip[data-open] {
+    --strip-top: max(round(calc(50% - 250px), 1px), 200px);
+  }
+  .metas {
+    transition: bottom 0.7s var(--ease);
+  }
+
+  /* Under the hub, on its left edge like the meta above it, down to the
+     foot of the screen: a box that scrolls in place. */
+  .hub-parts {
+    position: absolute;
+    left: calc(50% - 260px);
+    width: 520px;
+    top: calc(var(--strip-top) + var(--strip-h) + 20px);
+    bottom: calc(var(--frame-inset-block) + 8px);
+    display: grid;
+    transition: top 0.7s var(--ease);
+  }
+  .parts {
+    grid-area: 1 / 1;
+    min-height: 0;
+    visibility: hidden;
+    transition: visibility 0s 0.4s;
+  }
+  .parts.on {
+    visibility: visible;
+    pointer-events: auto;
+    transition: none;
+  }
+  .scroller {
+    /* The rows' offsetParent, for the follow scroll. */
+    position: relative;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+    /* More above or below: that edge fades. */
+    --top: 24px;
+    --end: 48px;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--top), #000 calc(100% - var(--end)), transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0, #000 var(--top), #000 calc(100% - var(--end)), transparent 100%);
+  }
+  .scroller::-webkit-scrollbar {
+    display: none;
+  }
+  .scroller[data-at-top] {
+    --top: 0px;
+  }
+  .scroller[data-at-end] {
+    --end: 0px;
+  }
+  /* The rows slide in one after another as the hub settles, and out
+     together. */
+  .parts li {
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 0.2s ease,
+      transform 0.3s var(--ease);
+  }
+  .parts.on li {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 0.45s ease calc(0.3s + var(--i) * 70ms),
+      transform 0.6s var(--ease) calc(0.3s + var(--i) * 70ms);
+  }
+  .part {
+    display: grid;
+    grid-template-columns: 112px minmax(0, 1fr);
+    column-gap: var(--space-16);
+    align-items: center;
+    padding-block: 10px;
+    border-top: 1px solid var(--line);
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .parts li:first-child .part {
+    border-top: 0;
+  }
+  .part img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    background: var(--surface);
+    transition: transform 0.4s var(--ease);
+  }
+  .part:hover img {
+    transform: scale(1.03);
+  }
+  .text {
+    display: grid;
+    gap: 3px;
+    min-width: 0;
+  }
+  .part .no {
+    color: var(--vers1ons);
+  }
+  .name {
+    font-weight: var(--weight-medium);
+  }
+  .summary {
+    overflow: hidden;
+    font-size: var(--text-small);
+    color: var(--muted);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .part:hover .name {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .part:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: -2px;
+  }
+
   .viewport {
     position: absolute;
     left: 0;
@@ -473,6 +749,7 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
     /* 6px of room above and below the frames for the focus ring. */
     top: calc(var(--strip-top) - 6px);
     height: round(calc(325 * var(--u) + 12px), 1px);
+    transition: top 0.6s var(--ease);
     overflow: clip;
     -webkit-mask-image: linear-gradient(to right, transparent 0, #000 9%, #000 91%, transparent 100%);
     mask-image: linear-gradient(to right, transparent 0, #000 9%, #000 91%, transparent 100%);
@@ -537,13 +814,6 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
     opacity: 0;
     transition: opacity 0.5s ease;
   }
-  .label {
-    position: absolute;
-    left: 8px;
-    top: 7px;
-    font-size: var(--text-mono-sm);
-    opacity: 0.7;
-  }
   .hud {
     position: absolute;
     left: 12px;
@@ -587,10 +857,22 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
          strip below. */
       --strip-top: max(round(calc(50% - 12px), 1px), 220px);
     }
-    .metas {
+    .filmstrip[data-open] {
+      --strip-top: max(round(calc(50% - 90px), 1px), 190px);
+    }
+    .metas,
+    .hub-parts {
       left: var(--frame-inset);
       right: var(--frame-inset);
       width: auto;
+    }
+    .hub-parts {
+      top: calc(var(--strip-top) + var(--strip-h) + 12px);
+      bottom: 0;
+    }
+    .part {
+      grid-template-columns: 88px minmax(0, 1fr);
+      column-gap: var(--space-12);
     }
     .row3 {
       flex-direction: column;

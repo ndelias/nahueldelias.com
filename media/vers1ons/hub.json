@@ -1,0 +1,32 @@
+{
+  "archive": "~/Vers1ons/portfolio-vers1ons",
+  "images": [
+    { "from": "screens/flows/hub/00-strip-logo.png", "to": "work/vers1ons/poster.webp", "width": 2080, "retouch": false },
+    { "from": "screens/flows/hub/00-strip-logo.png", "to": "work/vers1ons/cover.webp", "width": 1600, "retouch": false },
+    { "from": "videos/24-discover-loading.mp4", "to": "work/vers1ons/hero.webp", "width": 2688, "at": 6.0 },
+    { "from": "screens/flows/hub/00-poster.png", "to": "work/vers1ons/tour.webp", "width": 2688, "retouch": false },
+    { "from": "screens/eras/nov25/desktop-listing.png", "to": "work/vers1ons/versions/01-nov25.webp", "width": 1600, "crop": [0, 0, 2880, 1545] },
+    { "from": "screens/eras/mar26/desktop-listing.png", "to": "work/vers1ons/versions/02-mar26.webp", "width": 1600, "crop": [0, 0, 2880, 1545] },
+    { "from": "screens/eras/jul26/desktop-listing.png", "to": "work/vers1ons/versions/03-jul26.webp", "width": 1600, "crop": [0, 0, 2880, 1545] },
+    { "from": "screens/eras/today/desktop-listing.png", "to": "work/vers1ons/versions/04-today.webp", "width": 1600, "crop": [0, 0, 2880, 1545] }
+  ],
+  "videos": [
+    {
+      "to": "media/vers1ons/reel.mp4",
+      "kind": "hero",
+      "width": 1344,
+      "budget": 4000000,
+      "fade": 0.4,
+      "reel": [
+        { "from": "videos/24-discover-loading.mp4", "start": 6.0, "end": 9.6 },
+        { "from": "videos/25-hub-tour.mp4", "start": 15.3, "end": 18.1 },
+        { "from": "videos/21-purchase-walkthrough.mp4", "start": 0.3, "end": 3.6 },
+        { "from": "videos/21-purchase-walkthrough.mp4", "start": 36.4, "end": 39.2 },
+        { "from": "videos/21-purchase-walkthrough.mp4", "start": 46.0, "end": 49.4 },
+        { "from": "videos/25-hub-tour.mp4", "start": 42.0, "end": 45.4 },
+        { "from": "videos/25-hub-tour.mp4", "start": 55.9, "end": 61.0 }
+      ]
+    },
+    { "from": "videos/25-hub-tour.mp4", "to": "media/vers1ons/tour.mp4", "kind": "hero", "width": 1344 }
+  ]
+}

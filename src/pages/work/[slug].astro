@@ -13,6 +13,7 @@ import Frame from '../../components/Frame.astro';
 import Icon from '../../components/Icon.astro';
 import NextEntry from '../../components/NextEntry.astro';
 import PartsMatrix from '../../components/PartsMatrix.astro';
+import PartsNav from '../../components/PartsNav.astro';
 import VersionsStack from '../../components/VersionsStack.astro';
 import Base from '../../layouts/Base.astro';
 import { entriesIn, lastUpdated, partsOf, stackLine } from '../../lib/entries';
@@ -38,9 +39,11 @@ const heroMeta = hero?.video ? ['Walkthrough', 'muted', hero.duration].filter(Bo
   <DeferredStyles slot="head" />
   <Frame>
     <a slot="top-center" class="back" href="/">(<Icon name="arrow-left" /> Index)</a>
-    <main class="case container">
+    <main class:list={['case container', { hub: isHub }]}>
+      {/* A hub carries its parts' row on top, as each part does. */}
+      {isHub && <PartsNav hub={entry} />}
       {data.fixture && <p class="fixture mono muted">Fixture · a test entry for the templates, not real work</p>}
-      <EntryHeader entry={entry} />
+      {isHub ? <div class="header"><EntryHeader entry={entry} /></div> : <EntryHeader entry={entry} />}
 
       <Facts
         facts={[
@@ -70,6 +73,8 @@ const heroMeta = hero?.video ? ['Walkthrough', 'muted', hero.duration].filter(Bo
       <div class="parts defer" style="--defer-size: 547px"><PartsMatrix hub={entry} /></div>
 
       {data.versions && <div class="versions defer" style="--defer-size: 521px"><VersionsStack versions={data.versions} /></div>}
+
+      {data.disclaimer && <p class="disclaimer muted">{data.disclaimer}</p>}
 
       <div class="defer" style="--defer-size: 257px"><NextEntry entry={entry} /></div>
     </main>
@@ -103,6 +108,16 @@ const heroMeta = hero?.video ? ['Walkthrough', 'muted', hero.duration].filter(Bo
        the mock's 140px. The footer row sits in the last 32px + line. */
     padding-top: calc(var(--frame-inset-block) + 14px + 140px);
     padding-bottom: calc(var(--frame-inset-block) + 14px + 96px);
+  }
+  /* A hub: the parts' row 56px under the frame's header, then a rule in ink
+     over the hub's own header, as on a part page. */
+  .case.hub {
+    padding-top: calc(var(--frame-inset-block) + 14px + 56px);
+  }
+  .header {
+    margin-top: var(--space-32);
+    padding-top: var(--space-48);
+    border-top: 1px solid var(--ink);
   }
   .fixture {
     position: absolute;
@@ -142,6 +157,15 @@ const heroMeta = hero?.video ? ['Walkthrough', 'muted', hero.duration].filter(Bo
     .case {
       padding-top: var(--space-48);
       padding-bottom: var(--space-48);
+    }
+    .case.hub {
+      padding-top: var(--space-24);
+    }
+    /* The tab row has its own rule on a phone. */
+    .header {
+      margin-top: 0;
+      padding-top: var(--space-32);
+      border-top: 0;
     }
     .fixture {
       position: static;

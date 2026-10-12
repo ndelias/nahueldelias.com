@@ -1,71 +1,72 @@
 ---
-# FIXTURE from docs/design/CaseStudy.dc.html, until the real entry replaces it.
-# The hub: the 0→1 story. Its five parts are in ./vers1ons/.
-# A SHIP=1 build fails while any fixture remains.
-fixture: true
+# Copy drafted with Nahuel from his account of the project, partners
+# anonymous. Media from media/vers1ons/hub.json. Its five parts are in
+# ./vers1ons/.
 title: 'vers1ons'
 tagline: 'The licensing marketplace for music and its versions.'
 weight: 1
 status: shipped
-role: 'Product engineer, founding team'
+role: 'Early hire, product lead'
 dates:
-  start: '[Years]'
+  start: 2025-06
 stack: ['Next.js', 'tRPC', 'Postgres', 'Drizzle', 'Inngest', 'Socket.IO', 'Stripe Connect', 'Clerk', 'Object storage']
 links:
   live: 'https://vers1ons.com'
 decision:
-  chose: '[What you built first, or what you kept out.]'
-  rejected: '[The serious alternative you turned down.]'
-  cost: '[What it cost you, stated plainly.]'
+  intro: 'Remixes are everywhere in music, and almost none of them are licensed.'
+  chose: 'Make the license itself the product. Artists set the terms of a remix license and sell it themselves, and every version is tracked at the rights level, so a remix can be bought, released and paid all the way up the chain.'
+  rejected: 'Hosting remixes and sorting out the rights later, case by case.'
+  cost: 'Everything had to be built around rights first. The license, the signed agreement, payouts to every contributor, and distribution that checks the license. And the agreement had to hold up with labels'' legal teams.'
 hero:
-  # Raster, generated with the posters (scripts/fixture-posters.mjs), so
-  # the hero's AVIF path and budget run on the page Lighthouse measures.
-  src: ../../assets/fixtures/posters/vers1ons-hero.png
-  dark: ../../assets/fixtures/posters/vers1ons-hero-dark.png
-  alt: '[Walkthrough poster: what the first frame shows.]'
-  duration: '[0:48]'
-  caption: 'Upload → License → Release → Royalties'
+  src: ../../assets/work/vers1ons/hero.webp
+  alt: 'Discover: a new drop, featured songs with their prices, and new releases.'
+  video: /media/vers1ons/reel.mp4
+  duration: '0:23'
+  caption: 'Discover, publish, license, release and get paid'
 versions:
-  - src: ../../assets/fixtures/tones/tone3-desktop.svg
-    alt: '[v1 screen.]'
-    date: '[Date]'
-    note: '[What v1 got wrong.]'
-  - src: ../../assets/fixtures/tones/tone2-desktop.svg
-    alt: '[v2 screen.]'
-    date: '[Date]'
-    note: '[What changed and why.]'
-  - src: ../../assets/fixtures/tones/tone1-desktop.svg
-    alt: '[v3 screen.]'
-    date: '[Date]'
-    note: '[Where it is now.]'
+  - src: ../../assets/work/vers1ons/versions/01-nov25.webp
+    alt: 'A listing in November 2025: small caps, a placeholder cover, the license type and term, and two royalty percentages.'
+    date: 2025-11
+    note: 'The first listing. Small caps on everything, and the license was a template name, a term and two royalty numbers. This seed had no cover art.'
+  - src: ../../assets/work/vers1ons/versions/02-mar26.webp
+    alt: 'A listing in March 2026: one stacked column, the price beside an invite code field, and the royalties as two percentages.'
+    date: 2026-03
+    note: 'One stacked column. The price sat next to an invite code field, and the royalties were two bare percentages.'
+  - src: ../../assets/work/vers1ons/versions/03-jul26.webp
+    alt: 'A listing in July 2026: the song on the left, and the price, Purchase License and the license terms on the right.'
+    date: 2026-07
+    note: 'License first. The song on the left, the license on the right with the price and Purchase at the top, and the terms in plain sections.'
+  - src: ../../assets/work/vers1ons/versions/04-today.webp
+    alt: 'A listing today: the price and royalty shares at the top, where a remix can be released, and who it''s licensed by.'
+    date: 2026-10
+    note: 'On the system. Where a remix can be released, the royalty split and who you''re contracting with, all before you buy.'
+disclaimer: 'Showcase content. Artwork belongs to its respective owners. Artist names, prices and figures are fictional, and no affiliation is implied. Recordings come from an isolated local copy of the product running seeded data and Stripe''s test mode. The release''s delivery is staged, and its ISRC and UPC are placeholders. Earlier builds ran on their own seed data, and the November 2025 seed had no cover art.'
 cover:
-  src: ../../assets/fixtures/vers1ons.svg
-  alt: '[Cover image.]'
+  src: ../../assets/work/vers1ons/cover.webp
+  alt: 'The vers1ons wordmark on black.'
 poster:
-  src: ../../assets/fixtures/posters/vers1ons.png
-  dark: ../../assets/fixtures/posters/vers1ons-dark.png
+  src: ../../assets/work/vers1ons/poster.webp
+video: /media/vers1ons/reel.mp4
 order: 1
 ---
 import BodySection from '../../components/BodySection.astro';
 import Figure from '../../components/Figure.astro';
-import fig1 from '../../assets/fixtures/tones/tone2-wide.svg';
+import tour from '../../assets/work/vers1ons/tour.webp';
 
-<BodySection label="The bet" heading="[Why remixes needed a licensing marketplace at all.]" note="[One concrete fact that makes the problem real.]">
-  [The market problem in two or three sentences: who owns the rights, who wants to use them, and why that deal was slow, informal or illegal before.]
+<BodySection label="The bet" heading="From grey area to market.">
+  People remix songs all the time, but there was no simple way to license one. Without a license, a remix can't be released to streaming or earn anything, and the original artist never sees a cent from it. So most remixes stayed unofficial.
 
-  [Your role from day zero: founding team, joined as an intern, owned product and engineering across the parts below.]
+  vers1ons set out to turn that grey area into a market. Artists set their own terms and sell remix licenses directly, and every version stays tied to the rights it came from. I joined early as an engineer and became the product lead, working across product, design and engineering on every part below.
 </BodySection>
 
-<BodySection label="Sequencing" heading="[What had to exist first, and what could wait.]" note="[A timeline of the five parts can sit here.]">
-  [The order you built the five parts in, and why that order. This is the product-management story: what you cut, what you deferred, what you shipped half of on purpose.]
+<BodySection label="Sequencing" heading="The license had to come first. The money came after.">
+  Nothing else works until the license is real, so we started there, with the license as data the whole platform reads. Buying it came next, then paying every contributor their share, then releasing remixes to stores with the license checked along the way.
 
-  [How the design system let the later parts move faster.]
+  The design system came as the app grew, and moving every screen onto it took real work. That's the one thing I'd do differently. From zero, I'd build the design system on day one.
 </BodySection>
 
-<BodySection label="Where it is" heading="[What exists now, and what you would change.]" note="[Link the release notes or log entries that date each part.]">
-  [Evidence: partners, releases, licenses signed, money paid out. Real numbers or none.]
-
-  [The one thing you would build differently from zero.]
+<BodySection label="Where it is" heading="Live, with labels on board and remixes in stores.">
+  Artists and buyers use vers1ons in production. Labels list and license through it, licensed remixes are delivered to streaming stores, and the company is raising and growing. Each part below is one piece of how it got here.
 </BodySection>
 
-<Figure src={fig1} alt="[What the clip shows.]" caption="[Caption: what the reader should notice in this clip, in one sentence.]" />
+<Figure src={tour} alt="Review & Publish for Night Swim: the cover, $40.00, every step checked and Publish lit." video="/media/vers1ons/tour.mp4" caption="One license's life. An artist publishes, a buyer licenses it and releases a remix, and the artist gets paid (1:01)" />

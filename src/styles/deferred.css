@@ -1659,3 +1659,11 @@ nav.pager {
     }
   }
 }
+
+/* The hub's disclaimer, under the versions: whose artwork, what's staged. */
+.case > .disclaimer {
+  margin: var(--space-96) 0 0;
+  max-width: 75ch;
+  font-size: var(--text-caption);
+  line-height: var(--leading-small);
+}

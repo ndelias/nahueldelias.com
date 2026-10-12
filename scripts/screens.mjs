@@ -69,7 +69,7 @@ const SITE = [
   { name: 'home-index-1440-dark', viewport: DESKTOP, colorScheme: 'dark', view: 'index' },
   { name: 'home-index-390-light', viewport: PHONE, colorScheme: 'light', view: 'index' },
   { name: 'home-index-390-dark', viewport: PHONE, colorScheme: 'dark', view: 'index' },
-  // W01 focused, at rest. There's no video yet, so the frame is already a still.
+  // W01 focused, at rest, on its poster: its montage never loads (shoot()).
   { name: 'home-strip-1440-light', viewport: DESKTOP, colorScheme: 'light', view: 'strip' },
   { name: 'home-strip-1440-dark', viewport: DESKTOP, colorScheme: 'dark', view: 'strip' },
   { name: 'home-strip-390-light', viewport: PHONE, colorScheme: 'light', view: 'strip' },
@@ -169,11 +169,12 @@ async function loadAll(page) {
 /** Load a page in a fresh context and put it in the given state. */
 async function shoot(browser, origin, { viewport, colorScheme, view, next = 0, path }) {
   const ctx = await browser.newContext({ viewport, deviceScaleFactor: 1, colorScheme });
-  // Case study pages move on their own: recordings play, steps advance,
-  // comparisons rotate. A shot has to be the same every run, so the
-  // recordings never load (posters show) and the moving blocks are paused
-  // (from script, so no focus ring) before anything is captured.
-  if (path) await ctx.route('**/*.mp4', (route) => route.abort());
+  // Pages move on their own: the strip's focused frame and case studies'
+  // recordings play, steps advance, comparisons rotate. A shot has to be the
+  // same every run, so recordings never load anywhere (posters show) and
+  // case studies' moving blocks are paused (from script, so no focus ring)
+  // before anything is captured.
+  await ctx.route('**/*.mp4', (route) => route.abort());
   const page = await ctx.newPage();
   await page.goto(`${origin}${path ?? '/'}`, { waitUntil: 'load' });
   if (path) {
