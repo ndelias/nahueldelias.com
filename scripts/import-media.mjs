@@ -15,7 +15,8 @@
 //   crop of each goes to .media-review/ to look at.
 // Videos → public/media/…, re-encoded with ffmpeg: H.264, no audio track,
 //   fast start, trimmed with start/duration (or joined from "segments"),
-//   under the budget in the manifest entry (or the defaults below).
+//   under the budget in the manifest entry (or the defaults below). A
+//   "reel" pick joins stretches of several recordings with crossfades.
 //
 // The archive is never copied wholesale: only listed files, only image and
 // video types, and nothing that looks like a dotfile, key or secret. Needs
@@ -459,6 +460,7 @@ async function importImage(pick) {
 // --- videos -----------------------------------------------------------------
 
 function importVideo(pick) {
+  if (pick.reel) return importReel(pick);
   const from = source(pick.from);
   if (!VIDEO_TYPES.has(extname(from).toLowerCase())) throw new Error(`${pick.from}: not a video`);
   const to = join(ROOT, 'public', pick.to);
@@ -496,6 +498,43 @@ function importVideo(pick) {
       to,
     ]);
   // Start at the manifest's quality and step down until it fits.
+  let crf = pick.crf ?? 24;
+  encode(crf);
+  while (statSync(to).size > budget && crf < 34) encode((crf += 2));
+  const bytes = statSync(to).size;
+  if (bytes > budget) throw new Error(`${pick.to}: ${kb(bytes)} is over its ${kb(budget)} budget even at crf ${crf}`);
+  return { to: pick.to, bytes, crf };
+}
+
+// Reel: stretches of several recordings, joined in order with a plain
+// crossfade of `fade` seconds. [{ from, start, end }, …]; replaces from.
+function importReel(pick) {
+  const clips = pick.reel.map((c) => ({ ...c, file: source(c.from) }));
+  for (const c of clips) if (!VIDEO_TYPES.has(extname(c.file).toLowerCase())) throw new Error(`${c.from}: not a video`);
+  const to = join(ROOT, 'public', pick.to);
+  const budget = pick.budget ?? VIDEO_BUDGET[pick.kind ?? 'inline'];
+  if (check) return { to: pick.to };
+  mkdirSync(dirname(to), { recursive: true });
+  const fade = pick.fade ?? 0.4;
+  const scale = `scale=${pick.width ?? 1344}:-2:flags=lanczos,fps=30,format=yuv420p,setsar=1`;
+  const inputs = clips.flatMap((c) => ['-ss', String(c.start), '-t', String(c.end - c.start), '-i', c.file]);
+  const parts = clips.map((_, i) => `[${i}:v]${scale},setpts=PTS-STARTPTS[c${i}]`);
+  let last = 'c0';
+  let offset = 0;
+  for (let i = 1; i < clips.length; i++) {
+    offset += clips[i - 1].end - clips[i - 1].start - fade;
+    parts.push(`[${last}][c${i}]xfade=transition=fade:duration=${fade}:offset=${offset.toFixed(3)}[x${i}]`);
+    last = `x${i}`;
+  }
+  parts.push(`[${last}]format=yuv420p[out]`);
+  const encode = (crf) =>
+    execFileSync('ffmpeg', [
+      '-v', 'error', '-y', ...inputs, '-an',
+      '-filter_complex', parts.join(';'), '-map', '[out]',
+      '-c:v', 'libx264', '-preset', 'slow', '-crf', String(crf), '-profile:v', 'high',
+      '-movflags', '+faststart',
+      to,
+    ]);
   let crf = pick.crf ?? 24;
   encode(crf);
   while (statSync(to).size > budget && crf < 34) encode((crf += 2));

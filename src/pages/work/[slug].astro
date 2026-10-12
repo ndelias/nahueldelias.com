@@ -71,6 +71,8 @@ const heroMeta = hero?.video ? ['Walkthrough', 'muted', hero.duration].filter(Bo
 
       {data.versions && <div class="versions defer" style="--defer-size: 521px"><VersionsStack versions={data.versions} /></div>}
 
+      {data.disclaimer && <p class="disclaimer muted">{data.disclaimer}</p>}
+
       <div class="defer" style="--defer-size: 257px"><NextEntry entry={entry} /></div>
     </main>
     {updated && (

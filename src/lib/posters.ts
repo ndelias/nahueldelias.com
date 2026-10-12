@@ -47,6 +47,12 @@ export async function posterOf(entry: Entry): Promise<{ light: Srcsets; dark?: S
 // Never wider than the source. scripts/check-posters.mjs holds them to 60KB
 // up to 1344 wide (1x) and 120KB at 2688 (2x).
 export const HERO_WIDTHS = [672, 1344, 2688] as const;
+// The 672 AVIF is what a 1x–1.75x phone loads, Lighthouse's included, on a
+// slow link. A busy screen (the hub's Discover) came to 18KB at the default
+// quality, and with the HTML and fonts that pushed the hero into another
+// round trip: LCP 1203ms → 1053ms at 40 (13.7KB). 2x and 3x phones take the
+// 1344, at the default.
+const SMALL_HERO_QUALITY = 40;
 export const HERO_SIZES = '(min-width: 640px) calc(100vw - 96px), calc(100vw - 32px)';
 /** A part page's walkthrough, centered on eight columns (3 / span 8). */
 export const HERO_INSET_SIZES = '(min-width: 640px) 62vw, calc(100vw - 32px)';
@@ -62,7 +68,8 @@ async function heroSrcsets(src: ImageMetadata): Promise<HeroSources> {
   const { width } = (src as ImageMetadata & { clone?: ImageMetadata }).clone ?? src;
   const widths: number[] = HERO_WIDTHS.filter((w) => w <= width);
   if (!widths.length) widths.push(width);
-  const sized = (format: 'avif' | 'webp', w: number) => getImage({ src, format, width: w });
+  const sized = (format: 'avif' | 'webp', w: number) =>
+    getImage({ src, format, width: w, ...(format === 'avif' && w === HERO_WIDTHS[0] ? { quality: SMALL_HERO_QUALITY } : {}) });
   const set = async (format: 'avif' | 'webp') =>
     (await Promise.all(widths.map((w) => sized(format, w)))).map((img, i) => ({ url: img.src, w: widths[i] }));
   const [avif, webp] = await Promise.all([set('avif'), set('webp')]);

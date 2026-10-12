@@ -64,13 +64,13 @@ const front = (page) =>
 test('versions: tabs riffle the stack, the picked frame to the front', async () => {
   const { ctx, page } = await open();
   assert.equal(await page.getAttribute('[data-versions-tabs]', 'role'), 'tablist');
-  assert.equal(await front(page), 2, 'lands on the newest version');
+  assert.equal(await front(page), 3, 'lands on the newest version');
   await page.click('#version-tab-0');
   assert.equal(await front(page), 0);
   assert.equal(await page.getAttribute('#version-tab-0', 'aria-selected'), 'true');
-  assert.equal(await page.getAttribute('#version-tab-2', 'aria-selected'), 'false');
+  assert.equal(await page.getAttribute('#version-tab-3', 'aria-selected'), 'false');
   assert.equal(await page.getAttribute('#version-0', 'aria-hidden'), null, 'the front frame is the panel');
-  assert.equal(await page.getAttribute('#version-2', 'aria-hidden'), 'true', 'frames behind are hidden from AT');
+  assert.equal(await page.getAttribute('#version-3', 'aria-hidden'), 'true', 'frames behind are hidden from AT');
   // Frames behind step down and right, smaller, once the riffle settles.
   await page.waitForTimeout(700);
   const [a, b] = await page.$$eval('#version-0, #version-1', (els) => els.map((e) => e.getBoundingClientRect().toJSON()));
@@ -80,17 +80,17 @@ test('versions: tabs riffle the stack, the picked frame to the front', async () 
 
 test('versions: arrow keys, Home and End move selection and focus (roving tabindex)', async () => {
   const { ctx, page } = await open();
-  await page.focus('#version-tab-2');
+  await page.focus('#version-tab-3');
   await page.keyboard.press('ArrowDown'); // wraps
   assert.equal(await page.evaluate(() => document.activeElement.id), 'version-tab-0');
   assert.equal(await front(page), 0);
   await page.keyboard.press('End');
-  assert.equal(await page.evaluate(() => document.activeElement.id), 'version-tab-2');
+  assert.equal(await page.evaluate(() => document.activeElement.id), 'version-tab-3');
   await page.keyboard.press('ArrowLeft');
-  assert.equal(await front(page), 1);
+  assert.equal(await front(page), 2);
   await page.keyboard.press('Home');
   assert.equal(await front(page), 0);
-  assert.deepEqual(await page.$$eval('[data-version-tab]', (t) => t.map((b) => b.tabIndex)), [0, -1, -1]);
+  assert.deepEqual(await page.$$eval('[data-version-tab]', (t) => t.map((b) => b.tabIndex)), [0, -1, -1, -1]);
   await ctx.close();
 });
 
@@ -109,10 +109,10 @@ for (const [name, options] of [
   });
 }
 
-// Figure's recordings. No fixture has one yet, so the test gives the hub's
-// hero and Fig. 1 a clip: a WebM recorded here from a canvas, served at
-// /__test/ (it never exists as a file, so it can't reach dist/), added to the
-// built HTML in the markup Figure renders for a video.
+// Figure's recordings. The test gives the hub's hero and Fig. 1 a clip in
+// place of their own: a WebM recorded here from a canvas, served at /__test/
+// (it never exists as a file, so it can't reach dist/), added to the built
+// HTML in the markup Figure renders for a video, one of each way it plays.
 let clip;
 async function recordClip() {
   const { ctx, page } = await open();
@@ -144,7 +144,10 @@ async function recordClip() {
 
 async function withVideos(options = {}) {
   clip ??= await recordClip();
-  let html = await readFile(join(DIST, HUB, 'index.html'), 'utf8');
+  let html = (await readFile(join(DIST, HUB, 'index.html'), 'utf8'))
+    // The page's own recordings and their controls, replaced below.
+    .replace(/<video class="video astro-\w+"[^>]*><\/video>/g, '')
+    .replace(/<button class="(?:play|pause mono) astro-\w+"[^>]*data-figure-(?:toggle|pause)[^>]*>.*?<\/button>/gs, '');
   // Figure's scope class, from its media box.
   const cid = html.match(/<div class="media (astro-\w+)"/)[1];
   const medias = [...html.matchAll(/<div class="media astro-\w+"[^>]*>/g)];
@@ -566,7 +569,7 @@ for (const [path, id] of [
 test('deferred blocks: find-in-page reaches text in a block that was never rendered', async () => {
   // window.find is the scriptable form of Chrome's find bar; both search
   // content-visibility: auto content and reveal the match.
-  for (const [path, text] of [[HUB, '[Where it is now.]'], [PART, 'a playbook for when something goes wrong']]) {
+  for (const [path, text] of [[HUB, 'who you\'re contracting with'], [PART, 'a playbook for when something goes wrong']]) {
     const { ctx, page } = await openPart(path);
     const r = await page.evaluate((text) => {
       const found = window.find(text);

@@ -25,9 +25,16 @@ after(async () => {
   await server?.close();
 });
 
-async function open(options = {}) {
+// noVideos: / without the entries' own recordings, for tests that give
+// frames test clips of their own.
+async function open(options = {}, { noVideos = false } = {}) {
   const ctx = await browser.newContext({ viewport: DESKTOP, ...options });
   const page = await ctx.newPage();
+  if (noVideos)
+    await ctx.route(server.origin + '/', async (route) => {
+      const res = await route.fetch();
+      route.fulfill({ response: res, body: (await res.text()).replace(/ data-video="[^"]*"/g, '') });
+    });
   await page.goto(server.origin + '/', { waitUntil: 'load' });
   return { ctx, page };
 }
@@ -193,12 +200,13 @@ test('(Index)/(Strip) switches views; the list follows the strip', async () => {
   await ctx.close();
 });
 
-test('no video yet: no <video>, no "Playing" line', async () => {
+test('a frame without a video: no <video>, no "Playing" line', async () => {
   const { ctx, page } = await open();
-  await page.keyboard.press('ArrowRight');
+  assert.equal(await page.getAttribute('[data-strip] > [data-frame]:first-child', 'data-video'), '/media/vers1ons/reel.mp4', "W01's recording");
+  await page.keyboard.press('ArrowRight'); // W02: none
   await page.waitForTimeout(600);
   assert.equal(await page.locator('video').count(), 0);
-  assert.equal(await page.locator('.hud').count(), 0);
+  assert.equal(await page.locator('[data-frame].on .hud').count(), 0);
   await ctx.close();
 });
 
@@ -281,7 +289,7 @@ async function recordClip() {
 /** / with test clips on entries: { 1: 'clip' } gives W02 the good clip; 'missing' is a 404. */
 async function withVideos(videos, options = {}) {
   clip ??= await recordClip();
-  const { ctx, page } = await open(options);
+  const { ctx, page } = await open(options, { noVideos: true });
   const requests = [];
   await ctx.route('**/__test/*.webm', (route) => {
     requests.push(route.request().url());
@@ -315,9 +323,14 @@ test('video: loads only on focus, swaps into the focused frame, muted and inline
       controls: v.controls,
       autoplayAttr: v.hasAttribute('autoplay'),
       paused: v.paused,
+      // What's on top at the frame's centre: the recording, not its poster.
+      onTop: (() => {
+        const r = v.getBoundingClientRect();
+        return document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2) === v;
+      })(),
     };
   });
-  assert.deepEqual(v, { inFocused: true, label: 'W02', muted: true, inline: true, controls: false, autoplayAttr: false, paused: false });
+  assert.deepEqual(v, { inFocused: true, label: 'W02', muted: true, inline: true, controls: false, autoplayAttr: false, paused: false, onTop: true });
   assert.equal(requests.length >= 1, true);
   await ctx.close();
 });
@@ -348,7 +361,7 @@ test('video: pauses and detaches when focus leaves', async () => {
     src: null,
   });
   assert.equal(await page.locator('video').count(), 0);
-  assert.equal(await page.locator('.playing').count(), 0);
+  assert.equal(await page.locator('[data-frame].playing').count(), 0);
   await ctx.close();
 });
 

@@ -255,7 +255,8 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
           });
         }
         player.src = src;
-        hit(f).prepend(player);
+        // Over the poster, under the label and the HUD.
+        hit(f).querySelector('picture')!.after(player);
         player.play().catch(() => {});
       }, 250);
     }
