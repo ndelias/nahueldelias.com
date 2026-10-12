@@ -49,7 +49,7 @@ const previewRules =
             <ol aria-label={`Parts of ${entry.data.title}`}>
               {parts.map((part) => (
                 <li class="sub">
-                  <span class="no mono">{part.number}</span>
+                  <span class="sub-no mono">{part.number}</span>
                   <a class="sub-title" href={part.href}>{part.title}</a>
                 </li>
               ))}
@@ -211,7 +211,7 @@ const previewRules =
   .sub:first-child {
     margin-top: 10px;
   }
-  .sub .no {
+  .sub-no {
     color: var(--vers1ons);
     font-size: var(--text-mono-sm);
   }
