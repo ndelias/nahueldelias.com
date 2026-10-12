@@ -1,7 +1,7 @@
 ---
 // The filmstrip's corner controls (§7.5), placed in the frame's slots: the
 // (Index)/(Strip) switch top-center, Prev / Next bottom-center, out of the
-// way while the reader heads down a hub's parts (data-parts-down). Wired by
+// way while a hub's parts are open (data-parts-down). Wired by
 // Filmstrip.astro's island. Like the strip, they exist only with JS and
 // without reduced motion (data-strip-ui).
 import Icon from './Icon.astro';
@@ -57,12 +57,16 @@ const { part } = Astro.props;
       opacity 0.3s ease,
       visibility 0s;
   }
-  :global(:root[data-parts-down]) .nav {
-    opacity: 0;
-    visibility: hidden;
-    transition:
-      opacity 0.3s ease,
-      visibility 0s 0.3s;
+  /* A hub's parts reach down to the screen's foot on desktop. Phones keep
+     the controls in their own row under the strip. */
+  @media (min-width: 640px) {
+    :global(:root[data-parts-down]) .nav {
+      opacity: 0;
+      visibility: hidden;
+      transition:
+        opacity 0.3s ease,
+        visibility 0s 0.3s;
+    }
   }
   .to-strip {
     display: none;

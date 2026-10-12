@@ -111,7 +111,6 @@ test('tab order: only the focused frame and real controls', async () => {
   }
   const frames = order.filter((o) => o.startsWith('frame:'));
   assert.deepEqual([...new Set(frames)], ['frame:vers1ons, Work'], order.join(' | '));
-  assert.ok(order.some((o) => o.startsWith('W01.1')), `W01.1 is not in the tab order: ${order.join(' | ')}`);
   for (const want of ['Show as an index', 'Previous project', 'Next project', 'Open']) {
     assert.ok(order.includes(want), `${want} is not in the tab order: ${order.join(' | ')}`);
   }
@@ -202,80 +201,117 @@ test('(Index)/(Strip) switches views; the list follows the strip', async () => {
   await ctx.close();
 });
 
-test("a hub's parts come down under it while it's focused, one under the other, and fold up when it isn't", async () => {
+const hubParts = (page) =>
+  page.evaluate(() => {
+    const l = document.querySelector('[data-parts]');
+    const box = l.querySelector('ol');
+    return {
+      open: l.classList.contains('on'),
+      inert: l.inert,
+      frameTop: document.querySelector('[data-frame].on').getBoundingClientRect().top,
+      pageScrolls: document.documentElement.scrollHeight > innerHeight,
+      box: { top: box.scrollTop, height: box.clientHeight, content: box.scrollHeight },
+      links: [...l.querySelectorAll('a')].map((a) => [a.querySelector('.no').textContent, a.querySelector('.name').textContent, a.getAttribute('href')]),
+    };
+  });
+
+test("a hub lands on its own: its parts stay closed until you rest on it", async () => {
   const { ctx, page } = await open();
-  await page.waitForTimeout(1200);
-  const parts = () =>
-    page.evaluate(() => {
-      const l = document.querySelector('[data-parts]');
-      return {
-        open: l.classList.contains('on'),
-        inert: l.inert,
-        height: l.getBoundingClientRect().height,
-        links: [...l.querySelectorAll('a')].map((a) => [a.querySelector('.no').textContent, a.querySelector('.name').textContent, a.getAttribute('href')]),
-        tops: [...l.querySelectorAll('li')].map((li) => li.getBoundingClientRect().top),
-        covers: [...l.querySelectorAll('img')].map((i) => i.currentSrc),
-      };
-    });
-  const at = await parts();
-  assert.equal(at.open, true);
-  assert.equal(at.inert, false);
-  assert.deepEqual(at.links.map((l) => l[0]), ['W01.1', 'W01.2', 'W01.3', 'W01.4', 'W01.5']);
-  assert.deepEqual(at.links[0], ['W01.1', 'Design system', '/work/vers1ons/design-system/']);
-  assert.ok(at.tops.every((t, i) => i === 0 || t > at.tops[i - 1]), 'one under the other');
-  assert.ok(at.tops.at(-1) > DESKTOP.height, 'the list runs on below the screen');
-  assert.ok(at.covers.every(Boolean), 'every part has its cover');
-  // Under the focused frame, not over it.
-  const [frame, list] = await page.evaluate(() => [document.querySelector('[data-frame].on'), document.querySelector('[data-parts]')].map((el) => el.getBoundingClientRect().toJSON()));
-  assert.ok(list.top >= frame.bottom, `list top ${list.top} is above the frame's bottom ${frame.bottom}`);
-  // Pointing at a part keeps vers1ons focused.
-  await page.hover('[data-parts] li:nth-child(1) a');
-  await page.waitForTimeout(400);
-  assert.equal((await focused(page)).label, 'vers1ons, Work');
-  assert.equal(await counter(page), '01');
-  // Another entry: folded up and out of reach, and nothing to scroll.
-  await page.keyboard.press('ArrowRight');
-  await page.waitForTimeout(1200);
-  const away = await parts();
-  assert.equal(away.open, false);
-  assert.equal(away.inert, true);
-  assert.equal(away.height, 0);
-  assert.equal(await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight), true, 'the page still scrolls');
+  await page.waitForTimeout(2600);
+  const at = await hubParts(page);
+  assert.equal(at.open, false);
+  assert.equal(at.inert, true);
+  assert.equal(at.pageScrolls, false);
   await ctx.close();
 });
 
-test('a focused hub lifts and its foot fades; heading down clears the fade and Prev / Next', async () => {
+test('resting on a hub: its recording starts, the hub glides up, its parts slide in and scroll in place', async () => {
   const { ctx, page } = await open();
+  await page.waitForTimeout(800);
+  const before = await hubParts(page);
+  await page.mouse.move(720, 450);
+  await page.waitForTimeout(300);
+  assert.equal((await hubParts(page)).open, false, 'opened before the recording started');
   await page.waitForTimeout(1200);
-  const state = () =>
-    page.evaluate(() => ({
-      top: document.querySelector('[data-frame].on').getBoundingClientRect().top + scrollY,
-      foot: getComputedStyle(document.querySelector('.filmstrip .foot')).opacity,
-      nav: getComputedStyle(document.querySelector('[data-strip-next]').parentElement).visibility,
-    }));
-  const lifted = await state();
-  assert.equal(lifted.foot, '1');
-  assert.equal(lifted.nav, 'visible');
-  // Pointing at the parts.
-  await page.hover('[data-parts] li:nth-child(1) a');
-  await page.waitForTimeout(600);
-  assert.deepEqual([(await state()).foot, (await state()).nav], ['0', 'hidden']);
-  // Back up, then scrolling.
-  await page.mouse.move(720, 120);
-  await page.waitForTimeout(600);
-  assert.equal((await state()).nav, 'visible');
-  await page.mouse.wheel(0, 400);
-  await page.waitForTimeout(600);
-  assert.deepEqual([(await state()).foot, (await state()).nav], ['0', 'hidden']);
-  await page.mouse.wheel(0, -400);
-  await page.waitForTimeout(600);
-  // Another entry: back down to the middle, no fade.
+  const open1 = await hubParts(page);
+  assert.equal(open1.open, true);
+  assert.equal(open1.inert, false);
+  assert.ok(open1.frameTop < before.frameTop - 40, `the hub didn't glide up (${before.frameTop} → ${open1.frameTop})`);
+  assert.deepEqual(open1.links.map((l) => l[0]), ['W01.1', 'W01.2', 'W01.3', 'W01.4', 'W01.5']);
+  assert.deepEqual(open1.links[0], ['W01.1', 'Design system', '/work/vers1ons/design-system/']);
+  // The page stays one screen; the box scrolls itself.
+  assert.equal(open1.pageScrolls, false, 'the page scrolls');
+  assert.ok(open1.box.content > open1.box.height, 'every part fits: nothing to scroll in place');
+  const rect = await page.evaluate(() => document.querySelector('[data-parts] ol').getBoundingClientRect().toJSON());
+  assert.ok(rect.bottom <= DESKTOP.height, 'the box runs off the screen');
+  await page.mouse.move(rect.left + 200, rect.top + 60);
+  await page.mouse.wheel(0, 300);
+  await page.waitForTimeout(500);
+  const scrolled = await hubParts(page);
+  assert.ok(scrolled.box.top > 0, 'the box did not scroll');
+  assert.equal(await page.evaluate(() => scrollY), 0, 'the page scrolled');
+  // Pointing at the parts keeps the hub focused, and Prev / Next make way.
+  assert.equal((await focused(page)).label, 'vers1ons, Work');
+  assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('[data-strip-next]').parentElement).visibility), 'hidden');
+  // Another entry: folded away, back down.
   await page.keyboard.press('ArrowRight');
+  await page.waitForTimeout(1000);
+  const away = await hubParts(page);
+  assert.equal(away.open, false);
+  assert.equal(away.inert, true);
+  await ctx.close();
+});
+
+test('moving down the rows scrolls the box to the next ones; a still pointer stays put', async () => {
+  const { ctx, page } = await open();
+  await page.waitForTimeout(800);
+  await page.mouse.move(720, 450);
+  await page.waitForTimeout(1500);
+  const row = (k) => page.evaluate((k) => document.querySelectorAll('[data-parts] li')[k].getBoundingClientRect().toJSON(), k);
+  const r1 = await row(0);
+  await page.mouse.move(r1.left + 200, r1.top + r1.height / 2, { steps: 4 });
+  await page.waitForTimeout(600);
+  assert.equal((await hubParts(page)).box.top, 0, 'the first row scrolled the box');
+  const r3 = await row(2);
+  await page.mouse.move(r3.left + 200, r3.top + r3.height / 2, { steps: 6 });
+  await page.waitForTimeout(900);
+  const after3 = (await hubParts(page)).box.top;
+  assert.ok(after3 > 0, 'hovering the third row did not bring the next ones up');
+  // Rows slid under the still pointer: no chain reaction.
+  await page.waitForTimeout(900);
+  assert.equal((await hubParts(page)).box.top, after3);
+  await ctx.close();
+});
+
+test('leaving the hub and its parts folds them a moment later; a pass over it does nothing', async () => {
+  const { ctx, page } = await open();
+  await page.waitForTimeout(800);
+  await page.mouse.move(720, 450);
+  await page.waitForTimeout(200);
+  await page.mouse.move(720, 120);
   await page.waitForTimeout(1200);
-  const other = await state();
-  assert.ok(other.top > lifted.top, `the strip didn't come back down (${lifted.top} → ${other.top})`);
-  assert.equal(other.foot, '0');
-  assert.equal(other.nav, 'visible');
+  assert.equal((await hubParts(page)).open, false, 'opened without a full dwell');
+  await page.mouse.move(720, 450);
+  await page.waitForTimeout(1500);
+  assert.equal((await hubParts(page)).open, true);
+  await page.mouse.move(720, 120);
+  await page.waitForTimeout(300);
+  assert.equal((await hubParts(page)).open, true, 'folded at once');
+  await page.waitForTimeout(1200);
+  assert.equal((await hubParts(page)).open, false, 'still open after leaving');
+  await ctx.close();
+});
+
+test('keyboard: resting focus on the hub opens its parts, and Tab reaches them', async () => {
+  const { ctx, page } = await open();
+  await page.waitForTimeout(800);
+  await page.focus('[data-frame].on .hit');
+  await page.waitForTimeout(1500);
+  assert.equal((await hubParts(page)).open, true);
+  await page.keyboard.press('Tab');
+  assert.equal(await page.evaluate(() => document.activeElement.getAttribute('href')), '/work/vers1ons/design-system/');
+  await page.waitForTimeout(1200);
+  assert.equal((await hubParts(page)).open, true, 'folded while focus is in the parts');
   await ctx.close();
 });
 
