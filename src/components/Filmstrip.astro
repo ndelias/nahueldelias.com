@@ -9,15 +9,30 @@
 // copies of the ring are enough to fill any screen at first paint; the
 // island adds more when it needs room to wrap off-screen (src/lib/strip.ts).
 //
-// A hub's parts come down under it as a list while it's focused, number and
-// title, each to its page. The hub stays the focused frame throughout.
-import { SECTION_LABELS, entryHref, entryNumber, entryYears, homepageEntries, partsOf } from '../lib/entries';
+// A hub's parts come down under it while it's focused, one under the other
+// (cover, number, title, summary), each to its page, running on below the
+// screen. The hub lifts a little and the screen's foot fades, so it reads as
+// more to scroll to; pointing at the parts or scrolling clears the fade and
+// Prev / Next. The hub stays the focused frame throughout.
+import { getImage } from 'astro:assets';
+import { SECTION_LABELS, entryHref, entryNumber, entryYears, homepageEntries, partsOf, type Entry } from '../lib/entries';
 import { POSTER, posterOf } from '../lib/posters';
 import { isReal, layout } from '../lib/strip';
 import Icon from './Icon.astro';
 import StatusBadge from './StatusBadge.astro';
 
 const COPIES = 2;
+const THUMB = 176; // a part's cover, CSS px
+
+// Like the other posters, a part's cover gets its sources from the island
+// once W01 has painted (data-src, data-srcset).
+const thumb = async (part: Entry) => {
+  const src = part.data.cover.src;
+  // Read from a clone: reading the import itself ships the original too.
+  if (((src as typeof src & { clone?: typeof src }).clone ?? src).format === 'svg') return { src: src.src };
+  const img = await getImage({ src, widths: [THUMB, THUMB * 2], format: 'webp' });
+  return { src: img.src, srcset: img.srcSet.attribute };
+};
 
 const entries = await Promise.all(
   homepageEntries().map(async (entry) => ({
@@ -27,7 +42,15 @@ const entries = await Promise.all(
     href: entryHref(entry),
     years: entryYears(entry),
     poster: await posterOf(entry),
-    parts: partsOf(entry).map((part) => ({ number: entryNumber(part), title: part.data.title, href: entryHref(part) })),
+    parts: await Promise.all(
+      partsOf(entry).map(async (part) => ({
+        number: entryNumber(part),
+        title: part.data.title,
+        summary: part.data.summary ?? part.data.tagline,
+        href: entryHref(part),
+        thumb: await thumb(part),
+      })),
+    ),
   })),
 );
 const n = entries.length;
@@ -35,7 +58,7 @@ const weights = entries.map(({ entry }) => entry.data.weight);
 const slots = layout(weights, n * COPIES, 0);
 const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
 ---
-<section class="filmstrip" data-strip-ui data-filmstrip aria-label="Projects">
+<section class="filmstrip" data-strip-ui data-filmstrip aria-label="Projects" data-lifted={entries[0]?.parts.length ? '' : undefined}>
   <div class="metas">
     {entries.map(({ entry, number, section, href, years }, i) => (
       <div class:list={['meta', { on: i === 0 }]} data-meta inert={i !== 0}>
@@ -68,6 +91,7 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
             class:list={['frame', { on }]}
             data-frame
             data-video={j < n ? entry.data.video : undefined}
+            data-no={number}
             aria-hidden={isReal(offset, n) ? undefined : 'true'}
             style={`--x:${x};--w:${w};--h:${h}`}
           >
@@ -93,7 +117,6 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
                   alt=""
                 />
               </picture>
-              <span class="label mono" aria-hidden="true">{number}</span>
               {entry.data.video && (
                 <span class="hud mono" aria-hidden="true">
                   <span class="playing"><Icon name="dot" /> Playing · muted</span>
@@ -109,14 +132,24 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
   <div class="hub-parts">
     {entries.map(({ entry, parts }, i) => parts.length > 0 && (
       <div class:list={['parts', { on: i === 0 }]} data-parts={i} inert={i !== 0}>
-        <ol aria-label={`Parts of ${entry.data.title}`} style={`--rows: ${Math.ceil(parts.length / 2)}`}>
-          {parts.map(({ number, title, href }) => (
-            <li><a class="part mono" href={href}><span class="no">{number}</span> <span class="name">{title}</span></a></li>
+        <ol aria-label={`Parts of ${entry.data.title}`}>
+          {parts.map(({ number, title, summary, href, thumb }) => (
+            <li>
+              <a class="part" href={href}>
+                <img data-src={thumb.src} data-srcset={thumb.srcset} sizes={`${THUMB}px`} width={THUMB} height={THUMB * 10 / 16} alt="" loading="lazy" decoding="async" />
+                <span class="text">
+                  <span class="no mono">{number}</span>
+                  <span class="name">{title}</span>
+                  <span class="summary">{summary}</span>
+                </span>
+              </a>
+            </li>
           ))}
         </ol>
       </div>
     ))}
   </div>
+  <div class="foot" aria-hidden="true"></div>
   <p class="visually-hidden" aria-live="polite" data-strip-status></p>
 </section>
 
@@ -154,13 +187,30 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
     const titles = metas.map((m) => m.querySelector('h2')!.textContent!.trim());
     const status = root.querySelector('[data-strip-status]')!;
     const rows = [...document.querySelectorAll<HTMLElement>('[data-row]')];
-    const count = document.querySelector('[data-strip-count]');
     const toggle = document.querySelector<HTMLButtonElement>('[data-view-toggle]');
     const hit = (f: HTMLElement) => f.firstElementChild as HTMLElement;
     const frameOf = (t: EventTarget | null) => frames.indexOf((t as Element | null)?.closest?.('[data-frame]') as HTMLElement);
 
     let p = 0; // the focused frame
     let inRows = false; // the pointer is over the Index list
+    let inParts = false; // the pointer or focus is on a hub's parts
+
+    // Down: the reader is heading for the parts (pointing at them, in them
+    // by keyboard, or scrolled). The fade and Prev / Next make way.
+    function down() {
+      const on = root.hasAttribute('data-lifted') && html.dataset.homeView !== 'index' && (inParts || scrollY > 8);
+      root.toggleAttribute('data-down', on);
+      html.toggleAttribute('data-parts-down', on);
+    }
+    for (const l of root.querySelectorAll<HTMLElement>('[data-parts]')) {
+      l.addEventListener('pointerenter', () => ((inParts = true), down()));
+      l.addEventListener('pointerleave', () => ((inParts = false), down()));
+      l.addEventListener('focusin', () => ((inParts = true), down()));
+      l.addEventListener('focusout', (e) => {
+        if (!l.contains(e.relatedTarget as Node | null)) (inParts = false), down();
+      });
+    }
+    addEventListener('scroll', down, { passive: true });
     let offsets: number[] = [];
     const active = () => p % n;
 
@@ -205,7 +255,9 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
         // list: folding them up would pull the rows under it.
         if (i === a || !inRows) r.toggleAttribute('data-open', i === a);
       });
-      if (count) count.textContent = String(a + 1).padStart(2, '0');
+      const lifted = parts.some((l) => Number(l.dataset.parts) === a);
+      root.toggleAttribute('data-lifted', lifted);
+      down();
       play();
     }
 
@@ -371,6 +423,7 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
       toggle.setAttribute('aria-label', view === 'strip' ? 'Show as an index' : 'Show as a filmstrip');
       if (view === 'index') html.dataset.homeView = 'index';
       else delete html.dataset.homeView;
+      down();
       play();
     });
 
@@ -382,7 +435,7 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
 
     // The other posters.
     const posters = () =>
-      strip.querySelectorAll<HTMLElement>('[data-src], [data-srcset]').forEach((el) => {
+      root.querySelectorAll<HTMLElement>('[data-src], [data-srcset]').forEach((el) => {
         for (const name of ['src', 'srcset']) {
           const value = el.dataset[name];
           if (value) {
@@ -430,6 +483,7 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
     /* The strip is centred in the screen, as in the mock at 900px tall, and
        never climbs into the meta's room under the header. */
     --strip-top: max(round(calc(50% - 162px), 1px), 250px);
+    --strip-h: round(calc(325 * var(--u)), 1px);
     position: absolute;
     inset: 0;
     /* The layer spans the frame; only its parts take the pointer. */
@@ -500,14 +554,24 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
     text-underline-offset: 3px;
   }
 
-  /* Under the focused frame, on its left edge like the meta above it. Rolled
-     up (0fr) until its hub is focused, then it comes down. */
+  /* A hub, focused, lifts a little to show there's more under it. */
+  .filmstrip[data-lifted] {
+    --strip-top: max(round(calc(50% - 222px), 1px), 210px);
+  }
+  .metas {
+    transition: bottom 0.6s var(--ease);
+  }
+
+  /* Under the focused frame, on its left edge like the meta above it,
+     running on below the screen. Rolled up (0fr) until its hub is focused,
+     then it comes down. */
   .hub-parts {
     position: absolute;
     left: calc(50% - 260px);
     width: 520px;
-    top: calc(var(--strip-top) + round(calc(325 * var(--u)), 1px) + 20px);
+    top: calc(var(--strip-top) + var(--strip-h) + 24px);
     display: grid;
+    transition: top 0.6s var(--ease);
   }
   .parts {
     grid-area: 1 / 1;
@@ -523,36 +587,60 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
     opacity: 1;
     pointer-events: auto;
     transition:
-      grid-template-rows 0.6s var(--ease) 0.1s,
+      grid-template-rows 0.7s var(--ease) 0.1s,
       opacity 0.4s ease 0.1s;
   }
   .parts ol {
     min-height: 0;
     overflow: hidden;
     margin: 0;
-    /* Room for the last rule. */
-    padding: 0 0 1px;
+    padding: 0;
     list-style: none;
   }
-  /* A rule above and below each part; where two meet they share a line. */
+  /* Room to finish the page under the last part, rolled up with the rest. */
+  .parts ol::after {
+    content: '';
+    display: block;
+    height: var(--space-96);
+  }
   .part {
-    display: flex;
-    gap: var(--space-8);
-    align-items: center;
-    min-height: 28px;
-    box-shadow:
-      inset 0 1px var(--line),
-      0 1px var(--line);
-    color: var(--muted);
+    display: grid;
+    grid-template-columns: 176px minmax(0, 1fr);
+    column-gap: var(--space-16);
+    align-items: start;
+    padding-block: var(--space-16);
+    border-top: 1px solid var(--line);
+    color: var(--ink);
     text-decoration: none;
   }
+  .parts li:last-child .part {
+    border-bottom: 1px solid var(--line);
+  }
+  .part img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    background: var(--surface);
+  }
+  .text {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-top: 2px;
+  }
   .part .no {
-    min-width: 6ch;
     color: var(--vers1ons);
   }
-  .part:hover,
-  .part:focus-visible {
-    color: var(--ink);
+  .name {
+    font-size: var(--text-body);
+    font-weight: var(--weight-medium);
+  }
+  .summary {
+    font-size: var(--text-small);
+    line-height: 1.45;
+    color: var(--muted);
   }
   .part:hover .name {
     text-decoration: underline;
@@ -560,7 +648,22 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
   }
   .part:focus-visible {
     outline: var(--focus-ring);
-    outline-offset: -2px;
+    outline-offset: 2px;
+  }
+
+  /* The screen's foot fades over the parts until the reader heads down. */
+  .foot {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 160px;
+    background: linear-gradient(to top, var(--bg) 40%, transparent);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .filmstrip[data-lifted]:not([data-down]) .foot {
+    opacity: 1;
   }
 
   .viewport {
@@ -570,6 +673,7 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
     /* 6px of room above and below the frames for the focus ring. */
     top: calc(var(--strip-top) - 6px);
     height: round(calc(325 * var(--u) + 12px), 1px);
+    transition: top 0.6s var(--ease);
     overflow: clip;
     -webkit-mask-image: linear-gradient(to right, transparent 0, #000 9%, #000 91%, transparent 100%);
     mask-image: linear-gradient(to right, transparent 0, #000 9%, #000 91%, transparent 100%);
@@ -634,13 +738,6 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
     opacity: 0;
     transition: opacity 0.5s ease;
   }
-  .label {
-    position: absolute;
-    left: 8px;
-    top: 7px;
-    font-size: var(--text-mono-sm);
-    opacity: 0.7;
-  }
   .hud {
     position: absolute;
     left: 12px;
@@ -670,24 +767,6 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
     opacity: 1;
   }
 
-  /* Short screens: not enough room under the strip for one column of
-     parts, so they run top to bottom in two, and the strip sits a little
-     higher. */
-  @media (min-width: 640px) and (max-height: 859.98px) {
-    .filmstrip {
-      --strip-top: max(round(calc(50% - 162px), 1px), 210px);
-    }
-  }
-  @media (max-height: 859.98px) {
-    .parts ol {
-      display: grid;
-      grid-template-rows: repeat(var(--rows), auto);
-      grid-auto-flow: column;
-      grid-auto-columns: minmax(0, 1fr);
-      column-gap: var(--space-24);
-    }
-  }
-
   /* Phone: the strip sits under the header, in what's left of the screen,
      with the controls under it. Same structure as desktop (the meta
      above a strip placed on a whole pixel), just in the flow. */
@@ -702,6 +781,9 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
          strip below. */
       --strip-top: max(round(calc(50% - 12px), 1px), 220px);
     }
+    .filmstrip[data-lifted] {
+      --strip-top: max(round(calc(50% - 60px), 1px), 200px);
+    }
     .metas,
     .hub-parts {
       left: var(--frame-inset);
@@ -709,23 +791,15 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
       width: auto;
     }
     .hub-parts {
-      top: calc(var(--strip-top) + round(calc(325 * var(--u)), 1px) + 16px);
+      top: calc(var(--strip-top) + var(--strip-h) + 16px);
+    }
+    .part {
+      grid-template-columns: 120px minmax(0, 1fr);
+      column-gap: var(--space-12);
     }
     .row3 {
       flex-direction: column;
       gap: 10px;
-    }
-  }
-  /* Phones, short and tall: one column of parts fits only on a tall one;
-     on a short one the strip moves up into the room under the header. */
-  @media (max-width: 639.98px) and (min-height: 760px) {
-    .parts ol {
-      display: block;
-    }
-  }
-  @media (max-width: 639.98px) and (max-height: 759.98px) {
-    .filmstrip {
-      --strip-top: max(round(calc(50% - 72px), 1px), 170px);
     }
   }
 </style>

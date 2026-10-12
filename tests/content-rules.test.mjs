@@ -262,8 +262,9 @@ test("parts: they don't count toward the weight 1 cap and are never a homepage e
     const own = (html, attr) => (html.match(new RegExp(`<[^>]+${attr}[ >=]`, 'g')) ?? []).length;
     assert.equal(own(home, 'data-meta'), 2, 'a part has its own meta in the strip');
     assert.equal(own(home, 'data-row'), 2, 'a part has its own Index row');
-    assert.ok(!home.includes('Only on the hub.'), "a part's tagline appears on the homepage");
     const lists = home.match(/aria-label="Parts of The hub"[^]*?<\/ol>/g) ?? [];
+    const outside = lists.reduce((html, list) => html.replace(list, ''), home);
+    assert.ok(!outside.includes('Only on the hub.'), "a part's line appears outside its hub's list");
     assert.equal(lists.length, 2, "the hub's parts, under it in the strip and in the Index");
     for (const list of lists) assert.ok(list.indexOf('Licensing part') < list.indexOf('Payouts part'), 'parts in build order');
     const hub = await result.read('work/hub/index.html');

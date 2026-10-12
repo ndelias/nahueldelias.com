@@ -40,7 +40,8 @@ async function open(options = {}, { noVideos = false } = {}) {
 }
 
 const visible = (page, selector) => page.evaluate((s) => [...document.querySelectorAll(s)].some((el) => el.checkVisibility()), selector);
-const counter = (page) => page.textContent('[data-strip-count]');
+// The focused entry's position, "01"…, from the meta that shows.
+const counter = (page) => page.evaluate(() => String([...document.querySelectorAll('[data-meta]')].findIndex((m) => m.classList.contains('on')) + 1).padStart(2, '0'));
 const focused = (page) =>
   page.evaluate(() => {
     const f = document.querySelector('[data-frame].on');
@@ -51,7 +52,7 @@ const focused = (page) =>
 test('without JS: the Index list only, no strip and none of its controls', async () => {
   const { ctx, page } = await open({ javaScriptEnabled: false });
   assert.equal(await visible(page, '[data-home-index]'), true);
-  for (const s of ['.filmstrip', '[data-view-toggle]', '[data-strip-count]', '[data-strip-prev]', '[data-strip-next]']) {
+  for (const s of ['.filmstrip', '[data-view-toggle]', '[data-strip-prev]', '[data-strip-next]']) {
     assert.equal(await visible(page, s), false, `${s} shows without JS`);
   }
   await ctx.close();
@@ -60,7 +61,7 @@ test('without JS: the Index list only, no strip and none of its controls', async
 test('reduced motion: the Index list only, no strip, no toggle', async () => {
   const { ctx, page } = await open({ reducedMotion: 'reduce' });
   assert.equal(await visible(page, '[data-home-index]'), true);
-  for (const s of ['.filmstrip', '[data-view-toggle]', '[data-strip-count]', '[data-strip-prev]']) {
+  for (const s of ['.filmstrip', '[data-view-toggle]', '[data-strip-prev]']) {
     assert.equal(await visible(page, s), false, `${s} shows with reduced motion`);
   }
   await ctx.close();
@@ -75,7 +76,7 @@ test('lands on W01, centred and large; weight 1 is larger than the rest at rest'
   assert.deepEqual([f.w, f.h, Math.round(f.cx)], [520, 325, 720]);
   const sizes = await page.evaluate(() =>
     [...document.querySelectorAll('[data-frame]:not(.on):not([aria-hidden])')].map((el) => ({
-      no: el.querySelector('.label').textContent,
+      no: el.dataset.no,
       w: el.getBoundingClientRect().width,
     })),
   );
@@ -88,7 +89,7 @@ test('duplicates are aria-hidden: one real frame per entry, the focused one amon
   const { ctx, page } = await open();
   for (const step of [0, 3, -9]) {
     if (step) await page.evaluate((s) => [...Array(Math.abs(s))].forEach(() => document.querySelector(s > 0 ? '[data-strip-next]' : '[data-strip-prev]').click()), step);
-    const real = await page.evaluate(() => [...document.querySelectorAll('[data-frame]:not([aria-hidden])')].map((f) => f.querySelector('.label').textContent));
+    const real = await page.evaluate(() => [...document.querySelectorAll('[data-frame]:not([aria-hidden])')].map((f) => f.dataset.no));
     assert.equal(real.length, N);
     assert.equal(new Set(real).size, N);
     assert.equal(await page.locator('[data-frame].on[aria-hidden]').count(), 0);
@@ -110,7 +111,8 @@ test('tab order: only the focused frame and real controls', async () => {
   }
   const frames = order.filter((o) => o.startsWith('frame:'));
   assert.deepEqual([...new Set(frames)], ['frame:vers1ons, Work'], order.join(' | '));
-  for (const want of ['Show as an index', 'Previous project', 'Next project', 'Open', 'W01.1 Design system']) {
+  assert.ok(order.some((o) => o.startsWith('W01.1')), `W01.1 is not in the tab order: ${order.join(' | ')}`);
+  for (const want of ['Show as an index', 'Previous project', 'Next project', 'Open']) {
     assert.ok(order.includes(want), `${want} is not in the tab order: ${order.join(' | ')}`);
   }
   // Only the focused entry's Open link: one per lap.
@@ -200,9 +202,9 @@ test('(Index)/(Strip) switches views; the list follows the strip', async () => {
   await ctx.close();
 });
 
-test("a hub's parts come down under it while it's focused, and fold up when it isn't", async () => {
+test("a hub's parts come down under it while it's focused, one under the other, and fold up when it isn't", async () => {
   const { ctx, page } = await open();
-  await page.waitForTimeout(900);
+  await page.waitForTimeout(1200);
   const parts = () =>
     page.evaluate(() => {
       const l = document.querySelector('[data-parts]');
@@ -211,46 +213,70 @@ test("a hub's parts come down under it while it's focused, and fold up when it i
         inert: l.inert,
         height: l.getBoundingClientRect().height,
         links: [...l.querySelectorAll('a')].map((a) => [a.querySelector('.no').textContent, a.querySelector('.name').textContent, a.getAttribute('href')]),
+        tops: [...l.querySelectorAll('li')].map((li) => li.getBoundingClientRect().top),
+        covers: [...l.querySelectorAll('img')].map((i) => i.currentSrc),
       };
     });
   const at = await parts();
   assert.equal(at.open, true);
   assert.equal(at.inert, false);
-  assert.ok(at.height > 100, `parts list is ${at.height}px tall`);
   assert.deepEqual(at.links.map((l) => l[0]), ['W01.1', 'W01.2', 'W01.3', 'W01.4', 'W01.5']);
   assert.deepEqual(at.links[0], ['W01.1', 'Design system', '/work/vers1ons/design-system/']);
+  assert.ok(at.tops.every((t, i) => i === 0 || t > at.tops[i - 1]), 'one under the other');
+  assert.ok(at.tops.at(-1) > DESKTOP.height, 'the list runs on below the screen');
+  assert.ok(at.covers.every(Boolean), 'every part has its cover');
   // Under the focused frame, not over it.
   const [frame, list] = await page.evaluate(() => [document.querySelector('[data-frame].on'), document.querySelector('[data-parts]')].map((el) => el.getBoundingClientRect().toJSON()));
   assert.ok(list.top >= frame.bottom, `list top ${list.top} is above the frame's bottom ${frame.bottom}`);
   // Pointing at a part keeps vers1ons focused.
-  await page.hover('[data-parts] li:nth-child(3) a');
+  await page.hover('[data-parts] li:nth-child(1) a');
   await page.waitForTimeout(400);
   assert.equal((await focused(page)).label, 'vers1ons, Work');
   assert.equal(await counter(page), '01');
-  // Another entry: folded up and out of reach.
+  // Another entry: folded up and out of reach, and nothing to scroll.
   await page.keyboard.press('ArrowRight');
-  await page.waitForTimeout(900);
+  await page.waitForTimeout(1200);
   const away = await parts();
   assert.equal(away.open, false);
   assert.equal(away.inert, true);
-  assert.ok(away.height <= 1, `folded list is ${away.height}px tall`);
+  assert.equal(away.height, 0);
+  assert.equal(await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight), true, 'the page still scrolls');
   await ctx.close();
 });
 
-test("short screens: the parts run in two columns, clear of Prev/Next", async () => {
-  for (const viewport of [{ width: 1280, height: 720 }, { width: 375, height: 667 }]) {
-    const { ctx, page } = await open({ viewport });
-    await page.waitForTimeout(900);
-    const r = await page.evaluate(() => {
-      const items = [...document.querySelectorAll('[data-parts] li')].map((li) => li.getBoundingClientRect());
-      const list = document.querySelector('[data-parts]').getBoundingClientRect();
-      const prev = document.querySelector('[data-strip-prev]').getBoundingClientRect();
-      return { columns: new Set(items.map((i) => Math.round(i.left))).size, bottom: list.bottom, prev: prev.top };
-    });
-    assert.equal(r.columns, 2, `${viewport.width}×${viewport.height}`);
-    assert.ok(r.bottom <= r.prev, `${viewport.width}×${viewport.height}: the list ends at ${r.bottom}, Prev starts at ${r.prev}`);
-    await ctx.close();
-  }
+test('a focused hub lifts and its foot fades; heading down clears the fade and Prev / Next', async () => {
+  const { ctx, page } = await open();
+  await page.waitForTimeout(1200);
+  const state = () =>
+    page.evaluate(() => ({
+      top: document.querySelector('[data-frame].on').getBoundingClientRect().top + scrollY,
+      foot: getComputedStyle(document.querySelector('.filmstrip .foot')).opacity,
+      nav: getComputedStyle(document.querySelector('[data-strip-next]').parentElement).visibility,
+    }));
+  const lifted = await state();
+  assert.equal(lifted.foot, '1');
+  assert.equal(lifted.nav, 'visible');
+  // Pointing at the parts.
+  await page.hover('[data-parts] li:nth-child(1) a');
+  await page.waitForTimeout(600);
+  assert.deepEqual([(await state()).foot, (await state()).nav], ['0', 'hidden']);
+  // Back up, then scrolling.
+  await page.mouse.move(720, 120);
+  await page.waitForTimeout(600);
+  assert.equal((await state()).nav, 'visible');
+  await page.mouse.wheel(0, 400);
+  await page.waitForTimeout(600);
+  assert.deepEqual([(await state()).foot, (await state()).nav], ['0', 'hidden']);
+  await page.mouse.wheel(0, -400);
+  await page.waitForTimeout(600);
+  // Another entry: back down to the middle, no fade.
+  await page.keyboard.press('ArrowRight');
+  await page.waitForTimeout(1200);
+  const other = await state();
+  assert.ok(other.top > lifted.top, `the strip didn't come back down (${lifted.top} → ${other.top})`);
+  assert.equal(other.foot, '0');
+  assert.equal(other.nav, 'visible');
+  await ctx.close();
 });
 
 test("Index: a hub's parts are rows under it, down while it's the active row", async () => {
@@ -306,7 +332,7 @@ test('W01 poster is the preloaded, high-priority LCP image; the rest are lazy', 
       new Promise((done) =>
         new PerformanceObserver((list) => {
           const e = list.getEntries().at(-1);
-          done(e.element?.closest('[data-frame]')?.querySelector('.label')?.textContent ?? e.element?.tagName);
+          done(e.element?.closest('[data-frame]')?.dataset.no ?? e.element?.tagName);
         }).observe({ type: 'largest-contentful-paint', buffered: true }),
       ),
   );
@@ -399,7 +425,7 @@ test('video: loads only on focus, swaps into the focused frame, muted and inline
     const v = document.querySelector('video');
     return {
       inFocused: !!v.closest('[data-frame].on'),
-      label: v.closest('[data-frame]').querySelector('.label').textContent,
+      label: v.closest('[data-frame]').dataset.no,
       muted: v.muted,
       inline: v.playsInline,
       controls: v.controls,
@@ -425,7 +451,7 @@ test('video: one element only, moved from frame to frame', async () => {
   await page.keyboard.press('ArrowRight');
   await playing(page);
   assert.equal(await page.locator('video').count(), 1);
-  assert.equal(await page.evaluate(() => document.querySelector('video').closest('[data-frame]').querySelector('.label').textContent), 'S01');
+  assert.equal(await page.evaluate(() => document.querySelector('video').closest('[data-frame]').dataset.no), 'S01');
   assert.equal(await page.evaluate((v) => v === document.querySelector('video'), first), true, 'a new <video> was created');
   await ctx.close();
 });

@@ -1,25 +1,21 @@
 ---
 // The filmstrip's corner controls (§7.5), placed in the frame's slots: the
-// (Index)/(Strip) switch top-center, the counter bottom-left, Prev / Next
-// bottom-center. Wired by Filmstrip.astro's island. Like the strip, they
-// exist only with JS and without reduced motion (data-strip-ui).
-import { homepageEntries } from '../lib/entries';
+// (Index)/(Strip) switch top-center, Prev / Next bottom-center, out of the
+// way while the reader heads down a hub's parts (data-parts-down). Wired by
+// Filmstrip.astro's island. Like the strip, they exist only with JS and
+// without reduced motion (data-strip-ui).
 import Icon from './Icon.astro';
 
 interface Props {
-  part: 'toggle' | 'counter' | 'nav';
+  part: 'toggle' | 'nav';
 }
 
 const { part } = Astro.props;
-const total = String(homepageEntries().length).padStart(2, '0');
 ---
 {part === 'toggle' && (
   <button class="control mono" type="button" data-strip-ui data-view-toggle data-view="strip" aria-label="Show as an index">
     <span class="to-index">(Index)</span><span class="to-strip">(Strip)</span>
   </button>
-)}
-{part === 'counter' && (
-  <span class="counter mono" data-strip-ui aria-hidden="true"><span data-strip-count>01</span> <span class="muted">/ {total}</span></span>
 )}
 {part === 'nav' && (
   <span class="nav" data-strip-ui>
@@ -57,6 +53,16 @@ const total = String(homepageEntries().length).padStart(2, '0');
   .nav {
     display: flex;
     gap: 20px;
+    transition:
+      opacity 0.3s ease,
+      visibility 0s;
+  }
+  :global(:root[data-parts-down]) .nav {
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.3s ease,
+      visibility 0s 0.3s;
   }
   .to-strip {
     display: none;

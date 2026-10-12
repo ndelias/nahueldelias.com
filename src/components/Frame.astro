@@ -148,7 +148,11 @@ const bottom = Astro.slots.has('bottom-start') || Astro.slots.has('bottom-center
       min-width: 44px;
       min-height: 44px;
     }
+    /* Positioned, so it paints over the page's own positioned layers (the
+       homepage strip's fade). */
     .bottom {
+      position: relative;
+      inset: auto;
       display: flex;
       align-items: center;
       justify-content: flex-end;
