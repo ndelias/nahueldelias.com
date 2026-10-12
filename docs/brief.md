@@ -137,7 +137,7 @@ interface Essay {
 
 `thesis` keeps the spirit of principle 3: every essay commits to a position a reader can disagree with.
 
-**Hub and parts (decided 2026-09-28).** vers1ons is one `weight: 1` hub with five child entries (`parent: 'vers1ons'`, weight 2). Parts don't count toward the weight-1 cap and don't appear in the homepage filmstrip; they're reached from the hub's parts matrix, and each part page has sibling navigation and prev/next within the parts. Every part still needs its own `decision`. The hub's matrix shows product, design, frontend and backend per part, led vs contributed, so the 0→1 range is visible in one table.
+**Hub and parts (decided 2026-09-28).** vers1ons is one `weight: 1` hub with five child entries (`parent: 'vers1ons'`, weight 2). Parts don't count toward the weight-1 cap and are never a homepage entry of their own; they're reached from the hub's parts matrix and from the parts row on top of the hub, and each part page has the same row and prev/next within the parts. On the homepage (decided 2026-10-11), a hub's parts come down under it as a list, number and title, while it's focused in the strip or active in the Index. Every part still needs its own `decision`. The hub's matrix shows product, design, frontend and backend per part, led vs contributed, so the 0→1 range is visible in one table.
 
 Separately:
 

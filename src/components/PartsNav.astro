@@ -1,5 +1,6 @@
 ---
-// Sibling navigation on a part page: every part of the hub, in build order.
+// The hub's parts, in build order: sibling navigation on a part page, and
+// the same row on top of the hub itself (no part current there).
 // At rest it's one quiet row, number and title. Pointing at it (or tabbing
 // into it) lowers the thumbnails like a blind, pushing the page down, and
 // they roll back up a moment after you leave, so brushing off the edge
@@ -7,20 +8,21 @@
 // rule, the others dimmed. Phones: a row of text tabs that scrolls sideways
 // on its own, the current part scrolled into view, no thumbnails.
 import type { Entry } from '../lib/entries';
-import { entryHref, entryNumber, parentOf, partsOf } from '../lib/entries';
+import { entryHref, entryNumber, partsOf } from '../lib/entries';
 import EntryImage from './EntryImage.astro';
 
 interface Props {
-  part: Entry;
+  hub: Entry;
+  /** The part this page is; none on the hub. */
+  part?: Entry;
 }
 
-const { part } = Astro.props;
-const hub = parentOf(part)!;
+const { hub, part } = Astro.props;
 const parts = partsOf(hub);
 // vers1ons' numbers carry its own color.
 const brand = hub.id === 'vers1ons';
 ---
-<nav class="parts-nav" aria-label={`Parts of ${hub.data.title}`} data-parts-nav>
+<nav class="parts-nav" aria-label={`Parts of ${hub.data.title}`} data-parts-nav data-overview={part ? undefined : ''}>
   <ol style={`--n: ${parts.length}`}>
     {parts.map((p) => (
       <li>
@@ -116,6 +118,13 @@ const brand = hub.id === 'vers1ons';
     opacity: 0.8;
   }
   .current:hover .thumb :global(img) {
+    opacity: 1;
+  }
+  /* On the hub no part is current, so none is dimmed as far. */
+  [data-overview] .thumb :global(img) {
+    opacity: 0.8;
+  }
+  [data-overview] .item:hover .thumb :global(img) {
     opacity: 1;
   }
   /* Down in 0.6s; back up only after the pointer has been gone for 0.7s,

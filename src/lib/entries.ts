@@ -44,8 +44,8 @@ if (partProblems.length) {
 }
 
 // Top-level entries: everything but parts. Parts don't count toward the
-// weight 1 cap and never appear in the homepage strip or Index; they're
-// reached from their hub.
+// weight 1 cap and are never a homepage entry of their own (they're listed
+// under their hub there); their pages are reached from the hub.
 const all = everything.filter((entry) => !isPart(entry));
 
 // Rule 1 (§3): at most two entries carry the hire. Anti-flattening, so it throws.

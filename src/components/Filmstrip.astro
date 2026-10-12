@@ -8,7 +8,10 @@
 // the script runs and its poster (the LCP element) is in the HTML. Two
 // copies of the ring are enough to fill any screen at first paint; the
 // island adds more when it needs room to wrap off-screen (src/lib/strip.ts).
-import { SECTION_LABELS, entryHref, entryNumber, entryYears, homepageEntries } from '../lib/entries';
+//
+// A hub's parts come down under it as a list while it's focused, number and
+// title, each to its page. The hub stays the focused frame throughout.
+import { SECTION_LABELS, entryHref, entryNumber, entryYears, homepageEntries, partsOf } from '../lib/entries';
 import { POSTER, posterOf } from '../lib/posters';
 import { isReal, layout } from '../lib/strip';
 import Icon from './Icon.astro';
@@ -24,6 +27,7 @@ const entries = await Promise.all(
     href: entryHref(entry),
     years: entryYears(entry),
     poster: await posterOf(entry),
+    parts: partsOf(entry).map((part) => ({ number: entryNumber(part), title: part.data.title, href: entryHref(part) })),
   })),
 );
 const n = entries.length;
@@ -102,6 +106,17 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
       })}
     </ul>
   </div>
+  <div class="hub-parts">
+    {entries.map(({ entry, parts }, i) => parts.length > 0 && (
+      <div class:list={['parts', { on: i === 0 }]} data-parts={i} inert={i !== 0}>
+        <ol aria-label={`Parts of ${entry.data.title}`} style={`--rows: ${Math.ceil(parts.length / 2)}`}>
+          {parts.map(({ number, title, href }) => (
+            <li><a class="part mono" href={href}><span class="no">{number}</span> <span class="name">{title}</span></a></li>
+          ))}
+        </ol>
+      </div>
+    ))}
+  </div>
   <p class="visually-hidden" aria-live="polite" data-strip-status></p>
 </section>
 
@@ -135,6 +150,7 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
     const frames = [...strip.children] as HTMLElement[];
     const originals = frames.slice(0, n);
     const metas = [...root.querySelectorAll<HTMLElement>('[data-meta]')];
+    const parts = [...root.querySelectorAll<HTMLElement>('[data-parts]')];
     const titles = metas.map((m) => m.querySelector('h2')!.textContent!.trim());
     const status = root.querySelector('[data-strip-status]')!;
     const rows = [...document.querySelectorAll<HTMLElement>('[data-row]')];
@@ -144,6 +160,7 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
     const frameOf = (t: EventTarget | null) => frames.indexOf((t as Element | null)?.closest?.('[data-frame]') as HTMLElement);
 
     let p = 0; // the focused frame
+    let inRows = false; // the pointer is over the Index list
     let offsets: number[] = [];
     const active = () => p % n;
 
@@ -177,7 +194,17 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
         m.classList.toggle('on', i === a);
         m.inert = i !== a;
       });
-      rows.forEach((r, i) => r.toggleAttribute('data-active', i === a));
+      parts.forEach((l) => {
+        const on = Number(l.dataset.parts) === a;
+        l.classList.toggle('on', on);
+        l.inert = !on;
+      });
+      rows.forEach((r, i) => {
+        r.toggleAttribute('data-active', i === a);
+        // A hub's parts in the Index stay down while the pointer is in the
+        // list: folding them up would pull the rows under it.
+        if (i === a || !inRows) r.toggleAttribute('data-open', i === a);
+      });
       if (count) count.textContent = String(a + 1).padStart(2, '0');
       play();
     }
@@ -330,7 +357,13 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
       r.addEventListener('pointerenter', (e) => e.pointerType === 'mouse' && toEntry(i));
       r.addEventListener('focusin', () => toEntry(i));
     });
-    rows[0]?.parentElement?.setAttribute('data-synced', '');
+    const list = rows[0]?.parentElement;
+    list?.setAttribute('data-synced', '');
+    list?.addEventListener('pointerenter', () => (inRows = true));
+    list?.addEventListener('pointerleave', () => {
+      inRows = false;
+      rows.forEach((r) => r.toggleAttribute('data-open', r.hasAttribute('data-active')));
+    });
 
     toggle?.addEventListener('click', () => {
       const view = toggle.dataset.view === 'strip' ? 'index' : 'strip';
@@ -467,6 +500,69 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
     text-underline-offset: 3px;
   }
 
+  /* Under the focused frame, on its left edge like the meta above it. Rolled
+     up (0fr) until its hub is focused, then it comes down. */
+  .hub-parts {
+    position: absolute;
+    left: calc(50% - 260px);
+    width: 520px;
+    top: calc(var(--strip-top) + round(calc(325 * var(--u)), 1px) + 20px);
+    display: grid;
+  }
+  .parts {
+    grid-area: 1 / 1;
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition:
+      grid-template-rows 0.35s var(--ease),
+      opacity 0.25s ease;
+  }
+  .parts.on {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    pointer-events: auto;
+    transition:
+      grid-template-rows 0.6s var(--ease) 0.1s,
+      opacity 0.4s ease 0.1s;
+  }
+  .parts ol {
+    min-height: 0;
+    overflow: hidden;
+    margin: 0;
+    /* Room for the last rule. */
+    padding: 0 0 1px;
+    list-style: none;
+  }
+  /* A rule above and below each part; where two meet they share a line. */
+  .part {
+    display: flex;
+    gap: var(--space-8);
+    align-items: center;
+    min-height: 28px;
+    box-shadow:
+      inset 0 1px var(--line),
+      0 1px var(--line);
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .part .no {
+    min-width: 6ch;
+    color: var(--vers1ons);
+  }
+  .part:hover,
+  .part:focus-visible {
+    color: var(--ink);
+  }
+  .part:hover .name {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .part:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: -2px;
+  }
+
   .viewport {
     position: absolute;
     left: 0;
@@ -574,6 +670,24 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
     opacity: 1;
   }
 
+  /* Short screens: not enough room under the strip for one column of
+     parts, so they run top to bottom in two, and the strip sits a little
+     higher. */
+  @media (min-width: 640px) and (max-height: 859.98px) {
+    .filmstrip {
+      --strip-top: max(round(calc(50% - 162px), 1px), 210px);
+    }
+  }
+  @media (max-height: 859.98px) {
+    .parts ol {
+      display: grid;
+      grid-template-rows: repeat(var(--rows), auto);
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(0, 1fr);
+      column-gap: var(--space-24);
+    }
+  }
+
   /* Phone: the strip sits under the header, in what's left of the screen,
      with the controls under it. Same structure as desktop (the meta
      above a strip placed on a whole pixel), just in the flow. */
@@ -588,14 +702,30 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
          strip below. */
       --strip-top: max(round(calc(50% - 12px), 1px), 220px);
     }
-    .metas {
+    .metas,
+    .hub-parts {
       left: var(--frame-inset);
       right: var(--frame-inset);
       width: auto;
     }
+    .hub-parts {
+      top: calc(var(--strip-top) + round(calc(325 * var(--u)), 1px) + 16px);
+    }
     .row3 {
       flex-direction: column;
       gap: 10px;
+    }
+  }
+  /* Phones, short and tall: one column of parts fits only on a tall one;
+     on a short one the strip moves up into the room under the header. */
+  @media (max-width: 639.98px) and (min-height: 760px) {
+    .parts ol {
+      display: block;
+    }
+  }
+  @media (max-width: 639.98px) and (max-height: 759.98px) {
+    .filmstrip {
+      --strip-top: max(round(calc(50% - 72px), 1px), 170px);
     }
   }
 </style>

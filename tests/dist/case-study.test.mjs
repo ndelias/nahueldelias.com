@@ -253,6 +253,17 @@ test('hub: every matrix row links to its part page, and each page exists', async
   await ctx.close();
 });
 
+test('hub: the parts row on top, every part linked and none current', async () => {
+  const { ctx, page } = await open();
+  const items = await page.$$eval('[data-parts-nav] a', (as) => as.map((a) => ({ href: a.getAttribute('href'), current: a.getAttribute('aria-current') })));
+  assert.deepEqual(items.map((i) => i.href), ['design-system', 'licensing', 'purchasing', 'wallet-payouts', 'distribution'].map((p) => `/work/vers1ons/${p}/`));
+  assert.ok(items.every((i) => i.current === null));
+  // Above the hub's header.
+  const [nav, title] = await page.evaluate(() => [document.querySelector('[data-parts-nav]'), document.querySelector('h1')].map((el) => el.getBoundingClientRect().top));
+  assert.ok(nav < title);
+  await ctx.close();
+});
+
 test('part: sibling nav lists every part, the current one marked', async () => {
   const { ctx, page } = await openPart();
   const items = await page.$$eval('[data-parts-nav] a', (as) => as.map((a) => ({ href: a.getAttribute('href'), current: a.getAttribute('aria-current'), opacity: getComputedStyle(a.querySelector('.thumb img')).opacity })));
@@ -585,6 +596,9 @@ test('deferred blocks: find-in-page reaches text in a block that was never rende
 
 test("deferred blocks: a focus ring at a block's edge isn't clipped", async () => {
   const { ctx, page } = await openPart(HUB);
+  // Focused before the deferred styles land, the link is scrolled to against
+  // the unstyled blocks above it, then pushed out of view when they apply.
+  await page.waitForFunction(() => [...document.styleSheets].some((s) => s.href?.includes('/deferred') && s.cssRules.length > 0));
   await page.focus('a.next');
   await page.waitForTimeout(100);
   const { x, y } = await page.evaluate(() => {

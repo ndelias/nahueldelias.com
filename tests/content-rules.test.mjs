@@ -247,7 +247,7 @@ test('parts: a weight 1 part fails the build, so parts can never raise the cap',
   await assertFails(result, 'work → hub/licensing', 'weight: Parts are weight 2 (§3 hub and parts)');
 });
 
-test("parts: they don't count toward the weight 1 cap and never appear on the homepage", async () => {
+test("parts: they don't count toward the weight 1 cap and are never a homepage entry of their own", async () => {
   const result = await build({
     'work/hub': entry({ weight: 1, decision: DECISION, title: 'The hub' }),
     'work/other': entry({ weight: 1, decision: DECISION }),
@@ -258,8 +258,14 @@ test("parts: they don't count toward the weight 1 cap and never appear on the ho
     assert.equal(result.code, 0, `Two hubs plus parts should build:\n${result.output}`);
     const home = await result.read('index.html');
     assert.ok(home.includes('The hub'), 'the hub is on the homepage');
-    assert.ok(!home.includes('Licensing part') && !home.includes('Payouts part'), 'a part appears on the homepage');
+    // Only as links under their hub: no frame, meta or Index row of their own.
+    const own = (html, attr) => (html.match(new RegExp(`<[^>]+${attr}[ >=]`, 'g')) ?? []).length;
+    assert.equal(own(home, 'data-meta'), 2, 'a part has its own meta in the strip');
+    assert.equal(own(home, 'data-row'), 2, 'a part has its own Index row');
     assert.ok(!home.includes('Only on the hub.'), "a part's tagline appears on the homepage");
+    const lists = home.match(/aria-label="Parts of The hub"[^]*?<\/ol>/g) ?? [];
+    assert.equal(lists.length, 2, "the hub's parts, under it in the strip and in the Index");
+    for (const list of lists) assert.ok(list.indexOf('Licensing part') < list.indexOf('Payouts part'), 'parts in build order');
     const hub = await result.read('work/hub/index.html');
     assert.ok(hub.includes('Licensing part') && hub.includes('Payouts part'), "the hub's matrix lists its parts");
     assert.match(hub, /Zero to one, in two parts/);
