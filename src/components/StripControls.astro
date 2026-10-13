@@ -3,7 +3,9 @@
 // (Index)/(Strip) switch top-center, Prev / Next bottom-center, out of the
 // way while a hub's parts are open (data-parts-down). Wired by
 // Filmstrip.astro's island. Like the strip, they exist only with JS and
-// without reduced motion (data-strip-ui).
+// without reduced motion (data-strip-ui). With a single entry there's
+// nothing to step to, so no Prev / Next.
+import { homepageEntries } from '../lib/entries';
 import Icon from './Icon.astro';
 
 interface Props {
@@ -17,7 +19,7 @@ const { part } = Astro.props;
     <span class="to-index">(Index)</span><span class="to-strip">(Strip)</span>
   </button>
 )}
-{part === 'nav' && (
+{part === 'nav' && homepageEntries().length > 1 && (
   <span class="nav" data-strip-ui>
     <button class="control mono" type="button" data-strip-prev aria-label="Previous project">(<Icon name="arrow-left" /> Prev)</button>
     <button class="control mono" type="button" data-strip-next aria-label="Next project">(Next <Icon name="arrow-right" />)</button>

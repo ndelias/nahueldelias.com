@@ -230,7 +230,19 @@ const entrySchema = ({ image }: SchemaContext) => {
     });
 };
 
-const entries = (name: Section) => glob({ pattern: '**/*.mdx', base: `./src/content/${name}` });
+// A section's entries. The site ships only src/content. The fixture entries
+// (placeholders standing in for unbuilt projects) live in tests/fixtures/
+// and join only a FIXTURES=1 build, which the browser tests run against, so
+// the strip's ring stays tested with eight entries while the site has one.
+// Both roots share the section's id space: the id is the path under it.
+const FIXTURES = process.env.FIXTURES === '1';
+const ROOTS = FIXTURES ? ['src/content', 'tests/fixtures/content'] : ['src/content'];
+const entries = (name: Section) =>
+  glob({
+    pattern: ROOTS.map((root) => `${root}/${name}/**/*.mdx`),
+    base: '.',
+    generateId: ({ entry }) => entry.replace(new RegExp(`^(?:${ROOTS.join('|')})/${name}/`), '').replace(/\.mdx$/, ''),
+  });
 
 // Every essay commits to a position a reader can disagree with.
 const THESIS_REQUIRED = 'Required for essays (§3). State the position a reader could disagree with.';

@@ -74,3 +74,8 @@ Easing for strip motion: cubic-bezier(0.2, 0.7, 0.2, 1).
   and baselines together.
 - Never commit placeholder copy as if it were real: bracketed text like
   [Tagline] stays bracketed until Nahuel supplies it.
+- The site ships only real entries (src/content/). Fixture entries live in
+  tests/fixtures/content/ and join only `npm run build:fixtures`
+  (FIXTURES=1, into dist-fixtures/), which the browser tests in tests/dist/
+  run against so the strip's ring keeps eight entries. single.test.mjs
+  checks the shipped dist/. A new real project goes in src/content/.

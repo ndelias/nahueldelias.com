@@ -5,6 +5,7 @@ inspo/
 
 node_modules/
 /dist/
+/dist-fixtures/
 .astro/
 .vercel/
 .lighthouseci/

@@ -1,7 +1,8 @@
 // The homepage filmstrip's behaviour (§7.5, §9 step 4b), in Chrome against
 // the built site: what exists with and without JS or motion, where focus
 // lands and goes, the loop, keys, links, and the LCP poster. Runs against
-// dist/: build first.
+// dist-fixtures/, the build with the fixture entries, so the ring has eight
+// (npm run build:fixtures). The shipped single entry is in single.test.mjs.
 
 import { after, before, test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -9,14 +10,14 @@ import { existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { launch, serve } from '../../scripts/lib/browser.mjs';
 
-const DIST = join(resolve(import.meta.dirname, '../..'), 'dist');
+const DIST = join(resolve(import.meta.dirname, '../..'), 'dist-fixtures');
 const DESKTOP = { width: 1440, height: 900 };
 const N = 8; // fixture entries
 
 let server;
 let browser;
 before(async () => {
-  assert.ok(existsSync(DIST), 'No dist/. Run `npm run build` first.');
+  assert.ok(existsSync(DIST), 'No dist-fixtures/. Run `npm run build:fixtures` first.');
   server = await serve(DIST);
   browser = await launch();
 });

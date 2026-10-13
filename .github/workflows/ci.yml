@@ -99,6 +99,10 @@ jobs:
         with:
           name: dist
           path: dist
+      # The browser tests run against a second build with the fixture
+      # entries (tests/fixtures/), for the strip's ring; the shipped dist/
+      # above has only the real ones.
+      - run: npm run build:fixtures
       - run: npm run test:dist
 
   # Screenshots, in this environment (ubuntu-24.04, the pinned Chrome for

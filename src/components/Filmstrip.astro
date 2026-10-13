@@ -23,7 +23,9 @@ import { isReal, layout } from '../lib/strip';
 import Icon from './Icon.astro';
 import StatusBadge from './StatusBadge.astro';
 
-const COPIES = 2;
+// Two copies of the ring fill any screen at first paint. A single entry
+// isn't a ring: it stands alone, with nothing to step to.
+const copiesOf = (n: number) => (n > 1 ? 2 : 1);
 const THUMB = 112; // a part's cover, CSS px
 // ms on a hub before its parts open: the recording starts at 250, the hub
 // moves a beat after.
@@ -60,7 +62,7 @@ const entries = await Promise.all(
 );
 const n = entries.length;
 const weights = entries.map(({ entry }) => entry.data.weight);
-const slots = layout(weights, n * COPIES, 0);
+const slots = layout(weights, n * copiesOf(n), 0);
 const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
 ---
 <section class="filmstrip" data-strip-ui data-filmstrip aria-label="Projects" data-dwell-ms={DWELL}>
@@ -327,7 +329,7 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
     }
 
     function move(delta: number) {
-      if (!delta) return;
+      if (!delta || n < 2) return;
       p = (((p + delta) % frames.length) + frames.length) % frames.length;
       render(delta);
     }
@@ -338,6 +340,7 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
     // Enough copies that the frame wrapping round is off-screen, even on the
     // largest jump (a click on the farthest visible frame).
     function fill() {
+      if (n < 2) return false;
       const u = Math.min(1, (innerWidth - 96) / SIZE.active[0]); // --u in CSS
       const side = Math.ceil((innerWidth / 2 - (SIZE.active[0] / 2 + GAP) * u) / ((SIZE.other[0] + GAP) * u)) + 1;
       const copies = Math.max(2, Math.ceil((2 * (2 * side + 1)) / n));
@@ -456,7 +459,7 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
     // ←/→ while focus is in the strip or nowhere in particular, never while
     // typing or on another control.
     document.addEventListener('keydown', (e) => {
-      if ((e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey || e.isComposing) return;
+      if (n < 2 || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey || e.isComposing) return;
       const el = document.activeElement;
       const inside = !!el && strip.contains(el);
       if (!inside && el && el !== document.body && el !== html) return;
