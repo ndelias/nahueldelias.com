@@ -165,6 +165,10 @@ const brand = hub.id === 'vers1ons';
       overflow-x: auto;
       scrollbar-width: none;
       border-bottom: 1px solid var(--line);
+      /* The row runs off the right edge: fade it there, so a cut-off tab
+         reads as more to scroll to. */
+      -webkit-mask-image: linear-gradient(to left, transparent 0, #000 24px);
+      mask-image: linear-gradient(to left, transparent 0, #000 24px);
     }
     .item {
       display: flex;
