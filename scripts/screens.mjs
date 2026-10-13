@@ -56,7 +56,6 @@ const MOCK_CHANNEL = 24;
 // Mock baseline name → home.html URL options (see reference/README.md).
 const CAPTURES = {
   'home-light-w01': '?still=1&active=0',
-  'home-light-s02': '?still=1&active=3',
   'home-dark-w01': '?still=1&active=0&theme=dark',
   'home-light-index': '?still=1&view=index',
   'home-dark-index': '?still=1&view=index&theme=dark',
@@ -143,7 +142,6 @@ const REGIONS = {
 const MOCK = [
   { baseline: 'home-light-w01', colorScheme: 'light', view: 'strip' },
   { baseline: 'home-dark-w01', colorScheme: 'dark', view: 'strip' },
-  { baseline: 'home-light-s02', colorScheme: 'light', view: 'strip', next: 3 },
   { baseline: 'home-light-index', colorScheme: 'light', view: 'index' },
   { baseline: 'home-dark-index', colorScheme: 'dark', view: 'index' },
 ];

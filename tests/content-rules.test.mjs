@@ -260,12 +260,12 @@ test("parts: they don't count toward the weight 1 cap and are never a homepage e
     assert.ok(home.includes('The hub'), 'the hub is on the homepage');
     // Only as links under their hub: no frame, meta or Index row of their own.
     const own = (html, attr) => (html.match(new RegExp(`<[^>]+${attr}[ >=]`, 'g')) ?? []).length;
-    assert.equal(own(home, 'data-meta'), 2, 'a part has its own meta in the strip');
+    assert.equal(own(home, 'data-project'), 2, 'a part is a project of its own on the homepage');
     assert.equal(own(home, 'data-row'), 2, 'a part has its own Index row');
     const lists = home.match(/aria-label="Parts of The hub"[^]*?<\/ol>/g) ?? [];
     const outside = lists.reduce((html, list) => html.replace(list, ''), home);
     assert.ok(!outside.includes('Only on the hub.'), "a part's line appears outside its hub's list");
-    assert.equal(lists.length, 2, "the hub's parts, under it in the strip and in the Index");
+    assert.equal(lists.length, 2, "the hub's parts, in its project on the homepage and under it in the Index");
     for (const list of lists) assert.ok(list.indexOf('Licensing part') < list.indexOf('Payouts part'), 'parts in build order');
     const hub = await result.read('work/hub/index.html');
     assert.ok(hub.includes('Licensing part') && hub.includes('Payouts part'), "the hub's matrix lists its parts");

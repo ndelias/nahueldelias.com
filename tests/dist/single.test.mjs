@@ -38,20 +38,25 @@ test('no fixture is built or linked', async () => {
   assert.ok(!hub.includes('class="next'), 'the hub links a next entry that does not exist');
 });
 
-test('one frame, one row, no Prev / Next', async () => {
+test('vers1ons alone in the middle, larger, with its caption from the start; one Index row', async () => {
   const { ctx, page } = await open();
-  const shape = await page.evaluate(() => ({
-    frames: document.querySelectorAll('[data-frame]').length,
-    rows: document.querySelectorAll('[data-row]').length,
-    prev: !!document.querySelector('[data-strip-prev]'),
-    next: !!document.querySelector('[data-strip-next]'),
-    title: document.querySelector('[data-meta].on h2').textContent.trim(),
-  }));
-  assert.deepEqual(shape, { frames: 1, rows: 1, prev: false, next: false, title: 'vers1ons' });
+  await page.waitForTimeout(300);
+  const shape = await page.evaluate(() => {
+    const covers = document.querySelectorAll('[data-orbit] .card.cover');
+    const r = covers[0].getBoundingClientRect();
+    return {
+      covers: covers.length,
+      rows: document.querySelectorAll('[data-row]').length,
+      centred: Math.abs(r.left + r.width / 2 - innerWidth / 2) < 1,
+      wide: Math.round(r.width),
+      caption: document.querySelector('[data-caption].in [data-c="title"]')?.textContent.trim(),
+    };
+  });
+  assert.deepEqual(shape, { covers: 1, rows: 1, centred: true, wide: 425, caption: 'vers1ons' });
   await ctx.close();
 });
 
-test('arrow keys and swipes have nothing to do, and leave the page alone', async () => {
+test('arrow keys on the page have nothing to do, and leave it alone', async () => {
   const { ctx, page } = await open();
   const prevented = await page.evaluate(() => {
     const e = new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, cancelable: true });
@@ -59,19 +64,16 @@ test('arrow keys and swipes have nothing to do, and leave the page alone', async
     return e.defaultPrevented;
   });
   assert.equal(prevented, false);
-  assert.equal(await page.evaluate(() => document.querySelector('[data-frame]').classList.contains('on')), true);
   await ctx.close();
 });
 
-test("resting on vers1ons still opens its parts", async () => {
+test('resting on vers1ons opens its five parts around it', async () => {
   const { ctx, page } = await open();
-  await page.waitForTimeout(800);
-  await page.hover('[data-frame].on .hit');
-  await page.waitForTimeout(1500);
-  const parts = await page.evaluate(() => {
-    const l = document.querySelector('[data-parts]');
-    return { open: l.classList.contains('on'), links: l.querySelectorAll('a').length };
-  });
-  assert.deepEqual(parts, { open: true, links: 5 });
+  await page.hover('[data-orbit] .card.cover');
+  await page.waitForTimeout(1600);
+  const parts = await page.evaluate(() =>
+    [...document.querySelectorAll('[data-orbit] .card.part')].filter((p) => Number(getComputedStyle(p).opacity) > 0.5).map((p) => p.dataset.no),
+  );
+  assert.deepEqual(parts, ['W01.1', 'W01.2', 'W01.3', 'W01.4', 'W01.5']);
   await ctx.close();
 });
