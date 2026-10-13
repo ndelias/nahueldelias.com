@@ -21,8 +21,11 @@ const rows = homepageEntries().map((entry) => ({
   number: entryNumber(entry),
   href: entryHref(entry),
   years: entryYears(entry),
-  parts: partsOf(entry).map((part) => ({ number: entryNumber(part), title: part.data.title, href: entryHref(part) })),
+  parts: partsOf(entry).map((part) => ({ number: entryNumber(part), title: part.data.title, href: entryHref(part), cover: part.data.cover.src })),
 }));
+
+// Every part on the page, numbered once, for its preview rule.
+const partRows = rows.flatMap((row) => row.parts);
 
 // Which preview shows: the first by default; while a row is hovered or
 // focused, that row's. One rule per row, all here (unscoped) so their
@@ -32,7 +35,11 @@ const previewRules =
   '.index:has(.row:is(:hover,:focus-within)) .pv{visibility:hidden}' +
   rows.map((_, i) => `.index:has(.row:nth-child(${i + 1}):is(:hover,:focus-within)) .pv:nth-child(${i + 1}){visibility:visible}`).join('') +
   '.index:has([data-synced]) .pv{visibility:hidden}' +
-  rows.map((_, i) => `.index:has(.row:nth-child(${i + 1})[data-active]) .pv:nth-child(${i + 1}){visibility:visible}`).join('');
+  rows.map((_, i) => `.index:has(.row:nth-child(${i + 1})[data-active]) .pv:nth-child(${i + 1}){visibility:visible}`).join('') +
+  // A part's own cover while its line is hovered or focused, drawn over its
+  // hub's preview, as the filmstrip does.
+  '.pp{visibility:hidden}' +
+  partRows.map((_, k) => `.index:has(.sub[data-p="${k}"]:is(:hover,:focus-within)) .pp[data-p="${k}"]{visibility:visible}`).join('');
 ---
 <div class="index">
   <ol class="rows" aria-label="Projects">
@@ -48,7 +55,7 @@ const previewRules =
           <div class="subs">
             <ol aria-label={`Parts of ${entry.data.title}`}>
               {parts.map((part) => (
-                <li class="sub">
+                <li class="sub" data-p={partRows.indexOf(part)}>
                   <span class="sub-no mono">{part.number}</span>
                   <a class="sub-title" href={part.href}>{part.title}</a>
                 </li>
@@ -65,6 +72,12 @@ const previewRules =
       <figure class="pv">
         {/* Lazy: phones hide the preview and shouldn't fetch it (§6 LCP). */}
         <EntryImage src={entry.data.cover.src} alt="" />
+        <figcaption class="mono muted">({number}) Preview</figcaption>
+      </figure>
+    ))}
+    {partRows.map(({ number, cover }, k) => (
+      <figure class="pv pp" data-p={k}>
+        <EntryImage src={cover} alt="" />
         <figcaption class="mono muted">({number}) Preview</figcaption>
       </figure>
     ))}
@@ -253,6 +266,10 @@ const previewRules =
     flex-direction: column;
     gap: 10px;
     margin: 0;
+  }
+  /* A part's preview covers its hub's, caption included. */
+  .pp {
+    background: var(--bg);
   }
   .pv img {
     display: block;

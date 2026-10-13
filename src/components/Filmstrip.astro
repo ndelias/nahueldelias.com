@@ -571,14 +571,19 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
     gap: 10px;
     opacity: 0;
     transform: translateY(12px);
+    /* The outgoing meta clears quickly... */
     transition:
-      opacity 0.35s ease,
-      transform 0.45s var(--ease);
+      opacity 0.15s ease,
+      transform 0.3s var(--ease);
   }
   .meta.on {
     opacity: 1;
     transform: none;
     pointer-events: auto;
+    /* ...and the incoming one waits for it, so two titles never overlap. */
+    transition:
+      opacity 0.35s ease 0.12s,
+      transform 0.45s var(--ease) 0.12s;
   }
   .row1 {
     display: flex;
@@ -619,12 +624,14 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
     text-underline-offset: 3px;
   }
 
-  /* Its parts open: the hub glides up to make room under it. */
+  /* Its parts open: the hub glides up to make room under it. A short rise,
+     with the meta, strip and parts on one timing, so little moves under
+     the pointer and nothing drifts apart. */
   .filmstrip[data-open] {
-    --strip-top: max(round(calc(50% - 250px), 1px), 200px);
+    --strip-top: max(round(calc(50% - 220px), 1px), 220px);
   }
   .metas {
-    transition: bottom 0.7s var(--ease);
+    transition: bottom 0.5s var(--ease);
   }
 
   /* Under the hub, on its left edge like the meta above it, down to the
@@ -636,7 +643,7 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
     top: calc(var(--strip-top) + var(--strip-h) + 20px);
     bottom: calc(var(--frame-inset-block) + 8px);
     display: grid;
-    transition: top 0.7s var(--ease);
+    transition: top 0.5s var(--ease);
   }
   .parts {
     grid-area: 1 / 1;
@@ -749,7 +756,7 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
     /* 6px of room above and below the frames for the focus ring. */
     top: calc(var(--strip-top) - 6px);
     height: round(calc(325 * var(--u) + 12px), 1px);
-    transition: top 0.6s var(--ease);
+    transition: top 0.5s var(--ease);
     overflow: clip;
     -webkit-mask-image: linear-gradient(to right, transparent 0, #000 9%, #000 91%, transparent 100%);
     mask-image: linear-gradient(to right, transparent 0, #000 9%, #000 91%, transparent 100%);
@@ -800,6 +807,15 @@ const frames = slots.map((slot, j) => ({ ...slot, j, ...entries[j % n] }));
   }
   .on .hit {
     filter: none;
+  }
+  /* Dark only: a hairline so a dark recording keeps its edge on the dark
+     page. Over the image and video, under nothing that takes the pointer. */
+  .hit::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 1px solid light-dark(transparent, var(--line));
+    pointer-events: none;
   }
   .hit img,
   .hit :global(video) {
