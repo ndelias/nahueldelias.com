@@ -10,14 +10,15 @@ import { readFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { launch, serve } from '../../scripts/lib/browser.mjs';
 
-const DIST = join(resolve(import.meta.dirname, '../..'), 'dist');
+// The fixture build: the hub's Next row needs a second entry to point to.
+const DIST = join(resolve(import.meta.dirname, '../..'), 'dist-fixtures');
 const HUB = '/work/vers1ons/';
 const DESKTOP = { width: 1440, height: 900 };
 
 let server;
 let browser;
 before(async () => {
-  assert.ok(existsSync(join(DIST, HUB, 'index.html')), 'No built hub. Run `npm run build` first.');
+  assert.ok(existsSync(join(DIST, HUB, 'index.html')), 'No built hub. Run `npm run build:fixtures` first.');
   server = await serve(DIST);
   browser = await launch();
 });

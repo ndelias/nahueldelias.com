@@ -1,0 +1,303 @@
+---
+// The homepage constellation (§7.5, revised 2026-10-13). Built for a few
+// projects: every project in one calm row, nothing to scroll. Rest on one
+// (pointer, focus, or a tap) and it comes to the middle; its parts come out
+// of it, smaller, into a slow orbit around it, and the other projects wait
+// in a small row below. Point at a part and it comes forward and plays;
+// leave everything for a moment and the parts go back in.
+//
+// It enhances the Index list, which stays the whole page without JS and
+// with reduced motion; CSS hides everything marked data-strip-ui then.
+//
+// The row is rendered here, in place, so the first project's poster (the
+// LCP element) paints before the script runs. Positions are design px,
+// scaled by --u to fit the screen; the island uses the same numbers.
+import { getImage } from 'astro:assets';
+import { SECTION_LABELS, entryHref, entryNumber, entryYears, homepageEntries, partsOf, type Entry } from '../lib/entries';
+import { POSTER, posterOf } from '../lib/posters';
+
+// A part's still at its largest (forward, 0.8 of a 340px card): 1x and 2x.
+const THUMB = 272;
+const thumb = async (part: Entry) => {
+  const src = part.data.poster?.src ?? part.data.cover.src;
+  // Read from a clone: reading the import itself ships the original too.
+  if (((src as typeof src & { clone?: typeof src }).clone ?? src).format === 'svg') return { src: src.src };
+  const img = await getImage({ src, widths: [THUMB, THUMB * 2], format: 'webp' });
+  return { src: img.src, srcset: img.srcSet.attribute };
+};
+
+const projects = await Promise.all(
+  homepageEntries().map(async (entry) => ({
+    entry,
+    number: entryNumber(entry),
+    kicker: `${SECTION_LABELS[entry.collection]} · ${entryYears(entry)}`,
+    href: entryHref(entry),
+    poster: await posterOf(entry),
+    parts: await Promise.all(
+      partsOf(entry).map(async (part) => ({
+        number: entryNumber(part),
+        title: part.data.title,
+        line: part.data.summary ?? part.data.tagline,
+        href: entryHref(part),
+        video: part.data.video,
+        thumb: await thumb(part),
+      })),
+    ),
+  })),
+);
+
+// The row, in design px. One project stands alone, larger; a few share the
+// width. --u fits the row to the screen; the island reads ROW for the same.
+const N = projects.length;
+const GAP = N > 1 ? Math.min(330, 1280 / N) : 0;
+const S0 = N > 1 ? Math.min(0.9, (GAP - 26) / 340) : 1.25;
+const ROW = N > 1 ? (N - 1) * GAP + 340 * S0 : 340 * S0;
+const rowX = (k: number) => (k - (N - 1) / 2) * GAP;
+const first = projects[0];
+---
+<section class="orbit" data-strip-ui data-orbit aria-label="Projects" data-row-width={ROW} data-s0={S0} data-gap={GAP} style={`--u: min(1px, (100vw - 48px) / ${ROW})`}>
+  <div class="scene">
+    {projects.map(({ entry, number, kicker, href, poster, parts }, k) => {
+      // A project without a page of its own still opens and takes focus.
+      const Hit = href ? 'a' : 'button';
+      return (
+      <div class="project" data-project={k}>
+        <Hit
+          class="card cover"
+          {...(href ? { href } : { type: 'button' })}
+          data-k={k}
+          data-j="0"
+          data-video={entry.data.video}
+          data-no={number}
+          data-title={entry.data.title}
+          data-line={entry.data.tagline}
+          data-kicker={kicker}
+          aria-label={`${entry.data.title}, ${kicker}`}
+          style={`transform: translate(-50%, -50%) translateX(calc(${rowX(k)} * var(--u))) rotateY(${((-rowX(k) / 600) * 16).toFixed(2)}deg) scale(${S0})`}
+        >
+          <picture>
+            {poster.dark?.avif && <source type="image/avif" {...{ [k ? 'data-srcset' : 'srcset']: poster.dark.avif }} media="(prefers-color-scheme: dark)" data-dark />}
+            {poster.dark?.webp && <source type="image/webp" {...{ [k ? 'data-srcset' : 'srcset']: poster.dark.webp }} media="(prefers-color-scheme: dark)" data-dark />}
+            {poster.light.avif && <source type="image/avif" {...{ [k ? 'data-srcset' : 'srcset']: poster.light.avif }} />}
+            <img
+              {...(k
+                ? { 'data-src': poster.light.src, 'data-srcset': poster.light.webp, loading: 'lazy', decoding: 'async' }
+                : { src: poster.light.src, srcset: poster.light.webp, fetchpriority: 'high' })}
+              width={POSTER.width}
+              height={POSTER.height}
+              alt=""
+            />
+          </picture>
+          <span class="name mono" aria-hidden="true">{number} · {entry.data.title}</span>
+        </Hit>
+        {parts.length > 0 && (
+          <ol class="parts" aria-label={`Parts of ${entry.data.title}`}>
+            {parts.map((part, j) => (
+              <li>
+                <a
+                  class="card part"
+                  href={part.href}
+                  data-k={k}
+                  data-j={j + 1}
+                  data-video={part.video}
+                  data-no={part.number}
+                  data-title={part.title}
+                  data-line={part.line}
+                  data-kicker={`Part of ${entry.data.title}`}
+                  tabindex="-1"
+                >
+                  <img data-src={part.thumb.src} data-srcset={part.thumb.srcset} sizes={`${THUMB}px`} width={THUMB} height={THUMB * 10 / 16} alt="" loading="lazy" decoding="async" />
+                  <span class="visually-hidden">{part.number} {part.title}</span>
+                </a>
+              </li>
+            ))}
+          </ol>
+        )}
+      </div>
+      );
+    })}
+  </div>
+  {/* One project: its caption shows from the start. A few: on rest. */}
+  <div class:list={['caption', { in: N === 1 }]} aria-live="polite" data-caption>
+    <p class="kicker mono"><span data-c="no">{N === 1 && first.number}</span><span class="sep"> · </span><span data-c="kicker">{N === 1 && first.kicker}</span></p>
+    <p class="title" data-c="title">{N === 1 && first.entry.data.title}</p>
+    <p class="line" data-c="line">{N === 1 && first.entry.data.tagline}</p>
+  </div>
+</section>
+
+{/* A theme chosen with the toggle overrides the system, which the dark
+    posters' media queries can't see. Before first paint, point them at the
+    chosen theme; the island keeps them in step after. */}
+<script is:inline>(function(){var t=document.documentElement.dataset.theme;if(t)document.querySelectorAll("source[data-dark]").forEach(function(s){s.media=t==="dark"?"all":"not all"})})()</script>
+
+<script>
+  import { initOrbit } from '../lib/orbit';
+
+  const motion = matchMedia('(prefers-reduced-motion: no-preference)');
+  const root = document.querySelector<HTMLElement>('[data-orbit]');
+  let started = false;
+  const start = () => {
+    if (root && motion.matches && !started) {
+      started = true;
+      initOrbit(root);
+    }
+  };
+  start();
+  // Reduced motion switched off after load: the orbit shows (CSS), so run it.
+  motion.addEventListener('change', start);
+</script>
+
+<style>
+  .orbit {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    line-height: normal;
+    /* The layer spans the frame; only its cards take the pointer. */
+    pointer-events: none;
+  }
+  .scene,
+  .project,
+  .parts,
+  .parts li {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    transform-style: preserve-3d;
+    /* These planes sit at z 0, in front of the parts at the back of the
+       orbit: only the cards take the pointer. */
+    pointer-events: none;
+  }
+  .scene {
+    perspective: calc(1500 * var(--u));
+    perspective-origin: 50% 35%;
+  }
+  .card {
+    padding: 0;
+    border: 0;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    position: absolute;
+    left: 50%;
+    top: 46%;
+    width: calc(340 * var(--u));
+    aspect-ratio: 16 / 10;
+    border-radius: 9px;
+    overflow: hidden;
+    background: var(--surface);
+    outline: 1px solid color-mix(in srgb, var(--ink) 10%, transparent);
+    outline-offset: -1px;
+    box-shadow: 0 26px 50px -30px color-mix(in srgb, #000 55%, transparent);
+    pointer-events: auto;
+    will-change: transform, opacity;
+  }
+  .part {
+    /* Hidden in their cover until it opens. */
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.2);
+    border-radius: 12px;
+  }
+  .card img,
+  .card :global(video) {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .card :global(video) {
+    animation: fade 0.45s ease both;
+  }
+  @keyframes fade {
+    from { opacity: 0; }
+  }
+  .name {
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
+    padding: 3px 7px;
+    border-radius: 3px;
+    font-size: 11px;
+    background: var(--bg);
+    color: var(--ink);
+  }
+  .card:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  .caption {
+    position: absolute;
+    left: 50%;
+    bottom: 132px;
+    width: min(520px, calc(100vw - 32px));
+    transform: translateX(-50%);
+    text-align: center;
+    pointer-events: none;
+  }
+  .caption p {
+    margin: 0;
+  }
+  .caption:not(.in) {
+    opacity: 0;
+  }
+  .caption:global(.enter) > * {
+    animation: rise 0.45s var(--ease) both;
+  }
+  .caption:global(.enter) > :nth-child(2) { animation-delay: 0.035s; }
+  .caption:global(.enter) > :nth-child(3) { animation-delay: 0.07s; }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(5px); }
+  }
+  .kicker {
+    font-size: var(--text-mono-sm);
+    color: var(--muted);
+  }
+  .title {
+    margin: 5px 0 3px !important;
+    font-size: 24px;
+    font-weight: var(--weight-medium);
+    letter-spacing: -0.02em;
+  }
+  .line {
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  /* Phone: in the flow under the header, the screen less the header. */
+  @media (max-width: 639.98px) {
+    .orbit {
+      position: relative;
+      inset: auto;
+      height: max(calc(100svh - 104px), 520px);
+    }
+    .caption {
+      bottom: 56px;
+    }
+  }
+</style>
+
+<style is:global>
+  /* The orbit and its toggle exist only with JS and without reduced
+     motion. Otherwise the page is the Index list. */
+  :root:not(.js) [data-strip-ui] {
+    display: none !important;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-strip-ui] {
+      display: none !important;
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    :root.js:not([data-home-view='index']) [data-home-index] {
+      display: none;
+    }
+  }
+  :root[data-home-view='index'] .orbit {
+    display: none;
+  }
+</style>

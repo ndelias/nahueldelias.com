@@ -1,0 +1,42 @@
+---
+// The homepage's view switch (§7.5), in the frame's top-center slot:
+// (Index) shows the list, (Projects) brings the constellation back. Wired by
+// src/lib/orbit.ts. Like the constellation, it exists only with JS and
+// without reduced motion (data-strip-ui).
+---
+<button class="control mono" type="button" data-strip-ui data-view-toggle data-view="strip" aria-label="Show as an index">
+  <span class="to-index">(Index)</span><span class="to-strip">(Projects)</span>
+</button>
+
+<style>
+  .control {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+    cursor: pointer;
+  }
+  /* The header's corner labels align on their baselines; a 44px toggle
+     would push the row down. Phones get the 44px target. */
+  @media (max-width: 639.98px) {
+    .control {
+      min-height: 44px;
+    }
+  }
+  .control:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .to-strip {
+    display: none;
+  }
+  [data-view='index'] .to-index {
+    display: none;
+  }
+  [data-view='index'] .to-strip {
+    display: inline;
+  }
+</style>

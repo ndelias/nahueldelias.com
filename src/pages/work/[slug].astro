@@ -16,7 +16,7 @@ import PartsMatrix from '../../components/PartsMatrix.astro';
 import PartsNav from '../../components/PartsNav.astro';
 import VersionsStack from '../../components/VersionsStack.astro';
 import Base from '../../layouts/Base.astro';
-import { entriesIn, lastUpdated, partsOf, stackLine } from '../../lib/entries';
+import { entriesIn, lastUpdated, nextEntry, partsOf, stackLine } from '../../lib/entries';
 
 export const getStaticPaths = (() =>
   entriesIn('work').map((entry) => ({ params: { slug: entry.id }, props: { entry } }))) satisfies GetStaticPaths;
@@ -76,7 +76,7 @@ const heroMeta = hero?.video ? ['Walkthrough', 'muted', hero.duration].filter(Bo
 
       {data.disclaimer && <p class="disclaimer muted">{data.disclaimer}</p>}
 
-      <div class="defer" style="--defer-size: 257px"><NextEntry entry={entry} /></div>
+      {nextEntry(entry) && <div class="defer" style="--defer-size: 257px"><NextEntry entry={entry} /></div>}
     </main>
     {updated && (
       <span slot="bottom-start" class="muted">Updated <time datetime={updated.toISOString().slice(0, 10)}>{updated.toISOString().slice(0, 10)}</time></span>

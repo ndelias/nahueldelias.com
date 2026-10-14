@@ -10,6 +10,8 @@
     "dev": "astro dev",
     "prebuild": "node scripts/fixture-posters.mjs",
     "build": "astro build",
+    "prebuild:fixtures": "node scripts/fixture-posters.mjs",
+    "build:fixtures": "FIXTURES=1 astro build --outDir dist-fixtures",
     "preview": "astro preview",
     "pretypecheck": "node scripts/fixture-posters.mjs",
     "typecheck": "astro check",
@@ -21,7 +23,7 @@
     "check:lh": "lhci autorun",
     "screens": "node scripts/screens.mjs check",
     "screens:update": "node scripts/screens-update.mjs",
-    "ci": "npm run typecheck && npm test && npm run build && npm run test:dist && npm run check:js && npm run check:html && npm run check:dist && npm run check:posters && npm run check:lh",
+    "ci": "npm run typecheck && npm test && npm run build && npm run build:fixtures && npm run test:dist && npm run check:js && npm run check:html && npm run check:dist && npm run check:posters && npm run check:lh",
     "check:html": "node scripts/check-html.mjs"
   },
   "dependencies": {

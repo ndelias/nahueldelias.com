@@ -267,6 +267,15 @@ Nahuel's inspiration folder (15 references, mostly fashion and visual-studio sit
 3. `(Index)` swaps the strip for a numbered text list with a live preview. This is also the no-JS and reduced-motion fallback.
 4. Anything about Nahuel lives on `/about` (inspiration still to come).
 
+**Homepage: constellation (revised 2026-10-13).** The filmstrip is replaced. With three to four projects planned, a strip to scroll read as more work than there is, and a hub's parts looked like projects of their own. Chosen from prototypes A–G (cover flow, deck, ring, path, constellation; the explore branch, never merged):
+
+1. Every project in one calm row, the same size, nothing to scroll. One project stands alone in the middle, larger, with its caption.
+2. Rest on a project (pointer, focus, or a tap) and it comes to the middle; **its parts come out of it**, about a third of its size, into a slow 3D orbit round it, so they read as its children. The other projects wait in a small row below. Point at a part and it comes forward and plays; one caption names it ("W01.3 · Part of vers1ons"). Off everything for a moment, the parts go back in.
+3. Motion is springs (critically damped) toward a target per card, from a little state: open project, part forward, the orbit's turn. The loop sleeps when everything is at rest. The orbit keeps turning while the pointer moves, and holds while a part is forward.
+4. `(Index)` and the no-JS / reduced-motion fallback are unchanged. No Prev / Next, no counter.
+
+The filmstrip notes below are kept for history.
+
 **How the hierarchy survives the filmstrip.** A strip treats items as equals by default, so three rules keep the two weight-1 entries dominant: the page lands with W01 focused and playing; W01 and W02 come first; and at rest, weight-1 thumbnails are larger than everything else in the strip.
 
 **Performance note.** The strip is the one hydrated island on `/`: plain CSS transforms, one `<video>` element swapped into the focused frame, posters as images. Budget it at ~10KB JS; videos load only on focus, never autoplay with sound.

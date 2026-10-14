@@ -50,7 +50,8 @@ read as evidence of craft, performance sense and taste.
 bg #F2F1ED / #161513 · surface #E8E6E0 / #211F1C · line #D3D0C8 / #34312C
 muted #67645E / #9A968E · ink #1B1A18 / #EDEBE6 · accent #2447F0 / #7D93FF
 Accent is only for links, focus rings and the Concept badge.
-Easing for strip motion: cubic-bezier(0.2, 0.7, 0.2, 1).
+Easing for page motion: cubic-bezier(0.2, 0.7, 0.2, 1). The homepage
+constellation moves on springs instead (src/lib/orbit.ts).
 
 ## Working agreement
 - One §9 step per session. Plan first, list files you'll touch.
@@ -74,3 +75,8 @@ Easing for strip motion: cubic-bezier(0.2, 0.7, 0.2, 1).
   and baselines together.
 - Never commit placeholder copy as if it were real: bracketed text like
   [Tagline] stays bracketed until Nahuel supplies it.
+- The site ships only real entries (src/content/). Fixture entries live in
+  tests/fixtures/content/ and join only `npm run build:fixtures`
+  (FIXTURES=1, into dist-fixtures/), which the browser tests in tests/dist/
+  run against so the homepage row has several projects. single.test.mjs
+  checks the shipped dist/. A new real project goes in src/content/.
