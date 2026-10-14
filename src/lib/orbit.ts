@@ -308,7 +308,7 @@ export function initOrbit(root: HTMLElement) {
   const syncTheme = () => {
     const t = html.dataset.theme;
     root.querySelectorAll<HTMLSourceElement>('source[data-dark]').forEach((s) => {
-      s.media = t ? (t === 'dark' ? 'all' : 'not all') : '(prefers-color-scheme: dark)';
+      s.media = t === 'dark' ? 'all' : 'not all';
     });
   };
   new MutationObserver(syncTheme).observe(html, { attributes: true, attributeFilter: ['data-theme'] });

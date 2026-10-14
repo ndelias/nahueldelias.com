@@ -2,17 +2,18 @@
  * Design tokens. Values from CLAUDE.md and docs/design/Tokens.dc.html.
  *
  * Each color is one light-dark(light, dark) pair, resolved against the
- * element's color-scheme. Light is the default, dark follows the system, and
- * data-theme on <html> (set by the inline script in Base.astro) overrides the
- * system in either direction. Any subtree can pin a theme with color-scheme,
- * which is how /_tokens shows both at once.
+ * element's color-scheme. Every visit lands in light, whatever the system
+ * prefers; dark applies only once chosen with the toggle, which saves it in
+ * data-theme on <html> (set before first paint by the inline script in
+ * Base.astro). Any subtree can pin a theme with color-scheme, which is how
+ * /_tokens shows both at once.
  *
  * tests/contrast.test.mjs reads this file and fails on any text pair below
  * WCAG AA, so keep colors as literal hex pairs.
  */
 
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
 
   /* Color. Accent is only for links, focus rings and the Concept badge. */
   --bg: light-dark(#F2F1ED, #161513);

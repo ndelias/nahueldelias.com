@@ -170,6 +170,9 @@ async function loadAll(page) {
 /** Load a page in a fresh context and put it in the given state. */
 async function shoot(browser, origin, { viewport, colorScheme, view, next = 0, path }) {
   const ctx = await browser.newContext({ viewport, deviceScaleFactor: 1, colorScheme });
+  // Every visit lands in light; dark is the toggle's choice, saved before
+  // the page loads, as a returning visitor's would be.
+  if (colorScheme === 'dark') await ctx.addInitScript(() => localStorage.setItem('theme', 'dark'));
   // Pages move on their own: the strip's focused frame and case studies'
   // recordings play, steps advance, comparisons rotate. A shot has to be the
   // same every run, so recordings never load anywhere (posters show) and
