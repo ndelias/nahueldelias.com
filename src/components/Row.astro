@@ -1,0 +1,65 @@
+---
+// A row of a case study (H2, 2026-10-14): a short claim beside its picture,
+// sides swapping row by row. Numbered label, heading, a few lines; beside
+// them one screen (a step of the page's gallery, or an image of its own),
+// two phone screens, or anything placed in the media slot. For MDX:
+//
+//   <Row label="The listing" heading="Price and terms first." step={1}>
+//     A few lines, as Markdown.
+//   </Row>
+//   <Row label="On a phone" heading="…" phones={[1, 2]}>…</Row>
+//   <Row label="The problem" heading="…" src={before} alt="…" caption="…">…</Row>
+//
+// `step` and `phones` count from 1, as the page shows them. A step with a
+// clip plays it, muted, while the row is in view (src/scripts/reveal.ts).
+// The picture swipes in from its side as the row arrives; pointing at a
+// screen looks closer. Styles: src/styles/deferred.css (below the fold).
+import type { ImageMetadata } from 'astro';
+import EntryImage from './EntryImage.astro';
+
+interface Props {
+  label: string;
+  heading: string;
+  step?: number;
+  phones?: number[];
+  src?: ImageMetadata;
+  alt?: string;
+  caption?: string;
+}
+
+const { label, heading, step, phones, src, alt, caption } = Astro.props;
+const gallery = Astro.locals.gallery ?? [];
+const phoneShots = Astro.locals.phones ?? [];
+const shot = step ? gallery[step - 1] : undefined;
+if (step && !shot) throw new Error(`<Row step={${step}}>: the page has ${gallery.length} gallery items.`);
+const pair = (phones ?? []).map((n) => {
+  const p = phoneShots[n - 1];
+  if (!p) throw new Error(`<Row phones={[…${n}…]}>: the page has ${phoneShots.length} phone screens.`);
+  return p;
+});
+const image = shot ? { src: shot.src, alt: shot.alt } : src ? { src, alt: alt ?? '' } : undefined;
+const meta = (s: ImageMetadata) => (s as ImageMetadata & { clone?: ImageMetadata }).clone ?? s;
+const text = caption ?? shot?.title;
+---
+<section class="case-row grid" data-row-section>
+  <div class="text">
+    <p class="margin mono muted"><span class="no" aria-hidden="true"></span><span class="label">{label}</span></p>
+    <h2 class="heading">{heading}</h2>
+    <div class="prose"><slot /></div>
+  </div>
+  <figure class:list={['media', { phones: pair.length > 0 }]} data-swipe>
+    {image && (
+      <div class="screen" data-loupe>
+        <EntryImage class="still" src={image.src} alt={image.alt} width={Math.min(1280, meta(image.src).width)} />
+        {shot?.clip && <video class="clip" data-src={shot.clip} muted playsinline loop preload="none" aria-hidden="true"></video>}
+      </div>
+    )}
+    {pair.length > 0 && (
+      <div class="pair">
+        {pair.map((p) => <EntryImage class="phone" src={p.src} alt={p.alt} width={Math.min(720, meta(p.src).width)} />)}
+      </div>
+    )}
+    <slot name="media" />
+    {text && <figcaption class="mono muted">{text}</figcaption>}
+  </figure>
+</section>

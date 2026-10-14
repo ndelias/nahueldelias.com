@@ -76,6 +76,9 @@ const entrySchema = ({ image }: SchemaContext) => {
       // Where it stands now, in the meta row: "In production". The status
       // badge says shipped or not; this says how it's running.
       standing: z.string().min(1).optional(),
+      // What changed because of it, in one line: shown with the facts at the
+      // top of a part page, so a reader gets the result before scrolling.
+      outcome: z.string().min(1).optional(),
       links: z
         .object({
           live: z.url().optional(),
