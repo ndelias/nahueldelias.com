@@ -56,6 +56,9 @@ const MOCK_CHANNEL = 24;
 // Mock baseline name → home.html URL options (see reference/README.md).
 const CAPTURES = {
   'home-light-w01': '?still=1&active=0',
+  // Still captured, to prove the mock reproduces; no longer compared with
+  // the site, which has no Next to step to S02 with.
+  'home-light-s02': '?still=1&active=3',
   'home-dark-w01': '?still=1&active=0&theme=dark',
   'home-light-index': '?still=1&view=index',
   'home-dark-index': '?still=1&view=index&theme=dark',
