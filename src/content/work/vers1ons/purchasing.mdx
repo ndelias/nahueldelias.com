@@ -144,18 +144,18 @@ import cart from '../../../assets/work/vers1ons/purchasing/before-after/summary-
   Royalties became one short line on the listing. The worked example opens in a dialog, so the page stays light and the detail is still there.
 </Row>
 
-<Row label="Under the hood · Checkout" heading="One flow, and payment can't open before signing." step={4}>
-  I built checkout as one page with steps instead of a page per step. You read and sign the agreement, it folds away, and only then does the payment form appear below it. There's no path to pay for terms you haven't signed. The team built the signing and payment services underneath, and I built the flow on top of them.
+<Row label="Under the hood · Checkout" heading="Signed first, then charged, in one flow." step={4}>
+  I built checkout as one page. The payment is set up when the page loads, so the card form is ready the moment it appears. It appears once the agreement is filled in and you leave the signing fields, so it doesn't jump in on the first keystroke, and once it's shown it stays, so a card you've typed is never wiped. On Complete, the page checks the signature again and waits for it to be stored before anything is charged.
 </Row>
 
-<MobileDesign label="Under the hood · On a phone" intro="Checkout was desktop only, behind a gate. I took the gate out and rebuilt every step for a phone, the Stripe card form included, with the next action fixed at the bottom." />
+<MobileDesign label="Under the hood · On a phone" intro="On a phone, one page asks you to read a legal PDF, accept seven statements, sign and pay. A two-step version with a swipeable payment sheet came and went before it settled as stacked sections that collapse. Then the details. Typing the first initial counted as signed and pulled the field away mid-word, the PDF said reviewed before its pages had drawn, and four hand-placed bottom bars became one." />
 
 <Row label="Under the hood · Paying" heading="Credit first, the card only for the rest." step={5}>
-  Buyers can pay with platform credit, a card, or both. Credit is applied first and the card only covers what's left, so the total on screen is the one you pay.
+  Buyers can pay with platform credit, a card, or both. Checkout works out what the credit covers and shows what's left for the card before you pay, and when credit covers everything there's no card form at all. Credit and card are two parts of one purchase, so I handled either part failing and the balance changing between opening checkout and paying.
 </Row>
 
-<Row label="Under the hood · The receipt" heading="A receipt that waits for the signed copy." step={8}>
-  View Purchase opens a small receipt over the song's page instead of a whole page with no way back. It waits for the signed PDF and shows the download as soon as it's ready, and every purchase stays in your library.
+<Row label="Under the hood · The receipt" heading="A receipt that never waits on a file." step={8}>
+  View Purchase used to open a whole page with no way back. I made it a small receipt over the song's page. The agreement on it is drawn in the browser from the license itself, so it shows as soon as the license loads instead of waiting for the signed PDF, which is made in the background after payment. If that file isn't stored yet, the download says so and asks you to try again. Next, the button should update itself when the file lands.
 </Row>
 
 <SystemFigure label="How it works" spec={purchasing} />
