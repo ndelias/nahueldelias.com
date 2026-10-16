@@ -148,10 +148,10 @@ import cart from '../../../assets/work/vers1ons/purchasing/before-after/summary-
   I built checkout as one page. The payment is set up when the page loads, so the card form is ready the moment it appears. It appears once the agreement is filled in and you leave the signing fields, so it doesn't jump in on the first keystroke, and once it's shown it stays, so a card you've typed is never wiped. On Complete, the page checks the signature again and waits for it to be stored before anything is charged.
 </Row>
 
-<MobileDesign label="Under the hood · On a phone" intro="On a phone, one page asks you to read a legal PDF, accept seven statements, sign and pay. A two-step version with a swipeable payment sheet came and went before it settled as stacked sections that collapse. Then the details. Typing the first initial counted as signed and pulled the field away mid-word, the PDF said reviewed before its pages had drawn, and four hand-placed bottom bars became one." />
+<MobileDesign label="Under the hood · On a phone" intro="On a phone, one page asks you to read a legal PDF, accept seven statements, sign and pay. Five competing boxes became two sections that collapse, read and sign, then pay, after three attempts at a two-step sheet. One initials keystroke made the page jump 165px, and it's 0 now. Four hand-built bottom bars became one, and tap targets grew to 48px. I wrote 44 of this flow's commits, the third most, and 18 were for phones." />
 
 <Row label="Under the hood · Paying" heading="Credit first, the card only for the rest." step={5}>
-  Buyers can pay with platform credit, a card, or both. Checkout works out what the credit covers and shows what's left for the card before you pay, and when credit covers everything there's no card form at all. Credit and card are two parts of one purchase, so I handled either part failing and the balance changing between opening checkout and paying.
+  Buyers can pay with platform credit, a card, or both. Checkout shows what the credit covers and what's left for the card before you pay, and when credit covers everything there's no card form at all. Credit is taken before the card is charged, and if taking it fails, the card isn't charged at all. If the card is declined, retrying doesn't take the credit twice. If the checkout dies before it completes, the exact credit goes back to the pool it came from.
 </Row>
 
 <Row label="Under the hood · The receipt" heading="A receipt that never waits on a file." step={8}>
