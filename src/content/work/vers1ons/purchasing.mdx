@@ -7,7 +7,7 @@ tagline: 'Buying a license should be as easy as buying a song.'
 summary: 'Buying a license feels the same on your phone as on your desktop.'
 weight: 2
 status: shipped
-role: 'Product and UX lead on the purchase flow'
+role: 'Product lead; designed and built the frontend'
 dates:
   start: 2026-04
 stack: ['Next.js', 'React', 'Tailwind CSS', 'Stripe Elements']
@@ -130,7 +130,7 @@ import SystemFigure from '../../../components/diagrams/SystemFigure.astro';
 import { purchasing } from '../../../components/diagrams/specs/purchasing';
 import cart from '../../../assets/work/vers1ons/purchasing/before-after/summary-before.webp';
 
-{/* DRAFT copy (2026-10-14), shortened from the earlier page into rows. For Nahuel's review. */}
+{/* DRAFT copy (2026-10-16), shortened into rows, with an "under the hood" half on the frontend Nahuel built. For his review. */}
 
 <Row label="The problem" heading="Buying a license was harder than buying a song." src={cart} alt="The December 2025 order summary, laid out like a cart with Remove from cart." caption="Dec 2025 · the order summary was a cart">
   The price sat halfway down the listing, the royalties read like legal text, and checkout looked like a cart. A buyer who found a song on their phone had to switch to desktop to finish.
@@ -144,14 +144,18 @@ import cart from '../../../assets/work/vers1ons/purchasing/before-after/summary-
   Royalties became one short line on the listing. The worked example opens in a dialog, so the page stays light and the detail is still there.
 </Row>
 
-<Row label="Checkout" heading="Sign, then pay. Never the other way round." step={4}>
-  You read and sign the agreement first. It folds away and payment opens below it, so you always know which step you're on.
+<Row label="Under the hood · Checkout" heading="One flow, and payment can't open before signing." step={4}>
+  I built checkout as one page with steps instead of a page per step. You read and sign the agreement, it folds away, and only then does the payment form appear below it. There's no path to pay for terms you haven't signed. The team built the signing and payment services underneath, and I built the flow on top of them.
 </Row>
 
-<MobileDesign label="On a phone" intro="Checkout wasn't built for a phone. Text ran off the screen and buyers finished on desktop. I rebuilt every step with its own phone layout, with the next action fixed at the bottom." />
+<MobileDesign label="Under the hood · On a phone" intro="Checkout was desktop only, behind a gate. I took the gate out and rebuilt every step for a phone, the Stripe card form included, with the next action fixed at the bottom." />
 
-<Row label="After you buy" heading="A receipt, not a whole page." step={8}>
-  Viewing a purchase used to open a whole page with no way back. Now it's a small receipt with the files and the agreement, and every purchase stays in your library.
+<Row label="Under the hood · Paying" heading="Credit first, the card only for the rest." step={5}>
+  Buyers can pay with platform credit, a card, or both. Credit is applied first and the card only covers what's left, so the total on screen is the one you pay.
+</Row>
+
+<Row label="Under the hood · The receipt" heading="A receipt that waits for the signed copy." step={8}>
+  View Purchase opens a small receipt over the song's page instead of a whole page with no way back. It waits for the signed PDF and shows the download as soon as it's ready, and every purchase stays in your library.
 </Row>
 
 <SystemFigure label="How it works" spec={purchasing} />
@@ -160,8 +164,8 @@ import cart from '../../../assets/work/vers1ons/purchasing/before-after/summary-
 
 <Comparisons />
 
-<Row label="Reliability" heading="You can't pay for terms you haven't signed." step={6}>
-  Payment opens only after signing, and each signed agreement keeps its own terms, so a later price change never touches a license already sold. The team built what's behind these screens, like the signing, the payments and the rights each purchase grants.
+<Row label="Reliability" heading="A license sold keeps its terms." step={6}>
+  Each signed agreement keeps its own terms, so a later price change never touches a license already sold. When we opened buying to limited accounts, tests covered every closed route, so nothing opened by accident.
 </Row>
 
 <BodySection label="Outcome" heading="Buying a license now feels as simple as buying a song, on any screen.">
