@@ -293,10 +293,15 @@ test('part: the header names what it shows, led and contributed, for screen read
   await ctx.close();
 });
 
-test('part: the body places the steps and comparisons; the Mobile design row is the only gallery', async () => {
+test('part: the body places its rows, the steps and comparisons; the Mobile design row is the only gallery', async () => {
   const { ctx, page } = await openPart();
   const order = await page.$$eval('article.body > :not(script, style)', (els) => els.map((e) => e.className.split(' ')[0]));
-  assert.deepEqual(order.slice(0, 5), ['system-figure', 'body-section', 'body-section', 'steps', 'comparisons']);
+  // Told in rows (Row.astro), then How it works, the steps and what changed,
+  // each placed once by the body, in that order.
+  assert.equal(order.filter((c) => c === 'case-row').length, 7);
+  const placed = order.filter((c) => ['system-figure', 'steps', 'comparisons'].includes(c));
+  assert.deepEqual(placed, ['system-figure', 'steps', 'comparisons']);
+  assert.ok(order.lastIndexOf('case-row') < order.indexOf('system-figure'), 'the rows come before How it works');
   assert.equal(await page.locator('[data-steps]').count(), 1);
   assert.equal(await page.locator('[data-gallery]').count(), 0);
   const other = await openPart(GALLERY);
