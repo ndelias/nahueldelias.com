@@ -12,6 +12,7 @@ dates:
   start: 2025-12
 stack: ['Next.js', 'tRPC', 'Stripe Connect', 'Postgres', 'Inngest']
 standing: 'In production'
+outcome: 'Live. Every contributor is paid directly, and no one hits a bank form to sign up.'
 disciplines:
   led: [product, design, frontend]
   contributed: [backend]
@@ -123,21 +124,37 @@ import BodySection from '../../../components/BodySection.astro';
 import SystemFigure from '../../../components/diagrams/SystemFigure.astro';
 import { walletPayouts } from '../../../components/diagrams/specs/wallet-payouts';
 
-<SystemFigure label="How it works" spec={walletPayouts} />
+{/* DRAFT (2026-10-17): the approved copy in rows, with an under-the-hood half. Mechanism details to come from Nahuel, row by row. */}
 
-<BodySection label="Problem" heading="The rights followed the chain. The money didn't.">
-  A license knew everyone who owned a share of a song, but when it sold, the money went to one artist as a lump sum, and they had to split it themselves. New artists were asked for bank details before they'd made anything, and many left right there. And when we wanted to give licenses away, a coupon couldn't do it: transferring rights takes a real transaction.
-
-  None of that scales by hand as sales and remixes grow, and artists and labels only stay if they trust that everyone gets paid right.
+<BodySection label="The problem" heading="The rights followed the chain. The money didn't.">
+  A license knew everyone who owned a share of a song, but when it sold, the money went to one artist as a lump sum to split by hand. New artists were asked for bank details before they'd made anything, and many left right there. And a giveaway couldn't be a coupon, because transferring rights takes a real transaction.
 </BodySection>
 
 <BodySection label="What I did" heading="I made the product and UX calls, and built platform credit myself.">
-  With a teammate's payout groundwork in place, I made the call to pay every contributor their share directly, and designed how artists see it: the wallet, what they've earned, and withdrawing to their bank. I moved Stripe Connect out of sign-up, to where selling starts: publishing a listing, distributing, or the wallet. People can start right away and connect once they're using the app.
-
-  A contributor doesn't need an account to be owed money. When an uploader adds someone by email, that person is emailed that they have a share waiting. They can create a vers1ons account, or connect the one they already have, even under a different email, and claim it there.
-
-  Platform credit was mine end to end: a balance kept on a ledger, so a giveaway is a real purchase that transfers rights, with credit and card together at checkout, and a reversal when a sale doesn't go through. The team wired up the Stripe API; I worked closely with it, and with how every payout and money check works behind the screens.
+  On a teammate's payout groundwork, I made the call to pay every contributor directly and designed how artists see it, from the wallet to withdrawing. I moved Stripe Connect out of sign-up to where selling starts. Platform credit was mine end to end. The team wired up the Stripe API, and I worked closely with it.
 </BodySection>
+
+<SystemFigure label="How it works" spec={walletPayouts} />
+
+<Row label="The wallet" heading="What you've earned, and from which sale." step={1}>
+  Artists see their balance and where it came from, and withdraw it, instant or standard, with the fee and what will arrive shown before they confirm. Credit is kept separate. You can spend it at checkout, but you can't withdraw it.
+</Row>
+
+<Row label="Bank details, later" heading="No bank form to sign up." step={5}>
+  "Get paid" used to be a sign-up step, and many new artists left right there. Now payout setup waits until you first publish a listing or distribute, or you can do it from your wallet.
+</Row>
+
+<Row label="Under the hood · Shares" heading="Each sale is split the way the license says." step={3}>
+  vers1ons pays every contributor their share directly by default, and uploaders can opt out per contributor. A contributor without an account has their share held until they claim it, and once their payout account is ready, an hourly sweep pays anything still held.
+</Row>
+
+<Row label="Under the hood · Claiming" heading="Owed money, before you have an account." step={4}>
+  My part, 26 commits on the payout code, is the contributor who's owed money but has no account. They get a daily email whose unsubscribe link an email scanner can't trigger, and claim into a new or existing account with a code sent to the email they were credited under. A wrong email can be fixed and the held money moves with it. If someone says it wasn't meant for them, the money is frozen and the uploader is told.
+</Row>
+
+<Row label="Under the hood · Credit" heading="A giveaway is a real sale, paid from a ledger nobody can edit." step={6}>
+  Ten free drop licenses had to transfer rights, and a card can't charge under 50 cents or take a full discount. So credit pays for an actual purchase. The buyer signs, the sale settles and the seller is paid. I built it end to end, all seven commits. Entries are only added, never edited, and the balance is their sum. A sum has no row to lock, so every write that can lower a balance locks the owner first, and a unique index stops one sale spending twice.
+</Row>
 
 <Steps label="Feature by feature" />
 
@@ -146,9 +163,5 @@ import { walletPayouts } from '../../../components/diagrams/specs/wallet-payouts
 <Comparisons />
 
 <BodySection label="Reliability" heading="Every money check runs on the server, and fails safe.">
-  Payouts go to one Stripe account per person, and if a lookup ever finds two, it refuses instead of guessing. A contributor's share stays held until they claim it, and claiming it into a different account takes a code sent to the email they were credited under. Payout setup is checked on the server everywhere money moves, and the app responds to a stable reason, not to the wording of an error. Credit lives on a ledger where nothing is edited: it can't be spent twice, and a sale that never completes gives it back in the same step.
-</BodySection>
-
-<BodySection label="Outcome" heading="Live: every contributor is paid directly, and no one hits a bank form to sign up.">
-  Artists see their balance and withdraw it, and every contributor gets their share without the artist doing the math. Someone added by email is told they have a share waiting, and can claim it with a new or existing account. Giveaway licenses run on platform credit, as real sales.
+  Payouts go to one Stripe account per person, and if a lookup ever finds two, it refuses instead of guessing. Payout setup is checked on the server everywhere money moves, and the app responds to a stable reason, not to the wording of an error. A sale that dies before settling hands back the exact credit, to the pool it came from, in the same transaction that cancels it. A spend records its pool, not the profile that spent it, so a sibling profile can't spend the same money again.
 </BodySection>
