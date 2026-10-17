@@ -9,18 +9,14 @@ import IndexList from '../components/IndexList.astro';
 import ViewToggle from '../components/ViewToggle.astro';
 import Base from '../layouts/Base.astro';
 import { homepageEntries } from '../lib/entries';
-import { posterOf, type Srcsets } from '../lib/posters';
+import { posterOf } from '../lib/posters';
 
 // The W01 poster is the LCP element: preload the AVIF the constellation
-// will pick, only where it shows (JS on, no reduced motion) and for the
-// theme the system asks for.
+// will pick, only where it shows (JS on, no reduced motion). Every visit
+// lands in light, so it's the light poster.
 const lcp = await posterOf(homepageEntries()[0]);
 const STRIP = '(scripting: enabled) and (prefers-reduced-motion: no-preference)';
-const link = (p: Srcsets, media: string) =>
-  p.avif ? { imagesrcset: p.avif, type: 'image/avif', media } : { href: p.src, media };
-const preloads = lcp.dark
-  ? [link(lcp.light, `${STRIP} and (prefers-color-scheme: light)`), link(lcp.dark, `${STRIP} and (prefers-color-scheme: dark)`)]
-  : [link(lcp.light, STRIP)];
+const preloads = [lcp.light.avif ? { imagesrcset: lcp.light.avif, type: 'image/avif', media: STRIP } : { href: lcp.light.src, media: STRIP }];
 ---
 <Base title="Nahuel D'Elias — Product engineer" description="[Identity line]" preload={['sans-400', 'sans-500', 'mono-400']}>
   {preloads.map((attrs) => <link slot="head" rel="preload" as="image" fetchpriority="high" {...attrs} />)}

@@ -78,6 +78,20 @@ test('resting on vers1ons opens its five parts around it', async () => {
   await ctx.close();
 });
 
+test('every visit lands in light, even with the system in dark; the toggle switches and is remembered', async () => {
+  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, colorScheme: 'dark' });
+  await ctx.route('**/*.mp4', (route) => route.abort());
+  const page = await ctx.newPage();
+  const bg = () => page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+  await page.goto(server.origin + '/', { waitUntil: 'load' });
+  assert.equal(await bg(), 'rgb(242, 241, 237)', 'not light on landing');
+  await page.click('[data-theme-toggle]');
+  assert.equal(await bg(), 'rgb(22, 21, 19)', 'the toggle did not switch to dark');
+  await page.goto(server.origin + '/work/vers1ons/', { waitUntil: 'load' });
+  assert.equal(await bg(), 'rgb(22, 21, 19)', 'dark was not remembered');
+  await ctx.close();
+});
+
 test("vers1ons' poster is the largest paint", async () => {
   const { ctx, page } = await open();
   const lcp = await page.evaluate(

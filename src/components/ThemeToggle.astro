@@ -1,6 +1,6 @@
 ---
-// Manual theme switch. It shows the theme it switches to, "(Dark)" in light
-// mode, overrides the system in either direction, and saves the choice;
+// Manual theme switch. Every visit lands in light; this shows the theme it
+// switches to, "(Dark)" in light mode, and saves the choice;
 // Base.astro's inline script applies it before first paint on the next visit.
 // CSS picks the visible label from the resolved theme, so it's right at first
 // paint and nothing shifts when the script runs. Without JS it can't work, so
@@ -12,8 +12,7 @@
 
 <script>
   const root = document.documentElement;
-  const system = matchMedia('(prefers-color-scheme: dark)');
-  const current = () => root.dataset.theme ?? (system.matches ? 'dark' : 'light');
+  const current = () => (root.dataset.theme === 'dark' ? 'dark' : 'light');
   const other = () => (current() === 'dark' ? 'light' : 'dark');
 
   const buttons = document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]');
@@ -31,8 +30,6 @@
       sync();
     }),
   );
-  // With no saved choice, follow the system when it changes.
-  system.addEventListener('change', sync);
   sync();
 </script>
 
@@ -63,13 +60,5 @@
   }
   :global(:root[data-theme='dark']) .to-light {
     display: inline;
-  }
-  @media (prefers-color-scheme: dark) {
-    :global(:root:not([data-theme='light'])) .to-dark {
-      display: none;
-    }
-    :global(:root:not([data-theme='light'])) .to-light {
-      display: inline;
-    }
   }
 </style>

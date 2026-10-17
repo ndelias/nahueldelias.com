@@ -58,8 +58,8 @@ const row = layout === 'full';
     <div class="media" style={`aspect-ratio: ${width} / ${height}`}>
       {hero ? (
         <picture>
-          {hero.dark && <source type="image/avif" srcset={hero.dark.avif} sizes={heroSizes} media="(prefers-color-scheme: dark)" data-dark data-hero />}
-          {hero.dark && <source type="image/webp" srcset={hero.dark.webp} sizes={heroSizes} media="(prefers-color-scheme: dark)" data-dark data-hero />}
+          {hero.dark && <source type="image/avif" srcset={hero.dark.avif} sizes={heroSizes} media="not all" data-dark data-hero />}
+          {hero.dark && <source type="image/webp" srcset={hero.dark.webp} sizes={heroSizes} media="not all" data-dark data-hero />}
           <source type="image/avif" srcset={hero.light.avif} sizes={heroSizes} data-hero />
           <source type="image/webp" srcset={hero.light.webp} sizes={heroSizes} data-hero />
           <img class="still" src={hero.light.src} alt={alt} width={width} height={height} loading="eager" fetchpriority="high" />
@@ -75,10 +75,10 @@ const row = layout === 'full';
           sizes={sizes}
         />
       )}
-      {/* A theme chosen with the toggle overrides the system: point the dark
-          sources at it before the image is picked. Tiny and inline. */}
+      {/* The dark sources are off unless the dark theme was chosen: turn them
+          on for it before the image is picked. Tiny and inline. */}
       {hero?.dark && (
-        <script is:inline>(function(){var t=document.documentElement.dataset.theme;if(t)document.querySelectorAll("source[data-hero][data-dark]").forEach(function(s){s.media=t==="dark"?"all":"not all"})})()</script>
+        <script is:inline>document.documentElement.dataset.theme==="dark"&&document.querySelectorAll("source[data-hero][data-dark]").forEach(function(s){s.media="all"})</script>
       )}
       {video && (
         <video class="video" data-src={video} data-play={play} muted playsinline preload="none" width={width} height={height} aria-label={alt} loop={play !== 'click'} />

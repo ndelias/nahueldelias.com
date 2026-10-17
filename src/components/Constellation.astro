@@ -76,8 +76,8 @@ const first = projects[0];
           style={`transform: translate(-50%, -50%) translateX(calc(${rowX(k)} * var(--u))) rotateY(${((-rowX(k) / 600) * 16).toFixed(2)}deg) scale(${S0})`}
         >
           <picture>
-            {poster.dark?.avif && <source type="image/avif" {...{ [k ? 'data-srcset' : 'srcset']: poster.dark.avif }} media="(prefers-color-scheme: dark)" data-dark />}
-            {poster.dark?.webp && <source type="image/webp" {...{ [k ? 'data-srcset' : 'srcset']: poster.dark.webp }} media="(prefers-color-scheme: dark)" data-dark />}
+            {poster.dark?.avif && <source type="image/avif" {...{ [k ? 'data-srcset' : 'srcset']: poster.dark.avif }} media="not all" data-dark />}
+            {poster.dark?.webp && <source type="image/webp" {...{ [k ? 'data-srcset' : 'srcset']: poster.dark.webp }} media="not all" data-dark />}
             {poster.light.avif && <source type="image/avif" {...{ [k ? 'data-srcset' : 'srcset']: poster.light.avif }} />}
             <img
               {...(k
@@ -125,10 +125,10 @@ const first = projects[0];
   </div>
 </section>
 
-{/* A theme chosen with the toggle overrides the system, which the dark
-    posters' media queries can't see. Before first paint, point them at the
-    chosen theme; the island keeps them in step after. */}
-<script is:inline>(function(){var t=document.documentElement.dataset.theme;if(t)document.querySelectorAll("source[data-dark]").forEach(function(s){s.media=t==="dark"?"all":"not all"})})()</script>
+{/* The dark posters are off (media="not all") unless the dark theme was
+    chosen: before first paint, turn them on for it; the island keeps them
+    in step after. */}
+<script is:inline>document.documentElement.dataset.theme==="dark"&&document.querySelectorAll("source[data-dark]").forEach(function(s){s.media="all"})</script>
 
 <script>
   import { initOrbit } from '../lib/orbit';

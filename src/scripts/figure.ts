@@ -101,13 +101,13 @@ function init() {
   // A tab swaps in new content (Tabs.astro): set up the figures in it.
   document.addEventListener('tabs:swap', (event) => bind((event as CustomEvent<HTMLElement>).detail));
 
-  // The hero's dark sources follow the theme toggle too.
+  // The hero's dark sources follow the theme toggle too (off unless dark).
   const root = document.documentElement;
   const heroDark = document.querySelectorAll<HTMLSourceElement>('source[data-hero][data-dark]');
   if (heroDark.length) {
     new MutationObserver(() => {
       const t = root.dataset.theme;
-      heroDark.forEach((s) => (s.media = t ? (t === 'dark' ? 'all' : 'not all') : '(prefers-color-scheme: dark)'));
+      heroDark.forEach((s) => (s.media = t === 'dark' ? 'all' : 'not all'));
     }).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
   }
 
