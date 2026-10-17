@@ -293,10 +293,17 @@ test('part: the header names what it shows, led and contributed, for screen read
   await ctx.close();
 });
 
-test('part: the body places the steps and comparisons; the Mobile design row is the only gallery', async () => {
+test('part: the body places its rows, the steps and comparisons; the Mobile design row is the only gallery', async () => {
   const { ctx, page } = await openPart();
   const order = await page.$$eval('article.body > :not(script, style)', (els) => els.map((e) => e.className.split(' ')[0]));
-  assert.deepEqual(order.slice(0, 5), ['system-figure', 'body-section', 'body-section', 'steps', 'comparisons']);
+  // How it works first (no images near the top, so nothing competes with
+  // the largest paint), then the rows, the steps and what changed, each
+  // placed once by the body, in that order.
+  assert.equal(order.filter((c) => c === 'case-row').length, 6);
+  const placed = order.filter((c) => ['system-figure', 'steps', 'comparisons'].includes(c));
+  assert.deepEqual(placed, ['system-figure', 'steps', 'comparisons']);
+  assert.ok(order.indexOf('system-figure') < order.indexOf('case-row'), 'How it works comes before the rows');
+  assert.ok(order.lastIndexOf('case-row') < order.indexOf('steps'), 'the rows come before the steps');
   assert.equal(await page.locator('[data-steps]').count(), 1);
   assert.equal(await page.locator('[data-gallery]').count(), 0);
   const other = await openPart(GALLERY);
@@ -581,7 +588,7 @@ for (const [path, id] of [
 test('deferred blocks: find-in-page reaches text in a block that was never rendered', async () => {
   // window.find is the scriptable form of Chrome's find bar; both search
   // content-visibility: auto content and reveal the match.
-  for (const [path, text] of [[HUB, 'who you\'re contracting with'], [PART, 'a playbook for when something goes wrong']]) {
+  for (const [path, text] of [[HUB, 'who you\'re contracting with'], [PART, 'tests that try to break the endpoints on purpose']]) {
     const { ctx, page } = await openPart(path);
     const r = await page.evaluate((text) => {
       const found = window.find(text);

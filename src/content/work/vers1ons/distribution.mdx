@@ -12,6 +12,7 @@ dates:
   start: 2025-11
 stack: ['Next.js', 'Inngest', 'Postgres', 'Redis', 'Socket.IO', 'Object storage', 'ffmpeg']
 standing: 'In production'
+outcome: 'Live in production. A remix no longer has to leave vers1ons to reach the stores.'
 disciplines:
   led: [backend, product, frontend]
   contributed: []
@@ -178,30 +179,47 @@ import BodySection from '../../../components/BodySection.astro';
 import SystemFigure from '../../../components/diagrams/SystemFigure.astro';
 import { distribution } from '../../../components/diagrams/specs/distribution';
 
-<SystemFigure label="How it works" spec={distribution} />
+{/* DRAFT (2026-10-16): the approved copy restructured into rows, with an under-the-hood half. Mechanism details to come from Nahuel, row by row. */}
 
-<BodySection label="Problem" heading="Every remix that left for an outside distributor took its royalties and its data with it.">
-  vers1ons licenses the right to remix. But to get a remix onto Spotify or Apple Music, artists had to take it somewhere else. Outside distributors know nothing about the license chain, so credits came out wrong, the original artist dropped off, and the royalties never came back through us.
-
-  To be worth more as a company, we needed to keep remixes, royalties and data inside vers1ons, and to pay every contributor down a chain of remixes, from the original to the sixth version and beyond.
+<BodySection label="The problem" heading="Every remix that left for an outside distributor took its royalties and its data with it.">
+  To reach Spotify or Apple Music, a remix licensed on vers1ons had to go somewhere else. Outside distributors know nothing about the license chain, so credits came out wrong and the royalties never came back through us.
 </BodySection>
 
 <BodySection label="What I did" heading="I owned distribution end to end, from the partner calls to the screens.">
-  I worked with our partners to learn how distribution actually works behind the scenes. Then I built our own system around one delivery partner, made so others can plug in: one Inngest function that takes a release from submission to every store, blocking for individual stores that follows each license, and royalty routing that pays everyone in the chain.
-
-  I designed and built the wizard too. Contributors, splits and metadata are hard to explain, so I turned them into steps an artist can get through without knowing any of it.
+  I learned how distribution works from our partners and built our system around one delivery partner, from the job that takes a release to every store to the royalties that follow it. I designed and built the wizard too, so an artist gets through contributors, splits and metadata without needing to know any of it.
 </BodySection>
+
+<SystemFigure label="How it works" spec={distribution} />
+
+<Row label="Start from the license" heading="A release starts from the track, not an empty project." step={1}>
+  Most remixes are one track from one license, so a release starts from a new upload or a track you already licensed. A licensed track brings its listing's audio and details with it, so there's less to type and nothing to contradict.
+</Row>
+
+
+<Row label="Under the hood · Delivery" heading="A job that refuses before it does anything it can't take back." step={11}>
+  Submitting runs nine checks and writes the release in one transaction. Then one durable job takes it to the stores. I wrote the most commits on it, 36. Store codes are permanent, so the job checks the partner's storage, the label and genre, the code source, and the license's stores and dates again before minting any. A re-run reuses the release it already made instead of creating a second one, a re-submit that has its codes skips that step, and it only retries what a retry can fix.
+</Row>
+
+<Row label="Under the hood · Live status" heading="Live status, no polling, never a stale step." step={12}>
+  The job saves each milestone to the release before announcing it over Socket.IO, through Redis, to that artist only. The event is a nudge, not the data, so the page re-reads the saved state. A reload or a dropped connection never shows a stale step.
+</Row>
+
+<Row label="Under the hood · Stores" heading="Store blocking that follows each license." step={7}>
+  Some stores only travel together, so the picker groups them by delivery route. If the license excludes some stores, the job drops them, ships the rest and tells the artist. The stored store list matches what was delivered, so later edits and takedowns can't reach an excluded store.
+</Row>
+
+<Row label="Under the hood · Royalties" heading="Nobody's share gets lost on the way." step={13}>
+  A release's splits come from the signed split sheet, so every contributor is on it. My part, 26 commits on the payout code, is the contributor who's owed money but has no account yet. vers1ons pays them directly by default and holds the money until they claim it. A wrong email can be fixed and the money moves with it, and once their payout account is ready, an hourly sweep pays anything still held.
+</Row>
+
+<Row label="Under the hood · Failure" heading="A failed release isn't a dead end." step={14}>
+  The artist sees the step it stopped at and gets a notification that actually arrives. Before my fix, failure notices were saved where the bell never showed them. They fix and resubmit from the same draft without starting over, and the retry reuses the release and codes the first attempt made instead of minting new ones.
+</Row>
 
 <Steps />
 
 <Comparisons />
 
 <BodySection label="Reliability" heading="Every failure we've seen in production, we caught and fixed.">
-  Over 245 unit tests, plus tests that try to break the endpoints on purpose. Metrics, tracing and a playbook for when something goes wrong. Our test releases in production have found real bugs, and we've fixed and addressed each one. We continue to do so.
-</BodySection>
-
-<BodySection label="Outcome" heading="Live in production: a remix no longer has to leave vers1ons to reach the stores.">
-  Beta users and remix buyers release straight to stores from vers1ons, and labels distribute on behalf of their roster. Every release's credits and splits stay with us, so royalties can follow the chain back to the original artist.
-
-  116 PRs over about ten months: nine checks before any write, seven durable steps, one transaction.
+  Over 245 unit tests, tests that try to break the endpoints on purpose, metrics, tracing and a playbook. Test releases in production found real bugs, and we fixed each one. 116 PRs over about ten months.
 </BodySection>
