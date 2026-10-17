@@ -128,13 +128,14 @@ order: 3
 import BodySection from '../../../components/BodySection.astro';
 import SystemFigure from '../../../components/diagrams/SystemFigure.astro';
 import { purchasing } from '../../../components/diagrams/specs/purchasing';
-import cart from '../../../assets/work/vers1ons/purchasing/before-after/summary-before.webp';
 
 {/* DRAFT copy (2026-10-16), shortened into rows, with an "under the hood" half on the frontend Nahuel built. For his review. */}
 
-<Row label="The problem" heading="Buying a license was harder than buying a song." src={cart} alt="The December 2025 order summary, laid out like a cart with Remove from cart." caption="Dec 2025 · the order summary was a cart">
+<BodySection label="The problem" heading="Buying a license was harder than buying a song.">
   The price sat halfway down the listing, the royalties read like legal text, and checkout looked like a cart. A buyer who found a song on their phone had to switch to desktop to finish.
-</Row>
+</BodySection>
+
+<SystemFigure label="How it works" spec={purchasing} />
 
 <Row label="The listing" heading="Price and terms first, where buyers look." step={1}>
   I put the song on one side and the license on the other, with the price and Purchase at the top. A purchase bar stays with you as you scroll.
@@ -158,7 +159,6 @@ import cart from '../../../assets/work/vers1ons/purchasing/before-after/summary-
   View Purchase used to open a whole page with no way back. I made it a small receipt over the song's page. The agreement on it is drawn in the browser from the license itself, so it shows as soon as the license loads instead of waiting for the signed PDF, which is made in the background after payment. If that file isn't stored yet, the download says so and asks you to try again. Next, the button should update itself when the file lands.
 </Row>
 
-<SystemFigure label="How it works" spec={purchasing} />
 
 <Steps label="Step by step" />
 

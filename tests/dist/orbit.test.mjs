@@ -188,7 +188,10 @@ test('pointing at a part brings it forward and plays its recording, muted and in
   await restOn(page, 'W01');
   // A part never holds still (it orbits), so no waiting for it to.
   await page.locator('[data-orbit] .card.part[data-no="W01.3"]').hover({ force: true });
-  await page.waitForTimeout(1200);
+  // Wait for the outcome, not a fixed time: under load the springs and the
+  // caption take longer to get there.
+  await page.waitForFunction(() => document.querySelector('[data-caption].in [data-c="no"]')?.textContent === 'W01.3' && document.querySelector('video')?.closest('.card')?.dataset.no === 'W01.3', null, { timeout: 8000 });
+  await page.waitForTimeout(600);
   assert.match(await caption(page), /^W01\.3 · Part of vers1ons Purchasing/i);
   const all = await cards(page);
   const hot = all.find((c) => c.no === 'W01.3');
