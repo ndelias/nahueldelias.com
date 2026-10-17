@@ -94,14 +94,21 @@ test('every visit lands in light, even with the system in dark; the toggle switc
 
 test("vers1ons' poster is the largest paint", async () => {
   const { ctx, page } = await open();
+  // Text paints before the poster arrives, so the first candidate can be a
+  // line of the caption; the poster replaces it once it paints. Wait for
+  // the poster (or give up after 5s and report the last candidate).
   const lcp = await page.evaluate(
     () =>
-      new Promise((done) =>
+      new Promise((done) => {
+        let last = 'none';
+        const timer = setTimeout(() => done(last), 5000);
         new PerformanceObserver((list) => {
-          const e = list.getEntries().at(-1);
-          done(e.element?.closest('.card')?.dataset.no ?? e.element?.tagName);
-        }).observe({ type: 'largest-contentful-paint', buffered: true }),
-      ),
+          for (const e of list.getEntries()) {
+            last = e.element?.closest('.card')?.dataset.no ?? e.element?.tagName;
+            if (last === 'W01') (clearTimeout(timer), done(last));
+          }
+        }).observe({ type: 'largest-contentful-paint', buffered: true });
+      }),
   );
   assert.equal(lcp, 'W01');
   await ctx.close();
