@@ -4,7 +4,8 @@
 // stray public/ file, a test asset.
 //
 // Pages (.html) are the roots. From each: src, href, srcset (and the data-
-// forms the strip swaps in later), imagesrcset, poster and content
+// forms the strip swaps in later, and data-video, the recording the
+// homepage plays for a project or part), imagesrcset, poster and content
 // attributes, and url() and import specifiers in inline CSS and scripts.
 // Referenced CSS and JS files are followed for the same. Dependency-free.
 
@@ -32,7 +33,7 @@ const toUrlPath = (file) => '/' + relative(DIST, file).split(sep).join('/');
 const files = new Set((await walk(DIST)).map(toUrlPath));
 const pages = [...files].filter((f) => f.endsWith('.html'));
 
-const ATTR = /\s(?:src|href|data-src|data-[\w-]*-url|poster|content)\s*=\s*["']([^"']+)["']/gi;
+const ATTR = /\s(?:src|href|data-src|data-video|data-[\w-]*-url|poster|content)\s*=\s*["']([^"']+)["']/gi;
 // Files listed in a JSON file a page fetches (a gallery's screens.json).
 const JSON_URL = /"(?:full|src)":"([^"]+)"/g;
 const SRCSET = /\s(?:srcset|data-srcset|imagesrcset)\s*=\s*["']([^"']+)["']/gi;

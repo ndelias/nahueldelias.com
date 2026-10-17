@@ -12,6 +12,7 @@ dates:
   start: 2025-11
 stack: ['React', 'Tailwind CSS', 'CSS variables', 'Figma']
 standing: 'In production'
+outcome: 'One product on one system, kept on brand by CI. Labels said it felt like a product they could trust.'
 disciplines:
   led: [design, frontend]
   contributed: [product]
@@ -124,37 +125,41 @@ order: 1
 import BodySection from '../../../components/BodySection.astro';
 import SystemFigure from '../../../components/diagrams/SystemFigure.astro';
 import { designSystem } from '../../../components/diagrams/specs/design-system';
-import Figure from '../../../components/Figure.astro';
-import tour from '../../../assets/work/vers1ons/design-system/tour.webp';
 
-<SystemFigure label="How it works" spec={designSystem} />
+{/* DRAFT (2026-10-17): the approved copy in rows, with an under-the-hood half. Mechanism details to come from Nahuel, row by row. */}
 
-<BodySection label="Problem" heading="The app looked like it was built by a different team every week.">
-  vers1ons grew screen by screen. There were seven different status badges, a dozen hand-built play buttons and prices in three different greens. Orange and pink accents competed with the brand, and none of it said who we were. The app didn't feel cohesive, and it felt amateur.
-
-  Fixes didn't stick either. A color changed in one place stayed wrong in ten others, and every new screen started from scratch. For a product asking labels and artists to trust it with their music, looking unfinished was a real cost.
+<BodySection label="The problem" heading="The app looked like it was built by a different team every week.">
+  Seven status badges, a dozen hand-built play buttons, prices in three greens, and a fix in one place stayed wrong in ten others. For a product asking labels to trust it with their music, looking unfinished was a real cost.
 </BodySection>
 
 <BodySection label="What I did" heading="I designed the system and moved the whole app onto it.">
-  I set the visual direction. Dark only, warm black surfaces so cover art stands out, lavender for the brand and actions, and green only for money, so the price is always the thing you can find. Inter for words, Red Hat Mono for data like prices, BPM and dates.
-
-  Underneath, I built the tokens and the shared components, like the play button, the price pill and one status badge in place of seven. I redesigned Discover on them, and moved the rest of the app across in five waves, from the shell and wizards to the player and the smaller apps around it. Then I made it hold. A design check in CI blocks off-system colors, layering and motion, and a mobile spec builds touch sizes into the components themselves.
-
-  I designed or shaped most of the app's UI along the way, including the cards in use today. The team helped build them.
+  I set the visual direction, added tokens for surfaces, shadows, layering and motion, built shared components on them, redesigned Discover and moved the rest of the app across. Then I made it hold, with a design check in CI and a mobile spec built into the components. The team helped build the cards in use today.
 </BodySection>
 
-<Figure src={tour} alt="Discover on the system, with featured cards and new releases." video="/media/vers1ons/design-system/walkthrough.mp4" caption="A tour on the system: Discover, search, an artist, the library and the upload wizard (0:56)" />
+<SystemFigure label="How it works" spec={designSystem} />
+
+<Row label="Color" heading="Color means something." step={1}>
+  Dark only, so cover art stands out, lavender for the brand and actions, and green only for money, so the price is always easy to find. Mono type for data like prices, BPM and dates.
+</Row>
+
+<Row label="Shared parts" heading="One badge in place of seven." step={3}>
+  Every screen builds on the same shared components instead of copying them, like the play button, the price pill and one status badge. One lesson came the hard way. A class defined only in an app's styles silently did nothing in a shared component, which broke the tabs and the carousel, so shared utilities now live in the base config.
+</Row>
+
+<Row label="Under the hood · Migration" heading="The whole app moved across in five waves." step={5}>
+  The dark-only rebrand, then shared components, then screens, then the smaller apps. Each wave was fixed by hand and checked with searches. Then the CI check turned those searches into a permanent gate, widened area by area as each was cleaned, so the work can't quietly slide back.
+</Row>
+
+<Row label="Under the hood · CI" heading="A check in CI keeps every change on the system." step={8}>
+  It's a search script, not a lint plugin, so CI needs no extra tools, and it runs on every PR. It fails the build on colors that bypass the tokens, raw layering values, one-off motion, components that turn the focus ring off, and bottom bars outside the shared one. Raw hex only warns, since some is legitimate. Exceptions sit in two lists, permanent with a reason or temporary with a ticket, and if the search itself errors, the build fails. Its first run caught a thinner icon line and a 32px close button.
+</Row>
+
+<Row label="Under the hood · Phones" heading="Touch sizes come from the components." step={7}>
+  The mobile spec lives in the shared components, so screens get it by default. Tap targets grew to 48px, the mobile chrome first, then Discover, then the rest, each checked in a browser. One shared focus ring serves every interactive component, and below 768px dialogs become real bottom sheets, switched in one place.
+</Row>
 
 <Steps label="Piece by piece" />
 
 <MobileDesign />
 
 <Comparisons />
-
-<BodySection label="Reliability" heading="The rules live in code, so they hold.">
-  Colors, type, spacing, layering and motion all come from tokens, and every screen builds on the same shared components instead of copying them. A check in CI fails any change that uses an off-system color, a raw layering value or off-token motion. Each exception it allows is listed in the check with a reason. Every control has a visible focus ring from its component, and touch sizes on mobile come from the components too, so a new screen gets them for free.
-</BodySection>
-
-<BodySection label="Outcome" heading="vers1ons looks like one product, and it stays that way.">
-  Every surface runs on the same system, from the app and its wizards to the landing page and the smaller apps around it. New screens are put together from parts instead of designed from scratch, and CI keeps them on brand without a reviewer. People noticed. Labels told us it felt like a product they could trust, artists said it looked really good, and investors came back saying everything looked a lot better.
-</BodySection>
