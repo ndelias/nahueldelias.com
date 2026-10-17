@@ -31,12 +31,17 @@ const { label, heading, step, phones, src, alt, caption } = Astro.props;
 const gallery = Astro.locals.gallery ?? [];
 const phoneShots = Astro.locals.phones ?? [];
 const shot = step ? gallery[step - 1] : undefined;
-if (step && !shot) throw new Error(`<Row step={${step}}>: the page has ${gallery.length} gallery items.`);
+// On a part told in tabs, every tab's rows are evaluated on each tab's page
+// and only the open tab's are kept (Tab.astro), against the open tab's
+// gallery. A row from another tab can point past it: render nothing, since
+// it's discarded. Anywhere else a missing step is a mistake: fail the build.
+const otherTab = !!Astro.locals.tabs;
+if (step && !shot && !otherTab) throw new Error(`<Row step={${step}}>: the page has ${gallery.length} gallery items.`);
 const pair = (phones ?? []).map((n) => {
   const p = phoneShots[n - 1];
-  if (!p) throw new Error(`<Row phones={[…${n}…]}>: the page has ${phoneShots.length} phone screens.`);
+  if (!p && !otherTab) throw new Error(`<Row phones={[…${n}…]}>: the page has ${phoneShots.length} phone screens.`);
   return p;
-});
+}).filter((p) => p !== undefined);
 const image = shot ? { src: shot.src, alt: shot.alt } : src ? { src, alt: alt ?? '' } : undefined;
 const meta = (s: ImageMetadata) => (s as ImageMetadata & { clone?: ImageMetadata }).clone ?? s;
 const text = caption ?? shot?.title;

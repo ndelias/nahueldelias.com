@@ -13,6 +13,7 @@ dates:
   start: 2025-06
 stack: ['Next.js', 'tRPC', 'Postgres', 'Stripe', 'Inngest', 'Redis', 'Object storage']
 standing: 'In production'
+outcome: 'Live, with major labels, indie labels and established artists selling licenses under these terms.'
 disciplines:
   led: [product, design]
   contributed: [frontend, backend]
@@ -342,67 +343,92 @@ import { licensingListings } from '../../../components/diagrams/specs/licensing-
 import { licensingSheets } from '../../../components/diagrams/specs/licensing-sheets';
 
 <BodySection label="Problem" heading="A license is only worth something if everyone can trust it, and ours couldn't yet be trusted.">
-  What a licensor set on a listing didn't always match what the system allowed, so a remix could reach a store the license didn't cover. Once a remix was remixed again, it got hard to tell who the original rights holders were and who should be paid. And setting up a listing, with its contributors, splits and terms, was easy to get wrong.
-
-  That mattered for three reasons. A release that breaks its license is a legal problem for vers1ons. Original artists only list their songs if they know they'll be credited and paid down the chain. And the license is what we sell: if it isn't true, there's nothing to sell.
+  What a licensor set on a listing didn't always match what the system allowed, so a remix could reach a store the license didn't cover. Once a remix was remixed again, it got hard to tell who should be credited and paid. A release that breaks its license is a legal problem for vers1ons, and the license is what we sell.
 </BodySection>
 
 <Tabs label="Three parts">
   <Tab id="listings">
+    <BodySection label="What I did" heading="I led the product decisions on licensing and built it with our engineering team.">
+      I worked with legal on the agreement, with labels and artists on the terms, and with our founders on the license model. We turned the agreement into data the platform runs on. Every purchase issues a rights grant that points back to the one it came from, and the terms a buyer signs are frozen at purchase. The listing wizard was shared work, and the parts below were mine.
+    </BodySection>
+
     <SystemFigure label="How it works" spec={licensingListings} />
 
-    <BodySection label="What I did" heading="I led the product decisions on licensing and built it with our engineering team.">
-      I worked with legal on the agreement, with labels and artists on the terms they needed, and with our founders on the license model. Then we turned the agreement into data the platform runs on. Every purchase issues a rights grant that points back to the grant it came from, so rights and royalties resolve up the chain however deep it goes. The terms a buyer signs are frozen at purchase, and one check decides where a remix may release, the same in the API, the release wizard and the delivery worker.
+    <Row label="Contributors" heading="Everyone who's paid, in one list." step={4}>
+      I built the contributors step with an inline split editor, merging songwriting and recording into one list, and made publishers payable parties with their own ID and a cut of their writer's share. A listing can't go live until every paid contributor has a phone number and a confirmed notice, and Review links back to what's missing.
+    </Row>
 
-      On the screens, I designed the listing flow so an artist can set contributors, splits, terms and the stores remixes may go to, then sign and publish, without being a lawyer.
-    </BodySection>
+    <Row label="Under the hood · Release check" heading="One rule decides where a remix may release." step={6}>
+      Licensors choosing the stores a remix may go to was my feature, and I wrote most of the rule behind it. It's enforced at submit and again at delivery, which drops excluded stores at the last step, and the wizard shows its answer.
+    </Row>
+
+    <Row label="Under the hood · Locked once live" heading="Once it's live, what buyers relied on can't change." step={10}>
+      A published listing freezes its license scope, title and audio, its codes can be set only once, and price and royalties stay editable. Saving a draft no longer writes license terms nobody chose, or turns the filename into the contract title.
+    </Row>
 
     <Steps />
 
     <MobileDesign />
 
     <Comparisons />
-
-    <BodySection label="Outcome" heading="Live in production, with labels and artists selling licenses under these terms.">
-      Major labels, indie labels and established artists list songs on vers1ons. A remix of a remix still credits and pays the original artist, and only goes to the stores its license allows.
-    </BodySection>
   </Tab>
 
   <Tab id="drops">
+    <BodySection label="What I did" heading="I built Drops end to end: a remix contest where no one leaves as a loser.">
+      Most remix contests run on a form and a Dropbox link. Stems leak, entries have no license, and the winning remix can't be released. In a drop, the license is the entry fee. I wrote the spec, designed the pages and wrote most of the drop code, 185 commits. It's shipped end to end, with the first drops being set up with artists now.
+    </BodySection>
+
     <SystemFigure label="How it works" spec={licensingDrops} />
 
-    <BodySection label="What I did" heading="I built Drops end to end: a remix contest where no one leaves as a loser.">
-      Most remix contests run on a form and a Dropbox link. Stems leak, entries have no license, and the winning remix can't be released because nobody cleared the rights. In a drop, the license is the entry fee. The artist is paid for every license sold, and every producer leaves with a remix they're licensed to release to socials and stores, with no legal back-and-forth between teams.
+    <Row label="The rules, in public" heading="Every producer agrees to the exact rules they saw." step={3}>
+      The artist is paid for every license sold, and every producer leaves licensed to release their remix. Agreeing to the rules used to only unlock a button. Now the server refuses an entry without it and records the time and a hash of the exact wording, so editing the rules later can't change what someone agreed to.
+    </Row>
 
-      I wrote the spec, designed the pages and built the backend. Each entry is saved as its own work that points back to the original, and the purchase issues a real rights grant, so a winning remix can go straight to distribution. The windows to submit, judge and release are enforced on the server, at purchase, at submission and at release. On top of that come the lifecycle emails, from the invite to the winners, and a judging page where the host plays, stars and picks entries.
-    </BodySection>
+    <Row label="Under the hood · Stems" heading="Stems only reach the people who bought them." step={2}>
+      Stems used to stream in full from the public page. Now only the owner, the managing label or a buyer gets full audio, and everyone else gets the 30-second preview. The check runs before the response is built, so an unentitled page never contains the links, and a missing preview means no audio, never the full song. Search and browse use a batched check, two queries whatever the page size.
+    </Row>
+
+    <Row label="Under the hood · Windows" heading="The windows are enforced on the server." step={5}>
+      A drop that hadn't opened could still sell. Now the check runs where a purchase becomes real, creating the license and the payment, because the cart lives in the browser and can reach checkout weeks later. Release terms are frozen in the same transaction as the sale, and early-access codes are claimed there too, so two people can't use one at once. Delivery checks the release date itself, now being rolled out.
+    </Row>
+
+    <Row label="Judging" heading="The host plays, stars and picks." step={11}>
+      A winners shelf in star order, All, Starred and Unheard filters, waveforms, markers for what's been heard, review by keyboard, and winners announced with a confirmation. Emails cover the waitlist code, the opening and "your drop is live".
+    </Row>
 
     <Steps />
 
     <MobileDesign />
 
     <Comparisons />
-
-    <BodySection label="Outcome" heading="Shipped and working end to end, with the first drops being set up with artists now.">
-      A drop goes from create, invite, buy and submit to judge, winners and release window, on the same licenses as every listing. The buzz of a contest, with the rights already cleared.
-    </BodySection>
   </Tab>
 
   <Tab id="sheets">
+    <BodySection label="What I did" heading="A satellite app that gets the paperwork done before a license exists.">
+      Most co-written songs have no split sheet, and without one there's no clean license to sell. So I built sheets.vers1ons.com on my own, from nothing, 82 commits and almost all of it. Anyone can make a split sheet for free with no account. It's live as the first vers1ons satellite app.
+    </BodySection>
+
     <SystemFigure label="How it works" spec={licensingSheets} />
 
-    <BodySection label="What I did" heading="A satellite app that gets the paperwork done before a license exists.">
-      Most co-written songs have no split sheet, and without one there's no clean license to sell. So I built sheets.vers1ons.com on my own, from nothing: anyone can create a split sheet, or bring in one they already have, with no account. When it's ready, it collects signatures and the authority of everyone who owns a share, and then hands the song to vers1ons to become a license agreement.
-    </BodySection>
+    <Row label="No account" heading="Nothing is saved until you ask." step={1}>
+      The sheet lives in the browser, checked against the expected format before it's loaded back, and the PDF is made without touching the database or storage. That route is rate-limited, and refuses if the limiter is down. Saving takes a free account, one sheet each, and a database rule means a double click, two tabs or a retry can't make a second.
+    </Row>
+
+    <Row label="Splits" heading="Splits balance the same way everywhere." step={7}>
+      The split rules are shared with the main app, so Sheets and the vers1ons wizard balance splits the same way. The PDF can't be downloaded until both sides add up to 100%.
+    </Row>
+
+    <Row label="Under the hood · Signatures" heading="Every signature binds to the version that was sent." step={10}>
+      The version is frozen before it's sent, and every signature is recorded against it, once even if someone signs twice. Signing links are single-use and stored only as hashes, and a forged one is rejected before any lookup. The signed PDF is made from the frozen version once everyone has signed, and stored privately. Paid saving and signing by every owner are built behind a flag.
+    </Row>
+
+    <Row label="Under the hood · Handoff" heading="A signed sheet arrives as a draft listing." step={9}>
+      Continue on vers1ons carries the title and splits behind a signed one-time code and signs you in. An approved artist lands in a draft listing they own with the splits filled in, contributors whose email matches an account are linked, and repeating it is safe.
+    </Row>
 
     <Steps />
 
-
     <Comparisons />
-
-    <BodySection label="Outcome" heading="Live in production as the first vers1ons satellite app.">
-      Anyone can make a split sheet at sheets.vers1ons.com for free. Paying gets it signed by everyone who owns a share, and a signed sheet comes into vers1ons ready to become a license. It's how artists who've never heard of us find the marketplace.
-    </BodySection>
   </Tab>
 </Tabs>
 
