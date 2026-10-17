@@ -17,7 +17,10 @@ const versions = Astro.props.versions.map((v, i) => ({ ...v, label: v.label ?? `
 const n = versions.length;
 const active = n - 1;
 const depth = (i: number) => (active - i + n) % n;
-const place = (d: number) => `--depth: ${d}; --o: ${d === 0 ? 1 : 0.9 - d * 0.15}; z-index: ${10 - d}`;
+// Frames behind the front one stay solid and take a wash of the page color,
+// deeper the further back: they recede without showing each other through.
+const tint = (d: number) => (d === 0 ? 0 : Math.min(60, 10 + d * 14) / 100);
+const place = (d: number) => `--depth: ${d}; --tint: ${tint(d)}; z-index: ${10 - d}`;
 ---
 {n > 0 && (
   <section class="versions grid" aria-labelledby="versions-label" data-versions style={`--n: ${n}`}>
@@ -42,6 +45,8 @@ const place = (d: number) => `--depth: ${d}; --o: ${d === 0 ? 1 : 0.9 - d * 0.15
           </div>
         ))}
       </div>
+      {/* The front version's note, under the stack (stack mode only). */}
+      <p class="caption muted" data-versions-caption aria-hidden="true">{versions[active].note}</p>
     </div>
   </section>
 )}
@@ -53,6 +58,7 @@ const place = (d: number) => `--depth: ${d}; --o: ${d === 0 ? 1 : 0.9 - d * 0.15
     const tablist = root.querySelector<HTMLElement>('[data-versions-tabs]')!;
     const tabs = [...root.querySelectorAll<HTMLButtonElement>('[data-version-tab]')];
     const frames = [...root.querySelectorAll<HTMLElement>('[data-version]')];
+    const caption = root.querySelector<HTMLElement>('[data-versions-caption]');
     const n = frames.length;
     let active = n - 1;
 
@@ -61,12 +67,13 @@ const place = (d: number) => `--depth: ${d}; --o: ${d === 0 ? 1 : 0.9 - d * 0.15
       frames.forEach((frame, i) => {
         const d = (active - i + n) % n;
         frame.style.setProperty('--depth', String(d));
-        frame.style.setProperty('--o', String(d === 0 ? 1 : 0.9 - d * 0.15));
+        frame.style.setProperty('--tint', String(d === 0 ? 0 : Math.min(60, 10 + d * 14) / 100));
         frame.style.zIndex = String(10 - d);
         // Only the front frame is the panel; the ones behind are decoration.
         if (d === 0) frame.removeAttribute('aria-hidden');
         else frame.setAttribute('aria-hidden', 'true');
       });
+      if (caption) caption.textContent = frames[active].querySelector('.note')?.textContent ?? '';
       tabs.forEach((tab, i) => {
         tab.setAttribute('aria-selected', String(i === active));
         tab.tabIndex = i === active ? 0 : -1;
@@ -224,10 +231,33 @@ const place = (d: number) => `--depth: ${d}; --o: ${d === 0 ? 1 : 0.9 - d * 0.15
     width: var(--w);
     transform: translate(calc(var(--depth) * var(--dx)), calc(var(--depth) * var(--dy))) scale(calc(1 - var(--depth) * 0.04));
     transform-origin: top left;
-    opacity: var(--o);
-    transition:
-      transform 0.5s var(--ease),
-      opacity 0.3s ease;
+    outline: 1px solid var(--line);
+    outline-offset: -1px;
+    transition: transform 0.5s var(--ease);
+  }
+  /* The wash over a frame behind: solid page color at --tint. */
+  .stacked .frame::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--bg);
+    opacity: var(--tint, 0);
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+  /* In the stack the note reads under it, not over a screen. */
+  .stacked .note {
+    display: none;
+  }
+  .caption {
+    display: none;
+    margin: var(--space-16) 0 0;
+    max-width: 60ch;
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+  }
+  .stacked .caption {
+    display: block;
   }
 
   @media (min-width: 640px) {
