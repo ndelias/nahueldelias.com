@@ -89,6 +89,9 @@ test('every visit lands in light, even with the system in dark; the toggle switc
   assert.equal(await bg(), 'rgb(22, 21, 19)', 'the toggle did not switch to dark');
   await page.goto(server.origin + '/work/vers1ons/', { waitUntil: 'load' });
   assert.equal(await bg(), 'rgb(22, 21, 19)', 'dark was not remembered');
+  await ctx.close();
+});
+
 test("vers1ons' poster is the largest paint", async () => {
   const { ctx, page } = await open();
   const lcp = await page.evaluate(
