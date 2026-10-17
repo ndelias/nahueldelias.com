@@ -242,7 +242,9 @@ async function shoot(browser, origin, { viewport, colorScheme, view, next = 0, p
   );
   if (!ok) throw new Error(`The page has no ${view} view with ${next} Next presses at ${viewport.width}px`);
   await settle(page);
-  const png = await page.screenshot();
+  // The covers' beckoning ring loops; held at its start (no ring), the shot
+  // is the same every run.
+  const png = await page.screenshot({ animations: 'disabled' });
   await ctx.close();
   return png;
 }

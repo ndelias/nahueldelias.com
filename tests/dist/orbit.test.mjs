@@ -167,6 +167,19 @@ test('resting on a project opens it: to the middle, its parts out of it, smaller
   await ctx.close();
 });
 
+test('the covers beckon with a ring until a project is opened, then stop for the visit; no tag on them', async () => {
+  const { ctx, page } = await open();
+  const beckoning = () =>
+    page.evaluate(() => [...document.querySelectorAll('[data-orbit] .cover')].map((el) => el.getAnimations().some((a) => a.animationName === 'beckon')));
+  assert.ok((await beckoning()).every(Boolean), 'a cover is not beckoning at rest');
+  assert.equal(await page.locator('[data-orbit] .cover .name').count(), 0);
+  await restOn(page, 'W01');
+  await page.mouse.move(5, 450);
+  await page.waitForTimeout(2000);
+  assert.ok((await beckoning()).every((on) => !on), 'a cover still beckons after a project was opened');
+  await ctx.close();
+});
+
 test('every part can be pointed at, the ones behind the project too', async () => {
   const { ctx, page } = await open();
   await restOn(page, 'W01');

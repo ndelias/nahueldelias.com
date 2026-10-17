@@ -129,6 +129,8 @@ export function initOrbit(root: HTMLElement) {
     const now = performance.now();
     open = k;
     hot = null;
+    // Found: the covers stop beckoning for the rest of the visit.
+    root.classList.add('met');
     const cover = coverOf(k);
     // The parts start inside the cover, wherever it is, and come out in turn.
     partsOf(k).forEach((p, i) => {
