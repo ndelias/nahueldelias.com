@@ -185,13 +185,12 @@ import { distribution } from '../../../components/diagrams/specs/distribution';
   To reach Spotify or Apple Music, a remix licensed on vers1ons had to go somewhere else. Outside distributors know nothing about the license chain, so credits came out wrong and the royalties never came back through us. I learned how distribution works from our partners, then owned ours end to end.
 </BodySection>
 
+<SystemFigure label="How it works" spec={distribution} />
+
 <Row label="Start from the license" heading="A release starts from the track, not an empty project." step={1}>
   Most remixes are one track from one license, so a release starts from a new upload or a track you already licensed. A licensed track brings its listing's audio and details with it, so there's less to type and nothing to contradict.
 </Row>
 
-<Row label="Credits" heading="The release can't contradict the license." step={4}>
-  Contributors arrive locked from the listing's signed split sheet, and Next says why it's disabled until the splits add up.
-</Row>
 
 <Row label="Under the hood · Delivery" heading="A job that refuses before it does anything it can't take back." step={11}>
   Submitting runs nine checks and writes the release in one transaction. Then one durable job takes it to the stores. I wrote the most commits on it, 36. Store codes are permanent, so the job checks the partner's storage, the label and genre, the code source, and the license's stores and dates again before minting any. A re-run reuses the release it already made instead of creating a second one, a re-submit that has its codes skips that step, and it only retries what a retry can fix.
@@ -212,8 +211,6 @@ import { distribution } from '../../../components/diagrams/specs/distribution';
 <Row label="Under the hood · Failure" heading="A failed release isn't a dead end." step={14}>
   The artist sees the step it stopped at and gets a notification that actually arrives. Before my fix, failure notices were saved where the bell never showed them. They fix and resubmit from the same draft without starting over, and the retry reuses the release and codes the first attempt made instead of minting new ones.
 </Row>
-
-<SystemFigure label="How it works" spec={distribution} />
 
 <Steps />
 
