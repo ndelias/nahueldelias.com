@@ -77,3 +77,18 @@ test('resting on vers1ons opens its five parts around it', async () => {
   assert.deepEqual(parts, ['W01.1', 'W01.2', 'W01.3', 'W01.4', 'W01.5']);
   await ctx.close();
 });
+
+test("vers1ons' poster is the largest paint", async () => {
+  const { ctx, page } = await open();
+  const lcp = await page.evaluate(
+    () =>
+      new Promise((done) =>
+        new PerformanceObserver((list) => {
+          const e = list.getEntries().at(-1);
+          done(e.element?.closest('.card')?.dataset.no ?? e.element?.tagName);
+        }).observe({ type: 'largest-contentful-paint', buffered: true }),
+      ),
+  );
+  assert.equal(lcp, 'W01');
+  await ctx.close();
+});

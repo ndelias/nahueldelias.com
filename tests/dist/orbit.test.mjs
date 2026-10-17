@@ -134,7 +134,10 @@ test('at rest: every project in one row, in order, on screen; parts tucked away 
   await ctx.close();
 });
 
-test('the first poster is the preloaded, high-priority LCP image; the rest wait for it', async () => {
+test('the first poster is preloaded and high priority; the rest wait for it', async () => {
+  // Which element is the largest paint is checked on the shipped page
+  // (single.test.mjs): here eight posters share the row, each too small to
+  // be sure of beating a line of text.
   const { ctx, page } = await open();
   const imgs = await page.evaluate(() =>
     [...document.querySelectorAll('[data-orbit] .cover img')].map((i) => ({ p: i.getAttribute('fetchpriority'), l: i.getAttribute('loading'), w: i.getAttribute('width') })),
@@ -143,16 +146,6 @@ test('the first poster is the preloaded, high-priority LCP image; the rest wait 
   for (const i of imgs.slice(1)) assert.equal(i.l, 'lazy');
   const preload = await page.evaluate(() => [...document.querySelectorAll('link[rel=preload][as=image]')].map((l) => [l.getAttribute('fetchpriority'), l.type]));
   assert.ok(preload.length >= 1 && preload.every(([p, t]) => p === 'high' && t === 'image/avif'));
-  const lcp = await page.evaluate(
-    () =>
-      new Promise((done) =>
-        new PerformanceObserver((list) => {
-          const e = list.getEntries().at(-1);
-          done(e.element?.closest('.card')?.dataset.no ?? e.element?.tagName);
-        }).observe({ type: 'largest-contentful-paint', buffered: true }),
-      ),
-  );
-  assert.equal(lcp, 'W01');
   await ctx.close();
 });
 

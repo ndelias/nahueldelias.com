@@ -7,11 +7,12 @@ tagline: 'Buying a license should be as easy as buying a song.'
 summary: 'Buying a license feels the same on your phone as on your desktop.'
 weight: 2
 status: shipped
-role: 'Product and UX lead on the purchase flow'
+role: 'Product lead; designed and built the frontend'
 dates:
   start: 2026-04
 stack: ['Next.js', 'React', 'Tailwind CSS', 'Stripe Elements']
 standing: 'In production'
+outcome: 'Checkout works start to finish on a phone, the same as on desktop.'
 disciplines:
   led: [product, design, frontend]
   contributed: []
@@ -127,33 +128,46 @@ order: 3
 import BodySection from '../../../components/BodySection.astro';
 import SystemFigure from '../../../components/diagrams/SystemFigure.astro';
 import { purchasing } from '../../../components/diagrams/specs/purchasing';
+import cart from '../../../assets/work/vers1ons/purchasing/before-after/summary-before.webp';
+
+{/* DRAFT copy (2026-10-16), shortened into rows, with an "under the hood" half on the frontend Nahuel built. For his review. */}
+
+<Row label="The problem" heading="Buying a license was harder than buying a song." src={cart} alt="The December 2025 order summary, laid out like a cart with Remove from cart." caption="Dec 2025 · the order summary was a cart">
+  The price sat halfway down the listing, the royalties read like legal text, and checkout looked like a cart. A buyer who found a song on their phone had to switch to desktop to finish.
+</Row>
+
+<Row label="The listing" heading="Price and terms first, where buyers look." step={1}>
+  I put the song on one side and the license on the other, with the price and Purchase at the top. A purchase bar stays with you as you scroll.
+</Row>
+
+<Row label="Royalties" heading="Royalties in one line. The detail is a tap away." step={2}>
+  Royalties became one short line on the listing. The worked example opens in a dialog, so the page stays light and the detail is still there.
+</Row>
+
+<Row label="Under the hood · Checkout" heading="Signed first, then charged, in one flow." step={4}>
+  I built checkout as one page. The payment is set up when the page loads, so the card form is ready the moment it appears. It appears once the agreement is filled in and you leave the signing fields, so it doesn't jump in on the first keystroke, and once it's shown it stays, so a card you've typed is never wiped. On Complete, the page checks the signature again and waits for it to be stored before anything is charged.
+</Row>
+
+<MobileDesign label="Under the hood · On a phone" intro="On a phone, one page asks you to read a legal PDF, accept seven statements, sign and pay. Five competing boxes became two sections that collapse, read and sign, then pay, after three attempts at a two-step sheet. One initials keystroke made the page jump 165px, and it's 0 now. Four hand-built bottom bars became one, and tap targets grew to 48px. I wrote 44 of this flow's commits, the third most, and 18 were for phones." />
+
+<Row label="Under the hood · Paying" heading="Credit first, the card only for the rest." step={5}>
+  Buyers can pay with platform credit, a card, or both. Checkout shows what the credit covers and what's left for the card before you pay, and when credit covers everything there's no card form at all. Credit is taken before the card is charged, and if taking it fails, the card isn't charged at all. If the card is declined, retrying doesn't take the credit twice. If the checkout dies before it completes, the exact credit goes back to the pool it came from.
+</Row>
+
+<Row label="Under the hood · The receipt" heading="A receipt that never waits on a file." step={8}>
+  View Purchase used to open a whole page with no way back. I made it a small receipt over the song's page. The agreement on it is drawn in the browser from the license itself, so it shows as soon as the license loads instead of waiting for the signed PDF, which is made in the background after payment. If that file isn't stored yet, the download says so and asks you to try again. Next, the button should update itself when the file lands.
+</Row>
 
 <SystemFigure label="How it works" spec={purchasing} />
 
-<BodySection label="Problem" heading="Buying a license was harder than it should have been.">
-  The listing buried what mattered most. The price sat halfway down the page, and the royalties read like legal text. The checkout itself didn't feel like a place you'd want to spend money. It was hard to follow and didn't look the part. On top of that, checkout was desktop-only. A buyer who found a song on their phone had to go back to the desktop app to finish, and that was a friction point for our users.
-
-  A license isn't a cart item. It comes with terms, an agreement to sign and royalties, and the buyer has to understand all of that before paying. Making it easy couldn't mean hiding any of it.
-</BodySection>
-
-<BodySection label="What I did" heading="I redesigned the purchase flow, on desktop and on phones.">
-  I redesigned the listing so the song is on one side and the license you're buying is on the other, with the price and Purchase at the top. A purchase bar stays with you as you scroll. Royalties are a short summary, with a worked example one tap away.
-
-  I also redesigned the checkout itself, from the order summary to the agreement and payment. On phones, I took the desktop gate out and rebuilt every step for a small screen. Signing and paying became two steps. You read and sign the agreement first, then payment opens right below it. After buying, the receipt is a small dialog instead of a whole page, and your purchases live in your library with the files and the signed agreement.
-
-  The team built what's behind the screens, like the agreement signing, payments and the rights each purchase grants.
-</BodySection>
-
 <Steps label="Step by step" />
-
-<MobileDesign />
 
 <Comparisons />
 
-<BodySection label="Reliability" heading="You can't pay for terms you haven't signed.">
-  Payment opens only after the agreement is signed, and each signed agreement keeps its own terms. If an artist changes the price later, licenses already sold don't change. The parts of a live listing that the rest of the platform depends on, like where remixes can be released and the master recording, are locked once it's on sale. The receipt waits for the signed PDF and shows the download as soon as it's ready. When we opened buying to limited accounts, tests covered every closed route, so nothing opened by accident.
-</BodySection>
+<Row label="Reliability" heading="A license sold keeps its terms." step={6}>
+  Each signed agreement keeps its own terms, so a later price change never touches a license already sold. When we opened buying to limited accounts, tests covered every closed route, so nothing opened by accident.
+</Row>
 
 <BodySection label="Outcome" heading="Buying a license now feels as simple as buying a song, on any screen.">
-  The listing puts the price, the terms and the royalties up front, where buyers look first. The checkout is clean and easy to follow, from the order summary to the signed agreement. And it works the same on a phone as on desktop, so nobody has to switch devices to finish. What you bought, with the files and the signed agreement, is waiting in your library.
+  The price, the terms and the royalties sit up front, checkout is easy to follow, and it works the same on a phone as on desktop. What you bought waits in your library.
 </BodySection>
