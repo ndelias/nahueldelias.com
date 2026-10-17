@@ -1667,3 +1667,156 @@ nav.pager {
   font-size: var(--text-caption);
   line-height: var(--leading-small);
 }
+
+/* A case study row (components/Row.astro, H2 2026-10-14): a short claim
+   beside its picture, five columns to seven, sides swapping row by row. It
+   shares the body sections' numbering, so a page can mix them. */
+
+.case-row {
+  & {
+    counter-increment: body-section;
+    row-gap: var(--space-24);
+    align-items: center;
+  }
+  .text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-16);
+  }
+  .margin {
+    display: flex;
+    gap: var(--space-12);
+    align-items: baseline;
+    margin: 0;
+    line-height: normal;
+  }
+  .no::before {
+    content: counter(body-section, decimal-leading-zero);
+    color: var(--accent);
+  }
+  .label {
+    color: var(--ink);
+  }
+  .heading {
+    margin: 0;
+    max-width: 18ch;
+    font-size: var(--text-h3);
+    line-height: var(--leading-h3);
+    letter-spacing: var(--tracking-h3);
+    text-wrap: balance;
+  }
+  .prose p {
+    margin: 0;
+    max-width: 40ch;
+    font-size: var(--text-prose);
+    line-height: var(--leading-prose);
+  }
+  .prose p + p {
+    margin-top: var(--space-12);
+  }
+  .media {
+    margin: 0;
+  }
+  .screen {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 16 / 10;
+    border-radius: 10px;
+    background: var(--surface);
+    outline: 1px solid color-mix(in srgb, var(--ink) 10%, transparent);
+    outline-offset: -1px;
+  }
+  .screen .still,
+  .screen .clip {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform-origin: var(--ox, 50%) var(--oy, 50%);
+    transition: transform 0.5s var(--ease);
+  }
+  .screen .clip {
+    opacity: 0;
+    transition:
+      opacity 0.6s ease,
+      transform 0.5s var(--ease);
+  }
+  .screen .clip.playing {
+    opacity: 1;
+  }
+  /* Pointing at a screen looks closer, where the pointer is. */
+  @media (hover: hover) {
+    .screen {
+      cursor: zoom-in;
+    }
+    .screen.zoom .still,
+    .screen.zoom .clip {
+      transform: scale(1.8);
+    }
+  }
+  .pair {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-24);
+    padding: var(--space-32) 0 var(--space-48);
+    border-radius: 10px;
+    background: var(--surface);
+  }
+  .pair .phone {
+    display: block;
+    width: 34%;
+    height: auto;
+    border-radius: 16px;
+  }
+  .pair .phone + .phone {
+    transform: translateY(var(--space-24));
+  }
+  figcaption {
+    margin-top: 10px;
+    font-size: var(--text-mono-sm);
+    line-height: normal;
+  }
+  @media (min-width: 640px) {
+    & {
+      column-gap: 72px;
+    }
+    .text {
+      grid-column: 1 / span 5;
+      grid-row: 1;
+    }
+    .media {
+      grid-column: 6 / span 7;
+      grid-row: 1;
+    }
+    /* Every other row, the picture on the left. */
+    &:nth-child(even of .case-row) .text {
+      grid-column: 8 / span 5;
+    }
+    &:nth-child(even of .case-row) .media {
+      grid-column: 1 / span 7;
+    }
+  }
+}
+
+/* The swipe: once reveal.ts is ready, a picture waits off to its side,
+   masked, and slides in as its row arrives. Rows on the left come from the
+   left. */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal-ready [data-swipe] {
+    transition:
+      opacity 0.6s ease,
+      translate 1.2s var(--ease),
+      clip-path 1.2s var(--ease);
+  }
+  .reveal-ready [data-swipe]:not(.in) {
+    opacity: 0;
+    translate: 56px 0;
+    clip-path: inset(0 0 0 100%);
+  }
+  .reveal-ready .case-row:nth-child(even of .case-row) [data-swipe]:not(.in) {
+    translate: -56px 0;
+    clip-path: inset(0 100% 0 0);
+  }
+}
