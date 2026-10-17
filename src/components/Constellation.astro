@@ -88,7 +88,6 @@ const first = projects[0];
               alt=""
             />
           </picture>
-          <span class="name mono" aria-hidden="true">{number} · {entry.data.title}</span>
         </Hit>
         {parts.length > 0 && (
           <ol class="parts" aria-label={`Parts of ${entry.data.title}`}>
@@ -215,15 +214,25 @@ const first = projects[0];
   @keyframes fade {
     from { opacity: 0; }
   }
-  .name {
-    position: absolute;
-    left: 10px;
-    bottom: 10px;
-    padding: 3px 7px;
-    border-radius: 3px;
-    font-size: 11px;
-    background: var(--bg);
-    color: var(--ink);
+  /* An invitation: until a project has been opened, a faint ring breathes
+     out from each cover's edge, then rests. Resting on it holds it still. */
+  @media (prefers-reduced-motion: no-preference) {
+    .orbit:not(:global(.met)) .cover:not(:hover) {
+      animation: beckon 2.8s 1.2s cubic-bezier(0.2, 0.7, 0.2, 1) infinite;
+    }
+  }
+  @keyframes beckon {
+    0% {
+      box-shadow:
+        0 26px 50px -30px color-mix(in srgb, #000 55%, transparent),
+        0 0 0 0 color-mix(in srgb, var(--ink) 24%, transparent);
+    }
+    50%,
+    100% {
+      box-shadow:
+        0 26px 50px -30px color-mix(in srgb, #000 55%, transparent),
+        0 0 0 8px color-mix(in srgb, var(--ink) 0%, transparent);
+    }
   }
   .card:focus-visible {
     outline: var(--focus-ring);
