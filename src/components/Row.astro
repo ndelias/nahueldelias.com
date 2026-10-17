@@ -38,6 +38,9 @@ const pair = (phones ?? []).map((n) => {
   return p;
 });
 const image = shot ? { src: shot.src, alt: shot.alt } : src ? { src, alt: alt ?? '' } : undefined;
+// The screen keeps its own shape: a phone shows whole, centered in the box,
+// and a detail crop gets its wide ratio. Only desktop screens fill it.
+const frame = shot?.frame ?? 'desktop';
 const meta = (s: ImageMetadata) => (s as ImageMetadata & { clone?: ImageMetadata }).clone ?? s;
 const text = caption ?? shot?.title;
 ---
@@ -49,7 +52,7 @@ const text = caption ?? shot?.title;
   </div>
   <figure class:list={['media', { phones: pair.length > 0 }]} data-swipe>
     {image && (
-      <div class="screen" data-loupe>
+      <div class:list={['screen', frame]} data-loupe>
         <EntryImage class="still" src={image.src} alt={image.alt} width={Math.min(1280, meta(image.src).width)} />
         {shot?.clip && <video class="clip" data-src={shot.clip} muted playsinline loop preload="none" aria-hidden="true"></video>}
       </div>

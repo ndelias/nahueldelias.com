@@ -1746,6 +1746,16 @@ nav.pager {
   .screen .clip.playing {
     opacity: 1;
   }
+  /* A phone screen shows whole: centered in the box on the surface, never
+     cropped to fill it. A detail crop keeps its own wide ratio. */
+  .screen.phone .still,
+  .screen.phone .clip {
+    padding: 4% 0;
+    object-fit: contain;
+  }
+  .screen.detail {
+    aspect-ratio: 21 / 9;
+  }
   /* Pointing at a screen looks closer, where the pointer is. */
   @media (hover: hover) {
     .screen {
