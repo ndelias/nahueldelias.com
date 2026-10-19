@@ -1,9 +1,9 @@
 ---
-// ← → ↗ ● ▶, drawn as inline SVG because the subset fonts don't carry them.
+// ← → ↗ ↓ ● ▶, drawn as inline SVG because the subset fonts don't carry them.
 // Sized to the surrounding text (1em) and colored with currentColor. Next to a
 // text label it's decoration and hidden from assistive tech (the default).
 // Standing alone, pass `label` and it's announced as an image.
-type Name = 'arrow-left' | 'arrow-right' | 'arrow-up-right' | 'dot' | 'play';
+type Name = 'arrow-left' | 'arrow-right' | 'arrow-up-right' | 'download' | 'dot' | 'play';
 
 interface Props {
   name: Name;
@@ -17,6 +17,7 @@ const ARROWS: Record<Exclude<Name, 'dot' | 'play'>, string> = {
   'arrow-left': 'M14 8H2.5M7 3.5 2.5 8 7 12.5',
   'arrow-right': 'M2 8h11.5M9 3.5 13.5 8 9 12.5',
   'arrow-up-right': 'M4 12 12 4M5.5 4H12v6.5',
+  download: 'M8 2v9.5M3.5 7 8 11.5 12.5 7M3 14h10',
 };
 ---
 <svg
