@@ -1,0 +1,433 @@
+---
+// /about: who Nahuel is, told as a path. A pixel meadow opens the page; under
+// it, how he thinks about product, as five steps that branch out of one
+// point and come back into his portrait (the steps are his thinking). A
+// thread carries on from there down his experience and ends in an arrow at
+// the way to reach him.
+//
+// Server-rendered and readable without JS: the meadow, the lines and the
+// portrait are drawn by src/scripts/about.ts after the first paint. Without
+// JS (or before it runs) the meadow is a flat wash of its colors, the steps
+// and text show plainly, and the portrait's slot is hidden.
+import AfterLoad from '../components/AfterLoad.astro';
+import Frame from '../components/Frame.astro';
+import Icon from '../components/Icon.astro';
+import Base from '../layouts/Base.astro';
+import behaviour from '../scripts/about.ts?worker&url';
+
+const STEPS = [
+  { title: 'Be curious', line: "Have conversations with the people you're building for. Consider every potential customer's perspective." },
+  { title: 'Understand the problem', line: 'Fall in love with the problem, not the solution.' },
+  { title: 'Map the journey', line: 'Map out the product journey for each user.' },
+  { title: 'Know what the build needs', line: 'Understand every requirement. Work end to end, and know when to pull others in.' },
+  { title: 'Mindless when it works', line: 'When it works, people move through the product without thinking about it.' },
+];
+
+const EXPERIENCE = [
+  { when: '2025 – now', role: 'Product Engineer', where: 'vers1ons', line: 'Product, design and code for music licensing. Joined as a product intern.', href: '/work/vers1ons/' },
+  { when: '2025', role: 'CX Design Strategist', where: 'EY', line: 'Client experience strategy for the future of EY wavespace, through USC Iovine and Young.' },
+  { when: '2025', role: 'Product Designer', where: 'Techstars', line: 'Placed with VideoDraft to research and shape AI script-to-video tools.' },
+  { when: '2024', role: 'Product Designer', where: 'Beats by Dre', line: 'Research and prototypes for the Beats Pill app.' },
+  { when: '2024', role: 'AI Prompt Engineer', where: 'Outlier', line: 'Prompt design and A/B testing to improve AI output quality.' },
+  { when: '2024', role: 'Artist Management Consultant', where: 'Culture Collective', line: 'Day-to-day management and web design for artists like Leon Thomas.' },
+];
+
+const RESUME = '/nahuel-delias-resume.pdf';
+const LINKS = [
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/nahuel-d-elias' },
+  { label: 'Email', href: 'mailto:njdelias@gmail.com' },
+  { label: 'GitHub', href: 'https://github.com/ndelias' },
+];
+---
+<Base title="About — Nahuel D'Elias" description="How Nahuel D'Elias, a product engineer, thinks about product: from the first conversation to a product people move through without thinking." preload={['sans-500', 'mono-400']}>
+  <Frame>
+    <main class="about">
+      <canvas class="meadow" data-meadow aria-hidden="true"></canvas>
+
+      <section class="open container" aria-labelledby="about-title">
+        <p class="kicker mono muted">Nahuel D'Elias · About me</p>
+        <h1 id="about-title">This is how I think about product.</h1>
+        <span class="origin" data-origin></span>
+      </section>
+
+      <section class="tree container" data-tree aria-label="How I think about product">
+        <svg class="lines" data-lines aria-hidden="true"></svg>
+        <ol class="steps" data-steps>
+          {STEPS.map((s, i) => (
+            <li class="step">
+              <span class="no mono muted">{String(i + 1).padStart(2, '0')}</span>
+              <span class="step-title">{s.title}</span>
+              <span class="step-line muted">{s.line}</span>
+            </li>
+          ))}
+        </ol>
+        <div class="me">
+          <canvas class="portrait" data-portrait role="img" aria-label="A portrait of Nahuel D'Elias drawn in characters"></canvas>
+          <h2 class="name">Nahuel D'Elias</h2>
+          <p data-statement>As a builder in today's world, I'm responsible for all sides of a product. It has to be visually clean, and seamless enough that people forget they're on it, but still memorable and identifiable.</p>
+          <p>Anybody can have an idea. Not everybody can think through an entire product. That's what I do.</p>
+        </div>
+      </section>
+
+      <div class="rest container">
+        <svg class="thread" data-thread aria-hidden="true"></svg>
+        <section class="exp" data-exp aria-labelledby="exp-title">
+          <h2 class="label mono muted" id="exp-title">Experience</h2>
+          <ol class="rows">
+            {EXPERIENCE.map((e) => {
+              const Tag = e.href ? 'a' : 'div';
+              return (
+                <li>
+                  <Tag class="row" href={e.href}>
+                    <span class="when mono muted">{e.when}</span>
+                    <span class="role">{e.role}<span class="role-line muted">{e.line}</span></span>
+                    <span class="where muted">{e.where}</span>
+                    {e.href && <Icon name="arrow-up-right" />}
+                  </Tag>
+                </li>
+              );
+            })}
+          </ol>
+          <h2 class="label mono muted edu">Education</h2>
+          <div class="row">
+            <span class="when"></span>
+            <span class="role">M.S. Integrated Design, Business and Technology</span>
+            <span class="where muted">USC Iovine and Young Academy</span>
+          </div>
+        </section>
+
+        <section class="reach" data-reach aria-labelledby="reach-title">
+          <h2 class="reach-line" id="reach-title">Have an idea? Want to build something? Need a coffee? Let's talk.</h2>
+          <ul class="links">
+            <li class="pair">
+              <a href={RESUME} target="_blank" rel="noopener">Résumé <Icon name="arrow-up-right" /></a>
+              <a class="download" href={RESUME} download="Nahuel D'Elias résumé.pdf" aria-label="Download résumé (PDF)"><Icon name="download" /></a>
+            </li>
+            {LINKS.map((l) => (
+              <li><a href={l.href} {...(l.href.startsWith('http') ? { target: '_blank', rel: 'noopener' } : {})}>{l.label} <Icon name="arrow-up-right" /></a></li>
+            ))}
+          </ul>
+        </section>
+      </div>
+    </main>
+  </Frame>
+  <AfterLoad src={behaviour} />
+</Base>
+
+<style>
+  .about {
+    /* The frame's header sits over the page on desktop: the meadow starts
+       under it. */
+    padding-top: 72px;
+    padding-bottom: var(--space-160);
+  }
+
+  /* The meadow: a small canvas scaled up, pixels kept square. Until it's
+     drawn (and without JS), a flat wash of its sky, hills and grass. */
+  .meadow {
+    display: block;
+    width: 100%;
+    height: min(64vh, 620px);
+    image-rendering: pixelated;
+    background: linear-gradient(#e3eaea 0 40%, #a3b3c0 40% 44%, #a3bb4c 44% 56%, #82bf44 56% 82%, #2f6b44 82%);
+  }
+
+  .open {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding-top: var(--space-48);
+  }
+  .kicker {
+    margin: 0;
+    font-size: var(--text-mono);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+  }
+  h1 {
+    margin: var(--space-16) 0 0;
+    max-width: 18ch;
+    font-size: var(--text-display);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-display);
+    letter-spacing: var(--tracking-display);
+    text-wrap: balance;
+  }
+  .origin {
+    width: 7px;
+    height: 7px;
+    margin-top: var(--space-48);
+    background: var(--ink);
+  }
+
+  /* The tree: lines out of the mark to each step, then from each step into
+     the portrait (drawn in the svg by the script). */
+  .tree {
+    position: relative;
+  }
+  .lines,
+  .thread {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .lines :global(path),
+  .thread :global(path),
+  .thread :global(polyline) {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 1;
+    opacity: 0.5;
+  }
+  .thread :global(rect) {
+    fill: var(--ink);
+  }
+  .steps {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--space-24);
+    margin: 0;
+    padding: 200px 0 0;
+    list-style: none;
+  }
+  .step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-8);
+    text-align: center;
+  }
+  /* Once the script draws the lines, each step shows as its line reaches it. */
+  .tree[data-ready] .step:not(.in) {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .tree[data-ready] .step {
+      transition:
+        opacity 0.5s var(--ease),
+        transform 0.5s var(--ease);
+    }
+  }
+  .no {
+    font-size: var(--text-mono);
+  }
+  .step-title {
+    font-size: var(--text-lead);
+    font-weight: var(--weight-medium);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+  .step-line {
+    max-width: 24ch;
+    font-size: var(--text-caption);
+    line-height: 1.4;
+  }
+  .me {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 240px;
+    text-align: center;
+  }
+  .portrait {
+    display: block;
+    width: 400px;
+    max-width: 100%;
+    aspect-ratio: 400 / 480;
+  }
+  .name {
+    margin: var(--space-24) 0 var(--space-8);
+    font-size: var(--text-title);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-title);
+  }
+  .me p {
+    margin: 0 0 var(--space-12);
+    max-width: 52ch;
+    color: var(--muted);
+    font-size: var(--text-meta);
+    line-height: var(--leading-small);
+  }
+
+  /* Experience: rows, a thread down their left side. */
+  .rest {
+    position: relative;
+  }
+  .exp {
+    margin-top: 200px;
+    padding-left: var(--space-48);
+  }
+  .label {
+    margin: 0 0 var(--space-16);
+    font-size: var(--text-mono);
+    font-weight: var(--weight-regular);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+  }
+  .edu {
+    margin-top: var(--space-64);
+  }
+  .rows {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: 140px minmax(0, 2fr) minmax(0, 1fr) 16px;
+    align-items: baseline;
+    gap: var(--space-16);
+    padding: 18px 0;
+    border-top: 1px solid var(--line);
+    color: inherit;
+    text-decoration: none;
+  }
+  .rows li:last-child .row,
+  .edu + .row {
+    border-bottom: 1px solid var(--line);
+  }
+  .when {
+    font-size: var(--text-mono);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+  }
+  .role {
+    font-size: var(--text-row-title);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-row-title);
+  }
+  .role-line {
+    display: block;
+    margin-top: var(--space-4);
+    font-size: var(--text-caption);
+    font-weight: var(--weight-regular);
+    letter-spacing: 0;
+    line-height: 1.45;
+  }
+  a.row:hover .role {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  a.row :global(.icon) {
+    justify-self: end;
+    color: var(--accent);
+  }
+
+  /* The close: the thread ends in an arrow pointing here. */
+  .reach {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 200px;
+    text-align: center;
+  }
+  .reach-line {
+    margin: 0;
+    max-width: 24ch;
+    font-size: var(--text-h2);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-h2);
+    letter-spacing: var(--tracking-h2);
+    text-wrap: balance;
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-12) var(--space-32);
+    margin: var(--space-32) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-8);
+    min-height: 44px;
+    color: var(--ink);
+    font-size: var(--text-lead);
+    font-weight: var(--weight-medium);
+    text-decoration: none;
+  }
+  .links a:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .links :global(.icon) {
+    color: var(--accent);
+  }
+  .pair {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+  .download {
+    justify-content: center;
+    min-width: 44px;
+  }
+  a:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-offset);
+  }
+
+  /* Without JS the portrait can't be drawn: no empty slot. */
+  :global(:root:not(.js)) .portrait {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .links :global(.icon),
+    a.row :global(.icon) {
+      transition: transform 0.25s var(--ease);
+    }
+    .links a:hover :global(.icon),
+    a.row:hover :global(.icon) {
+      transform: translate(2px, -2px);
+    }
+    .links .download:hover :global(.icon) {
+      transform: translateY(2px);
+    }
+  }
+
+  /* Narrow: one column, one line running through the steps. */
+  @media (max-width: 899.98px) {
+    .steps {
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: 72px;
+      padding-top: 72px;
+    }
+  }
+  @media (max-width: 639.98px) {
+    .about {
+      padding-top: var(--space-16);
+    }
+    .meadow {
+      height: 46vh;
+    }
+    .me {
+      padding-top: 160px;
+    }
+    .exp {
+      padding-left: var(--space-32);
+    }
+    .row {
+      grid-template-columns: minmax(0, 1fr) 16px;
+      gap: var(--space-4) var(--space-16);
+    }
+    .when,
+    .role,
+    .where {
+      grid-column: 1;
+    }
+    a.row :global(.icon) {
+      grid-column: 2;
+      grid-row: 1;
+    }
+  }
+</style>
