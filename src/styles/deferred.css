@@ -1657,6 +1657,9 @@ nav.pager {
     &.grid .inner {
       grid-column: 4 / span 9;
     }
+    &.grid.center .inner {
+      grid-column: 3 / span 8;
+    }
   }
 }
 
@@ -1807,6 +1810,19 @@ nav.pager {
     &:nth-child(even of .case-row) .media {
       grid-column: 1 / span 7;
     }
+    /* A row can keep its text on one side (Row's side prop). */
+    &.side-left:nth-child(n of .case-row) .text {
+      grid-column: 1 / span 5;
+    }
+    &.side-left:nth-child(n of .case-row) .media {
+      grid-column: 6 / span 7;
+    }
+    &.side-right:nth-child(n of .case-row) .text {
+      grid-column: 8 / span 5;
+    }
+    &.side-right:nth-child(n of .case-row) .media {
+      grid-column: 1 / span 7;
+    }
   }
 }
 
@@ -1826,6 +1842,14 @@ nav.pager {
     clip-path: inset(0 0 0 100%);
   }
   .reveal-ready .case-row:nth-child(even of .case-row) [data-swipe]:not(.in) {
+    translate: -56px 0;
+    clip-path: inset(0 100% 0 0);
+  }
+  .reveal-ready .case-row.side-left:nth-child(n of .case-row) [data-swipe]:not(.in) {
+    translate: 56px 0;
+    clip-path: inset(0 0 0 100%);
+  }
+  .reveal-ready .case-row.side-right:nth-child(n of .case-row) [data-swipe]:not(.in) {
     translate: -56px 0;
     clip-path: inset(0 100% 0 0);
   }

@@ -25,9 +25,11 @@ interface Props {
   src?: ImageMetadata;
   alt?: string;
   caption?: string;
+  /** Which side the text sits on. Rows alternate unless they say. */
+  side?: 'left' | 'right';
 }
 
-const { label, heading, step, phones, src, alt, caption } = Astro.props;
+const { label, heading, step, phones, src, alt, caption, side } = Astro.props;
 const gallery = Astro.locals.gallery ?? [];
 const phoneShots = Astro.locals.phones ?? [];
 const shot = step ? gallery[step - 1] : undefined;
@@ -49,7 +51,7 @@ const frame = shot?.frame ?? 'desktop';
 const meta = (s: ImageMetadata) => (s as ImageMetadata & { clone?: ImageMetadata }).clone ?? s;
 const text = caption ?? shot?.title;
 ---
-<section class="case-row grid" data-row-section>
+<section class:list={['case-row grid', side && `side-${side}`]} data-row-section>
   <div class="text">
     <p class="margin mono muted"><span class="no" aria-hidden="true"></span><span class="label">{label}</span></p>
     <h2 class="heading">{heading}</h2>

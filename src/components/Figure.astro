@@ -38,8 +38,10 @@ interface Props {
   meta?: string;
   /** Mono label in the frame's corner, e.g. the entry number. */
   label?: string;
-  /** inset: the body's reading and figure columns (4 / span 9). full: the page width. */
-  layout?: 'inset' | 'full';
+  /** inset: the body's reading and figure columns (4 / span 9). center: eight
+   * columns in the middle (3 / span 8), like a part's walkthrough. full: the
+   * page width. */
+  layout?: 'inset' | 'center' | 'full';
   /** The hero: likely the LCP element. In the HTML at first paint, eager,
    * fetchpriority high, AVIF and WebP at three widths, dark variant. */
   priority?: boolean;
@@ -53,7 +55,7 @@ const { width, height } = (src as ImageMetadata & { clone?: ImageMetadata }).clo
 const sizes = layout === 'full' ? '(min-width: 640px) calc(100vw - 96px), calc(100vw - 32px)' : '(min-width: 640px) 75vw, calc(100vw - 32px)';
 const row = layout === 'full';
 ---
-<figure class:list={['figure', layout === 'inset' && 'grid']} data-figure>
+<figure class:list={['figure', layout !== 'full' && 'grid', layout === 'center' && 'center']} data-figure>
   <div class="inner">
     <div class="media" style={`aspect-ratio: ${width} / ${height}`}>
       {hero ? (
