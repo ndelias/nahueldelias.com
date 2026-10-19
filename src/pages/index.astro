@@ -20,7 +20,7 @@ const preloads = [lcp.light.avif ? { imagesrcset: lcp.light.avif, type: 'image/a
 ---
 <Base title="Nahuel D'Elias — Product engineer" description="[Identity line]" preload={['sans-400', 'sans-500', 'mono-400']}>
   {preloads.map((attrs) => <link slot="head" rel="preload" as="image" fetchpriority="high" {...attrs} />)}
-  <Frame>
+  <Frame contact>
     <ViewToggle slot="top-center" />
     <main>
       <h1 class="visually-hidden">Nahuel D'Elias, product engineer: work</h1>
