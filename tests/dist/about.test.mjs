@@ -51,6 +51,19 @@ test('no placeholder copy; About is in the nav on every page', async () => {
   }
 });
 
+test('the name in the corner leads here; the homepage carries the résumé and Contact, small, bottom right', async () => {
+  for (const page of ['index.html', 'about/index.html', 'work/vers1ons/index.html']) {
+    const html = await readFile(join(DIST, page), 'utf8');
+    assert.match(html, /<a class="name[^"]*"[^>]*href="\/about"/, `the name doesn't lead to /about on ${page}`);
+  }
+  const home = await readFile(join(DIST, 'index.html'), 'utf8');
+  const corner = home.match(/<div class="contact[^"]*"[^>]*>([\s\S]*?)<\/div>/)?.[1] ?? '';
+  assert.match(corner, /href="\/nahuel-delias-resume\.pdf" target="_blank"/);
+  assert.match(corner, /href="mailto:njdelias@gmail\.com"/);
+  const hub = await readFile(join(DIST, 'work/vers1ons/index.html'), 'utf8');
+  assert.ok(!/class="contact[ "]/.test(hub), 'the corner links show off the homepage');
+});
+
 test('without JS: the steps, the statement, the experience and the links read plainly; no empty portrait', async () => {
   const { ctx, page } = await open({ javaScriptEnabled: false });
   const state = await page.evaluate(() => ({

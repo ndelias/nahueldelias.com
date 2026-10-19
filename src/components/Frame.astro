@@ -3,13 +3,21 @@
 // Pages fill the other corners through slots: top-center, bottom-start and
 // bottom-center (the homepage puts the strip's controls there).
 //
-// Nav items and Contact render only once they have somewhere to go, the same
-// rule as sections: no dead links.
+// Nav items render only once they have somewhere to go, the same rule as
+// sections: no dead links. The name leads to /about once it exists (else
+// home). On the homepage (`contact`), the bottom-right corner carries the
+// résumé (a new tab) and Contact (email), small.
 import Icon from './Icon.astro';
 import ThemeToggle from './ThemeToggle.astro';
 
-// Set to a mailto: or URL once there's an address. Until then, no Contact.
-const CONTACT: string | undefined = undefined;
+interface Props {
+  /** The résumé and Contact links in the bottom-right corner. */
+  contact?: boolean;
+}
+const { contact = false } = Astro.props;
+
+const CONTACT = 'mailto:njdelias@gmail.com';
+const RESUME = '/nahuel-delias-resume.pdf';
 
 const pages = Object.keys(import.meta.glob('../pages/**/*.astro'));
 const exists = (path: string) => path === '/' || pages.some((p) => p === `../pages${path}.astro` || p === `../pages${path}/index.astro`);
@@ -22,11 +30,12 @@ const NAV = [
 
 const here = Astro.url.pathname.replace(/\/$/, '') || '/';
 const current = (href: string) => (href === here ? 'page' : undefined);
+const about = exists('/about') ? '/about' : '/';
 const bottom = Astro.slots.has('bottom-start') || Astro.slots.has('bottom-center');
 ---
 <div class="frame">
   <header class="corner top mono">
-    <a class="name" href="/" aria-current={current('/')}>Nahuel D'Elias<span class="role muted"> · Product engineer</span></a>
+    <a class="name" href={about} aria-current={current(about)}>Nahuel D'Elias<span class="role muted"> · Product engineer</span></a>
     {Astro.slots.has('top-center') && <div class="center"><slot name="top-center" /></div>}
     <div class="end">
       <nav aria-label="Primary">
@@ -38,11 +47,16 @@ const bottom = Astro.slots.has('bottom-start') || Astro.slots.has('bottom-center
 
   <slot />
 
-  {(CONTACT || bottom) && (
+  {(contact || bottom) && (
     <footer class="corner bottom mono">
       {Astro.slots.has('bottom-start') && <div class="start"><slot name="bottom-start" /></div>}
       {Astro.slots.has('bottom-center') && <div class="center"><slot name="bottom-center" /></div>}
-      {CONTACT && <a class="contact" href={CONTACT}>Contact <Icon name="arrow-up-right" /></a>}
+      {contact && (
+        <div class="contact">
+          <a href={RESUME} target="_blank" rel="noopener">Résumé <Icon name="arrow-up-right" /></a>
+          <a href={CONTACT}>Contact <Icon name="arrow-up-right" /></a>
+        </div>
+      )}
     </footer>
   )}
 </div>
@@ -89,7 +103,8 @@ const bottom = Astro.slots.has('bottom-start') || Astro.slots.has('bottom-center
     justify-self: end;
   }
   .end,
-  nav {
+  nav,
+  .contact {
     display: flex;
     align-items: baseline;
     gap: var(--space-24);
