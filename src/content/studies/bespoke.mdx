@@ -82,27 +82,7 @@ tabs:
   - id: today
     label: 'Today'
     caption: 'Storefronts and discovery for artisans, with search by image.'
-    phones:
-      - { src: ../../assets/studies/bespoke/today/design-discover.webp, alt: 'Discover: a search bar that takes a photo, ceramics categories, and a feed of pots with their makers and prices.', caption: 'Discover', frame: phone }
-      - { src: ../../assets/studies/bespoke/today/design-search.webp, alt: 'Find work like this: a photo of an orange vase, ready to search.', caption: 'Search by image', frame: phone }
-      - { src: ../../assets/studies/bespoke/today/design-matches.webp, alt: 'Like your photo: three artisans who make work like it, each with three of their pieces.', caption: 'Matched to real work', frame: phone }
-      - { src: ../../assets/studies/bespoke/today/design-storefront.webp, alt: 'Mara Lind''s storefront: her work and studio, Follow, Message, Commissions open, and her pieces.', caption: 'A storefront', frame: phone }
-      - { src: ../../assets/studies/bespoke/today/design-piece.webp, alt: 'Flowery Pot #2: the piece, its maker and materials, $200, Buy, and its certificate of origin.', caption: 'A piece', frame: phone }
-      - { src: ../../assets/studies/bespoke/today/design-certificate.webp, alt: 'A certificate of origin: the piece, who made it, where and when, materials, edition, a code, and the maker''s signature.', caption: 'Certificate of origin', frame: phone }
-    comparisons:
-      - title: 'Discover'
-        frame: phone
-        before: { src: ../../assets/studies/bespoke/today/wire-discover.webp, alt: 'Wireframe: a search bar, category pills, and grey boxes in two columns.', label: 'Wireframe' }
-        now: { src: ../../assets/studies/bespoke/today/design-discover.webp, alt: 'Design: a feed of pots with their makers and prices.', label: 'Design' }
-      - title: 'Search by image'
-        frame: phone
-        before: { src: ../../assets/studies/bespoke/today/wire-search.webp, alt: 'Wireframe: Find work like this, a grey photo box, and two buttons.', label: 'Wireframe' }
-        now: { src: ../../assets/studies/bespoke/today/design-search.webp, alt: 'Design: a photo of an orange vase, ready to search.', label: 'Design' }
-      - title: 'Certificate of origin'
-        frame: phone
-        before: { src: ../../assets/studies/bespoke/today/wire-certificate.webp, alt: 'Wireframe: Certificate of Origin, a grey image box, and the piece''s details.', label: 'Wireframe' }
-        now: { src: ../../assets/studies/bespoke/today/design-certificate.webp, alt: 'Design: the certificate with the piece, its details, and the maker''s signature.', label: 'Design' }
-disclaimer: 'Designs from 2024, shown as they were. The rings in Bespoke AI are AI generated. Product photos in Bespoke are stand-ins, and no affiliation is implied. The Today tab is a concept, not something built. Its screens were designed for this page, and its artisans are fictional.'
+disclaimer: 'Designs from 2024, shown as they were. The rings in Bespoke AI are AI generated. Product photos in Bespoke are stand-ins, and no affiliation is implied. The Today tab is a concept, not something built.'
 cover:
   src: ../../assets/studies/bespoke/v2-flow.webp
   alt: 'Bespoke on a phone: Discover, a feed of clothes, ceramics, and jewelry.'
@@ -177,9 +157,15 @@ import phones from '../../assets/studies/bespoke/v2-phones.webp';
 
     <SystemFigure label="How it works" spec={bespokeToday} />
 
-    <MobileDesign label="Today, on a phone" intro="What I'd build now, designed for this page. Click any screen to see it full size." />
+    <BodySection label="What it would do" heading="Four things, for artisans and the people who buy from them.">
+      **A storefront for each artisan.** Their pieces, their story, and how they make their work, in one place they can share. They keep designing what they enjoy making, and they can open commissions when they want to.
 
-    <Comparisons label="Wireframe to design" intro="The wireframes first, then the screens." />
+      **A discover feed.** Real pieces from many makers, browsed like Pinterest. Starting with one category, like ceramics, so the feed is worth scrolling from day one.
+
+      **Search by image.** Add a photo of something you like, and see the artisans whose real work looks like it. You buy a piece they've made, or start a conversation about one they'd want to make.
+
+      **A certificate of origin.** Every piece ships with one, made by the artisan in a few minutes. Buyers can check it with a code, with no wallet or app to learn.
+    </BodySection>
 
     <Row label="What I'd keep" heading="The discover feed." src={phones} alt="The second version on three phones: Discover, a feed of real pieces, between a collection and a piece.">
       Browsing real work by the people who made it was the best part of the second version. Today it's the center of the product, and search by image is just another way into it.

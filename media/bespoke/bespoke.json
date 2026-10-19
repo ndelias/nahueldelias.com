@@ -240,60 +240,6 @@
       "to": "studies/bespoke/v2-phones.webp",
       "width": 1920,
       "retouch": false
-    },
-    {
-      "from": "today/design-discover.png",
-      "to": "studies/bespoke/today/design-discover.webp",
-      "width": 590,
-      "retouch": false
-    },
-    {
-      "from": "today/design-search.png",
-      "to": "studies/bespoke/today/design-search.webp",
-      "width": 590,
-      "retouch": false
-    },
-    {
-      "from": "today/design-matches.png",
-      "to": "studies/bespoke/today/design-matches.webp",
-      "width": 590,
-      "retouch": false
-    },
-    {
-      "from": "today/design-storefront.png",
-      "to": "studies/bespoke/today/design-storefront.webp",
-      "width": 590,
-      "retouch": false
-    },
-    {
-      "from": "today/design-piece.png",
-      "to": "studies/bespoke/today/design-piece.webp",
-      "width": 590,
-      "retouch": false
-    },
-    {
-      "from": "today/design-certificate.png",
-      "to": "studies/bespoke/today/design-certificate.webp",
-      "width": 590,
-      "retouch": false
-    },
-    {
-      "from": "today/wire-discover.png",
-      "to": "studies/bespoke/today/wire-discover.webp",
-      "width": 590,
-      "retouch": false
-    },
-    {
-      "from": "today/wire-search.png",
-      "to": "studies/bespoke/today/wire-search.webp",
-      "width": 590,
-      "retouch": false
-    },
-    {
-      "from": "today/wire-certificate.png",
-      "to": "studies/bespoke/today/wire-certificate.webp",
-      "width": 590,
-      "retouch": false
     }
   ],
   "videos": [
