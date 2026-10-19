@@ -1,0 +1,29 @@
+{
+  "archive": "~/Desktop/bespoke",
+  "images": [
+    { "from": "figma/v1-grid.png", "to": "studies/bespoke/versions/01-bespoke-ai.webp", "width": 1600, "crop": [0, 70, 1512, 811], "retouch": false },
+    { "from": "bespoke2/Slide 16_9 - 3.jpg", "to": "studies/bespoke/versions/02-bespoke.webp", "width": 1600, "crop": [0, 25, 1920, 1030], "retouch": false },
+
+    { "from": "bespoke1/buyerUI.mov", "at": 0.5, "to": "studies/bespoke/v1-buyer.webp", "width": 2396, "retouch": false },
+    { "from": "bespoke1/artisanUI.mov", "at": 0.5, "to": "studies/bespoke/v1-artisan.webp", "width": 2396, "retouch": false },
+    { "from": "bespoke2/Bespoke Product Design (1).mp4", "at": 0.5, "to": "studies/bespoke/v2-flow.webp", "width": 1660, "retouch": false },
+
+    { "from": "figma/v1-insight.png", "to": "studies/bespoke/v1-insight.webp", "width": 1512, "crop": [0, 0, 1512, 945], "retouch": false },
+    { "from": "figma/v1-artisan-bid.png", "to": "studies/bespoke/v1-bid.webp", "width": 1512, "crop": [0, 0, 1512, 945], "retouch": false },
+    { "from": "bespoke2/NAHUEL-3.jpg", "to": "studies/bespoke/fork.webp", "width": 1920, "retouch": false },
+    { "from": "derived/value-16x10.jpg", "to": "studies/bespoke/v2-value.webp", "width": 1920, "retouch": false },
+    { "from": "derived/lifecycle-16x10.jpg", "to": "studies/bespoke/v2-lifecycle.webp", "width": 1920, "retouch": false },
+    { "from": "derived/summary-16x10.jpg", "to": "studies/bespoke/summary.webp", "width": 1920, "retouch": false },
+
+    { "from": "bespoke1/wireframe video buyer .mov", "at": 0.5, "to": "studies/bespoke/wire-prompt.webp", "width": 1480, "crop": [201, 125, 1480, 925], "retouch": false },
+    { "from": "bespoke1/wireframe video buyer .mov", "at": 3.0, "to": "studies/bespoke/wire-grid.webp", "width": 1480, "crop": [201, 125, 1480, 925], "retouch": false },
+    { "from": "bespoke1/wireframe video buyer .mov", "at": 9.5, "to": "studies/bespoke/wire-question.webp", "width": 1480, "crop": [201, 125, 1480, 925], "retouch": false },
+    { "from": "figma/v1-prompt.png", "to": "studies/bespoke/design-prompt.webp", "width": 1512, "crop": [0, 0, 1512, 945], "retouch": false },
+    { "from": "figma/v1-grid.png", "to": "studies/bespoke/design-grid.webp", "width": 1512, "crop": [0, 0, 1512, 945], "retouch": false }
+  ],
+  "videos": [
+    { "from": "bespoke1/buyerUI.mov", "to": "media/bespoke/v1-buyer.mp4", "kind": "hero", "width": 1344, "budget": 5000000 },
+    { "from": "bespoke1/artisanUI.mov", "to": "media/bespoke/v1-artisan.mp4", "kind": "hero", "width": 1344, "budget": 3000000 },
+    { "from": "bespoke2/Bespoke Product Design (1).mp4", "to": "media/bespoke/v2-flow.mp4", "kind": "hero", "width": 1344, "budget": 4000000 }
+  ]
+}

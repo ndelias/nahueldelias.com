@@ -77,7 +77,10 @@ if (process.env.SHIP === '1') {
 
 const byOrder = (a: Entry, b: Entry) => a.data.order - b.data.order;
 
-export const allEntries = (): Entry[] => [...all].sort(byOrder);
+// What the homepage lists: everything but entries shared only by link.
+const listed = all.filter((entry) => !entry.data.unlisted);
+
+export const allEntries = (): Entry[] => [...listed].sort(byOrder);
 
 /** A hub's parts, in build order. Empty for any other entry. */
 export const partsOf = (hub: Entry): Entry[] =>
@@ -104,7 +107,7 @@ export const entriesIn = <S extends Section>(section: S) =>
 
 // Homepage order (§7.5): the two weight 1 entries first, then by order.
 export const homepageEntries = (): Entry[] =>
-  [...all].sort((a, b) => Number(b.data.weight === 1) - Number(a.data.weight === 1) || byOrder(a, b));
+  [...listed].sort((a, b) => Number(b.data.weight === 1) - Number(a.data.weight === 1) || byOrder(a, b));
 
 const PREFIX: Record<Section, string> = { work: 'W', studies: 'S', data: 'D', play: 'P' };
 export const SECTION_LABELS: Record<Section, string> = { work: 'Work', studies: 'Study', data: 'Data', play: 'Play' };
@@ -128,7 +131,7 @@ export function entryYears(entry: Entry): string {
 
 // Sections with a detail page so far. The rest render in indexes without a
 // link until their template exists (§9 step 7), never as a dead one.
-const DETAIL_PAGES: Partial<Record<Section, string>> = { work: '/work/' };
+const DETAIL_PAGES: Partial<Record<Section, string>> = { work: '/work/', studies: '/studies/' };
 
 export const entryHref = (entry: Entry): string | undefined => {
   const base = DETAIL_PAGES[entry.collection];

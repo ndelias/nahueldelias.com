@@ -76,6 +76,10 @@ const entrySchema = ({ image }: SchemaContext) => {
       // Where it stands now, in the meta row: "In production". The status
       // badge says shipped or not; this says how it's running.
       standing: z.string().min(1).optional(),
+      // A study's opening note under the meta row, before the story: when the
+      // work is from and how it's shown. Above the fold, so it's in the
+      // page's first paint, not the deferred body.
+      note: z.string().min(1).optional(),
       // What changed because of it, in one line: shown with the facts at the
       // top of a part page, so a reader gets the result before scrolling.
       outcome: z.string().min(1).optional(),
@@ -162,6 +166,9 @@ const entrySchema = ({ image }: SchemaContext) => {
       order: z.number().int(),
       // Test and scaffolding entries. Rendered, but noindexed and labeled.
       fixture: z.boolean().default(false),
+      // Reached only by its link: the page is built, but the homepage strip,
+      // the Index and the next-entry links leave it out.
+      unlisted: z.boolean().default(false),
     })
     .superRefine((entry, ctx) => {
       for (const key of ['start', 'end'] as const) {
