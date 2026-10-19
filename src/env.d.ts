@@ -8,9 +8,6 @@ declare namespace App {
     comparisons?: import('./components/Comparisons.astro').Comparison[];
     // The page's phone screens (<MobileDesign />): the open tab's, or the part's.
     phones?: { src: import('astro').ImageMetadata; alt: string; caption?: string; frame: import('./lib/model').FrameType; more?: boolean }[];
-    // A study's decision and versions, which its body places where the
-    // story needs them (<Decision />, <Versions />).
-    entry?: import('./lib/entries').Entry;
     // A part told in tabs: the open one, and every tab with its URL.
     tabs?: {
       open: NonNullable<import('./lib/entries').Entry['data']['tabs']>[number];

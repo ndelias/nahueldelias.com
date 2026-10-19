@@ -1,7 +1,8 @@
 ---
 # Copy drafted with Nahuel from his account of the project (2026-10-19),
 # still in review. Media from media/bespoke/bespoke.json: his 2024 recordings,
-# deck slides and the Figma file. Shared by link only, for now.
+# deck slides, Figma frames and phone exports. Told in three tabs: Bespoke
+# AI, Bespoke, and what he'd build today. Shared by link only, for now.
 title: 'Bespoke'
 tagline: 'Bespoke, 2024. Two versions, and why neither would have worked.'
 weight: 2
@@ -12,120 +13,170 @@ dates:
   end: 2024-12
 stack: ['Figma']
 standing: 'Designs and prototypes'
-note: 'This is from 2024, before vers1ons. The designs are as I left them. Under each version I''ve added what I was thinking then and what I''d change now.'
+note: 'A look at how I thought about product in 2024, before the AI boom and before vers1ons. I designed both versions by hand, and they''re shown as they were. Each tab covers how a version was supposed to work and why it wouldn''t have. The last one is what I''d build today.'
 decision:
   intro: 'Halfway through 2024 we had two directions for Bespoke.'
   chose: 'Build for artisans. A marketplace where every piece carries an NFC tag linked to a digital passport. Buyers can see where it came from, and the maker earns on every resale.'
   rejected: 'A creative AI tool for buyers. You describe a piece, sort through AI images until one feels right, and an artisan bids to make it.'
   cost: 'We gave up the part people found fun to use. And a marketplace needs artisans before it needs buyers.'
-versions:
-  - src: ../../assets/studies/bespoke/versions/01-bespoke-ai.webp
-    alt: 'Bespoke AI: nine AI-generated rings in a grid, with My taste and I found the one below.'
+tabs:
+  - id: bespoke-ai
     label: 'Bespoke AI'
-    date: 2024-01
-    note: 'Buyers describe a piece in one line, narrow it down by reacting to AI images, and artisans bid to make it.'
-  - src: ../../assets/studies/bespoke/versions/02-bespoke.webp
-    alt: 'Bespoke: three phone screens on black, a product feed, a piece and its passport.'
+    caption: 'A buyer describes a piece, narrows it down with AI images, and artisans bid to make it.'
+    walkthrough:
+      src: ../../assets/studies/bespoke/v1-buyer.webp
+      alt: 'Bespoke AI on a laptop: the one-line prompt, Create a, for, for, with examples below.'
+      video: /media/bespoke/v1-buyer.mp4
+      duration: '0:56'
+      caption: 'The buyer''s side, from one line to the one'
+    comparisons:
+      - title: 'The prompt'
+        frame: desktop
+        before: { src: ../../assets/studies/bespoke/wire-prompt.webp, alt: 'Wireframe: Help me create a object for occasion for who, in grey and blue boxes.', label: 'Wireframe' }
+        now: { src: ../../assets/studies/bespoke/design-prompt.webp, alt: 'Design: Create a, for, for, with three colored blanks to fill in.', label: 'Design' }
+      - title: 'Narrowing it down'
+        frame: desktop
+        before: { src: ../../assets/studies/bespoke/wire-grid.webp, alt: 'Wireframe: nine placeholder images, with Likes and Dislikes below.', label: 'Wireframe' }
+        now: { src: ../../assets/studies/bespoke/design-grid.webp, alt: 'Design: nine gold rings, and Select your favorite pieces below.', label: 'Design' }
+      - title: 'Asking as it goes'
+        frame: desktop
+        before: { src: ../../assets/studies/bespoke/wire-question.webp, alt: 'Wireframe: Do you like silver? with three blue answer boxes.', label: 'Wireframe' }
+        now: { src: ../../assets/studies/bespoke/v1-insight.webp, alt: 'Design: Do you not like silver? over the ring grid, with I like this, idk and Not my vibe.', label: 'Design' }
+  - id: artisans
     label: 'Bespoke'
-    date: 2024-07
-    note: 'Artisans list their own work. Each piece carries an NFC tag and a digital passport, and the maker earns on every resale.'
-disclaimer: 'Designs from 2024, shown as they were. The rings in Bespoke AI are AI generated. Product photos in Bespoke are stand-ins, and no affiliation is implied.'
+    caption: 'Artisans list their own work, and each piece carries an NFC tag and a digital passport.'
+    walkthrough:
+      src: ../../assets/studies/bespoke/v2-flow.webp
+      alt: 'Bespoke on a phone: Discover, a feed of clothes, ceramics and jewelry.'
+      video: /media/bespoke/v2-flow.mp4
+      duration: '0:42'
+      caption: 'Find a piece, buy it, scan its tag, and it''s in your wallet'
+    phones:
+      - { src: ../../assets/studies/bespoke/phones/01-open.webp, alt: 'The Bespoke wordmark on white.', frame: phone, more: true }
+      - { src: ../../assets/studies/bespoke/phones/02-discover.webp, alt: 'Discover: a grid of clothes, a bag, ceramics and jewelry, each with its maker.', caption: 'Discover', frame: phone }
+      - { src: ../../assets/studies/bespoke/phones/03-search.webp, alt: 'Search: featured artists and spotlighted items.', frame: phone, more: true }
+      - { src: ../../assets/studies/bespoke/phones/04-collection.webp, alt: 'Sea Pot: one collection of pots by the same maker, each with its price and status.', caption: 'A collection', frame: phone }
+      - { src: ../../assets/studies/bespoke/phones/05-piece.webp, alt: 'Sea Pot #2: the piece, its maker, its details, and Purchase for $250.', caption: 'A piece and its details', frame: phone }
+      - { src: ../../assets/studies/bespoke/phones/06-history.webp, alt: 'Sea Pot #8: its activity, every listing and sale, with prices and dates.', frame: phone, more: true }
+      - { src: ../../assets/studies/bespoke/phones/07-artisan.webp, alt: 'An artisan''s profile: their collections, offers and likes.', frame: phone, more: true }
+      - { src: ../../assets/studies/bespoke/phones/08-pay.webp, alt: 'Pay: $200 and a Pay button.', caption: 'Pay', frame: phone }
+      - { src: ../../assets/studies/bespoke/phones/09-ordered.webp, alt: 'Congrats! Your order is on its way, with No. 8 on a card.', frame: phone, more: true }
+      - { src: ../../assets/studies/bespoke/phones/10-scan.webp, alt: 'Scan Tag: the pot behind a scanning frame.', caption: 'Scan the tag', frame: phone }
+      - { src: ../../assets/studies/bespoke/phones/11-found.webp, alt: 'Item Found: the pot with a check over it.', frame: phone, more: true }
+      - { src: ../../assets/studies/bespoke/phones/12-wallet.webp, alt: 'Added to Wallet: No. 8 on a card with confetti.', caption: 'Added to your wallet', frame: phone }
+      - { src: ../../assets/studies/bespoke/phones/13-profile.webp, alt: 'A buyer''s profile: their wallet of pieces owned and on the way.', frame: phone, more: true }
+      - { src: ../../assets/studies/bespoke/phones/14-collection-2.webp, alt: 'Flowery Pot: another collection of pots in different glazes.', frame: phone, more: true }
+    comparisons:
+      - title: 'Discover'
+        frame: phone
+        before: { src: ../../assets/studies/bespoke/wire-discover.webp, alt: 'Wireframe: Following and Discover tabs over grey boxes.', label: 'Wireframe' }
+        now: { src: ../../assets/studies/bespoke/phones/02-discover.webp, alt: 'Design: Discover, a grid of real pieces with their makers.', label: 'Design' }
+      - title: 'A piece'
+        frame: phone
+        before: { src: ../../assets/studies/bespoke/wire-piece.webp, alt: 'Wireframe: a grey image, the artisan''s name, details, and Bid and Save.', label: 'Wireframe' }
+        now: { src: ../../assets/studies/bespoke/phones/05-piece.webp, alt: 'Design: Sea Pot #2 with its maker, details and Purchase for $250.', label: 'Design' }
+      - title: 'The wallet'
+        frame: phone
+        before: { src: ../../assets/studies/bespoke/wire-wallet.webp, alt: 'Wireframe: a cube icon and Generate Wallet.', label: 'Wireframe' }
+        now: { src: ../../assets/studies/bespoke/phones/12-wallet.webp, alt: 'Design: Added to Wallet, the pot on a card with confetti.', label: 'Design' }
+  - id: today
+    label: 'Today'
+    caption: 'Storefronts and discovery for artisans, with search by image.'
+disclaimer: 'Designs from 2024, shown as they were. The rings in Bespoke AI are AI generated. Product photos in Bespoke are stand-ins, and no affiliation is implied. The Today tab is a concept, not something built.'
 cover:
-  src: ../../assets/studies/bespoke/versions/02-bespoke.webp
-  alt: 'Bespoke: three phone screens on black, a product feed, a piece and its passport.'
+  src: ../../assets/studies/bespoke/v2-flow.webp
+  alt: 'Bespoke on a phone: Discover, a feed of clothes, ceramics and jewelry.'
 unlisted: true
 order: 10
 ---
-import buyer from '../../assets/studies/bespoke/v1-buyer.webp';
+import { bespokeAi } from '../../components/diagrams/specs/bespoke-ai';
+import { bespokeArtisans } from '../../components/diagrams/specs/bespoke-artisans';
+import { bespokeToday } from '../../components/diagrams/specs/bespoke-today';
 import artisan from '../../assets/studies/bespoke/v1-artisan.webp';
 import insight from '../../assets/studies/bespoke/v1-insight.webp';
 import bid from '../../assets/studies/bespoke/v1-bid.webp';
 import fork from '../../assets/studies/bespoke/fork.webp';
-import flow from '../../assets/studies/bespoke/v2-flow.webp';
 import value from '../../assets/studies/bespoke/v2-value.webp';
 import lifecycle from '../../assets/studies/bespoke/v2-lifecycle.webp';
 import summary from '../../assets/studies/bespoke/summary.webp';
-import wirePrompt from '../../assets/studies/bespoke/wire-prompt.webp';
-import wireGrid from '../../assets/studies/bespoke/wire-grid.webp';
-import wireQuestion from '../../assets/studies/bespoke/wire-question.webp';
-import designPrompt from '../../assets/studies/bespoke/design-prompt.webp';
-import designGrid from '../../assets/studies/bespoke/design-grid.webp';
+import phones from '../../assets/studies/bespoke/v2-phones.webp';
 
 {/* DRAFT (2026-10-19): Nahuel edits the copy as we go. */}
 
-<Versions />
-
-<BodySection label="Version 1 · Bespoke AI" heading="Pick what you like, and an artisan makes it.">
-  The first Bespoke started with one line. A ring, for my engagement in Lake Tahoe, for my artsy fiancée. It made nine images and you X'd out the ones you didn't like. Between rounds it asked questions like "Do you not like silver?" and kept a list of what you wanted and didn't, which you could edit. Every answer went back into the prompt. When you found the one, you sent it out and artisans bid to make it.
+<BodySection label="The rule I broke" heading="I fell in love with the solution, not the problem.">
+  My rule is to fall in love with the problem, not the solution. With Bespoke I did the opposite. The real problem was artisans connecting with the people who'd buy their work. Both versions chased an idea that looked great, without checking that anyone wanted it.
 </BodySection>
 
-<Figure src={buyer} alt="Bespoke AI on a laptop: the one-line prompt with its three blanks filled in." video="/media/bespoke/v1-buyer.mp4" caption="The buyer's side, from one line to the one (0:56)" />
+<Tabs label="Then and now">
+  <Tab id="bespoke-ai">
+    <BodySection label="The idea" heading="Pick what you like, and an artisan makes it.">
+      The first Bespoke started with one line. A ring, for my engagement in Lake Tahoe, for my artsy fiancée. It made nine images and you X'd out the ones you didn't like. Between rounds it asked questions like "Do you not like silver?" and kept a list of what you wanted and didn't, which you could edit. Every answer went back into the prompt. When you found the one, you sent it out and artisans bid to make it.
+    </BodySection>
 
-<Comparisons
-  label="Wireframe to design"
-  intro="The wireframes I started from, and the screens they became."
-  items={[
-    {
-      title: 'The prompt',
-      frame: 'desktop',
-      before: { src: wirePrompt, alt: 'Wireframe: Help me create a object for occasion for who, in grey and blue boxes.', label: 'Wireframe' },
-      now: { src: designPrompt, alt: 'Design: Create a, for, for, with three colored blanks to fill in.', label: 'Design' },
-    },
-    {
-      title: 'Narrowing it down',
-      frame: 'desktop',
-      before: { src: wireGrid, alt: 'Wireframe: nine placeholder images, with Likes and Dislikes below.', label: 'Wireframe' },
-      now: { src: designGrid, alt: 'Design: nine gold rings, and Select your favorite pieces below.', label: 'Design' },
-    },
-    {
-      title: 'Asking as it goes',
-      frame: 'desktop',
-      before: { src: wireQuestion, alt: 'Wireframe: Do you like silver? with three blue answer boxes.', label: 'Wireframe' },
-      now: { src: insight, alt: 'Design: Do you not like silver? over the ring grid, with I like this, idk and Not my vibe.', label: 'Design' },
-    },
-  ]}
-/>
+    <SystemFigure label="How it works" spec={bespokeAi} />
 
-<Row label="What I was thinking" heading="React to images instead of writing a brief." src={insight} alt="Do you not like silver? over the ring grid, with I like this, idk and Not my vibe.">
-  People know what they like when they see it, even when they can't describe it. So instead of writing a brief, you'd type one line and react to images. Every X and every answer sharpened the prompt until you found the one.
-</Row>
+    <Row label="What I was thinking" heading="React to images instead of writing a brief." src={insight} alt="Do you not like silver? over the ring grid, with I like this, idk and Not my vibe.">
+      People know what they like when they see it, even when they can't describe it. So instead of writing a brief, you'd type one line and react to images. Every X and every answer sharpened the prompt until you found the one.
+    </Row>
 
-<Figure src={artisan} alt="Bespoke AI for artisans on a laptop: I create unique rings for weddings for creative people." video="/media/bespoke/v1-artisan.mp4" caption="The artisan's side. Say what you make, pick a request and bid on it (0:27)" />
+    <Comparisons label="Wireframe to design" intro="The wireframes I started from, and the screens they became." />
 
-<Row label="Why it wouldn't work" heading="Artisans would be bidding on a picture." src={bid} alt="An artisan's bid of $400 on a Pink Garnite Flower Ring, generated by a buyer.">
-  The images showed pieces no one could make at that price, or at all. An artisan would be bidding on a picture, not a spec. And the buyer hadn't committed anything, so an artisan had little reason to take the job.
-</Row>
+    <Figure src={artisan} alt="Bespoke AI for artisans on a laptop: I create unique rings for weddings for creative people." video="/media/bespoke/v1-artisan.mp4" caption="The artisan's side. Say what you make, pick a request and bid on it (0:27)" />
 
-<Decision />
+    <Row label="Why it wouldn't work" heading="It took the artisan out of the design." src={bid} alt="An artisan's bid of $400 on a Pink Garnite Flower Ring, generated by a buyer.">
+      Artisans make the things they enjoy making, and then sell them. Sometimes a client is part of the process, but the design is still theirs. Bespoke AI handed them a buyer's finished idea and asked them to build it, which takes away the creative freedom that makes their work worth buying. And the images showed pieces no one could make at that price, or at all.
+    </Row>
 
-<Figure src={fork} alt="The Fork slide: two options, Creative Tool for Users and Empower Artisans Through Digital Authentication." caption="The fork, from our deck" />
+    <Figure src={fork} alt="The Fork slide: two options, Creative Tool for Users and Empower Artisans Through Digital Authentication." caption="The fork that led to the second version, from our deck" />
+  </Tab>
 
-<BodySection label="Version 2 · Bespoke" heading="Start from artisans who already have a style.">
-  The second Bespoke built for the other side. Artisans who already make high-end work list it, and buyers find it. Each piece gets an NFC tag before it's sold. Scanning the tag opens its digital passport, with the maker, the piece and every owner since. When it sells, ownership moves to the buyer through a smart contract, and a share of every resale goes back to the maker and earlier owners.
-</BodySection>
+  <Tab id="artisans">
+    <BodySection label="The idea" heading="Start from artisans who already have a style.">
+      The second Bespoke built for the other side. Artisans who already make high-end work list it, and buyers find it. Each piece gets an NFC tag before it's sold. Scanning the tag opens its digital passport, with the maker, the piece and every owner since. When it sells, ownership moves to the buyer through a smart contract, and a share of every resale goes back to the maker and earlier owners.
+    </BodySection>
 
-<Figure src={flow} alt="Bespoke on three phones: a feed of clothes, ceramics and jewelry." video="/media/bespoke/v2-flow.mp4" caption="Find a piece, buy it, scan its tag, and it's in your wallet (0:42)" />
+    <SystemFigure label="How it works" spec={bespokeArtisans} />
 
-<Row label="What I was thinking" heading="Handmade becomes the luxury." src={value} alt="Value Proposition slide: digital passports in users' wallets, stress-free second-hand purchases, and artisans earning on every resale.">
-  As more things get made by machines, handmade work becomes what people pay more for. Many artisans already have a style and a following. What they don't have is a way to prove a piece is theirs. An NFC tag on each piece gives it a passport. A smart contract sends the maker a share every time it resells.
-</Row>
+    <Row label="What I was thinking" heading="Handmade becomes the luxury." src={value} alt="Value Proposition slide: digital passports in users' wallets, stress-free second-hand purchases, and artisans earning on every resale.">
+      As more things get made by machines, handmade work becomes what people pay more for. Many artisans already have a style and a following. What they don't have is a way to prove a piece is theirs. An NFC tag on each piece gives it a passport. A smart contract sends the maker a share every time it resells.
+    </Row>
 
-<Row label="Why it wouldn't work" heading="The resale loop came before the first sale." src={lifecycle} alt="A loop from artisan onboarding and RFID shipment through product listing, purchase, escrow, delivery and resale.">
-  We built the resale loop before anyone had made a first sale. To buy a vase, a buyer had to understand wallets and digital twins. And the tag proves where the tag came from, not the piece. Someone still has to check each piece when it's made.
-</Row>
+    <MobileDesign intro="The flow on a phone, from Discover to the wallet. Click any screen to see it full size." />
 
-<Row label="What we never asked" heading="We never picked the problem." src={summary} alt="Summary slide: from sustainable materials sourcing, to a marketplace with creative AI tools, to a marketplace for digitally authenticated goods.">
-  We never decided whether the problem was artisans finding buyers or buyers not valuing handmade work. Those are two different products.
+    <Comparisons label="Wireframe to design" intro="The wireframes I started from, and the screens they became." />
 
-  Ceramics, shoes, clothing, paintings and furniture each sell, ship and price differently. We designed for all of them at once.
+    <Row label="Why it wouldn't work" heading="The blockchain asked too much of buyers." src={lifecycle} alt="A loop from artisan onboarding and RFID shipment through product listing, purchase, escrow, delivery and resale.">
+      The marketplace part was right. Established artisans wanted more people to find their work. But NFC tags, NFT twins and smart contracts asked buyers to adopt something people don't use in everyday life. We also built the resale loop before anyone had made a first sale. A certificate of origin would have done the job.
+    </Row>
+  </Tab>
 
-  I designed for how I thought people would buy in ten years and hoped they'd catch up. It had to work for how they buy today.
-</Row>
+  <Tab id="today">
+    <BodySection label="Start from the problem" heading="Help established artisans get found.">
+      Today I'd start with the problem we skipped. Artisans with great work and their own style need more people to find them. So Bespoke would be storefronts for artisans and a discover feed of real pieces you scroll like Pinterest. You could search with a picture of something you like, say a mid-century chair, and find the artisans who make that kind of work. The AI would read their real work, not generate pieces that don't exist.
+    </BodySection>
 
-<BodySection label="How I'd build it now" heading="One category, one problem, today's buyers.">
-  I'd pick one category and one problem first. For example, ceramicists who sell through Instagram DMs and lose sales in the back-and-forth. I'd start with something they'd use this week, like a checkout link with a simple certificate of origin. The passport, resale royalties and wallet stay as the ten-year direction, and each gets added when buyers ask for it.
-</BodySection>
+    <SystemFigure label="How it works" spec={bespokeToday} />
 
-<BodySection label="What I'd keep" heading="The read on handmade.">
-  The read on luxury still holds. One-of-one handmade work will matter more as more things are made by machines. Demand for transparency is rising too, like the EU mandate for digital passports. [The snippets you enjoyed most]
-</BodySection>
+    <Row label="What I'd keep" heading="The discover feed." src={phones} alt="The second version on three phones: Discover, a feed of real pieces, between a collection and a piece.">
+      Browsing real work by the people who made it was the best part of the second version. Today it's the center of the product, and search by image is just another way into it.
+    </Row>
+
+    <Row label="What I'd change" heading="A certificate, not a blockchain." src={lifecycle} alt="The second version's passport loop, from artisan onboarding to resale.">
+      Each piece would ship with a certificate of origin and an authentication package the artisan puts together in minutes. It proves where a piece came from without asking buyers to learn anything new.
+    </Row>
+
+    <Row label="What we never asked" heading="Whose problem, and which category." src={summary} alt="Summary slide: from sustainable materials sourcing, to a marketplace with creative AI tools, to a marketplace for digitally authenticated goods.">
+      We never decided whether the problem was artisans finding buyers or buyers not valuing handmade work. Ceramics, shoes, clothing, paintings and furniture each sell, ship and price differently, and we designed for all of them at once. Today I'd start with one category.
+
+      I also designed for how I thought people would buy in ten years and hoped they'd catch up. It had to work for how they buy today.
+    </Row>
+
+    <BodySection label="How I'd build it" heading="Build it, and let artisans tell me what's next.">
+      In 2024 Bespoke stayed in Figma. Since then, working on vers1ons and in my internships, I've learned to use AI as leverage to build and to learn. Now I'd build a working version of this, put it in front of a few artisans in one category, and let what they and their buyers do decide what comes next.
+    </BodySection>
+
+    <BodySection label="What still holds" heading="Handmade will matter more.">
+      One-of-one handmade work will matter more as more things are made by machines, and buyers want to know where things come from. That read hasn't changed.
+    </BodySection>
+  </Tab>
+</Tabs>

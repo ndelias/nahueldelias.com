@@ -1,9 +1,0 @@
----
-// The page's provenance stack (Astro.locals.entry's versions), for a study
-// whose body places it: <Versions /> in MDX.
-import VersionsStack from './VersionsStack.astro';
-
-const versions = Astro.locals.entry?.data.versions;
-if (!versions) throw new Error('<Versions />: the page has no versions.');
----
-<div class="versions"><VersionsStack versions={versions} /></div>

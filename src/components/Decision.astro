@@ -1,9 +1,0 @@
----
-// The page's decision (Astro.locals.entry), for a study whose body places
-// it between the versions it chose between: <Decision /> in MDX.
-import DecisionBlock from './DecisionBlock.astro';
-
-const decision = Astro.locals.entry?.data.decision;
-if (!decision) throw new Error('<Decision />: the page has no decision.');
----
-<div class="decision"><DecisionBlock decision={decision} intro={decision.intro} /></div>
