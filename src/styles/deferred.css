@@ -1223,6 +1223,53 @@ section.decision {
   }
 }
 
+/* Points (components/Points.astro): a body section's margin, then a few
+   short points side by side across the reading and figure columns. */
+.points {
+  h2.margin {
+    font-size: var(--text-mono);
+    font-weight: var(--weight-regular);
+  }
+  .items {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-32);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  li {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+    padding-top: var(--space-16);
+    border-top: 1px solid var(--line);
+  }
+  li .mono {
+    margin: 0;
+    font-size: var(--text-mono-sm);
+    line-height: normal;
+  }
+  .text {
+    margin: 0;
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+  }
+  @media (min-width: 640px) {
+    .items {
+      grid-column: 4 / span 9;
+      display: grid;
+      grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+      column-gap: var(--grid-gutter);
+    }
+  }
+  @media (max-width: 639.98px) {
+    h2.margin {
+      margin-bottom: var(--space-12);
+    }
+  }
+}
+
 /* PartPager */
 nav.pager {
   & {

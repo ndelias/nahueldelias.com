@@ -98,8 +98,6 @@ import bid from '../../assets/studies/bespoke/v1-bid.webp';
 import fork from '../../assets/studies/bespoke/fork.webp';
 import value from '../../assets/studies/bespoke/v2-value.webp';
 import lifecycle from '../../assets/studies/bespoke/v2-lifecycle.webp';
-import summary from '../../assets/studies/bespoke/summary.webp';
-import phones from '../../assets/studies/bespoke/v2-phones.webp';
 
 {/* DRAFT (2026-10-19): Nahuel edits the copy as we go. */}
 
@@ -167,19 +165,14 @@ import phones from '../../assets/studies/bespoke/v2-phones.webp';
       **A certificate of origin.** Every piece ships with one, made by the artisan in a few minutes. Buyers can check it with a code, with no wallet or app to learn.
     </BodySection>
 
-    <Row label="What I'd keep" heading="The discover feed." src={phones} alt="The second version on three phones: Discover, a feed of real pieces, between a collection and a piece.">
-      Browsing real work by the people who made it was the best part of the second version. Today it's the center of the product, and search by image is just another way into it.
-    </Row>
-
-    <Row label="What I'd change" heading="A certificate, not a blockchain." src={lifecycle} alt="The second version's passport loop, from artisan onboarding to resale.">
-      Each piece would ship with a certificate of origin and an authentication package the artisan puts together in minutes. It proves where a piece came from without asking buyers to learn anything new.
-    </Row>
-
-    <Row label="What we never asked" heading="Whose problem, and which category." src={summary} alt="Summary slide: from sustainable materials sourcing, to a marketplace with creative AI tools, to a marketplace for digitally authenticated goods.">
-      We never decided whether the problem was artisans finding buyers or buyers not valuing handmade work. Ceramics, shoes, clothing, paintings, and furniture each sell, ship, and price differently, and we designed for all of them at once. Today I'd start with one category.
-
-      I also designed for how I thought people would buy in ten years and hoped they'd catch up. It had to work for how they buy today.
-    </Row>
+    <Points
+      label="Looking back"
+      items={[
+        { label: "What I'd keep", heading: 'The discover feed.', text: "Browsing real work by the people who made it was the best part of the second version. Now it's the center." },
+        { label: "What I'd change", heading: 'A certificate, not a blockchain.', text: 'Each piece ships with a certificate of origin the artisan makes in minutes. Buyers have nothing new to learn.' },
+        { label: 'What we never asked', heading: 'Whose problem, and which category.', text: "We never chose a problem or a category, and designed for how people might buy in ten years. Now I'd start with one." },
+      ]}
+    />
 
     <BodySection label="How I'd build it" heading="Build it, and let artisans tell me what's next.">
       In 2024 Bespoke stayed in Figma. Since then, working on vers1ons and in my internships, I've learned to use AI as leverage to build and to learn. Now I'd build a working version of this, put it in front of a few artisans in one category, and let what they and their buyers do decide what comes next.

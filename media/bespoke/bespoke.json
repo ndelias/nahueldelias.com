@@ -65,12 +65,6 @@
       "retouch": false
     },
     {
-      "from": "derived/summary-16x10.jpg",
-      "to": "studies/bespoke/summary.webp",
-      "width": 1920,
-      "retouch": false
-    },
-    {
       "from": "bespoke1/wireframe video buyer .mov",
       "at": 0.5,
       "to": "studies/bespoke/wire-prompt.webp",
@@ -233,12 +227,6 @@
       "from": "bespoke2/wireframes/Generate Wallet.png",
       "to": "studies/bespoke/wire-wallet.webp",
       "width": 393,
-      "retouch": false
-    },
-    {
-      "from": "derived/phones-16x10.jpg",
-      "to": "studies/bespoke/v2-phones.webp",
-      "width": 1920,
       "retouch": false
     }
   ],

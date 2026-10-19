@@ -18,6 +18,7 @@ import Gallery from './Gallery.astro';
 import Icon from './Icon.astro';
 import MobileDesign from './MobileDesign.astro';
 import NextEntry from './NextEntry.astro';
+import Points from './Points.astro';
 import Row from './Row.astro';
 import Steps from './Steps.astro';
 import Tab from './Tab.astro';
@@ -86,7 +87,7 @@ const title = `${tab && tab !== data.tabs?.[0] ? `${tab.label} — ` : ''}${data
       )}
 
       <article class="body">
-        <Content components={{ BodySection, Comparisons, Figure, Gallery, MobileDesign, Row, Steps, SystemFigure, Tab, Tabs }} />
+        <Content components={{ BodySection, Comparisons, Figure, Gallery, MobileDesign, Points, Row, Steps, SystemFigure, Tab, Tabs }} />
       </article>
 
       {usesRows && <AfterLoad src={reveal} />}
