@@ -1,0 +1,256 @@
+{
+  "archive": "~/Desktop/bespoke",
+  "images": [
+    {
+      "from": "bespoke1/buyerUI.mov",
+      "at": 0.5,
+      "to": "studies/bespoke/v1-buyer.webp",
+      "width": 2396,
+      "retouch": false
+    },
+    {
+      "from": "bespoke1/artisanUI.mov",
+      "at": 0.5,
+      "to": "studies/bespoke/v1-artisan.webp",
+      "width": 2396,
+      "retouch": false
+    },
+    {
+      "from": "bespoke2/Bespoke Product Design (1).mp4",
+      "at": 0.5,
+      "to": "studies/bespoke/v2-flow.webp",
+      "width": 1660,
+      "retouch": false
+    },
+    {
+      "from": "figma/v1-insight.png",
+      "to": "studies/bespoke/v1-insight.webp",
+      "width": 1512,
+      "crop": [
+        0,
+        0,
+        1512,
+        945
+      ],
+      "retouch": false
+    },
+    {
+      "from": "figma/v1-artisan-bid.png",
+      "to": "studies/bespoke/v1-bid.webp",
+      "width": 1512,
+      "crop": [
+        0,
+        0,
+        1512,
+        945
+      ],
+      "retouch": false
+    },
+    {
+      "from": "bespoke2/NAHUEL-3.jpg",
+      "to": "studies/bespoke/fork.webp",
+      "width": 1920,
+      "retouch": false
+    },
+    {
+      "from": "derived/value-16x10.jpg",
+      "to": "studies/bespoke/v2-value.webp",
+      "width": 1920,
+      "retouch": false
+    },
+    {
+      "from": "derived/lifecycle-loop.jpg",
+      "to": "studies/bespoke/v2-lifecycle.webp",
+      "width": 1920,
+      "retouch": false
+    },
+    {
+      "from": "bespoke1/wireframe video buyer .mov",
+      "at": 0.5,
+      "to": "studies/bespoke/wire-prompt.webp",
+      "width": 1480,
+      "crop": [
+        201,
+        125,
+        1480,
+        925
+      ],
+      "retouch": false
+    },
+    {
+      "from": "bespoke1/wireframe video buyer .mov",
+      "at": 3.0,
+      "to": "studies/bespoke/wire-grid.webp",
+      "width": 1480,
+      "crop": [
+        201,
+        125,
+        1480,
+        925
+      ],
+      "retouch": false
+    },
+    {
+      "from": "bespoke1/wireframe video buyer .mov",
+      "at": 9.5,
+      "to": "studies/bespoke/wire-question.webp",
+      "width": 1480,
+      "crop": [
+        201,
+        125,
+        1480,
+        925
+      ],
+      "retouch": false
+    },
+    {
+      "from": "figma/v1-prompt.png",
+      "to": "studies/bespoke/design-prompt.webp",
+      "width": 1512,
+      "crop": [
+        0,
+        0,
+        1512,
+        945
+      ],
+      "retouch": false
+    },
+    {
+      "from": "figma/v1-grid.png",
+      "to": "studies/bespoke/design-grid.webp",
+      "width": 1512,
+      "crop": [
+        0,
+        0,
+        1512,
+        945
+      ],
+      "retouch": false
+    },
+    {
+      "from": "bespoke2/Open.png",
+      "to": "studies/bespoke/phones/01-open.webp",
+      "width": 590,
+      "retouch": false
+    },
+    {
+      "from": "bespoke2/Discover Page-2.png",
+      "to": "studies/bespoke/phones/02-discover.webp",
+      "width": 590,
+      "retouch": false
+    },
+    {
+      "from": "bespoke2/Discover Page-1.png",
+      "to": "studies/bespoke/phones/03-search.webp",
+      "width": 590,
+      "retouch": false
+    },
+    {
+      "from": "bespoke2/collection page.png",
+      "to": "studies/bespoke/phones/04-collection.webp",
+      "width": 590,
+      "retouch": false
+    },
+    {
+      "from": "bespoke2/Product Page-1.png",
+      "to": "studies/bespoke/phones/05-piece.webp",
+      "width": 590,
+      "retouch": false
+    },
+    {
+      "from": "bespoke2/Product Page.png",
+      "to": "studies/bespoke/phones/06-history.webp",
+      "width": 590,
+      "retouch": false
+    },
+    {
+      "from": "bespoke2/Artisan Profile-1.png",
+      "to": "studies/bespoke/phones/07-artisan.webp",
+      "width": 590,
+      "retouch": false
+    },
+    {
+      "from": "bespoke2/Generate Wallet.png",
+      "to": "studies/bespoke/phones/08-pay.webp",
+      "width": 590,
+      "retouch": false
+    },
+    {
+      "from": "bespoke2/Generate Wallet-1.png",
+      "to": "studies/bespoke/phones/09-ordered.webp",
+      "width": 590,
+      "retouch": false
+    },
+    {
+      "from": "bespoke2/Generate Wallet-3.png",
+      "to": "studies/bespoke/phones/10-scan.webp",
+      "width": 590,
+      "retouch": false
+    },
+    {
+      "from": "bespoke2/Generate Wallet-4.png",
+      "to": "studies/bespoke/phones/11-found.webp",
+      "width": 590,
+      "retouch": false
+    },
+    {
+      "from": "bespoke2/Generate Wallet-2.png",
+      "to": "studies/bespoke/phones/12-wallet.webp",
+      "width": 590,
+      "retouch": false
+    },
+    {
+      "from": "bespoke2/Profile-1.png",
+      "to": "studies/bespoke/phones/13-profile.webp",
+      "width": 590,
+      "retouch": false
+    },
+    {
+      "from": "bespoke2/colletion page.png",
+      "to": "studies/bespoke/phones/14-collection-2.webp",
+      "width": 590,
+      "retouch": false
+    },
+    {
+      "from": "bespoke2/wireframes/Discover Page.png",
+      "to": "studies/bespoke/wire-discover.webp",
+      "width": 393,
+      "retouch": false
+    },
+    {
+      "from": "bespoke2/wireframes/Find Item.png",
+      "to": "studies/bespoke/wire-piece.webp",
+      "width": 393,
+      "retouch": false
+    },
+    {
+      "from": "bespoke2/wireframes/Generate Wallet.png",
+      "to": "studies/bespoke/wire-wallet.webp",
+      "width": 393,
+      "retouch": false
+    }
+  ],
+  "videos": [
+    {
+      "from": "bespoke1/buyerUI.mov",
+      "to": "media/bespoke/v1-buyer.mp4",
+      "kind": "hero",
+      "width": 1344,
+      "budget": 5000000
+    },
+    {
+      "from": "bespoke1/artisanUI.mov",
+      "to": "media/bespoke/v1-artisan.mp4",
+      "kind": "hero",
+      "width": 1344,
+      "budget": 3000000
+    },
+    {
+      "from": "bespoke2/Bespoke Product Design (1).mp4",
+      "to": "media/bespoke/v2-flow.mp4",
+      "kind": "hero",
+      "width": 1344,
+      "budget": 4000000
+    }
+  ]
+}

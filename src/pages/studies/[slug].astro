@@ -1,0 +1,13 @@
+---
+// /studies/[slug]: a product study (§2). A study told in tabs opens on its
+// first tab here; the others are /studies/[slug]/[tab].
+import type { GetStaticPaths } from 'astro';
+import StudyPage from '../../components/StudyPage.astro';
+import { entriesIn } from '../../lib/entries';
+
+export const getStaticPaths = (() =>
+  entriesIn('studies').map((entry) => ({ params: { slug: entry.id }, props: { entry } }))) satisfies GetStaticPaths;
+
+const { entry } = Astro.props;
+---
+<StudyPage entry={entry} tab={entry.data.tabs?.[0]} />

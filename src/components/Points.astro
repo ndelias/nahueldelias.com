@@ -1,0 +1,28 @@
+---
+// A few short points side by side, for use in MDX: a numbered label in the
+// margin like a body section's, then one column per point (a label, a
+// heading, a line or two). Three fit the body's nine columns; a phone
+// stacks them.
+//
+//   <Points label="Looking back" items={[{ label: 'Keep', heading: '…', text: '…' }, …]} />
+interface Props {
+  label: string;
+  items: { label: string; heading: string; text: string }[];
+}
+
+const { label, items } = Astro.props;
+// Styles: src/styles/deferred.css (loaded after first paint; this
+// component only renders below the fold).
+---
+<section class="body-section points grid">
+  <h2 class="margin mono muted"><span class="no" aria-hidden="true"></span><span class="label">{label}</span></h2>
+  <ul class="items" style={`--n: ${items.length}`}>
+    {items.map((item) => (
+      <li>
+        <p class="mono muted">{item.label}</p>
+        <h3 class="heading">{item.heading}</h3>
+        <p class="text">{item.text}</p>
+      </li>
+    ))}
+  </ul>
+</section>

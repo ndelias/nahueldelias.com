@@ -1,0 +1,16 @@
+---
+// /studies/[slug]/[tab]: a study told in tabs, open on one of its other
+// tabs. The same page as the study's own URL, with that tab's content: a
+// link to it works without JS, and Tabs.astro fetches it to switch in place.
+import type { GetStaticPaths } from 'astro';
+import StudyPage from '../../../components/StudyPage.astro';
+import { entriesIn } from '../../../lib/entries';
+
+export const getStaticPaths = (() =>
+  entriesIn('studies').flatMap((entry) =>
+    (entry.data.tabs ?? []).slice(1).map((tab) => ({ params: { slug: entry.id, tab: tab.id }, props: { entry, tab } })),
+  )) satisfies GetStaticPaths;
+
+const { entry, tab } = Astro.props;
+---
+<StudyPage entry={entry} tab={tab} />
