@@ -14,7 +14,7 @@ export const bespokeAi: DiagramSpec = {
       zone: "buyer",
       title: "One line",
       body: ["a ring", "for an engagement", "for my artsy fiancée"],
-      detail: "Three blanks to fill in, an object, an occasion and who it's for. No brief to write.",
+      detail: "Three blanks to fill in, an object, an occasion, and who it's for. No brief to write.",
       col: 1,
       row: 1,
     },

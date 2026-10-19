@@ -6,7 +6,7 @@ import type { DiagramSpec } from "../types";
 export const bespokeToday: DiagramSpec = {
   id: "bespoke-today",
   eyebrow: "bespoke · today",
-  title: "Help artisans get found",
+  title: "Found by their work",
   subtitle: "Artisans with their own style get a storefront. Buyers find them by scrolling real work, or by searching with a picture of what they like. Every piece ships with a certificate of origin.",
   columns: 4,
   nodes: [
