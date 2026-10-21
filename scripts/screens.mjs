@@ -195,6 +195,18 @@ async function shoot(browser, origin, { viewport, colorScheme, view, next = 0, p
     // what's under it a pixel differently from run to run.
     await page.addStyleTag({ content: '*, *::before, *::after { transition: none !important; }' });
   }
+  // The strip's covers beckon (a ring breathing out from each edge) from
+  // 1.2s after load. That's about when a shot is taken, so whether the
+  // ring's first frame is in it varied from run to run. Hold it at its
+  // start, the state before it begins.
+  await page.evaluate(() => {
+    for (const a of document.getAnimations()) {
+      if (a.animationName?.includes('beckon')) {
+        a.pause();
+        a.currentTime = 0;
+      }
+    }
+  });
   await settle(page);
   if (path) {
     await loadAll(page);
