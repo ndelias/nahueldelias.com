@@ -38,7 +38,7 @@
 import { mkdir, readFile, writeFile, appendFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { launch, serve } from './lib/browser.mjs';
+import { launch, serve, DETERMINISTIC } from './lib/browser.mjs';
 
 const ROOT = resolve(import.meta.dirname, '..');
 const REFERENCE = join(ROOT, 'docs/design/reference');
@@ -340,7 +340,7 @@ async function captureSite(browser, out) {
   return shots;
 }
 
-const browser = await launch();
+const browser = await launch(DETERMINISTIC);
 try {
   if (mode === 'capture') {
     const out = resolve(outArg ?? MOCK_BASELINES);
