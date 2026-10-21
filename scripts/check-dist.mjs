@@ -55,7 +55,11 @@ function refs(text, isHtml) {
   return out;
 }
 
+// The site's own origin, as absolute URLs use it (og:image must be absolute).
+const SITE = 'https://nahueldelias.com';
+
 function resolveRef(ref, from) {
+  if (ref?.startsWith(SITE + '/')) ref = ref.slice(SITE.length);
   if (!ref || /^(?:[a-z][a-z\d+.-]*:|\/\/|#)/i.test(ref)) return null; // data:, https:, mailto:, anchors
   let path = new URL(ref, `https://x${from}`).pathname;
   path = decodeURIComponent(path);

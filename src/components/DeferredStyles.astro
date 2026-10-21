@@ -13,15 +13,11 @@
 import href from '../styles/deferred.css?url';
 ---
 <noscript><link rel="stylesheet" href={href} /></noscript>
-<script is:inline define:vars={{ href }}>
-  afterPaint(function () {
-    var l = document.createElement('link'), m = 0, f = function () { m = 1; }; l.rel = 'stylesheet'; l.href = href;
-    ['wheel', 'touchstart', 'keydown'].forEach(function (e) { addEventListener(e, f, { once: true, passive: true }); });
-    l.onload = function () { var t = location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1))); if (!t || m) return;
-      var b = document.querySelectorAll('.body > *'), cv = function (v) { b.forEach(function (e) { e.style.contentVisibility = v; }); };
-      cv('visible'); t.scrollIntoView();
-      requestAnimationFrame(function () { setTimeout(function () { cv(''); t.scrollIntoView(); }); });
-    };
-    document.head.append(l);
-  });
-</script>
+{/* Minified by hand, like Base's inline script: it ships in the HTML of
+    every case study page, which sits at the HTML budget. Readable:
+      afterPaint: make <link rel=stylesheet href>; note any wheel,
+      touchstart or keydown (m = 1); on load, if the URL has a #fragment
+      and the reader hasn't moved (m), render the .body blocks for a frame
+      (contentVisibility "visible"), land on the target, then clear it and
+      land again. */}
+<script is:inline set:html={`afterPaint(function(){var l=document.createElement("link"),m=0,f=function(){m=1};l.rel="stylesheet";l.href=${JSON.stringify(href)};["wheel","touchstart","keydown"].forEach(function(e){addEventListener(e,f,{once:true,passive:true})});l.onload=function(){var t=location.hash&&document.getElementById(decodeURIComponent(location.hash.slice(1)));if(!t||m)return;var b=document.querySelectorAll(".body>*"),c=function(v){b.forEach(function(e){e.style.contentVisibility=v})};c("visible");t.scrollIntoView();requestAnimationFrame(function(){setTimeout(function(){c("");t.scrollIntoView()})})};document.head.append(l)})`} />

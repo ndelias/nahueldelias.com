@@ -1,0 +1,8 @@
+---
+date: 2026-10-21
+---
+
+A link to the site now unfurls with my portrait: the one on the About page, drawn in characters, with my name and "Product engineer" under it.
+
+- **Drawn the way the page draws it:** scripts/og-image.mjs renders the same character grid in Chrome with the site's own fonts, at 2x so it stays sharp where a preview shows it large. 61KB.
+- **Paid for in bytes:** four tags go in every page's head, about 80 bytes gzipped, and the Distribution page had about 64 to spare under the 14KB HTML budget. Hand-minifying the script that loads the case study styles freed the rest.
