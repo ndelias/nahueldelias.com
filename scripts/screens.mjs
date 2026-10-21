@@ -207,6 +207,14 @@ async function shoot(browser, origin, { viewport, colorScheme, view, next = 0, p
       }
     }
   });
+  // The strip's other posters swap in from data-srcset once the first has
+  // painted, then load and decode on their own time. A shot taken before or
+  // after that caught a poster at a different stage (a pixel or two a level
+  // off). Wait for the swap, then for every image to be decoded.
+  await page
+    .waitForFunction(() => !document.querySelector('[data-orbit] [data-src], [data-orbit] [data-srcset]'), null, { timeout: 10_000 })
+    .catch(() => {});
+  await loadAll(page);
   await settle(page);
   if (path) {
     await loadAll(page);
