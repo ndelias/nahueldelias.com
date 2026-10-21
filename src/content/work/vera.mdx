@@ -3,7 +3,7 @@
 # research (github.com/ndelias/vera, research/findings/) and site. Media
 # from media/vera/hub.json (captures from the site's scripted demo).
 title: 'Vera'
-tagline: 'Review for the AI era: proof the reviewer understood the change, and every sign-off at once.'
+tagline: 'Review that keeps up with AI-written code, without approving what nobody read.'
 weight: 1
 status: wip
 role: 'Solo: research, product, design and engineering'
@@ -15,10 +15,10 @@ links:
   repo: 'https://github.com/ndelias/vera'
   demo: 'https://vera-agent.vercel.app/demo'
 decision:
-  intro: 'As AI writes more of the code, reviewers approve changes they no longer fully understand.'
-  chose: 'Check that the reviewer understood the change, and get everyone who has to sign off to do it at the same time, as a layer above the review bots.'
+  intro: 'AI doubled the code in every change, and review didn''t get any faster to match.'
+  chose: 'Speed review up to the pace of the code, as a layer above the review bots: what to look at first, a brief for each role, everyone signing off at once, and proof someone understood the change.'
   rejected: 'My first idea, Blast Radius: letting non-engineers ship small changes. The data ranked it last.'
-  cost: 'Weeks of research before any product code, and a harder product to build than another review bot. Understanding is harder to check than code.'
+  cost: 'Weeks of research before any product code, and a harder product to build than another review bot. Faster is easy; faster without skipping the reading is the hard part.'
 hero:
   src: ../../assets/work/vera/hero.webp
   alt: 'The Vera demo before it starts: a pull request at a made-up shop, and the run panel waiting.'
@@ -41,8 +41,8 @@ import ranking from '../../assets/work/vera/ranking.webp';
 import askVera from '../../assets/work/vera/ask-vera.webp';
 import slack from '../../assets/work/vera/slack.webp';
 
-<BodySection label="The problem" heading="Review didn't slow down. Attention did.">
-  In a year, merge requests at GitLab that disclose AI help went from 3% to 22%, and the code in each change doubled, from 37 lines to 76. Time to merge didn't move. Something had to give, and it was attention: review comments per line fell 38%. People are approving changes they haven't really read.
+<BodySection label="The problem" heading="The code doubled. Review didn't speed up.">
+  In a year, merge requests at GitLab that disclose AI help went from 3% to 22%, and the code in each change doubled, from 37 lines to 76. Review isn't slow. It just didn't get any faster, so reviewers kept pace by reading less: review comments per line fell 38%. Review has to speed up to match the code, without people approving what they haven't read.
 </BodySection>
 
 <Figure src={whyNow} alt="Two charts: merge requests disclosing AI help rising to 22% by month, and lines changed per merge request climbing to 76 while time to merge stays flat." caption="Measured on GitLab's product repo, which is developed in public" />
@@ -55,10 +55,10 @@ import slack from '../../assets/work/vera/slack.webp';
 
 <Figure src={ranking} alt="Twelve pains ranked by score. AI-written code needing cleanup and overloaded code review tie at the top; non-engineers depending on engineering, my original idea, is last." caption="Twelve pains, scored on the same rules. My first idea is the grey bar at the bottom" />
 
-<BodySection label="The product" heading="Understood, signed off, shipped.">
-  Vera sits above the review bots. Four agents read each pull request. One maps what it touches and spots likely AI-written code nobody has checked. One writes a brief for each role. One asks the reviewer a couple of questions to check they understood the change, and records the answer on the approval. One gets design, security and product to sign off at the same time.
+<BodySection label="The product" heading="Faster reviews, without skipping the reading.">
+  Vera sits above the review bots and organizes each pull request so it moves faster. It maps what the change touches and shows reviewers what to look at first, including likely AI-written code nobody has checked. Each role gets a brief instead of the whole diff, and can ask Vera about the code; it answers with the lines it used. Design, security and product are asked to sign off at the same time, not one after another.
 
-  Reviewers can ask Vera about the change. It answers from the code, with the lines it used, but it won't hand out the answers to an open check. And rules in the repo, not a model, decide who has to approve.
+  The speed comes with a check: on risky changes, the reviewer answers a couple of questions, and the result is recorded on the approval. Rules in the repo, not a model, decide who has to approve.
 </BodySection>
 
 <Figure src={askVera} alt="Ask Vera on the reviewer's turn: Vera holds back the answer to an open check question and points to the code, then answers who calls applyDiscount, citing the lines." caption="On your turn, Vera explains the change, but not the answers to your check" />
@@ -66,5 +66,5 @@ import slack from '../../assets/work/vera/slack.webp';
 <Figure src={slack} alt="Vera answering design in Slack, security on the pull request and product in Slack, each answer citing the code it read." caption="Design, security and product ask Vera before they sign off" />
 
 <BodySection label="Where it is" heading="Researched, designed, and running as a demo.">
-  The research and the site are live. The demo replays a scripted run in the same trace format the real agents will write, costed with the same price table, so real runs will play in the same viewer. Next come evals on GitLab's history, then the agents themselves.
+  The research and the site are live. The demo replays a scripted run in the same trace format the real agents will write, costed with the same price table, so real runs will play in the same viewer. Next come evals on GitLab's history, then the agents themselves, measured on two numbers: reviewer minutes per 100 lines, and time to full sign-off.
 </BodySection>
