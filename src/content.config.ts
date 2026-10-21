@@ -66,6 +66,9 @@ const entrySchema = ({ image }: SchemaContext) => {
       // the tagline (the matrix says what the part does; the page's tagline
       // says why it matters). Defaults to the tagline.
       summary: z.string().min(1).max(99, 'Summaries are one line: under 100 characters.').optional(),
+      // A few words under the entry's card on the homepage strip, at rest:
+      // what it is, before anyone points at it. Hidden while a caption shows.
+      short: z.string().min(1).max(40, 'A card label is a few words: 40 characters at most.').optional(),
       weight: z.union([z.literal(1), z.literal(2), z.literal(3)]),
       status: z.enum(STATUSES),
       role: z.string().min(1),

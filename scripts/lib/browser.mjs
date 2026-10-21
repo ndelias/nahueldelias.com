@@ -39,5 +39,17 @@ export function serve(dir) {
   );
 }
 
-export const launch = () =>
-  chromium.launch(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : { channel: 'chrome' });
+export const launch = (args = []) =>
+  chromium.launch({ ...(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : { channel: 'chrome' }), args });
+
+// For screenshots that must match to the pixel run after run: draw in
+// software on one raster thread. With threaded, GPU-backed raster, layers
+// with a 3D transform (the strip's tilted cards) came out a level off in a
+// pixel or two from one CI run to the next.
+export const DETERMINISTIC = [
+  '--disable-gpu',
+  '--disable-gpu-rasterization',
+  '--num-raster-threads=1',
+  '--disable-partial-raster',
+  '--disable-skia-runtime-opts',
+];
