@@ -2,13 +2,13 @@
   "archive": "~/Desktop/blast-radius",
   "images": [
     {
-      "from": "apps/panel/public/brand/vera-card-dark.png",
+      "from": "apps/panel/public/brand/vera-card-light.png",
       "to": "work/vera/poster.webp",
       "width": 2080,
       "retouch": false
     },
     {
-      "from": "apps/panel/public/brand/vera-card-dark.png",
+      "from": "apps/panel/public/brand/vera-card-light.png",
       "to": "work/vera/cover.webp",
       "width": 1600,
       "retouch": false
