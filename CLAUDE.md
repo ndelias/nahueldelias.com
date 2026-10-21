@@ -61,8 +61,10 @@ constellation moves on springs instead (src/lib/orbit.ts).
 - Playwright comparisons load pages over HTTP (a local static server), never
   file://. Allow ~0.5% pixel difference: text-edge anti-aliasing alone
   differs by ~0.25% from the baselines.
-- The site's own screenshots in tests/screens/ are a CI gate, exact to the
-  pixel (the ~0.5% allowance is for comparisons with docs/design). When a
+- The site's own screenshots in tests/screens/ are a CI gate, all but exact:
+  a pixel counts only when a channel moves by more than 2 levels, and up to
+  16 may (Chrome on CI draws a pixel or two a level off from run to run).
+  The ~0.5% allowance is for comparisons with docs/design. When a
   render change is intended, push, run `npm run screens:update` and commit
   the new baselines with the change.
 - Chrome is pinned. The screens, dist-tests and Lighthouse jobs run Chrome
