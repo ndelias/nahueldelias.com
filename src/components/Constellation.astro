@@ -116,6 +116,22 @@ const first = projects[0];
       );
     })}
   </div>
+  {/* A few projects: a few words under each card at rest, until a caption
+      takes over (pointing at a card, or one open). */}
+  {N > 1 && (
+    <div class="rests" aria-hidden="true">
+      {projects.map(({ entry }, k) =>
+        entry.data.short ? (
+          <p
+            class="rest mono"
+            style={`left: calc(50% + ${rowX(k)} * var(--u)); top: calc(46% + ${(106.25 * S0).toFixed(2)} * var(--u) + 18px); width: calc(${(340 * S0).toFixed(1)} * var(--u))`}
+          >
+            {entry.data.short}
+          </p>
+        ) : null,
+      )}
+    </div>
+  )}
   {/* One project: its caption shows from the start. A few: on rest. */}
   <div class:list={['caption', { in: N === 1 }]} aria-live="polite" data-caption>
     <p class="kicker mono"><span data-c="no">{N === 1 && first.number}</span><span class="sep"> · </span><span data-c="kicker">{N === 1 && first.kicker}</span></p>
@@ -239,6 +255,22 @@ const first = projects[0];
     outline-offset: 2px;
   }
 
+  .rests {
+    position: absolute;
+    inset: 0;
+  }
+  .rest {
+    position: absolute;
+    margin: 0;
+    transform: translateX(-50%);
+    text-align: center;
+    font-size: var(--text-mono-sm);
+    color: var(--muted);
+    transition: opacity 0.3s var(--ease);
+  }
+  .orbit:has([data-caption].in) .rest {
+    opacity: 0;
+  }
   .caption {
     position: absolute;
     left: 50%;
