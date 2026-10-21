@@ -42,6 +42,14 @@ const favicon = `data:image/svg+xml,${faviconSvg.trim().replace(/"/g, "'").repla
     <title>{title}</title>
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex" />}
+    {/* The link preview: the portrait card (scripts/og-image.mjs) on every
+        page, with the page's own title and description. Only the tags
+        previews need: each optional one costs bytes in every page's HTML,
+        and the longest pages sit at the HTML budget. */}
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL('/og.png', Astro.site)} />
+    <meta name="twitter:card" content="summary_large_image" />
     {preload.map((face) => <link rel="preload" href={FACES[face]} as="font" type="font/woff2" crossorigin />)}
     <link rel="icon" href={favicon} type="image/svg+xml" />
     <slot name="head" />
