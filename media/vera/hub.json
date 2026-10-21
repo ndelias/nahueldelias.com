@@ -1,0 +1,28 @@
+{
+  "archive": "~/Desktop/blast-radius/captures",
+  "images": [
+    { "from": "screens/home-hero.png", "to": "work/vera/poster.webp", "width": 2080, "retouch": false },
+    { "from": "screens/home-hero.png", "to": "work/vera/cover.webp", "width": 1600, "retouch": false },
+    { "from": "screens/demo-01-start.png", "to": "work/vera/hero.webp", "width": 2688, "retouch": false },
+    { "from": "screens/why-charts.png", "to": "work/vera/why-now.webp", "width": 2688, "retouch": false },
+    { "from": "screens/why-ranking.png", "to": "work/vera/ranking.webp", "width": 2688, "retouch": false },
+    { "from": "screens/demo-06-ask-vera.png", "to": "work/vera/ask-vera.webp", "width": 2688, "retouch": false },
+    { "from": "screens/demo-08-slack.png", "to": "work/vera/slack.webp", "width": 2688, "retouch": false }
+  ],
+  "videos": [
+    { "from": "video/demo-full.mp4", "to": "media/vera/demo.mp4", "kind": "hero", "width": 1344 },
+    {
+      "to": "media/vera/reel.mp4",
+      "kind": "hero",
+      "width": 1344,
+      "budget": 3000000,
+      "fade": 0.4,
+      "reel": [
+        { "from": "video/demo-full.mp4", "start": 5.0, "end": 9.5 },
+        { "from": "video/demo-full.mp4", "start": 22.0, "end": 26.5 },
+        { "from": "video/demo-full.mp4", "start": 50.0, "end": 54.5 },
+        { "from": "video/demo-full.mp4", "start": 71.0, "end": 75.0 }
+      ]
+    }
+  ]
+}

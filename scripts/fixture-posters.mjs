@@ -39,7 +39,6 @@ const HERO_GRAIN_SIZE = 4;
 // Homepage order, as in the reference: [slug, light, dark].
 const TONES = [
   ['vers1ons', '#CFC9BE', '#34302A'],
-  ['blast-radius', '#C3C8CF', '#2C3037'],
   ['bespoke', '#D6CCBF', '#3A332B'],
   ['city-social-club', '#C8CDC2', '#2E332C'],
   ['app-teardown', '#D0CDD6', '#322F38'],

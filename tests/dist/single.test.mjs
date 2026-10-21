@@ -1,6 +1,6 @@
-// The shipped homepage with its single entry (dist/, no fixtures): vers1ons
-// stands alone, with no ring to step through and nothing unbuilt in sight.
-// The ring itself is tested against the fixture build in filmstrip.test.mjs.
+// The shipped homepage with its two real entries (dist/, no fixtures):
+// vers1ons (W01) and Vera (W02) side by side, nothing unbuilt in sight. The
+// ring itself is tested against the fixture build in filmstrip.test.mjs.
 
 import { after, before, test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -34,25 +34,30 @@ test('no fixture is built or linked', async () => {
   assert.equal(existsSync(join(DIST, 'work/blast-radius')), false);
   const html = await readFile(join(DIST, 'index.html'), 'utf8');
   for (const placeholder of ['Blast Radius', '[Role]', '[One line.]', 'Fixture']) assert.ok(!html.includes(placeholder), `"${placeholder}" on /`);
+  for (const page of ['work/vers1ons/index.html', 'work/vera/index.html']) {
+    const html = await readFile(join(DIST, page), 'utf8');
+    for (const placeholder of ['[Role]', '[One line.]', 'Fixture']) assert.ok(!html.includes(placeholder), `"${placeholder}" on ${page}`);
+  }
   const hub = await readFile(join(DIST, 'work/vers1ons/index.html'), 'utf8');
-  assert.ok(!hub.includes('class="next'), 'the hub links a next entry that does not exist');
+  assert.ok(/class="next[^>]*>[\s\S]*?href="\/work\/vera\/"/.test(hub) || hub.includes('href="/work/vera/"'), 'the vers1ons hub does not lead on to Vera');
 });
 
-test('vers1ons alone in the middle, larger, with its caption from the start; one Index row', async () => {
+test('vers1ons and Vera side by side, the same size, in order; two Index rows', async () => {
   const { ctx, page } = await open();
   await page.waitForTimeout(300);
   const shape = await page.evaluate(() => {
-    const covers = document.querySelectorAll('[data-orbit] .card.cover');
-    const r = covers[0].getBoundingClientRect();
+    const covers = [...document.querySelectorAll('[data-orbit] .card.cover')];
+    const [a, b] = covers.map((c) => c.getBoundingClientRect());
     return {
       covers: covers.length,
+      order: covers.map((c) => c.dataset.no),
       rows: document.querySelectorAll('[data-row]').length,
-      centred: Math.abs(r.left + r.width / 2 - innerWidth / 2) < 1,
-      wide: Math.round(r.width),
-      caption: document.querySelector('[data-caption].in [data-c="title"]')?.textContent.trim(),
+      sameSize: Math.round(a.width) === Math.round(b.width),
+      leftToRight: a.left < b.left,
+      centred: Math.abs((a.left + b.right) / 2 - innerWidth / 2) < 1,
     };
   });
-  assert.deepEqual(shape, { covers: 1, rows: 1, centred: true, wide: 425, caption: 'vers1ons' });
+  assert.deepEqual(shape, { covers: 2, order: ['W01', 'W02'], rows: 2, sameSize: true, leftToRight: true, centred: true });
   await ctx.close();
 });
 
