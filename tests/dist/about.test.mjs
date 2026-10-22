@@ -51,7 +51,7 @@ test('no placeholder copy; About is in the nav on every page', async () => {
   }
 });
 
-test('the name in the corner leads here; the homepage carries the résumé and Contact, small, bottom right', async () => {
+test('the name in the corner leads here; the homepage carries the resume and Contact, small, bottom right', async () => {
   for (const page of ['index.html', 'about/index.html', 'work/vers1ons/index.html']) {
     const html = await readFile(join(DIST, page), 'utf8');
     assert.match(html, /<a class="name[^"]*"[^>]*href="\/about"/, `the name doesn't lead to /about on ${page}`);
@@ -119,7 +119,7 @@ test('reduced motion: everything is in place at once, the meadow still', async (
   await ctx.close();
 });
 
-test('the résumé opens in a new tab and downloads; it is served as a PDF', async () => {
+test('the resume opens in a new tab and downloads; it is served as a PDF', async () => {
   const { ctx, page } = await open();
   const links = await page.evaluate(() =>
     [...document.querySelectorAll('[data-reach] a[href$=".pdf"]')].map((a) => ({ target: a.target, download: a.hasAttribute('download') })),

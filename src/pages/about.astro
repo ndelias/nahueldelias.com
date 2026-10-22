@@ -100,8 +100,8 @@ const LINKS = [
           <h2 class="reach-line" id="reach-title">Have an idea? Want to build something? Need a coffee? Let's talk.</h2>
           <ul class="links">
             <li class="pair">
-              <a href={RESUME} target="_blank" rel="noopener">Résumé <Icon name="arrow-up-right" /></a>
-              <a class="download" href={RESUME} download="Nahuel D'Elias résumé.pdf" aria-label="Download résumé (PDF)"><Icon name="download" /></a>
+              <a href={RESUME} target="_blank" rel="noopener">Resume <Icon name="arrow-up-right" /></a>
+              <a class="download" href={RESUME} download="Nahuel D'Elias resume.pdf" aria-label="Download resume (PDF)"><Icon name="download" /></a>
             </li>
             {LINKS.map((l) => (
               <li><a href={l.href} {...(l.href.startsWith('http') ? { target: '_blank', rel: 'noopener' } : {})}>{l.label} <Icon name="arrow-up-right" /></a></li>

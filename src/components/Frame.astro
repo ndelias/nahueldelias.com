@@ -6,12 +6,12 @@
 // Nav items render only once they have somewhere to go, the same rule as
 // sections: no dead links. The name leads to /about once it exists (else
 // home). On the homepage (`contact`), the bottom-right corner carries the
-// résumé (a new tab) and Contact (email), small.
+// resume (a new tab) and Contact (email), small.
 import Icon from './Icon.astro';
 import ThemeToggle from './ThemeToggle.astro';
 
 interface Props {
-  /** The résumé and Contact links in the bottom-right corner. */
+  /** The resume and Contact links in the bottom-right corner. */
   contact?: boolean;
 }
 const { contact = false } = Astro.props;
@@ -53,7 +53,7 @@ const bottom = Astro.slots.has('bottom-start') || Astro.slots.has('bottom-center
       {Astro.slots.has('bottom-center') && <div class="center"><slot name="bottom-center" /></div>}
       {contact && (
         <div class="contact">
-          <a href={RESUME} target="_blank" rel="noopener">Résumé <Icon name="arrow-up-right" /></a>
+          <a href={RESUME} target="_blank" rel="noopener">Resume <Icon name="arrow-up-right" /></a>
           <a href={CONTACT}>Contact <Icon name="arrow-up-right" /></a>
         </div>
       )}
