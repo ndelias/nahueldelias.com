@@ -67,7 +67,8 @@ const CAPTURES = {
   'home-dark-index': '?still=1&view=index&theme=dark',
 };
 
-// The site's committed baselines. `view` is the homepage view to show;
+// The site's committed baselines. `view` is /work's view to show (the
+// home-* names are from when it was the homepage);
 // `next` presses Next that many times first.
 const SITE = [
   { name: 'home-index-1440-light', viewport: DESKTOP, colorScheme: 'light', view: 'index' },
@@ -183,7 +184,8 @@ async function shoot(browser, origin, { viewport, colorScheme, view, next = 0, p
   // before anything is captured.
   await ctx.route('**/*.mp4', (route) => route.abort());
   const page = await ctx.newPage();
-  await page.goto(`${origin}${path ?? '/'}`, { waitUntil: 'load' });
+  // No path: the constellation, on /work (the homepage until About took /).
+  await page.goto(`${origin}${path ?? '/work/'}`, { waitUntil: 'load' });
   if (path) {
     await page.waitForFunction(
       () =>

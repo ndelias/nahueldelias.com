@@ -10,13 +10,15 @@ export default defineConfig({
   // page's HTML (the HTML budget).
   scopedStyleStrategy: 'class',
   integrations: [mdx()],
+  // About became the homepage: old links to /about land there.
+  redirects: { '/about': '/' },
   // Inline all CSS. It's a few KB per page, and a separate stylesheet would
   // put a render-blocking round trip in front of LCP. The default inlines
   // only under 4KB, a threshold the base styles already sit on.
   build: { inlineStylesheets: 'always' },
   vite: {
     build: {
-      // Inline the homepage constellation island into the page. Under
+      // Inline the constellation island (/work) into the page. Under
       // simulated 4G, every request that finishes before the largest paint
       // counts toward LCP; inlined, the island adds ~3.2KB gzip to the HTML
       // and no request (measured: LCP 1203ms as a file). Everything else

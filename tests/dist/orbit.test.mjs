@@ -1,8 +1,8 @@
-// The homepage constellation's behaviour (§7.5), in Chrome against the built
+// The constellation's behaviour on /work (§7.5), in Chrome against the built
 // site: what exists with and without JS or motion, the row, opening a
 // project (pointer, keyboard, tap), its parts, the caption, the video, the
 // (Index) switch and the LCP poster. Runs against dist-fixtures/, the build
-// with the fixture entries, so the row has eight projects (npm run
+// with the fixture entries, so the row has nine projects (npm run
 // build:fixtures). The shipped single project is in single.test.mjs.
 
 import { after, before, test } from 'node:test';
@@ -13,7 +13,7 @@ import { launch, serve } from '../../scripts/lib/browser.mjs';
 
 const DIST = join(resolve(import.meta.dirname, '../..'), 'dist-fixtures');
 const DESKTOP = { width: 1440, height: 900 };
-const N = 8; // fixture entries
+const N = 9; // fixture entries and the real ones
 const PARTS = ['W01.1', 'W01.2', 'W01.3', 'W01.4', 'W01.5'];
 
 let server;
@@ -34,7 +34,7 @@ let clip;
 async function recordClip() {
   const ctx = await browser.newContext();
   const page = await ctx.newPage();
-  await page.goto(server.origin + '/', { waitUntil: 'load' });
+  await page.goto(server.origin + '/work/', { waitUntil: 'load' });
   const b64 = await page.evaluate(async () => {
     const canvas = Object.assign(document.createElement('canvas'), { width: 64, height: 40 });
     const g = canvas.getContext('2d');
@@ -70,7 +70,7 @@ async function open(options = {}) {
     return route.fulfill({ status: 200, contentType: 'video/webm', body: clip });
   });
   const page = await ctx.newPage();
-  await page.goto(server.origin + '/', { waitUntil: 'load' });
+  await page.goto(server.origin + '/work/', { waitUntil: 'load' });
   return { ctx, page, videos };
 }
 
@@ -136,7 +136,7 @@ test('at rest: every project in one row, in order, on screen; parts tucked away 
 
 test('the first poster is preloaded and high priority; the rest wait for it', async () => {
   // Which element is the largest paint is checked on the shipped page
-  // (single.test.mjs): here eight posters share the row, each too small to
+  // (single.test.mjs): here nine posters share the row, each too small to
   // be sure of beating a line of text.
   const { ctx, page } = await open();
   const imgs = await page.evaluate(() =>
@@ -258,7 +258,7 @@ test('click: the first on a closed project opens it without leaving; on the open
   const { ctx, page } = await open();
   await page.locator('[data-orbit] .card.cover[data-no="W01"]').click();
   await page.waitForTimeout(1200);
-  assert.equal(new URL(page.url()).pathname, '/');
+  assert.equal(new URL(page.url()).pathname, '/work/');
   assert.deepEqual(await openParts(page), PARTS);
   await page.locator('[data-orbit] .card.cover[data-no="W01"]').click();
   await page.waitForURL('**/work/vers1ons/');
@@ -273,7 +273,7 @@ test('touch: a tap brings a part forward, a second tap opens it', async () => {
   const part = page.locator('[data-orbit] .card.part[data-no="W01.1"]');
   await part.tap({ force: true });
   await page.waitForTimeout(900);
-  assert.equal(new URL(page.url()).pathname, '/');
+  assert.equal(new URL(page.url()).pathname, '/work/');
   assert.match(await caption(page), /^W01\.1 · Part of vers1ons/i);
   await part.tap({ force: true });
   await page.waitForURL('**/work/vers1ons/design-system/');

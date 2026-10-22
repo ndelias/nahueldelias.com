@@ -1,12 +1,12 @@
 ---
 // The four-corner mono frame (§7.5), inset by --frame-inset, outside the grid.
 // Pages fill the other corners through slots: top-center, bottom-start and
-// bottom-center (the homepage puts the strip's controls there).
+// bottom-center (/work puts the strip's controls there).
 //
 // Nav items render only once they have somewhere to go, the same rule as
-// sections: no dead links. The name leads to /about once it exists (else
-// home). On the homepage (`contact`), the bottom-right corner carries the
-// resume (a new tab) and Contact (email), small.
+// sections: no dead links. The name leads home (/, the About page). On
+// /work (`contact`), the bottom-right corner carries the resume (a new tab)
+// and Contact (email), small.
 import Icon from './Icon.astro';
 import ThemeToggle from './ThemeToggle.astro';
 
@@ -23,19 +23,18 @@ const pages = Object.keys(import.meta.glob('../pages/**/*.astro'));
 const exists = (path: string) => path === '/' || pages.some((p) => p === `../pages${path}.astro` || p === `../pages${path}/index.astro`);
 
 const NAV = [
-  { label: 'Work', href: '/' },
-  { label: 'About', href: '/about' },
+  { label: 'Work', href: '/work' },
+  { label: 'About', href: '/' },
   { label: 'Log', href: '/log' },
 ].filter((item) => exists(item.href));
 
 const here = Astro.url.pathname.replace(/\/$/, '') || '/';
 const current = (href: string) => (href === here ? 'page' : undefined);
-const about = exists('/about') ? '/about' : '/';
 const bottom = Astro.slots.has('bottom-start') || Astro.slots.has('bottom-center');
 ---
 <div class="frame">
   <header class="corner top mono">
-    <a class="name" href={about} aria-current={current(about)}>Nahuel D'Elias<span class="role muted"> · Product engineer</span></a>
+    <a class="name" href="/" aria-current={current('/')}>Nahuel D'Elias<span class="role muted"> · Product engineer</span></a>
     {Astro.slots.has('top-center') && <div class="center"><slot name="top-center" /></div>}
     <div class="end">
       <nav aria-label="Primary">

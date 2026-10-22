@@ -315,13 +315,57 @@ function meadow(canvas: HTMLCanvasElement) {
     then = performance.now();
     requestAnimationFrame(tick);
   };
+  // The arrival: the first frame's pixels fly in from scattered points and
+  // settle into the scene, the middle first, then the edges, each pixel on
+  // its own short ease (about 1.5s in all). Only then does the scene move.
+  // Pixels not yet launched aren't drawn, so the scene fills in as they
+  // land. Under reduced motion the scene is simply there.
+  function assemble(done: () => void) {
+    const W = PW, H = PH, N = W * H;
+    const src = new Uint32Array(g.getImageData(0, 0, W, H).data.buffer.slice(0));
+    const sx = new Float32Array(N), sy = new Float32Array(N), delay = new Float32Array(N);
+    const cx = W / 2, cy = H / 2, far = Math.hypot(cx, cy);
+    for (let i = 0; i < N; i++) {
+      const x = i % W, y = (i / W) | 0;
+      sx[i] = Math.random() * W;
+      sy[i] = Math.random() * H;
+      delay[i] = Math.random() * 0.3 + (Math.hypot(x - cx, y - cy) / far) * 0.3;
+    }
+    const DUR = 0.9;
+    const out = g.createImageData(W, H), buf = new Uint32Array(out.data.buffer);
+    const t0 = performance.now();
+    const step = (now: number) => {
+      if (canvas.width !== W || canvas.height !== H) return done(); // resized: skip ahead
+      const t = (now - t0) / 1000;
+      buf.fill(0);
+      let landed = true;
+      for (let i = 0; i < N; i++) {
+        const k = (t - delay[i]) / DUR;
+        if (k < 1) landed = false;
+        if (k <= 0) continue;
+        const e = k >= 1 ? 1 : 1 - Math.pow(1 - k, 4);
+        const x = i % W, y = (i / W) | 0;
+        buf[Math.round(sy[i] + (y - sy[i]) * e) * W + Math.round(sx[i] + (x - sx[i]) * e)] = src[i];
+      }
+      g.putImageData(out, 0, 0);
+      if (landed) done();
+      else requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
   build();
   frame(0, 0);
-  canvas.dataset.ready = '';
-  new IntersectionObserver(([e]) => {
-    visible = e.isIntersecting;
-    if (visible) go();
-  }).observe(canvas);
+  const begin = () => {
+    canvas.dataset.ready = '';
+    start = performance.now();
+    new IntersectionObserver(([e]) => {
+      visible = e.isIntersecting;
+      if (visible) go();
+    }).observe(canvas);
+  };
+  if (reduce) begin();
+  else assemble(begin);
   if (reduce) addEventListener('scroll', () => frame(0, 0), { passive: true });
   addEventListener('resize', () => { build(); frame(0, 0); });
 }
@@ -451,29 +495,45 @@ function tree(root: HTMLElement, drawPortrait: (k: number) => void) {
 }
 
 /* ---------- The thread ----------
-   From the statement under the portrait down to the experience, along its
-   left side with a mark at each role, then back out to the middle, ending
-   in an arrow at the close. Drawn as you scroll; complete at the page end. */
+   From the statement under the portrait into My work, then down the
+   experience, along its left side with a mark at each role, then back out
+   to the middle, ending in an arrow at the close. Drawn as you scroll; complete at the page end. */
 function thread(svg: SVGSVGElement) {
   const box = svg.parentElement!;
   const statement = document.querySelector<HTMLElement>('[data-statement]')!.parentElement!;
+  const work = document.querySelector<HTMLElement>('[data-work]');
   const exp = document.querySelector<HTMLElement>('[data-exp]')!;
   const reach = document.querySelector<HTMLElement>('[data-reach]')!;
-  let path: SVGPathElement, len = 0, y0 = 0, y1 = 0, head: SVGPolylineElement;
+  // Two runs: the statement down into My work, then out of it, down the
+  // experience and on to the close. Each draws over its own stretch of page.
+  let runs: { p: SVGPathElement; len: number; y0: number; y1: number }[] = [];
+  let head: SVGPolylineElement;
   let marks: { m: SVGRectElement; y: number }[] = [];
 
   const layout = () => {
     const M = box.getBoundingClientRect(), S = statement.getBoundingClientRect(), E = exp.getBoundingClientRect(), R = reach.getBoundingClientRect();
+    const W = work?.getBoundingClientRect();
     const x0 = S.left + S.width / 2 - M.left, sy = S.bottom - M.top + 28;
     const x1 = E.left - M.left + 8, ey = E.top - M.top + 10, eb = E.bottom - M.top + 24;
     const x2 = R.left + R.width / 2 - M.left, end = R.top - M.top - 18;
     svg.replaceChildren();
-    path = document.createElementNS(SVG, 'path');
-    path.setAttribute('d', `M${x0},${sy} L${x0},${sy + 40} C${x0},${ey - 60} ${x1},${sy + 100} ${x1},${ey} L${x1},${eb} C${x1},${eb + 90} ${x2},${end - 110} ${x2},${end}`);
-    svg.append(path);
-    len = path.getTotalLength();
-    path.style.strokeDasharray = String(len);
-    y0 = sy; y1 = end;
+    const run = (d: string, y0: number, y1: number) => {
+      const p = document.createElementNS(SVG, 'path');
+      p.setAttribute('d', d);
+      svg.append(p);
+      const len = p.getTotalLength();
+      p.style.strokeDasharray = String(len);
+      runs.push({ p, len, y0, y1 });
+    };
+    runs = [];
+    // From the statement, or from the bottom of My work once it's passed.
+    let from = sy;
+    if (W) {
+      const wt = W.top - M.top - 20;
+      run(`M${x0},${sy} L${x0},${wt}`, sy, wt);
+      from = W.bottom - M.top + 20;
+    }
+    run(`M${x0},${from} L${x0},${from + 20} C${x0},${ey - 60} ${x1},${from + 80} ${x1},${ey} L${x1},${eb} C${x1},${eb + 90} ${x2},${end - 110} ${x2},${end}`, from, end);
     head = document.createElementNS(SVG, 'polyline');
     head.setAttribute('points', `${x2 - 6},${end - 7} ${x2},${end} ${x2 + 6},${end - 7}`);
     svg.append(head);
@@ -490,8 +550,11 @@ function thread(svg: SVGSVGElement) {
     const M = box.getBoundingClientRect();
     const atEnd = innerHeight + scrollY >= document.documentElement.scrollHeight - 4;
     const reached = reduce || atEnd ? Infinity : innerHeight * 0.8 - M.top;
-    const k = clamp((reached - y0) / (y1 - y0));
-    path.style.strokeDashoffset = String(len * (1 - k));
+    let k = 0;
+    for (const r of runs) {
+      k = clamp((reached - r.y0) / (r.y1 - r.y0));
+      r.p.style.strokeDashoffset = String(r.len * (1 - k));
+    }
     head.style.opacity = k >= 0.995 ? '' : '0';
     for (const { m, y } of marks) m.style.opacity = reached > y ? '1' : '0';
   };
@@ -500,6 +563,45 @@ function thread(svg: SVGSVGElement) {
   layout();
 }
 
+/* ---------- My work ----------
+   Pointing at a card (or focusing it) plays the project's recording over its
+   cover, muted and inline, as /work does; leaving stops it and drops its
+   source, so it stops downloading. Nothing loads until then, and nothing
+   plays under reduced motion. */
+function workCards(root: HTMLElement) {
+  if (reduce) return;
+  const video = document.createElement('video');
+  video.muted = true;
+  video.playsInline = true;
+  video.loop = true;
+  video.setAttribute('aria-hidden', 'true');
+  let on: HTMLElement | null = null;
+  const stop = () => {
+    video.pause();
+    video.removeAttribute('src');
+    video.load();
+    video.remove();
+    on = null;
+  };
+  video.addEventListener('error', () => video.hasAttribute('src') && stop());
+  const play = (card: HTMLElement) => {
+    if (on === card) return;
+    stop();
+    on = card;
+    video.src = card.dataset.video!;
+    card.querySelector('.cover')!.append(video);
+    video.play().catch(() => {});
+  };
+  for (const card of root.querySelectorAll<HTMLElement>('a[data-video]')) {
+    card.addEventListener('pointerenter', (e) => e.pointerType === 'mouse' && play(card));
+    card.addEventListener('pointerleave', (e) => e.pointerType === 'mouse' && on === card && stop());
+    card.addEventListener('focus', () => card.matches(':focus-visible') && play(card));
+    card.addEventListener('blur', () => on === card && stop());
+  }
+}
+
+const workEl = document.querySelector<HTMLElement>('[data-work]');
+if (workEl) workCards(workEl);
 const meadowEl = document.querySelector<HTMLCanvasElement>('[data-meadow]');
 if (meadowEl) meadow(meadowEl);
 document.fonts.ready.then(() => {

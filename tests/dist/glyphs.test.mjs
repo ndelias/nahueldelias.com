@@ -89,7 +89,9 @@ test('every character on every built page is in the font face that sets it', { t
   const families = new Map();
   for (const f of faces) families.set(f.family, [...(families.get(f.family) ?? []), f]);
 
-  const pages = await htmlPages(DIST);
+  // Redirect pages (/about → /) have nothing to set, and leave as they load.
+  const pages = [];
+  for (const file of await htmlPages(DIST)) if (!/http-equiv="refresh"/.test(await readFile(file, 'utf8'))) pages.push(file);
   assert.ok(pages.length > 0, 'No HTML pages in dist/.');
 
   const server = await serve(DIST);

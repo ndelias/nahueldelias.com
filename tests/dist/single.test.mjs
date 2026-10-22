@@ -1,5 +1,6 @@
-// The shipped homepage with its two real entries (dist/, no fixtures):
-// vers1ons (W01) and Vera (W02) side by side, nothing unbuilt in sight. The
+// The shipped /work page with its real entries (dist/, no fixtures):
+// vers1ons (W01), Vera (W02) and Bespoke (S01) side by side, nothing
+// unbuilt in sight. The
 // ring itself is tested against the fixture build in filmstrip.test.mjs.
 
 import { after, before, test } from 'node:test';
@@ -26,14 +27,16 @@ after(async () => {
 async function open() {
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
   const page = await ctx.newPage();
-  await page.goto(server.origin + '/', { waitUntil: 'load' });
+  await page.goto(server.origin + '/work/', { waitUntil: 'load' });
   return { ctx, page };
 }
 
 test('no fixture is built or linked', async () => {
   assert.equal(existsSync(join(DIST, 'work/blast-radius')), false);
-  const html = await readFile(join(DIST, 'index.html'), 'utf8');
-  for (const placeholder of ['Blast Radius', '[Role]', '[One line.]', 'Fixture']) assert.ok(!html.includes(placeholder), `"${placeholder}" on /`);
+  for (const page of ['index.html', 'work/index.html']) {
+    const html = await readFile(join(DIST, page), 'utf8');
+    for (const placeholder of ['Blast Radius', '[Role]', '[One line.]', 'Fixture']) assert.ok(!html.includes(placeholder), `"${placeholder}" on ${page}`);
+  }
   for (const page of ['work/vers1ons/index.html', 'work/vera/index.html']) {
     const html = await readFile(join(DIST, page), 'utf8');
     for (const placeholder of ['[Role]', '[One line.]', 'Fixture']) assert.ok(!html.includes(placeholder), `"${placeholder}" on ${page}`);
@@ -42,22 +45,23 @@ test('no fixture is built or linked', async () => {
   assert.ok(/class="next[^>]*>[\s\S]*?href="\/work\/vera\/"/.test(hub) || hub.includes('href="/work/vera/"'), 'the vers1ons hub does not lead on to Vera');
 });
 
-test('vers1ons and Vera side by side, the same size, in order; two Index rows', async () => {
+test('vers1ons, Vera and Bespoke side by side, the same size, in order; three Index rows', async () => {
   const { ctx, page } = await open();
   await page.waitForTimeout(300);
   const shape = await page.evaluate(() => {
     const covers = [...document.querySelectorAll('[data-orbit] .card.cover')];
-    const [a, b] = covers.map((c) => c.getBoundingClientRect());
+    const r = covers.map((c) => c.getBoundingClientRect());
     return {
       covers: covers.length,
       order: covers.map((c) => c.dataset.no),
       rows: document.querySelectorAll('[data-row]').length,
-      sameSize: Math.round(a.width) === Math.round(b.width),
-      leftToRight: a.left < b.left,
-      centred: Math.abs((a.left + b.right) / 2 - innerWidth / 2) < 1,
+      // The outer two turn toward the middle by the same amount.
+      sameSize: Math.abs(r[0].width - r.at(-1).width) < 1,
+      leftToRight: r.every((x, i) => !i || r[i - 1].left < x.left),
+      centred: Math.abs((r[0].left + r.at(-1).right) / 2 - innerWidth / 2) < 1,
     };
   });
-  assert.deepEqual(shape, { covers: 2, order: ['W01', 'W02'], rows: 2, sameSize: true, leftToRight: true, centred: true });
+  assert.deepEqual(shape, { covers: 3, order: ['W01', 'W02', 'S01'], rows: 3, sameSize: true, leftToRight: true, centred: true });
   await ctx.close();
 });
 

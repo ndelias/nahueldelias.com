@@ -256,8 +256,9 @@ test("parts: they don't count toward the weight 1 cap and are never a homepage e
   });
   try {
     assert.equal(result.code, 0, `Two hubs plus parts should build:\n${result.output}`);
-    const home = await result.read('index.html');
-    assert.ok(home.includes('The hub'), 'the hub is on the homepage');
+    // The projects' page (/work, the homepage until About took /).
+    const home = await result.read('work/index.html');
+    assert.ok(home.includes('The hub'), 'the hub is on /work');
     // Only as links under their hub: no frame, meta or Index row of their own.
     const own = (html, attr) => (html.match(new RegExp(`<[^>]+${attr}[ >=]`, 'g')) ?? []).length;
     assert.equal(own(home, 'data-project'), 2, 'a part is a project of its own on the homepage');
