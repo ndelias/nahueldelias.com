@@ -1,0 +1,47 @@
+---
+// /work (§7.5, the homepage until About took /): every project, as the
+// constellation. Server-rendered: the frame, the constellation in its first
+// state (the projects in a row) and the (Index) list. Without JS or with
+// reduced motion, the Index list is the whole page; otherwise the
+// constellation island runs, and (Index) switches to the list.
+import Constellation from '../../components/Constellation.astro';
+import Frame from '../../components/Frame.astro';
+import IndexList from '../../components/IndexList.astro';
+import ViewToggle from '../../components/ViewToggle.astro';
+import Base from '../../layouts/Base.astro';
+import { homepageEntries } from '../../lib/entries';
+import { posterOf } from '../../lib/posters';
+
+// The W01 poster is the LCP element: preload the AVIF the constellation
+// will pick, only where it shows (JS on, no reduced motion). Every visit
+// lands in light, so it's the light poster.
+const lcp = await posterOf(homepageEntries()[0]);
+const STRIP = '(scripting: enabled) and (prefers-reduced-motion: no-preference)';
+const preloads = [lcp.light.avif ? { imagesrcset: lcp.light.avif, type: 'image/avif', media: STRIP } : { href: lcp.light.src, media: STRIP }];
+---
+<Base title="Work — Nahuel D'Elias" description="Work by Nahuel D'Elias, a product engineer: vers1ons, Vera and Bespoke." preload={['sans-400', 'sans-500', 'mono-400']}>
+  {preloads.map((attrs) => <link slot="head" rel="preload" as="image" fetchpriority="high" {...attrs} />)}
+  <Frame contact>
+    <ViewToggle slot="top-center" />
+    <main>
+      <h1 class="visually-hidden">Nahuel D'Elias, product engineer: work</h1>
+      <Constellation />
+      <div class="home-index" data-home-index>
+        <IndexList />
+      </div>
+    </main>
+  </Frame>
+</Base>
+
+<style>
+  .home-index {
+    /* The page is a single frame: content aligns to the frame inset, not
+       the grid margin (§7.5). The list starts 150px down, as in the mock. */
+    padding: 150px var(--frame-inset) var(--space-96);
+  }
+  @media (max-width: 639.98px) {
+    .home-index {
+      padding-top: var(--space-32);
+    }
+  }
+</style>

@@ -38,7 +38,7 @@ const heroMeta = hero?.video ? ['Walkthrough', 'muted', hero.duration].filter(Bo
 <Base title={`${data.title} — Nahuel D'Elias`} description={data.tagline} noindex={data.fixture} preload={['sans-400', 'sans-500']}>
   <DeferredStyles slot="head" />
   <Frame>
-    <a slot="top-center" class="back" href="/">(<Icon name="arrow-left" /> Index)</a>
+    <a slot="top-center" class="back" href="/work">(<Icon name="arrow-left" /> Index)</a>
     <main class:list={['case container', { hub: isHub }]}>
       {/* A hub carries its parts' row on top, as each part does. */}
       {isHub && <PartsNav hub={entry} />}
@@ -81,7 +81,7 @@ const heroMeta = hero?.video ? ['Walkthrough', 'muted', hero.duration].filter(Bo
     {updated && (
       <span slot="bottom-start" class="muted">Updated <time datetime={updated.toISOString().slice(0, 10)}>{updated.toISOString().slice(0, 10)}</time></span>
     )}
-    <a slot="bottom-center" class="back" href="/">(<Icon name="arrow-left" /> Index)</a>
+    <a slot="bottom-center" class="back" href="/work">(<Icon name="arrow-left" /> Index)</a>
   </Frame>
 </Base>
 

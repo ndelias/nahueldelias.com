@@ -13,7 +13,7 @@ const { join } = require('node:path');
 const DIST = join(__dirname, 'dist');
 // The pages the budget is measured on. A page that isn't built yet (the part
 // template before it exists) is left out rather than failing on a 404.
-const PAGES = ['/', '/about/', '/work/vers1ons/', '/work/vera/', '/work/vers1ons/distribution/', '/work/vers1ons/licensing/', '/studies/bespoke/'];
+const PAGES = ['/', '/work/', '/work/vers1ons/', '/work/vera/', '/work/vers1ons/distribution/', '/work/vers1ons/licensing/', '/studies/bespoke/'];
 
 const file = (url) => join(DIST, url, 'index.html');
 const built = PAGES.filter((url) => existsSync(file(url)));
