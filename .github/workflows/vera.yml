@@ -1,0 +1,27 @@
+# Vera reviews each pull request here and keeps one comment up to date:
+# which areas it touches, whether it makes a design decision, and who
+# should look. It reads only; it never approves, blocks or runs the code.
+# https://github.com/ndelias/vera
+name: Vera review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: vera-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: ndelias/vera@v0.1.0
+        with:
+          anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
