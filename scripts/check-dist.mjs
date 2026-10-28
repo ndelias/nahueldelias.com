@@ -33,12 +33,14 @@ const toUrlPath = (file) => '/' + relative(DIST, file).split(sep).join('/');
 const files = new Set((await walk(DIST)).map(toUrlPath));
 const pages = [...files].filter((f) => f.endsWith('.html'));
 
-const ATTR = /\s(?:src|href|data-src|data-video|data-[\w-]*-url|poster|content)\s*=\s*["']([^"']+)["']/gi;
+// component-url and friends: the code an Astro island hydrates with.
+const ATTR = /\s(?:src|href|data-src|data-video|data-[\w-]*-url|component-url|renderer-url|before-hydration-url|poster|content)\s*=\s*["']([^"']+)["']/gi;
 // Files listed in a JSON file a page fetches (a gallery's screens.json).
 const JSON_URL = /"(?:full|src)":"([^"]+)"/g;
 const SRCSET = /\s(?:srcset|data-srcset|imagesrcset)\s*=\s*["']([^"']+)["']/gi;
 const CSS_URL = /url\(\s*["']?([^"')]+)["']?\s*\)/gi;
-const IMPORT = /(?:\bimport\s*\(\s*|(?:^|[;\s}])(?:import|export)\s*(?:[\w$*{}\s,]*?\bfrom\s*)?)["']([^"']+)["']/g;
+// Quotes or backticks: Preact's island loader imports \`./signals…\` on demand.
+const IMPORT = /(?:\bimport\s*\(\s*|(?:^|[;\s}])(?:import|export)\s*(?:[\w$*{}\s,]*?\bfrom\s*)?)["'`]([^"'`]+)["'`]/g;
 // Scripts added after load (AfterLoad.astro): their URL is a string literal.
 const AFTER_LOAD = /\bsrc = "(\/_astro\/[^"]+\.js)"/g;
 

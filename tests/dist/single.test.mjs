@@ -76,14 +76,14 @@ test('arrow keys on the page have nothing to do, and leave it alone', async () =
   await ctx.close();
 });
 
-test('resting on vers1ons opens its five parts around it', async () => {
+test('resting on vers1ons opens its five parts around it, and its money page', async () => {
   const { ctx, page } = await open();
   await page.hover('[data-orbit] .card.cover');
   await page.waitForTimeout(1600);
   const parts = await page.evaluate(() =>
     [...document.querySelectorAll('[data-orbit] .card.part')].filter((p) => Number(getComputedStyle(p).opacity) > 0.5).map((p) => p.dataset.no),
   );
-  assert.deepEqual(parts, ['W01.1', 'W01.2', 'W01.3', 'W01.4', 'W01.5']);
+  assert.deepEqual(parts, ['W01.1', 'W01.2', 'W01.3', 'W01.4', 'W01.5', 'W01.$']);
   await ctx.close();
 });
 

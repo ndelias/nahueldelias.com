@@ -1,0 +1,606 @@
+---
+// /work/vers1ons/money: the money side of vers1ons, end to end, laid out
+// like a finance app. Who gets paid from one license sale (MoneyMap), one
+// purchase in the ledger as a working model (LedgerSim), the guarantees
+// that keep the ledger exact, how contributors without accounts get paid, the
+// rules Drops purchases keep, and how it was built.
+//
+// The two islands are Preact + Framer Motion, hydrated as they scroll into
+// view (about 40KB, this page only). Everything else is server-rendered,
+// and the page reads in full without JS.
+//
+// Copy drafted with Nahuel from his account and the vers1ons case studies;
+// bracketed text is waiting on him.
+import Frame from '../../../components/Frame.astro';
+import Icon from '../../../components/Icon.astro';
+import LedgerSim from '../../../components/money/LedgerSim';
+import MoneyMap from '../../../components/money/MoneyMap';
+import Base from '../../../layouts/Base.astro';
+
+const PAYEES = [
+  { side: 'Recording', who: 'The artist and contributors', note: 'Shares come from the signed split sheet, and the recording adds to 100%.', pill: 'Paid directly', tone: 'paid' as const },
+  { side: 'Composition', who: 'Writers and publishers', note: "The composition adds to 100% too. A publisher takes a cut of their writer's share.", pill: 'Paid directly', tone: 'paid' as const },
+  { side: 'No account yet', who: 'Credited contributors', note: 'Their share is held until they claim it. An hourly sweep pays anything still held once they can be paid.', pill: 'Held', tone: 'held' as const },
+  { side: 'Platform', who: 'vers1ons', note: 'A fee added at checkout, and a percentage of the royalties once a remix earns.', pill: 'Fee', tone: 'fee' as const },
+];
+
+const GUARANTEES = [
+  { title: 'Append-only', body: 'Grants, spends and reversals are only ever added, never edited. The balance is their sum, in signed cents.' },
+  { title: 'Locks in a set order', body: 'A sum has no row to lock, so every write that can lower a balance locks the owner first, always in the same documented order.' },
+  { title: 'The database says no', body: "Partial unique indexes make a second spend or a second reversal of the same sale impossible, not just unlikely. A spend records the pool it came from, so a sibling profile can't spend the same money again." },
+  { title: 'Credit first', body: "Credit is taken before the card is charged. If taking it fails, the card isn't charged at all, and a declined card doesn't take the credit twice." },
+  { title: 'Settles from an event', body: "A sale settles from a deterministic event instead of waiting on a webhook. A card sale settles from Stripe's event, and a sale paid only with credit settles as its own." },
+  { title: 'Reconciled every 15 minutes', body: 'A reconcile job runs every 15 minutes and settles anything an event missed.' },
+  { title: 'Clean reversals', body: 'A sale that dies before settling hands back the exact credit, to the pool it came from, in the same transaction that cancels it.' },
+  { title: 'Replay-audited', body: 'I replayed every side effect of settlement to check each one happens once. That is how I found and fixed a missing duplicate guard.' },
+];
+
+const CLAIM = [
+  { step: 'Sale', body: 'A license sells, and a credited contributor, on the recording or the composition, has no account yet.' },
+  { step: 'Held', body: 'Their share is held for them, against the email they were credited under.' },
+  { step: 'Claim link', body: 'They get a claim link by email.' },
+  { step: 'Verify', body: 'They verify twice, with a code sent to that email and a code by text message.' },
+  { step: 'Paid', body: 'They claim into their own Stripe account, and the held money follows.' },
+];
+
+const STACK = ['Next.js', 'React', 'TypeScript', 'Tailwind', 'shadcn/Radix', 'Framer Motion', 'tRPC', 'Postgres', 'Drizzle', 'Inngest', 'Stripe Connect'];
+---
+<Base title="Money at vers1ons — Nahuel D'Elias" description="How money moves through vers1ons: one checkout that pays everyone, a credit ledger that can't spend twice, and payouts for contributors without accounts." preload={['sans-400', 'sans-500', 'mono-400']}>
+  <Frame>
+    <a slot="top-center" class="back" href="/work/vers1ons/">(<Icon name="arrow-left" /> vers1ons)</a>
+    <main class="money container">
+      <header class="head">
+        <p class="kicker mono muted">W01 · vers1ons · Money</p>
+        <h1>How money moves through vers1ons</h1>
+        <p class="lead">One license sale on vers1ons pays several people at once, from a single checkout. I built the credit ledger and how it settles, and I led getting every contributor paid. This is the money side, end to end.</p>
+      </header>
+
+      <dl class="statement">
+        <div><dt class="eyebrow">Role</dt><dd>Product engineer. The credit ledger, its settlement and the admin page are mine. I extended the Stripe settlement pipeline.</dd></div>
+        <div><dt class="eyebrow">Built</dt><dd class="num">Credit and split checkout in 4 days, solo. Contributor payouts in 2.5 weeks, about 18 PRs.</dd></div>
+        <div><dt class="eyebrow">Team</dt><dd>Under 10 people</dd></div>
+        <div><dt class="eyebrow">Status</dt><dd><span class="pill paid">Live</span></dd></div>
+      </dl>
+
+      <section class="block" aria-labelledby="who">
+        <h2 id="who">Everyone who gets paid</h2>
+        <p class="intro">Every sale is split the way the license says, so the money can't disagree with it. vers1ons pays each person their share directly, instead of paying the artist a lump sum to split by hand.</p>
+        <MoneyMap client:visible payees={PAYEES} />
+      </section>
+
+      <section class="block" aria-labelledby="ledger">
+        <h2 id="ledger">One purchase, in the ledger</h2>
+        <p class="intro">Credit is a spendable balance in a buyer's Wallet. An admin can grant it, even before someone signs up, which is how prize and giveaway licenses became real transactions. At checkout it pays for all of a license or part of it, and a card pays the rest. Try it.</p>
+        <LedgerSim client:visible />
+        <p class="note small muted">Example amounts. The real ledger stores signed cents.</p>
+      </section>
+
+      <section class="block" aria-labelledby="exact">
+        <h2 id="exact">Why it can't spend twice</h2>
+        <p class="intro">A money product can't be mostly right. These are the rules that keep the ledger exact, and each one is enforced by the code or the database, not by hoping.</p>
+        <ol class="guarantees">
+          {GUARANTEES.map((g, i) => (
+            <li class="card">
+              <p class="eyebrow num">{String(i + 1).padStart(2, '0')}</p>
+              <p class="g-title">{g.title}</p>
+              <p class="small muted">{g.body}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section class="block" aria-labelledby="claim">
+        <h2 id="claim">Getting every contributor paid</h2>
+        <p class="intro">When a license sells, credited contributors who don't have an account still get their share, on the recording side and the composition side alike. I wrote the PRD and led it, including protection against account takeover.</p>
+        <ol class="timeline">
+          {CLAIM.map((c, i) => (
+            <li>
+              <span class="dot" aria-hidden="true"></span>
+              <p class="eyebrow num">{String(i + 1).padStart(2, '0')} · {c.step}</p>
+              <p class="small">{c.body}</p>
+            </li>
+          ))}
+        </ol>
+        <ul class="facts-list small muted">
+          <li>A wrong email can be fixed, and the held money moves with it.</li>
+          <li>If someone says it wasn't meant for them, the money is frozen and the uploader is told.</li>
+          <li>Payout setup is checked on the server everywhere money moves.</li>
+        </ul>
+      </section>
+
+      <section class="block" aria-labelledby="drops">
+        <h2 id="drops">Drops, with rules the server keeps</h2>
+        <p class="intro">Drops are time-boxed remix contests. In a drop, the license is the entry fee, and the artist is paid for every license sold, whoever wins.</p>
+        <ul class="rules">
+          <li class="card"><p class="g-title">The window</p><p class="small muted">The purchase window is enforced on the server, not just in the page.</p></li>
+          <li class="card"><p class="g-title">One entry each</p><p class="small muted">One live submission per buyer, enforced in the database.</p></li>
+          <li class="card"><p class="g-title">Terms frozen</p><p class="small muted">Release terms are frozen at the moment of purchase, so a buyer's deal can't change underneath them.</p></li>
+        </ul>
+      </section>
+
+      <section class="block" aria-labelledby="built">
+        <h2 id="built">Built to the same standard</h2>
+        <ul class="rules">
+          <li class="card"><p class="g-title">On phones</p><p class="small muted">An 8-PR mobile overhaul over 9 days brought the whole app to phones, purchase flow included.</p></li>
+          <li class="card"><p class="g-title">One design system</p><p class="small muted">Checkout uses the design system I led a redesign of. 40 of 54 primitives restyled, 25+ reusable components, and a CI lint check that keeps new screens consistent.</p></li>
+          <li class="card"><p class="g-title">Accessibility <span class="pill held">In progress</span></p><p class="small muted">I'm auditing the app against accessibility standards and building a Claude Code skill to bring every screen up to them.</p></li>
+        </ul>
+        <p class="stack mono muted">{STACK.join(' · ')}</p>
+        <p class="small muted">The motion on this page uses Framer Motion, as the vers1ons app does.</p>
+      </section>
+
+      <nav class="more" aria-label="More on vers1ons">
+        <a href="/work/vers1ons/wallet-payouts/">Wallet &amp; payouts <Icon name="arrow-right" /></a>
+        <a href="/work/vers1ons/purchasing/">Purchasing <Icon name="arrow-right" /></a>
+        <a href="/work/vers1ons/">vers1ons <Icon name="arrow-right" /></a>
+      </nav>
+    </main>
+  </Frame>
+</Base>
+
+<style>
+  /* A finance app's grammar on the site's tokens: statements, cards and
+     pills; amounts in mono with tabular digits; money in green, refusals in
+     red. The islands' markup isn't scoped, so their rules sit under
+     .money :global(...). */
+  .money {
+    padding-top: 112px;
+    padding-bottom: var(--space-160);
+  }
+  .back {
+    color: inherit;
+    text-decoration: none;
+  }
+  .back:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .head {
+    max-width: 52rem;
+  }
+  .kicker {
+    margin: 0;
+    font-size: var(--text-mono);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+  }
+  h1 {
+    margin: var(--space-16) 0 0;
+    font-size: var(--text-display);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-display);
+    letter-spacing: var(--tracking-display);
+    text-wrap: balance;
+  }
+  .lead {
+    margin: var(--space-24) 0 0;
+    max-width: 44rem;
+    font-size: var(--text-lead);
+    line-height: var(--leading-lead);
+  }
+  .money :global(.eyebrow) {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-mono);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .money :global(.num) {
+    font-variant-numeric: tabular-nums;
+  }
+  .money :global(.small) {
+    margin: 0;
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+  }
+  .money :global(.muted) {
+    color: var(--muted);
+  }
+  .money :global(.card),
+  .money :global(.node),
+  .money :global(.payee) {
+    padding: var(--space-24);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface);
+  }
+  .money :global(.pill) {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: var(--text-mono);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    vertical-align: middle;
+    border: 1px solid currentColor;
+  }
+  .money :global(.pill.paid),
+  .money :global(.pill.settled) {
+    color: var(--money);
+  }
+  .money :global(.pill.held),
+  .money :global(.pill.pending),
+  .money :global(.pill.fee) {
+    color: var(--muted);
+  }
+  .money :global(.pill.reversed) {
+    color: var(--warn);
+  }
+
+  /* The statement: the header's facts as an account summary. */
+  .statement {
+    display: grid;
+    grid-template-columns: 2fr 2fr 1fr 1fr;
+    gap: var(--space-24);
+    margin: var(--space-48) 0 0;
+    padding: var(--space-24) 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .statement dd {
+    margin: var(--space-8) 0 0;
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+  }
+
+  .block {
+    margin-top: var(--space-160);
+  }
+  .block h2 {
+    margin: 0;
+    font-size: var(--text-h2);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-h2);
+    letter-spacing: var(--tracking-h2);
+  }
+  .intro {
+    margin: var(--space-16) 0 var(--space-48);
+    max-width: 44rem;
+    color: var(--muted);
+    line-height: var(--leading-body);
+  }
+  .note {
+    margin-top: var(--space-16);
+  }
+  .money :global(.node-title),
+  .g-title {
+    margin: var(--space-8) 0 var(--space-4);
+    font-size: var(--text-lead);
+    font-weight: var(--weight-medium);
+    letter-spacing: -0.01em;
+  }
+
+  /* The map: a lane of steps, a fan into the payees, a second lane. */
+  .money :global(.map ol),
+  .money :global(.map ul) {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .money :global(.lane) {
+    display: grid;
+    grid-template-columns: 1fr 48px 1fr 48px 1fr;
+    align-items: center;
+  }
+  .money :global(.link) {
+    position: relative;
+    height: 1px;
+    background: var(--line);
+  }
+  .money :global(.fan) {
+    position: relative;
+    width: 1px;
+    height: 56px;
+    margin: 0 auto;
+    background: var(--line);
+  }
+  .money :global(.coin) {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    margin: -4px 0 0 -4px;
+    border-radius: 50%;
+    background: var(--money);
+  }
+  .money :global(.fan .coin) {
+    left: 50%;
+    margin: -4px 0 0 -4px;
+  }
+  .money :global(.payees) {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--grid-gutter);
+  }
+  .money :global(.payee-top) {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-8);
+  }
+  .money :global(.payee.held) {
+    border-style: dashed;
+  }
+  .money :global(.lane-label) {
+    margin: var(--space-64) 0 var(--space-16);
+  }
+
+  /* The ledger model. */
+  .money :global(.sim-controls) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-8);
+    margin-bottom: var(--space-16);
+  }
+  .money :global(.chip),
+  .money :global(.btn) {
+    min-height: 40px;
+    padding: 0 var(--space-16);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--bg);
+    color: var(--ink);
+    font: inherit;
+    font-size: var(--text-small);
+    cursor: pointer;
+  }
+  .money :global(.chip[aria-pressed='true']) {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--bg);
+  }
+  .money :global(.btn.primary) {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--bg);
+  }
+  .money :global(.btn.ghost) {
+    border-color: transparent;
+    color: var(--muted);
+  }
+  .money :global(.chip:disabled),
+  .money :global(.btn:disabled) {
+    opacity: 0.4;
+    cursor: default;
+  }
+  .money :global(.chip:focus-visible),
+  .money :global(.btn:focus-visible),
+  .money a:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-offset);
+  }
+  .money :global(.sim-grid) {
+    display: grid;
+    grid-template-columns: 5fr 7fr;
+    grid-template-areas: 'balance ledger' 'log ledger';
+    gap: var(--grid-gutter);
+    align-items: start;
+  }
+  .money :global(.balance) {
+    grid-area: balance;
+  }
+  .money :global(.ledger) {
+    grid-area: ledger;
+  }
+  .money :global(.log) {
+    grid-area: log;
+  }
+  .money :global(.big) {
+    margin: var(--space-8) 0;
+    font-size: var(--text-h2);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-h2);
+  }
+  .money :global(.mini) {
+    margin: var(--space-16) 0;
+    padding: var(--space-12) 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .money :global(.mini div) {
+    display: flex;
+    justify-content: space-between;
+    padding: 2px 0;
+    font-size: var(--text-small);
+  }
+  .money :global(.mini dt) {
+    color: var(--muted);
+  }
+  .money :global(.mini dd) {
+    margin: 0;
+  }
+  .money :global(.actions) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-8);
+  }
+  .money :global(.ledger table) {
+    width: 100%;
+    margin-top: var(--space-12);
+    border-collapse: collapse;
+    font-size: var(--text-small);
+  }
+  .money :global(.ledger th) {
+    padding: var(--space-8) 0;
+    border-bottom: 1px solid var(--line);
+    font-family: var(--font-mono);
+    font-size: var(--text-mono);
+    font-weight: var(--weight-regular);
+    letter-spacing: var(--tracking-mono);
+    text-align: left;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .money :global(.ledger td) {
+    padding: var(--space-12) 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .money :global(.ledger .r) {
+    text-align: right;
+  }
+  .money :global(.ledger tfoot td),
+  .money :global(.ledger tfoot th) {
+    border-bottom: 0;
+    padding-top: var(--space-12);
+    font-weight: var(--weight-medium);
+  }
+  .money :global(.num.pos) {
+    color: var(--money);
+  }
+  .money :global(.num.neg) {
+    color: var(--ink);
+  }
+  .money :global(.empty) {
+    padding: var(--space-24) 0;
+  }
+  .money :global(.log ol) {
+    display: grid;
+    gap: var(--space-8);
+    margin: var(--space-12) 0 0;
+    padding: 0 0 0 var(--space-16);
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+  }
+  .money :global(.log li.ok) {
+    color: var(--money);
+  }
+  .money :global(.log li.no) {
+    color: var(--warn);
+  }
+  .money :global(.reconcile) {
+    margin-top: var(--space-16);
+    padding-top: var(--space-12);
+    border-top: 1px solid var(--line);
+  }
+
+  /* Guarantees, timeline, rules. */
+  .guarantees,
+  .rules {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--grid-gutter);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .rules {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .timeline {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--grid-gutter);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--line);
+  }
+  .timeline li {
+    position: relative;
+    padding-top: var(--space-24);
+  }
+  .timeline .dot {
+    position: absolute;
+    top: -5px;
+    left: 0;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--money);
+  }
+  .money .timeline .small {
+    margin-top: var(--space-8);
+  }
+  .money .facts-list {
+    margin: var(--space-32) 0 0;
+    padding-left: var(--space-16);
+    display: grid;
+    gap: var(--space-4);
+  }
+  .stack {
+    margin: var(--space-32) 0 var(--space-8);
+    font-size: var(--text-mono);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+  }
+  .more {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-12) var(--space-32);
+    margin-top: var(--space-160);
+    padding-top: var(--space-24);
+    border-top: 1px solid var(--line);
+  }
+  .more a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-8);
+    min-height: 44px;
+    color: var(--ink);
+    font-weight: var(--weight-medium);
+    text-decoration: none;
+  }
+  .more a:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  @media (max-width: 899.98px) {
+    .statement {
+      grid-template-columns: 1fr 1fr;
+    }
+    .guarantees {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .money :global(.payees) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .money :global(.sim-grid) {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas: 'balance' 'ledger' 'log';
+    }
+  }
+  @media (max-width: 639.98px) {
+    /* A 44px target, as on the other case pages. */
+    .back {
+      display: inline-block;
+      line-height: 44px;
+    }
+    .money {
+      padding-top: var(--space-32);
+    }
+    .statement,
+    .guarantees,
+    .rules,
+    .timeline,
+    .money :global(.payees) {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .money :global(.lane) {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .money :global(.link) {
+      width: 1px;
+      height: 32px;
+      margin: 0 auto;
+    }
+    /* Stacked, a lane's links run down: no coin across them. */
+    .money :global(.link .coin) {
+      display: none;
+    }
+    .timeline {
+      border-top: 0;
+      border-left: 1px solid var(--line);
+      padding-left: var(--space-24);
+      gap: var(--space-24);
+    }
+    .timeline li {
+      padding-top: 0;
+    }
+    .timeline .dot {
+      top: 4px;
+      left: calc(-1 * var(--space-24) - 5px);
+    }
+  }
+</style>
