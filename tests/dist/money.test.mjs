@@ -104,6 +104,15 @@ test('credit alone: no charge to wait for, the sale settles as its own event', a
   await ctx.close();
 });
 
+test('the hub features it in a card above the parts', async () => {
+  const html = await readFile(join(DIST, 'work/vers1ons/index.html'), 'utf8');
+  const card = html.match(/<a class="feature[^"]*" href="([^"]+)"[\s\S]*?<\/a>/);
+  assert.ok(card, 'no featured card on the hub');
+  assert.equal(card[1], PATH);
+  assert.match(card[0], /How money moves through vers1ons/);
+  assert.ok(html.indexOf('class="feature') < html.indexOf('class="parts defer'), 'the card is not above the parts');
+});
+
 test('the hub and Wallet & payouts link here', async () => {
   for (const page of ['work/vers1ons/index.html', 'work/vers1ons/wallet-payouts/index.html']) {
     const html = await readFile(join(DIST, page), 'utf8');

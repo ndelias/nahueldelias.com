@@ -154,6 +154,11 @@ const entrySchema = ({ image }: SchemaContext) => {
       // Shown at the end of the page: whose artwork it is, what's fictional,
       // what's staged. Required wording lives with the content, not the template.
       disclaimer: z.string().min(1).optional(),
+      // A page of its own beyond the parts, featured on a hub above them
+      // (vers1ons' money page): a card with a label, title and line.
+      feature: z
+        .object({ label: z.string().min(1), title: z.string().min(1), line: z.string().min(1), href: z.string().startsWith('/') })
+        .optional(),
       // Slug of the hub entry. Set on parts (vers1ons/licensing…), which live
       // in the hub's folder: src/content/work/vers1ons/licensing.mdx.
       parent: z.string().min(1).optional(),
