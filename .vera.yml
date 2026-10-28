@@ -1,0 +1,30 @@
+# Who owns what in the portfolio, for Vera's reviews (https://github.com/ndelias/vera).
+
+lead: "@ndelias"
+
+areas:
+  # Broad areas first: as in CODEOWNERS, the last area whose paths match a file wins.
+  - name: Build and checks
+    description: CI, performance budgets, screenshot tests and deployment
+    paths: [".github/", "scripts/", "tests/", "lighthouserc.cjs", "astro.config.mjs", "vercel.json", "package.json", "package-lock.json"]
+  - name: Case studies
+    description: Project and study pages, their content and the components they're built from
+    paths: ["src/content/work/", "src/content/studies/", "src/pages/work/", "src/pages/studies/", "src/components/", "src/lib/entries.ts", "src/lib/essays.ts", "src/lib/model.ts", "src/lib/viewer.ts"]
+  - name: Media
+    description: Images, videos and posters, and the scripts that import and check them
+    paths: ["media/", "public/", "src/assets/", "scripts/import-media.mjs", "scripts/og-image.mjs", "scripts/portrait.mjs"]
+  - name: Design system
+    description: Tokens, base styles, fonts and the tokens page
+    paths: ["src/styles/", "src/pages/[tokens].astro", "src/layouts/", "scripts/subset-fonts.py", "scripts/font-metrics.mjs"]
+  - name: Homepage
+    description: The landing page and its constellation of project cards
+    paths: ["src/pages/index.astro", "src/components/Constellation.astro", "src/lib/orbit.ts", "src/lib/posters.ts"]
+  - name: Docs and log
+    description: The working rules, the design docs and the build log
+    paths: ["CLAUDE.md", "docs/", "src/content/log/", ".vera.yml"]
+
+people:
+  - { handle: "@ndelias", role: engineer, areas: [Homepage, Case studies, Media, Design system, Build and checks, Docs and log] }
+  - { handle: "@ndelias", role: design, areas: [Homepage, Case studies, Design system, Media] }
+  - { handle: "@ndelias", role: product, areas: [Homepage, Case studies] }
+  - { handle: "@ndelias", role: docs, areas: [Docs and log, Case studies] }
