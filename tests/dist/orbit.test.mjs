@@ -14,8 +14,8 @@ import { launch, serve } from '../../scripts/lib/browser.mjs';
 const DIST = join(resolve(import.meta.dirname, '../..'), 'dist-fixtures');
 const DESKTOP = { width: 1440, height: 900 };
 const N = 9; // fixture entries and the real ones
-// vers1ons' five parts, then its money page (featured, unnumbered: W01).
-const PARTS = ['W01.1', 'W01.2', 'W01.3', 'W01.4', 'W01.5', 'W01'];
+// vers1ons' five parts, then its money page (featured, as W01.$).
+const PARTS = ['W01.1', 'W01.2', 'W01.3', 'W01.4', 'W01.5', 'W01.$'];
 
 let server;
 let browser;

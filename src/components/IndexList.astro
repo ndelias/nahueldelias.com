@@ -21,10 +21,10 @@ const rows = homepageEntries().map((entry) => ({
   number: entryNumber(entry),
   href: entryHref(entry),
   years: entryYears(entry),
-  // Its parts, then its featured page (vers1ons' money page), unnumbered.
+  // Its parts, then its featured page (vers1ons' money page), as W01.$.
   parts: [
     ...partsOf(entry).map((part) => ({ number: entryNumber(part), title: part.data.title, href: entryHref(part), cover: part.data.cover.src })),
-    ...(entry.data.feature ? [{ number: '·', title: entry.data.feature.label, href: entry.data.feature.href, cover: entry.data.feature.cover }] : []),
+    ...(entry.data.feature ? [{ number: `${entryNumber(entry)}.$`, title: entry.data.feature.label, href: entry.data.feature.href, cover: entry.data.feature.cover }] : []),
   ],
 }));
 

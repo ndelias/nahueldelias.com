@@ -33,8 +33,8 @@ const projects = await Promise.all(
     kicker: `${SECTION_LABELS[entry.collection]} · ${entryYears(entry)}`,
     href: entryHref(entry),
     poster: await posterOf(entry),
-    // Its parts, then its featured page (vers1ons' money page), unnumbered:
-    // it orbits with the parts and says what it is in the caption.
+    // Its parts, then its featured page (vers1ons' money page), as W01.$:
+    // under the hub like a part, but not a numbered one.
     parts: [
       ...(await Promise.all(
         partsOf(entry).map(async (part) => ({
@@ -50,7 +50,7 @@ const projects = await Promise.all(
       ...(entry.data.feature
         ? [
             {
-              number: entryNumber(entry),
+              number: `${entryNumber(entry)}.$`,
               kicker: entry.data.feature.label,
               title: entry.data.feature.title,
               line: entry.data.feature.caption,
