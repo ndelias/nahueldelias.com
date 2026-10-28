@@ -88,7 +88,7 @@ export default function MoneyMap({ payees }: Props) {
         <li class="link" aria-hidden="true"><Coin delay={0.3} /></li>
         <Step i={1} eyebrow="Streams and sales" title="Royalties come in">Each sale and stream is a payment to split.</Step>
         <li class="link" aria-hidden="true"><Coin delay={0.8} /></li>
-        <Step i={2} eyebrow="Upstream" title="Everyone in the chain">The remixer, the first remixer and the original, each by the grant the remix inherited.</Step>
+        <Step i={2} eyebrow="Upstream" title="Everyone in the chain">The remixer, the first remixer and the original, each by the grant the remix inherited, and vers1ons takes its percentage.</Step>
       </ol>
     </div>
     </LazyMotion>
