@@ -18,8 +18,8 @@ import { POSTER, posterOf } from '../lib/posters';
 
 // A part's still at its largest (forward, 0.8 of a 340px card): 1x and 2x.
 const THUMB = 272;
-const thumb = async (part: Entry) => {
-  const src = part.data.poster?.src ?? part.data.cover.src;
+const thumb = async (part: Entry) => still(part.data.poster?.src ?? part.data.cover.src);
+const still = async (src: Entry['data']['cover']['src']) => {
   // Read from a clone: reading the import itself ships the original too.
   if (((src as typeof src & { clone?: typeof src }).clone ?? src).format === 'svg') return { src: src.src };
   const img = await getImage({ src, widths: [THUMB, THUMB * 2], format: 'webp' });
@@ -33,16 +33,34 @@ const projects = await Promise.all(
     kicker: `${SECTION_LABELS[entry.collection]} · ${entryYears(entry)}`,
     href: entryHref(entry),
     poster: await posterOf(entry),
-    parts: await Promise.all(
-      partsOf(entry).map(async (part) => ({
-        number: entryNumber(part),
-        title: part.data.title,
-        line: part.data.summary ?? part.data.tagline,
-        href: entryHref(part),
-        video: part.data.video,
-        thumb: await thumb(part),
-      })),
-    ),
+    // Its parts, then its featured page (vers1ons' money page), unnumbered:
+    // it orbits with the parts and says what it is in the caption.
+    parts: [
+      ...(await Promise.all(
+        partsOf(entry).map(async (part) => ({
+          number: entryNumber(part),
+          kicker: `Part of ${entry.data.title}`,
+          title: part.data.title,
+          line: part.data.summary ?? part.data.tagline,
+          href: entryHref(part),
+          video: part.data.video,
+          thumb: await thumb(part),
+        })),
+      )),
+      ...(entry.data.feature
+        ? [
+            {
+              number: entryNumber(entry),
+              kicker: entry.data.feature.label,
+              title: entry.data.feature.title,
+              line: entry.data.feature.caption,
+              href: entry.data.feature.href,
+              video: entry.data.feature.video,
+              thumb: await still(entry.data.feature.cover),
+            },
+          ]
+        : []),
+    ],
   })),
 );
 
@@ -102,7 +120,7 @@ const first = projects[0];
                   data-no={part.number}
                   data-title={part.title}
                   data-line={part.line}
-                  data-kicker={`Part of ${entry.data.title}`}
+                  data-kicker={part.kicker}
                   tabindex="-1"
                 >
                   <img data-src={part.thumb.src} data-srcset={part.thumb.srcset} sizes={`${THUMB}px`} width={THUMB} height={THUMB * 10 / 16} alt="" loading="lazy" decoding="async" />

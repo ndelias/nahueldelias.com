@@ -113,6 +113,15 @@ test('the hub features it in a card above the parts', async () => {
   assert.ok(html.indexOf('class="feature') < html.indexOf('class="parts defer'), 'the card is not above the parts');
 });
 
+test('/work lists it under vers1ons: in the orbit with the parts, and in the Index, unnumbered', async () => {
+  const html = await readFile(join(DIST, 'work/index.html'), 'utf8');
+  const card = html.match(/<a[^>]*class="card part[^"]*"[^>]*>/g)?.find((a) => a.includes(`href="${PATH}"`));
+  assert.ok(card, 'no Money card in the orbit');
+  assert.match(card, /data-kicker="Money, end to end"/);
+  assert.match(card, /data-video="\/media\/vers1ons\/money\/walkthrough\.mp4"/);
+  assert.match(html, new RegExp(`<a class="sub-title[^"]*" href="${PATH}">Money, end to end</a>`), 'no Money line in the Index');
+});
+
 test('the hub and Wallet & payouts link here', async () => {
   for (const page of ['work/vers1ons/index.html', 'work/vers1ons/wallet-payouts/index.html']) {
     const html = await readFile(join(DIST, page), 'utf8');

@@ -14,7 +14,8 @@ import { launch, serve } from '../../scripts/lib/browser.mjs';
 const DIST = join(resolve(import.meta.dirname, '../..'), 'dist-fixtures');
 const DESKTOP = { width: 1440, height: 900 };
 const N = 9; // fixture entries and the real ones
-const PARTS = ['W01.1', 'W01.2', 'W01.3', 'W01.4', 'W01.5'];
+// vers1ons' five parts, then its money page (featured, unnumbered: W01).
+const PARTS = ['W01.1', 'W01.2', 'W01.3', 'W01.4', 'W01.5', 'W01'];
 
 let server;
 let browser;
@@ -223,7 +224,7 @@ test('leaving everything puts the parts back in a moment later, and stops the vi
   await restOn(page, 'W01');
   await page.mouse.move(DESKTOP.width - 10, DESKTOP.height - 10);
   await page.waitForTimeout(400);
-  assert.equal((await openParts(page)).length, 5, 'closed at once');
+  assert.equal((await openParts(page)).length, PARTS.length, 'closed at once');
   await page.waitForTimeout(2200);
   assert.deepEqual(await openParts(page), []);
   assert.equal(await page.locator('video').count(), 0);
@@ -238,11 +239,11 @@ test('keyboard: focus opens a project, Tab reaches its parts in order, Escape cl
   await page.waitForTimeout(1200);
   assert.deepEqual(await openParts(page), PARTS);
   const hrefs = [];
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < PARTS.length; i++) {
     await page.keyboard.press('Tab');
     hrefs.push(await page.evaluate(() => document.activeElement.getAttribute('href')));
   }
-  assert.deepEqual(hrefs, ['/work/vers1ons/design-system/', '/work/vers1ons/licensing/', '/work/vers1ons/purchasing/', '/work/vers1ons/wallet-payouts/', '/work/vers1ons/distribution/']);
+  assert.deepEqual(hrefs, ['/work/vers1ons/design-system/', '/work/vers1ons/licensing/', '/work/vers1ons/purchasing/', '/work/vers1ons/wallet-payouts/', '/work/vers1ons/distribution/', '/work/vers1ons/money/']);
   await page.keyboard.press('Escape');
   assert.equal(await page.evaluate(() => document.activeElement.dataset.no), 'W01');
   await page.waitForTimeout(1200);
