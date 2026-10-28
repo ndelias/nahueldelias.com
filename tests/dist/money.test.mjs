@@ -51,7 +51,7 @@ test('without JS: the whole story reads, the map and the ledger included', async
   }));
   assert.deepEqual(state, {
     h1: 'How money moves through vers1ons',
-    sections: ['Everyone who gets paid', 'One purchase, in the ledger', "Why it can't spend twice", 'Getting co-writers paid', 'Drops, with rules the server keeps', 'Built to the same standard'],
+    sections: ['Everyone who gets paid', 'One purchase, in the ledger', "Why it can't spend twice", 'Getting every contributor paid', 'Drops, with rules the server keeps', 'Built to the same standard'],
     payees: 4,
     guarantees: 8,
     buy: true,

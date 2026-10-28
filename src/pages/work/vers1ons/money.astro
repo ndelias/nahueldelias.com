@@ -2,7 +2,7 @@
 // /work/vers1ons/money: the money side of vers1ons, end to end, laid out
 // like a finance app. Who gets paid from one license sale (MoneyMap), one
 // purchase in the ledger as a working model (LedgerSim), the guarantees
-// that keep the ledger exact, how co-writers without accounts get paid, the
+// that keep the ledger exact, how contributors without accounts get paid, the
 // rules Drops purchases keep, and how it was built.
 //
 // The two islands are Preact + Framer Motion, hydrated as they scroll into
@@ -36,28 +36,28 @@ const GUARANTEES = [
 ];
 
 const CLAIM = [
-  { step: 'Sale', body: 'A license sells, and a credited co-writer has no account yet.' },
+  { step: 'Sale', body: 'A license sells, and a credited contributor, on the recording or the composition, has no account yet.' },
   { step: 'Held', body: 'Their share is held for them, against the email they were credited under.' },
   { step: 'Claim link', body: 'They get a claim link by email.' },
-  { step: 'Verify', body: '[They verify by text message, or with a code sent to that email?]' },
+  { step: 'Verify', body: 'They verify twice, with a code sent to that email and a code by text message.' },
   { step: 'Paid', body: 'They claim into their own Stripe account, and the held money follows.' },
 ];
 
 const STACK = ['Next.js', 'React', 'TypeScript', 'Tailwind', 'shadcn/Radix', 'Framer Motion', 'tRPC', 'Postgres', 'Drizzle', 'Inngest', 'Stripe Connect'];
 ---
-<Base title="Money at vers1ons — Nahuel D'Elias" description="How money moves through vers1ons: one checkout that pays everyone, a credit ledger that can't spend twice, and payouts for co-writers without accounts." preload={['sans-400', 'sans-500', 'mono-400']}>
+<Base title="Money at vers1ons — Nahuel D'Elias" description="How money moves through vers1ons: one checkout that pays everyone, a credit ledger that can't spend twice, and payouts for contributors without accounts." preload={['sans-400', 'sans-500', 'mono-400']}>
   <Frame>
     <a slot="top-center" class="back" href="/work/vers1ons/">(<Icon name="arrow-left" /> vers1ons)</a>
     <main class="money container">
       <header class="head">
         <p class="kicker mono muted">W01 · vers1ons · Money</p>
         <h1>How money moves through vers1ons</h1>
-        <p class="lead">One license sale on vers1ons pays several people at once, from a single checkout. I built the credit ledger and how it settles, and I led getting co-writers paid. This is the money side, end to end.</p>
+        <p class="lead">One license sale on vers1ons pays several people at once, from a single checkout. I built the credit ledger and how it settles, and I led getting every contributor paid. This is the money side, end to end.</p>
       </header>
 
       <dl class="statement">
         <div><dt class="eyebrow">Role</dt><dd>Product engineer. The credit ledger, its settlement and the admin page are mine. I extended the Stripe settlement pipeline.</dd></div>
-        <div><dt class="eyebrow">Built</dt><dd class="num">Credit and split checkout in 4 days, solo. Co-writer payouts in 2.5 weeks, about 18 PRs.</dd></div>
+        <div><dt class="eyebrow">Built</dt><dd class="num">Credit and split checkout in 4 days, solo. Contributor payouts in 2.5 weeks, about 18 PRs.</dd></div>
         <div><dt class="eyebrow">Team</dt><dd>Under 10 people</dd></div>
         <div><dt class="eyebrow">Status</dt><dd><span class="pill paid">Live</span></dd></div>
       </dl>
@@ -90,8 +90,8 @@ const STACK = ['Next.js', 'React', 'TypeScript', 'Tailwind', 'shadcn/Radix', 'Fr
       </section>
 
       <section class="block" aria-labelledby="claim">
-        <h2 id="claim">Getting co-writers paid</h2>
-        <p class="intro">When a license sells, credited co-writers who don't have an account still get their share. I wrote the PRD and led it, including protection against account takeover.</p>
+        <h2 id="claim">Getting every contributor paid</h2>
+        <p class="intro">When a license sells, credited contributors who don't have an account still get their share, on the recording side and the composition side alike. I wrote the PRD and led it, including protection against account takeover.</p>
         <ol class="timeline">
           {CLAIM.map((c, i) => (
             <li>
