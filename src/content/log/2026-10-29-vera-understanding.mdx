@@ -1,0 +1,10 @@
+---
+date: 2026-10-29
+entrySlug: vera
+---
+
+Vera now checks that the engineer signing off understands the change (v0.4.0).
+
+- **When:** on pull requests that are likely AI-written or have a high-risk place, Vera asks the engineer up to three questions about how the change behaves.
+- **Where:** they answer where they sign off, numbered. Vera grades each answer once and shows "understood 2 of 3" next to their sign-off. It never blocks the merge.
+- **Tested first:** I rated [29 of 36 questions good, and the grader called 108 of 108 test answers right](https://vera-agent.vercel.app/evals), both against bars set before the run.
