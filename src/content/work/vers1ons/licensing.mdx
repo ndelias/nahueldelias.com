@@ -404,8 +404,8 @@ import { licensingSheets } from '../../../components/diagrams/specs/licensing-sh
   </Tab>
 
   <Tab id="sheets">
-    <BodySection label="What I did" heading="A satellite app that gets the paperwork done before a license exists.">
-      Most co-written songs have no split sheet, and without one there's no clean license to sell. So I built sheets.vers1ons.com on my own, from nothing, 82 commits and almost all of it. Anyone can make a split sheet for free with no account. It's live as the first vers1ons satellite app.
+    <BodySection label="What I did" heading="A satellite app I pitched to bring more people into vers1ons.">
+      Most co-written songs have no split sheet, and without one there's no clean license to sell. I pitched sheets.vers1ons.com as a satellite app that would bring more people into the main app, then built it totally solo, from the idea to taking payments in 13 days. Anyone can make a split sheet for free with no account. It's live as the first vers1ons satellite app.
     </BodySection>
 
     <SystemFigure label="How it works" spec={licensingSheets} />
@@ -419,7 +419,7 @@ import { licensingSheets } from '../../../components/diagrams/specs/licensing-sh
     </Row>
 
     <Row label="Under the hood · Signatures" heading="Every signature binds to the version that was sent." step={10}>
-      The version is frozen before it's sent, and every signature is recorded against it, once even if someone signs twice. Signing links are single-use and stored only as hashes, and a forged one is rejected before any lookup. The signed PDF is made from the frozen version once everyone has signed, and stored privately. Paid saving and signing by every owner are built behind a flag.
+      The version is frozen before it's sent, and every signature is recorded against it, once even if someone signs twice. Signing links are single-use and stored only as hashes, and a forged one is rejected before any lookup. The signed PDF is made from the frozen version once everyone has signed, and stored privately.
     </Row>
 
     <Row label="Under the hood · Handoff" heading="A signed sheet arrives as a draft listing." step={9}>
@@ -429,6 +429,10 @@ import { licensingSheets } from '../../../components/diagrams/specs/licensing-sh
     <Steps />
 
     <Comparisons />
+
+    <BodySection label="Outcome" heading="It's doing the job I pitched it for.">
+      More than 200 split sheets have been made so far. About 20% of users have paid, and about half of the users who came from outside vers1ons have applied to the main app's beta.
+    </BodySection>
   </Tab>
 </Tabs>
 
