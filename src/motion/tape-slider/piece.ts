@@ -136,8 +136,11 @@ define('tape-slider', (stage, { reduce }) => {
     // goes right, the value goes down), clamped at the walls; the value is
     // the nearest step. On release the tape rolls onto that step.
     let drag: { x: number; from: number } | null = null;
+    // Off (pitch under Varispeed): the row's styles already stop the pointer
+    // and it leaves the tab order, but the tape refuses input itself too.
+    const off = () => row.classList.contains('off');
     canvas.addEventListener('pointerdown', (e) => {
-      if (e.button !== 0) return;
+      if (e.button !== 0 || off()) return;
       canvas.setPointerCapture(e.pointerId);
       offset.value = offset.target = clampOffset(offset.value);
       offset.velocity = 0;
@@ -159,8 +162,9 @@ define('tape-slider', (stage, { reduce }) => {
     canvas.addEventListener('pointerup', end);
     canvas.addEventListener('pointercancel', end);
     canvas.addEventListener('lostpointercapture', end);
-    canvas.addEventListener('dblclick', () => set(spec.def));
+    canvas.addEventListener('dblclick', () => !off() && set(spec.def));
     canvas.addEventListener('keydown', (e) => {
+      if (off()) return;
       const by = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1, PageUp: 5, PageDown: -5 }[e.key];
       const to = e.key === 'Home' ? spec.min : e.key === 'End' ? spec.max : by !== undefined ? value + by * spec.step : null;
       if (to === null) return;

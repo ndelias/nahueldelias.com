@@ -201,6 +201,10 @@ test('the tape: dragging pulls it to a step, it stops at its wall, double-click 
   // Varispeed takes pitch out of play.
   await page.click('[data-vari]');
   assert.equal(await page.$eval('[data-row="pitch"] canvas', (c) => [c.tabIndex, c.getAttribute('aria-disabled')].join()), '-1,true');
+  // And it refuses keys even if it's focused from script.
+  await page.focus('[data-row="pitch"] canvas');
+  await page.keyboard.press('ArrowRight');
+  assert.equal(await read('[data-row="pitch"]'), '0 st', 'pitch moved under Varispeed');
   assert.deepEqual(errors, []);
   await ctx.close();
 });
