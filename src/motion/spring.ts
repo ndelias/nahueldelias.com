@@ -38,8 +38,10 @@ export function loop(tick: (dt: number) => boolean) {
   let raf = 0;
   let last = 0;
   const frame = (now: number) => {
-    // Clamp: a frame after a long pause (a background tab) mustn't jump.
-    const dt = last ? Math.min((now - last) / 1000, 1 / 30) : 1 / 60;
+    // Clamp: a frame after a long pause (a background tab) mustn't jump, and
+    // two frames with one timestamp mustn't make a zero dt (anything divided
+    // by it would be infinite, and a NaN spring never recovers).
+    const dt = last ? Math.min(Math.max((now - last) / 1000, 1 / 240), 1 / 30) : 1 / 60;
     last = now;
     raf = tick(dt) ? requestAnimationFrame(frame) : 0;
   };
