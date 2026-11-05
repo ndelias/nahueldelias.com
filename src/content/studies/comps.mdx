@@ -31,24 +31,29 @@ import CompsBuilder from '../../components/comps/CompsBuilder';
   Comps compare a company with its peers. An analyst picks the peers, pulls each one's numbers from its filings, adjusts them so they line up, and works out the multiples. By hand, ten companies take hours. AI tools can fill the same table in seconds. But a VP won't send a number to a client without knowing where it came from, so the analyst still checks each one against the filing. That check is the slow part, and it's the part I wanted to design for.
 </BodySection>
 
-<BodySection label="Who it's for" heading="[Heading]">
+<BodySection label="Who it's for" heading="The analyst builds it. The VP checks it.">
   Two people touch a comps table before a client sees it. The analyst builds it, usually in their first or second year. A VP or associate reviews it before it goes into a pitch book or a research note. The analyst needs to fill it fast. The VP needs to trust it without redoing it.
 </BodySection>
 
-<BodySection label="The fill" heading="[Heading]">
-  [Copy for the fill.]
+<BodySection label="The fill" heading="The builder fills the table and leaves blanks it can't source.">
+  When the analyst names the company, the builder fills the table one row at a time. Each number comes from a filing. When it can't find a line for a number, it leaves the cell blank and marks it Needs you. The multiples next to it stay empty too, so a missing number never turns into a wrong multiple.
 </BodySection>
 
 <CompsBuilder client:visible piece="fill" />
 
-<BodySection label="The trace" heading="[Heading]">
-  [Copy for the trace.]
+<BodySection label="The trace" heading="Every number opens the line it came from.">
+  Pick any number to see where it came from. The panel shows the filing, highlights the line, and shows how the number was built, like last year plus this year to date, minus the same months last year. A VP can check any number without asking the analyst.
 </BodySection>
 
 <CompsBuilder client:visible piece="trace" />
 
-<BodySection label="The correction" heading="[Heading]">
-  [Copy for the correction.]
+{/* Fiserv: check against its Q3 2026 release when the real numbers go in. */}
+<BodySection label="The correction" heading="Fixing a number updates everything that depends on it.">
+  Fiserv's earnings release reports adjusted operating income, not adjusted EBITDA, so the builder left it blank. Pick another line or enter a number. The multiples, the median, and the mean count to their new values, and a footnote records that you set it.
 </BodySection>
 
 <CompsBuilder client:visible piece="correct" />
+
+<BodySection label="The motion" heading="How it moves.">
+  Everything uses one easing curve, the same one as the rest of this site. Numbers fade up 6 pixels over a third of a second. Multiples count instead of jumping, so you can see which way they moved. The source panel slides in 16 pixels the first time and only crossfades after that, so switching between numbers doesn't feel like opening something new. A changed number gets a light tint that fades over a second. With reduced motion turned on, nothing moves or counts.
+</BodySection>

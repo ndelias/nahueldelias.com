@@ -144,6 +144,22 @@ entry, Enter commits and Escape cancels. One polite live region announces
 results, e.g. "Fiserv EV/EBITDA is now 9.8x. Peer median moved from 10.0x
 to 9.9x."
 
+## Section copy (approved 2026-11-05, in comps.mdx)
+
+Who it's for, heading: The analyst builds it. The VP checks it.
+
+The fill. Heading: The builder fills the table and leaves blanks it can't source.
+When the analyst names the company, the builder fills the table one row at a time. Each number comes from a filing. When it can't find a line for a number, it leaves the cell blank and marks it Needs you. The multiples next to it stay empty too, so a missing number never turns into a wrong multiple.
+
+The trace. Heading: Every number opens the line it came from.
+Pick any number to see where it came from. The panel shows the filing, highlights the line, and shows how the number was built, like last year plus this year to date, minus the same months last year. A VP can check any number without asking the analyst.
+
+The correction. Heading: Fixing a number updates everything that depends on it.
+Fiserv's earnings release reports adjusted operating income, not adjusted EBITDA, so the builder left it blank. [To check against Fiserv's Q3 2026 release.] Pick another line or enter a number. The multiples, the median, and the mean count to their new values, and a footnote records that you set it.
+
+The motion. Heading: How it moves.
+Everything uses one easing curve, the same one as the rest of this site. Numbers fade up 6 pixels over a third of a second. Multiples count instead of jumping, so you can see which way they moved. The source panel slides in 16 pixels the first time and only crossfades after that, so switching between numbers doesn't feel like opening something new. A changed number gets a light tint that fades over a second. With reduced motion turned on, nothing moves or counts.
+
 ## Sources
 
 - Wall Street Prep on calendarization: https://wallstreetprep.com/knowledge/calendarization
