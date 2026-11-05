@@ -32,6 +32,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: ndelias/vera@3379f0b76ff6a064dd67f8953bed473292b408a9 # v0.5.1
+      - uses: ndelias/vera@49340532e0c3be09f67e10ac84be5f57e18e06e8 # v0.6.0
         with:
           anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
