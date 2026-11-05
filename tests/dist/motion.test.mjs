@@ -121,12 +121,16 @@ test('the field draws, keeps drawing while on screen, and stops off it', async (
   const a = await frame();
   await page.waitForTimeout(600);
   assert.notEqual(a, await frame(), 'the field is still on screen');
-  // Off screen it can't be photographed, so check the loop itself: no
-  // frames requested while the stage is out of view.
+  // Off screen it can't be photographed, so count its draws instead. Only
+  // the field uses WebGL; counting animation frames would also count the
+  // toggle, which keeps stepping at the top of the page.
   await page.evaluate(() => {
     window.__frames = 0;
-    const raf = window.requestAnimationFrame;
-    window.requestAnimationFrame = (f) => (window.__frames++, raf(f));
+    const draw = WebGLRenderingContext.prototype.drawArrays;
+    WebGLRenderingContext.prototype.drawArrays = function (...args) {
+      window.__frames++;
+      return draw.apply(this, args);
+    };
     scrollTo(0, 0);
   });
   await page.waitForTimeout(300);
