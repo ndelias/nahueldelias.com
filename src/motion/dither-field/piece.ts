@@ -3,10 +3,12 @@
 // matrix. The canvas has one pixel per 3px cell and is scaled up with
 // pixelated rendering, so the GPU shades a ninth of the pixels and the cells
 // stay crisp at any density. The colors are read from the stage (its ink
-// and its surface) and re-read when the theme changes. The pointer pushes
-// the field outward; where it is and how hard it pushes both ride springs,
-// so the push eases in, follows, and lets go. Runs only while on screen.
-// Reduced motion: one still frame, no push.
+// and its surface) and re-read when the theme changes. The pointer drags
+// the field the way a finger drags through water: around it, with a wide
+// soft edge, the field is pulled along the direction it's moving, further
+// the faster it goes. Where it is and how fast it moves both ride springs,
+// so the drag builds, trails a little behind, and eases back when it stops.
+// Runs only while on screen. Reduced motion: one still frame, no drag.
 
 import { define } from '../runtime';
 import { Spring, loop } from '../spring';
@@ -16,8 +18,8 @@ const CELL = 3; // CSS px per dither cell
 const VERTEX = `attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}`;
 const FRAGMENT = `
 precision highp float;
-uniform vec2 uPtr;
-uniform float uTime, uPush;
+uniform vec2 uPtr, uDrag;
+uniform float uTime;
 uniform vec3 uInk, uPaper;
 
 vec2 hash(vec2 p) {
@@ -40,9 +42,10 @@ float bayer8(vec2 a) { return bayer4(.5 * a) * .25 + bayer2(a); }
 
 void main() {
   vec2 cell = gl_FragCoord.xy;
+  // The drag: one direction for the whole neighbourhood, fading out over
+  // ~270px, so the field bends rather than bulging around a point.
   vec2 d = cell - uPtr;
-  float fall = exp(-dot(d, d) / 1800.);
-  vec2 p = cell / 130. + normalize(d + 1e-4) * fall * uPush * .5;
+  vec2 p = (cell - uDrag * exp(-dot(d, d) / 8100.)) / 130.;
   float t = uTime * .05;
   vec2 q = vec2(fbm(p + vec2(0., t)), fbm(p + vec2(5.2, 1.3) - t));
   float v = smoothstep(-.1, .5, fbm(p + 1.8 * q + vec2(t * .5, -t * .3)));
@@ -84,7 +87,7 @@ define('dither-field', (stage, { reduce }) => {
   gl.enableVertexAttribArray(0);
   gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
   const u = (name: string) => gl.getUniformLocation(program, name);
-  const [uPtr, uTime, uPush, uInk, uPaper] = ['uPtr', 'uTime', 'uPush', 'uInk', 'uPaper'].map(u);
+  const [uPtr, uDrag, uTime, uInk, uPaper] = ['uPtr', 'uDrag', 'uTime', 'uInk', 'uPaper'].map(u);
 
   const colors = () => {
     const cs = getComputedStyle(stage);
@@ -93,13 +96,16 @@ define('dither-field', (stage, { reduce }) => {
   };
 
   let time = 20; // a settled-looking moment to start from
-  const px = new Spring(0, 60);
-  const py = new Spring(0, 60);
-  const push = new Spring(0, 40);
+  // Where the drag is centred (trailing the pointer a little) and how far
+  // it pulls, in cells.
+  const px = new Spring(0, 25);
+  const py = new Spring(0, 25);
+  const dx = new Spring(0, 40);
+  const dy = new Spring(0, 40);
   const render = () => {
     gl.uniform1f(uTime, time);
     gl.uniform2f(uPtr, px.value, py.value);
-    gl.uniform1f(uPush, push.value);
+    gl.uniform2f(uDrag, dx.value, dy.value);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   };
 
@@ -120,34 +126,56 @@ define('dither-field', (stage, { reduce }) => {
     return;
   }
 
+  // The pointer, in cells, y up (gl_FragCoord's origin is bottom left);
+  // null while it's off the stage.
+  let pointer: { x: number; y: number } | null = null;
+  let last: { x: number; y: number } | null = null;
+  const DRAG = 0.22; // cells of pull per cell/s of pointer speed
+  const MAX = 60; // cells: past this the field tears rather than bends
+
   let running = false;
   const anim = loop((dt) => {
     time += dt;
-    px.step(dt);
-    py.step(dt);
-    push.step(dt);
+    // The pull follows the pointer's speed this frame, capped, and goes
+    // back to nothing when it stops or leaves.
+    let tx = 0;
+    let ty = 0;
+    if (pointer && last) {
+      tx = ((pointer.x - last.x) / dt) * DRAG;
+      ty = ((pointer.y - last.y) / dt) * DRAG;
+      const len = Math.hypot(tx, ty);
+      if (len > MAX) {
+        tx *= MAX / len;
+        ty *= MAX / len;
+      }
+    }
+    last = pointer && { ...pointer };
+    dx.target = tx;
+    dy.target = ty;
+    if (pointer) {
+      px.target = pointer.x;
+      py.target = pointer.y;
+    }
+    for (const s of [px, py, dx, dy]) s.step(dt);
     render();
     return running;
   });
 
-  // Pointer in cells, y up (gl_FragCoord's origin is bottom left).
-  let rest = 0;
   stage.addEventListener('pointermove', (e) => {
     const r = stage.getBoundingClientRect();
-    const x = (e.clientX - r.left) / CELL;
-    const y = (r.bottom - e.clientY) / CELL;
-    if (push.value < 0.02) {
-      // Arrive where the pointer is rather than sweeping in from the last spot.
-      px.value = px.target = x;
-      py.value = py.target = y;
+    const at = { x: (e.clientX - r.left) / CELL, y: (r.bottom - e.clientY) / CELL };
+    if (!pointer && Math.hypot(dx.value, dy.value) < 0.5) {
+      // Arriving: start the drag where the pointer is, not sweeping in from
+      // where it last left.
+      px.value = px.target = at.x;
+      py.value = py.target = at.y;
     }
-    px.target = x;
-    py.target = y;
-    push.target = 1;
-    clearTimeout(rest);
-    rest = window.setTimeout(() => (push.target = 0), 700);
+    pointer = at;
   });
-  stage.addEventListener('pointerleave', () => (push.target = 0));
+  stage.addEventListener('pointerleave', () => {
+    pointer = null;
+    last = null;
+  });
 
   return {
     play() {
