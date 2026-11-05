@@ -19,3 +19,7 @@ export type Discipline = (typeof DISCIPLINES)[number];
 // A gallery screen's frame, which sets its aspect ratio.
 export const FRAMES = ['desktop', 'phone', 'detail'] as const;
 export type FrameType = (typeof FRAMES)[number];
+
+// How a /motion piece is built, in the order its label lists them.
+export const TECHNIQUES = ['CSS', 'SVG', 'TS', 'Canvas', 'WebGL', 'GLSL'] as const;
+export type Technique = (typeof TECHNIQUES)[number];

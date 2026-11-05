@@ -1,0 +1,18 @@
+---
+// M03, the dither field: noise drawn by a fragment shader (piece.ts) in the
+// stage's own two colors. Before it mounts, without JS or without WebGL, a
+// still halftone of the same two colors stands in.
+---
+<canvas class="field" data-field role="img" aria-label="A field of flowing noise, dithered in two colors"></canvas>
+
+<style>
+  .field {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+    background: radial-gradient(circle, var(--line) 1px, transparent 1.5px) 0 0 / 6px 6px;
+    touch-action: pan-y;
+  }
+</style>

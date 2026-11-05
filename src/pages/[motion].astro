@@ -1,0 +1,167 @@
+---
+// /motion: small pieces of interaction and motion, each running live on its
+// own stage. One content entry per piece (src/content/motion/), one folder
+// per piece's code (src/motion/<id>/: Stage.astro is the markup it starts
+// from, rendered here, so the page is complete before any script; piece.ts
+// is what makes it move, loaded by src/scripts/motion.ts when the stage
+// nears the viewport). Each label's size is that script, gzipped, measured
+// after the build (scripts/motion-sizes.mjs), so it can't drift.
+//
+// A dynamic route only so the page doesn't exist without pieces (sections
+// render only when they have entries); the Frame's nav follows the same rule.
+import type { GetStaticPaths } from 'astro';
+import { getCollection } from 'astro:content';
+import AfterLoad from '../components/AfterLoad.astro';
+import Frame from '../components/Frame.astro';
+import StatusBadge from '../components/StatusBadge.astro';
+import Base from '../layouts/Base.astro';
+import loader from '../scripts/motion.ts?worker&url';
+
+export const getStaticPaths = (async () => ((await getCollection('motion')).length ? [{ params: { motion: 'motion' } }] : [])) satisfies GetStaticPaths;
+
+const stages = import.meta.glob<{ default: (props: object) => unknown }>('../motion/*/Stage.astro', { eager: true });
+const scripts = import.meta.glob<string>('../motion/*/piece.ts', { query: '?worker&url', import: 'default', eager: true });
+
+const entries = (await getCollection('motion')).sort((a, b) => a.data.number - b.data.number);
+const pieces = entries.map((entry, i) => {
+  const Stage = stages[`../motion/${entry.id}/Stage.astro`]?.default;
+  const src = scripts[`../motion/${entry.id}/piece.ts`];
+  if (!Stage || !src) throw new Error(`/motion: "${entry.id}" has no piece. Add src/motion/${entry.id}/Stage.astro and piece.ts.`);
+  if (entries[i - 1]?.data.number === entry.data.number) throw new Error(`/motion: "${entries[i - 1].id}" and "${entry.id}" are both number ${entry.data.number}.`);
+  return { entry, Stage, src, code: `M${String(entry.data.number).padStart(2, '0')}` };
+});
+---
+<Base title="Motion — Nahuel D'Elias" description="Interaction and motion by Nahuel D'Elias, a product engineer: small pieces that run live, each labeled with how it's built and how much code it loads." preload={['sans-500', 'mono-400']}>
+  <Frame>
+    <main class="motion container">
+      <header class="head">
+        <p class="kicker mono muted">Nahuel D'Elias · Motion</p>
+        <h1>This is how I make things move.</h1>
+        <p class="lead muted">Each piece runs live on this page. Its label says how it's built and how much code it loads.</p>
+      </header>
+
+      <ol class="pieces grid">
+        {pieces.map(({ entry, Stage, src, code }) => (
+          <li class:list={['piece', { wide: entry.data.wide }]} data-piece={entry.id} data-src={src} aria-labelledby={`${entry.id}-title`}>
+            <div class="stage" data-stage><Stage /></div>
+            <div class="caption">
+              <span class="mono muted">{code}</span>
+              <h2 id={`${entry.id}-title`}>{entry.data.title}</h2>
+              <span class="tech mono muted">{entry.data.technique.join(' · ')} · <span data-size-of={src}>– KB</span></span>
+              <span class="badge mono"><StatusBadge entry={entry} /></span>
+            </div>
+            <p class="note muted">{entry.data.note}</p>
+          </li>
+        ))}
+      </ol>
+    </main>
+  </Frame>
+  <AfterLoad src={loader} />
+</Base>
+
+<style>
+  .motion {
+    /* The frame's header sits over the page on desktop. */
+    padding-top: 152px;
+    padding-bottom: var(--space-160);
+  }
+  .head {
+    max-width: 40rem;
+  }
+  .kicker {
+    margin: 0;
+  }
+  h1 {
+    margin: var(--space-16) 0 0;
+    font-size: var(--text-display);
+    line-height: var(--leading-display);
+    letter-spacing: var(--tracking-display);
+    text-wrap: balance;
+  }
+  .lead {
+    margin: var(--space-24) 0 0;
+    font-size: var(--text-lead);
+    line-height: var(--leading-lead);
+    text-wrap: pretty;
+  }
+
+  .pieces {
+    margin: var(--space-96) 0 0;
+    padding: 0;
+    list-style: none;
+    row-gap: var(--space-64);
+  }
+  .piece {
+    grid-column: span 6;
+    min-width: 0;
+  }
+  .piece.wide {
+    grid-column: 1 / -1;
+  }
+
+  /* The stage: the piece's own ground, ink on surface. Its colors are what
+     the shader reads. */
+  .stage {
+    position: relative;
+    display: grid;
+    place-items: center;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    padding: var(--space-24);
+    background: var(--surface);
+    color: var(--ink);
+  }
+  .wide .stage {
+    aspect-ratio: 21 / 9;
+  }
+
+  .caption {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    align-items: baseline;
+    column-gap: var(--space-16);
+    margin-top: var(--space-16);
+  }
+  h2 {
+    margin: 0;
+    font-size: var(--text-title);
+    line-height: var(--leading-title);
+    letter-spacing: var(--tracking-title);
+  }
+  .badge {
+    font-size: var(--text-mono-sm);
+  }
+  .note {
+    max-width: 52ch;
+    margin: var(--space-8) 0 0;
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+    text-wrap: pretty;
+  }
+
+  @media (max-width: 639.98px) {
+    .motion {
+      padding-top: var(--space-48);
+      padding-bottom: var(--space-96);
+    }
+    .pieces {
+      margin-top: var(--space-64);
+      row-gap: var(--space-48);
+    }
+    .piece {
+      grid-column: 1 / -1;
+    }
+    .stage,
+    .wide .stage {
+      aspect-ratio: 1;
+    }
+    /* Number, title and badge on one line; how it's built under them. */
+    .caption {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+    }
+    .tech {
+      grid-row: 2;
+      grid-column: 2 / -1;
+    }
+  }
+</style>

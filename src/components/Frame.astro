@@ -7,6 +7,7 @@
 // sections: no dead links. The name leads home (/, the About page). On
 // /work (`contact`), the bottom-right corner carries the resume (a new tab)
 // and Contact (email), small.
+import { getCollection } from 'astro:content';
 import Icon from './Icon.astro';
 import ThemeToggle from './ThemeToggle.astro';
 
@@ -20,10 +21,14 @@ const CONTACT = 'mailto:njdelias@gmail.com';
 const RESUME = '/nahuel-delias-resume.pdf';
 
 const pages = Object.keys(import.meta.glob('../pages/**/*.astro'));
-const exists = (path: string) => path === '/' || pages.some((p) => p === `../pages${path}.astro` || p === `../pages${path}/index.astro`);
+// /motion is a dynamic route that exists only while it has pieces.
+const motion = (await getCollection('motion')).length > 0;
+const exists = (path: string) =>
+  path === '/' || (path === '/motion' ? motion : pages.some((p) => p === `../pages${path}.astro` || p === `../pages${path}/index.astro`));
 
 const NAV = [
   { label: 'Work', href: '/work' },
+  { label: 'Motion', href: '/motion' },
   { label: 'About', href: '/' },
   { label: 'Log', href: '/log' },
 ].filter((item) => exists(item.href));
