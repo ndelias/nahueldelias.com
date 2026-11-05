@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comps sketch</title>
+<style>
+  /* Design sketch for the comps study, not shipped. Tokens copied from
+     src/styles/tokens.css. Numbers are samples for layout only. */
+  @font-face { font-family: "Instrument Sans"; src: url(/src/assets/fonts/instrument-sans-latin-400-normal.woff2) format("woff2"); font-weight: 400; }
+  @font-face { font-family: "Instrument Sans"; src: url(/src/assets/fonts/instrument-sans-latin-500-normal.woff2) format("woff2"); font-weight: 500; }
+  @font-face { font-family: "DM Mono"; src: url(/src/assets/fonts/dm-mono-latin-400-normal.woff2) format("woff2"); font-weight: 400; }
+  :root {
+    color-scheme: light;
+    --bg: light-dark(#F2F1ED, #161513);
+    --surface: light-dark(#E8E6E0, #211F1C);
+    --line: light-dark(#D3D0C8, #34312C);
+    --muted: light-dark(#67645E, #9A968E);
+    --ink: light-dark(#1B1A18, #EDEBE6);
+    --accent: light-dark(#2447F0, #7D93FF);
+    --warn: light-dark(#B0281F, #F08A80);
+    --font-sans: "Instrument Sans", system-ui, sans-serif;
+    --font-mono: "DM Mono", ui-monospace, monospace;
+    --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  :root[data-theme="dark"] { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-sans); font-size: 16px; line-height: 1.6; }
+  .page { max-width: 1344px; margin: 0 auto; padding: 48px 48px 96px; }
+  .eyebrow, .mono { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+  .muted { color: var(--muted); }
+  .sample { color: var(--warn); }
+  .toggle { float: right; background: none; border: 0; color: inherit; font: inherit; cursor: pointer; }
+
+  .app { margin-top: 24px; display: grid; grid-template-columns: minmax(0, 1fr) 380px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); overflow: hidden; }
+  .main { padding: 24px; min-width: 0; }
+  .head { display: flex; justify-content: space-between; align-items: baseline; gap: 24px; }
+  .head h2 { margin: 4px 0 0; font-size: 22px; font-weight: 500; letter-spacing: -0.01em; line-height: 1.25; }
+  .summary { display: flex; gap: 16px; margin: 0; padding: 0; list-style: none; }
+  .summary b { font-family: var(--font-mono); font-weight: 400; font-variant-numeric: tabular-nums; }
+
+  table { width: 100%; margin-top: 24px; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  th, td { padding: 10px 12px; text-align: right; white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; padding-left: 0; }
+  thead th { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 400; color: var(--muted); border-bottom: 1px solid var(--line); vertical-align: bottom; }
+  tbody td { border-bottom: 1px solid var(--line); }
+  td.n { font-family: var(--font-mono); font-size: 14px; }
+  .co { font-size: 15px; }
+  .co small { display: block; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; color: var(--muted); }
+  tr.target td { background: var(--surface); }
+  tr.target td:first-child { padding-left: 12px; border-radius: 8px 0 0 8px; }
+  tr.target td:last-child { border-radius: 0 8px 8px 0; }
+  tr.spacer td { border: 0; padding: 6px; }
+  tfoot td { color: var(--muted); }
+  tfoot tr:first-child td { border-top: 1px solid var(--ink); }
+
+  /* The three states. Sourced is plain. Adjusted carries a footnote
+     number, the way a pitch book does. Needs you is an empty, outlined
+     cell in the warning color. */
+  .cell { display: inline-flex; align-items: baseline; gap: 2px; padding: 2px 6px; margin: -2px -6px; border-radius: 4px; cursor: pointer; }
+  .cell:hover { background: var(--surface); }
+  .cell sup { font-size: 9px; color: var(--muted); }
+  .cell.selected { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .needs { display: inline-block; padding: 1px 8px; border: 1px dashed var(--warn); border-radius: 4px; color: var(--warn); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+
+  .legend { display: flex; gap: 24px; margin: 20px 0 0; padding: 0; list-style: none; font-size: 13px; color: var(--muted); }
+  .legend span { color: var(--ink); font-family: var(--font-mono); }
+
+  .panel { border-left: 1px solid var(--line); background: var(--surface); padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+  .panel h3 { margin: 4px 0 0; font-size: 18px; font-weight: 500; line-height: 1.3; }
+  .doc { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 16px; font-size: 13px; line-height: 1.55; }
+  .doc p { margin: 0 0 8px; }
+  .doc .row { display: flex; justify-content: space-between; gap: 16px; padding: 3px 6px; margin: 0 -6px; border-radius: 3px; font-variant-numeric: tabular-nums; }
+  .doc .row span:last-child { font-family: var(--font-mono); }
+  .doc .hit { background: color-mix(in srgb, var(--ink) 9%, transparent); box-shadow: inset 2px 0 0 var(--ink); }
+  .build { margin: 0; font-size: 13px; }
+  .build div { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+  .build div span:last-child { font-family: var(--font-mono); }
+  .build .total { border-bottom: 0; border-top: 1px solid var(--ink); font-weight: 500; }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; }
+  .btn { font: inherit; font-size: 14px; line-height: 1.2; white-space: nowrap; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); cursor: pointer; }
+  .btn.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .notes { margin-top: 32px; max-width: 65ch; font-size: 14px; }
+</style>
+</head>
+<body>
+<div class="page">
+  <button class="toggle mono" type="button" onclick="const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'light':'dark'">(Dark / Light)</button>
+  <p class="eyebrow muted">Sketch · the table, checking one number · <span class="sample">sample numbers, not real</span></p>
+
+  <section class="app" aria-label="Comps builder sketch">
+    <div class="main">
+      <div class="head">
+        <div>
+          <p class="eyebrow muted">Trading comps · LTM to Sep 30, 2026 · prices as of [date]</p>
+          <h2>Toast, Inc. and four peers</h2>
+        </div>
+        <ul class="summary mono muted">
+          <li><b>21</b> sourced</li>
+          <li><b>4</b> adjusted</li>
+          <li class="sample"><b>1</b> needs you</li>
+        </ul>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Company</th>
+            <th scope="col">Market cap<br>$bn</th>
+            <th scope="col">EV<br>$bn</th>
+            <th scope="col">LTM revenue<br>$bn</th>
+            <th scope="col">LTM adj. EBITDA<br>$bn</th>
+            <th scope="col">EV / revenue</th>
+            <th scope="col">EV / EBITDA</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="target">
+            <td class="co">Toast<small>TOST</small></td>
+            <td class="n"><span class="cell">20.0</span></td>
+            <td class="n"><span class="cell">18.5</span></td>
+            <td class="n"><span class="cell">6.0</span></td>
+            <td class="n"><span class="cell selected">0.60<sup>1</sup></span></td>
+            <td class="n">3.1x</td>
+            <td class="n">30.8x</td>
+          </tr>
+          <tr class="spacer"><td colspan="7"></td></tr>
+          <tr>
+            <td class="co">Block<small>XYZ</small></td>
+            <td class="n"><span class="cell">40.0</span></td>
+            <td class="n"><span class="cell">38.0</span></td>
+            <td class="n"><span class="cell">24.0</span></td>
+            <td class="n"><span class="cell">3.40<sup>2</sup></span></td>
+            <td class="n">1.6x</td>
+            <td class="n">11.2x</td>
+          </tr>
+          <tr>
+            <td class="co">Fiserv<small>FI</small></td>
+            <td class="n"><span class="cell">80.0</span></td>
+            <td class="n"><span class="cell">110.0</span></td>
+            <td class="n"><span class="cell">21.0</span></td>
+            <td class="n"><span class="needs">Needs you</span></td>
+            <td class="n">5.2x</td>
+            <td class="n muted">—</td>
+          </tr>
+          <tr>
+            <td class="co">Global Payments<small>GPN</small></td>
+            <td class="n"><span class="cell">20.0</span></td>
+            <td class="n"><span class="cell">36.0</span></td>
+            <td class="n"><span class="cell">9.0</span></td>
+            <td class="n"><span class="cell">4.50<sup>3</sup></span></td>
+            <td class="n">4.0x</td>
+            <td class="n">8.0x</td>
+          </tr>
+          <tr>
+            <td class="co">Shift4<small>FOUR</small></td>
+            <td class="n"><span class="cell">7.0</span></td>
+            <td class="n"><span class="cell">10.0</span></td>
+            <td class="n"><span class="cell">4.0</span></td>
+            <td class="n"><span class="cell">1.00<sup>4</sup></span></td>
+            <td class="n">2.5x</td>
+            <td class="n">10.0x</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr><td>Peer median</td><td></td><td></td><td></td><td></td><td class="n">3.3x</td><td class="n">10.0x</td></tr>
+          <tr><td>Peer mean</td><td></td><td></td><td></td><td></td><td class="n">3.3x</td><td class="n">9.7x</td></tr>
+        </tfoot>
+      </table>
+
+      <ul class="legend">
+        <li><span>12.3</span> sourced from a filing</li>
+        <li><span>12.3<sup>1</sup></span> adjusted, footnoted</li>
+        <li><span class="needs">Needs you</span> no line found, left blank</li>
+      </ul>
+    </div>
+
+    <aside class="panel" aria-label="Source">
+      <div>
+        <p class="eyebrow muted">Source · footnote 1</p>
+        <h3>Toast adjusted EBITDA, last twelve months</h3>
+      </div>
+      <div class="doc">
+        <p class="eyebrow muted">8-K · Q3 2026 earnings release · Exhibit 99.1</p>
+        <div class="row"><span>Net income</span><span>000</span></div>
+        <div class="row"><span>Stock-based compensation</span><span>000</span></div>
+        <div class="row"><span>Depreciation and amortization</span><span>000</span></div>
+        <div class="row hit"><span>Adjusted EBITDA</span><span>000</span></div>
+      </div>
+      <div>
+        <p class="eyebrow muted">How it's built</p>
+        <div class="build">
+          <div><span>FY2025, 10-K</span><span>0.50</span></div>
+          <div><span>+ Nine months 2026, 10-Q</span><span>0.45</span></div>
+          <div><span>− Nine months 2025, 10-Q</span><span>0.35</span></div>
+          <div class="total"><span>LTM</span><span>0.60</span></div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn primary" type="button">Keep</button>
+        <button class="btn" type="button">Use another line</button>
+        <button class="btn" type="button">Enter a number</button>
+      </div>
+    </aside>
+  </section>
+
+  <div class="notes muted">
+    <p>The VP's summary, the peer picker, and the motion aren't in this sketch. The fill, trace, and correction get built once the layout is agreed.</p>
+  </div>
+</div>
+</body>
+</html>

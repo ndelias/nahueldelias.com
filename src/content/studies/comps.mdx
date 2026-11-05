@@ -1,0 +1,54 @@
+---
+# DRAFT (2026-11-05): the fintech concept study, built with Nahuel phase by
+# phase (docs/studies/comps/draft.md). Unlisted while the live pieces run on
+# sample numbers (src/components/comps/data.ts). Bracketed text waits for
+# Nahuel. The cover is a stand-in from the fixtures until the real one.
+title: '[Title]'
+tagline: '[Tagline]'
+short: '[short]'
+weight: 2
+status: concept
+role: '[Role]'
+dates:
+  start: 2026-10
+stack: ['Preact', 'Framer Motion', 'TypeScript']
+standing: '[Standing]'
+note: 'A concept I designed and built on my own. I haven''t built comps myself. What I know about the work comes from training guides, analyst forums, and public case studies, and I''ve listed what I''m assuming. The numbers come from public filings.'
+decision:
+  intro: 'The AI can''t always trace a number to a filing. I had to decide what the table shows when that happens.'
+  chose: 'Leave the cell blank and ask the analyst.'
+  rejected: 'Fill every cell with a best guess and a confidence score.'
+  cost: 'The first table looks less finished, and the AI seems to do less. Analysts fill some cells by hand. In return, every number on the screen has a source.'
+cover:
+  src: ../../assets/fixtures/cover.svg
+  alt: '[Cover image.]'
+order: 11
+unlisted: true
+---
+import CompsBuilder from '../../components/comps/CompsBuilder';
+
+<BodySection label="The problem" heading="Checking an AI-built comps table takes as long as building one.">
+  Comps compare a company with its peers. An analyst picks the peers, pulls each one's numbers from its filings, adjusts them so they line up, and works out the multiples. By hand, ten companies take hours. AI tools can fill the same table in seconds. But a VP won't send a number to a client without knowing where it came from, so the analyst still checks each one against the filing. That check is the slow part, and it's the part I wanted to design for.
+</BodySection>
+
+<BodySection label="Who it's for" heading="[Heading]">
+  Two people touch a comps table before a client sees it. The analyst builds it, usually in their first or second year. A VP or associate reviews it before it goes into a pitch book or a research note. The analyst needs to fill it fast. The VP needs to trust it without redoing it.
+</BodySection>
+
+<BodySection label="The fill" heading="[Heading]">
+  [Copy for the fill.]
+</BodySection>
+
+<CompsBuilder client:visible piece="fill" />
+
+<BodySection label="The trace" heading="[Heading]">
+  [Copy for the trace.]
+</BodySection>
+
+<CompsBuilder client:visible piece="trace" />
+
+<BodySection label="The correction" heading="[Heading]">
+  [Copy for the correction.]
+</BodySection>
+
+<CompsBuilder client:visible piece="correct" />
