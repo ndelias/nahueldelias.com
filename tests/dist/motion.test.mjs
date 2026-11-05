@@ -160,3 +160,47 @@ test('reduced motion: the pill jumps, nothing plays on its own, the field is one
   assert.deepEqual(errors, []);
   await ctx.close();
 });
+
+test('the tape: dragging pulls it to a step, it stops at its wall, double-click and keys work', async () => {
+  const { ctx, page, errors } = await open();
+  await page.$eval('[data-piece="tape-slider"]', (e) => e.scrollIntoView({ block: 'center' }));
+  await live(page, 'tape-slider');
+  const speed = '[data-row="speed"]';
+  const read = (row) => page.$eval(`${row} [data-value]`, (e) => e.textContent);
+  const now = (row) => page.$eval(`${row} canvas`, (c) => c.getAttribute('aria-valuenow'));
+  assert.equal(await page.$eval(`${speed} canvas`, (c) => c.getAttribute('role')), 'slider');
+  const box = await page.locator(`${speed} canvas`).boundingBox();
+  const cx = box.x + box.width / 2;
+  const cy = box.y + box.height / 2;
+  // Drag left 5 steps (8px each): the tape goes left, the value up.
+  await page.mouse.move(cx, cy);
+  await page.mouse.down();
+  await page.mouse.move(cx - 41, cy, { steps: 4 });
+  assert.equal(await read(speed), '125%');
+  // Far past the end: it stops at the wall, 200%.
+  await page.mouse.move(cx - 600, cy, { steps: 6 });
+  assert.equal(await read(speed), '200%');
+  await page.mouse.up();
+  assert.equal(await now(speed), '2');
+  // Within one step of the default it catches on 100%, as in the product.
+  await page.mouse.dblclick(cx, cy);
+  assert.equal(await read(speed), '100%', 'double-click resets');
+  // Let the tape roll home: grabbed mid-roll, it's picked up where it is.
+  await page.waitForTimeout(900);
+  await page.mouse.move(cx, cy);
+  await page.mouse.down();
+  await page.mouse.move(cx - 9, cy, { steps: 2 });
+  await page.mouse.up();
+  assert.equal(await read(speed), '100%', 'a step off the default should catch on it');
+  // Keys step past the catch.
+  await page.focus('[data-row="gain"] canvas');
+  await page.keyboard.press('ArrowRight');
+  assert.equal(await read('[data-row="gain"]'), '+0.5 dB');
+  await page.keyboard.press('End');
+  assert.equal(await read('[data-row="gain"]'), '+12 dB');
+  // Varispeed takes pitch out of play.
+  await page.click('[data-vari]');
+  assert.equal(await page.$eval('[data-row="pitch"] canvas', (c) => [c.tabIndex, c.getAttribute('aria-disabled')].join()), '-1,true');
+  assert.deepEqual(errors, []);
+  await ctx.close();
+});
