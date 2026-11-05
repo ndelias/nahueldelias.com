@@ -97,9 +97,15 @@ revenue less network fees (GRLNF) as its key measure. Its Adjusted EBITDA
 margin is over GRLNF, not revenue. Which revenue goes in the table is still
 open. The table uses reported revenue, like the other four.
 
-Note for EV: Shift4's roughly $1.0 billion of mandatory convertible
-preferred is a claim ahead of common shareholders, and EV usually adds it.
-Left out of debt for now, to decide when EV is built.
+Decided 2026-11-05: Shift4's EV adds the preferred, with a footnote. It's
+a claim ahead of common shareholders, so EV counts it, at the liquidation
+preference the 10-Q states: "approximately $1.0 billion" (Liquidity,
+"Preferred Stock Obligations"). The 10-Q gives no per-share figure, so the
+table uses 1,000, the number on that line, not a computed one. Shift4 EV =
+market cap + 5,483 debt + 1,000 preferred − 1,242 cash.
+
+Footnote draft, for Nahuel to edit: "Shift4's EV adds about $1.0 billion of
+preferred stock, from its Q3 2026 10-Q."
 
 ## Global Payments (GPN, CIK 1123360)
 
