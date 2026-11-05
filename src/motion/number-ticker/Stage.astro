@@ -1,0 +1,19 @@
+---
+// M10, the number ticker (piece.ts): a running total that rolls digit by
+// digit when a sale comes in. Without JS it's the number, still. The rolling
+// digits are hidden from screen readers; they read the plain total, and a
+// live region says each new one once.
+---
+<div class="ticker" data-ticker>
+  <p class="label mono">Royalties paid</p>
+  <p class="total">
+    <span class="sign" aria-hidden="true">$</span><span class="num" aria-hidden="true" data-num data-value="12480">12,480</span>
+    <span class="visually-hidden" data-text>$12,480</span>
+  </p>
+  <p class="visually-hidden" aria-live="polite" data-said></p>
+  <div class="actions">
+    <button type="button" class="mono" data-add="240">+ $240 sale</button>
+    <button type="button" class="mono" data-add="1975">+ $1,975 sync</button>
+    <button type="button" class="mono" data-add="-100000">Reset</button>
+  </div>
+</div>

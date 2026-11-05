@@ -1,0 +1,21 @@
+---
+// M15, the accordion: native <details>, animated by CSS alone (stage.css).
+// The script (piece.ts) does nothing but say it's live; the motion is the
+// browser's. Questions in the same group (name="faq") close each other.
+const QA = [
+  ['Who gets paid when a song is licensed?', 'Everyone on its split sheet, each directly, in the shares the sheet records.'],
+  ['Can I use it in more than one video?', 'One license covers one production. Another use needs a license of its own.'],
+  ['What if a payment fails?', 'Nothing is licensed until it goes through. You can retry from your library.'],
+];
+---
+<div class="faq">
+  {QA.map(([q, a], i) => (
+    <details name="faq" open={i === 0}>
+      <summary>
+        <span>{q}</span>
+        <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M4 6l4 4 4-4" /></svg>
+      </summary>
+      <p>{a}</p>
+    </details>
+  ))}
+</div>

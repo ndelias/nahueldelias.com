@@ -1,0 +1,63 @@
+.ticker {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+}
+.label {
+  margin: 0;
+  font-size: var(--text-mono-sm);
+  color: var(--muted);
+}
+.total {
+  display: flex;
+  align-items: baseline;
+  margin: 0;
+  font-size: clamp(2.5rem, 6vw, 3.75rem);
+  font-weight: var(--weight-medium);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.sign {
+  margin-right: 0.04em;
+  color: var(--muted);
+}
+.num {
+  display: inline-flex;
+  overflow: hidden;
+  transition: width 500ms var(--ease);
+}
+/* One window per digit, one line tall; the column of 0–9 inside slides. */
+.digit {
+  display: inline-block;
+  height: 1em;
+  overflow: hidden;
+}
+.col {
+  display: flex;
+  flex-direction: column;
+  transition: transform 600ms var(--ease);
+  transition-delay: var(--delay, 0ms);
+}
+.col span {
+  height: 1em;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+.actions button {
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: var(--text-mono-sm);
+  cursor: pointer;
+}
+.actions button:hover {
+  border-color: var(--ink);
+}
