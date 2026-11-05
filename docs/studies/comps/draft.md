@@ -160,6 +160,44 @@ Fiserv's earnings release reports adjusted operating income, not adjusted EBITDA
 The motion. Heading: How it moves.
 Everything uses one easing curve, the same one as the rest of this site. Numbers fade up 6 pixels over a third of a second. Multiples count instead of jumping, so you can see which way they moved. The source panel slides in 16 pixels the first time and only crossfades after that, so switching between numbers doesn't feel like opening something new. A changed number gets a light tint that fades over a second. With reduced motion turned on, nothing moves or counts.
 
+## Under the hood (outline, 2026-11-05, words only)
+
+This part is a plan, not a built system. Only the demo on the page is built.
+
+1. Data model: every number is a record, not a cell. Value, unit, period,
+   company, which metric, its source (filing, section, line), how it's built
+   from other records, its state, and who changed it and why. Multiples are
+   worked out on the fly, never stored, so they can't drift from their inputs.
+2. Tracing: GAAP numbers from the 10-K and 10-Q come from EDGAR's XBRL data,
+   where each fact is tagged with its period and filing. Adjusted numbers come
+   from the earnings release's reconciliation table, which isn't tagged
+   (checked 2026-11-05: Toast's Q3 2026 Exhibit 99.1 has Adjusted EBITDA and
+   no inline XBRL tags; only the 8-K cover is tagged). Each number keeps the exact place it was read from, so the
+   panel can highlight it. A number without one doesn't enter the table.
+3. Checking the AI: the model proposes, plain code checks. The cited line has
+   to contain the number. LTM math has to add up. EV has to equal market cap
+   plus debt minus cash. Units have to match (thousands vs millions). Where
+   XBRL has the same fact, the two have to agree. Anything that fails becomes
+   Needs you. An eval set of hand-checked tables measures how often a filled
+   number is right and how many blanks it leaves.
+4. What I'd build first (decided 2026-11-05): the trace, with no AI. Records,
+   the source panel, and only XBRL numbers for one peer set. Then the AI reads
+   earnings releases, under the checks.
+
+## Under the hood copy (approved 2026-11-05, in comps.mdx)
+
+Under the hood · Records. Heading: Every number is a record, not a cell.
+Only the demo on this page is built. The rest of this section is how I'd build the real thing. Each number in the table is a record. It holds the value, the unit, the period, and the company. It also holds where it came from, how it's built from other numbers, its state, and who changed it and why. Multiples aren't stored. They're worked out from their inputs every time, so they can't drift.
+
+Under the hood · Sources. Heading: Each number keeps the place it was read from.
+Numbers from the 10-K and 10-Q come from EDGAR's XBRL data, where each fact is tagged with its period and filing. Adjusted EBITDA comes from the earnings release, and that table isn't tagged. Toast's Q3 2026 release has no tags at all, so the builder reads it like a page. Either way, each number keeps the exact place it was read from, so the panel can highlight it. A number without one stays blank.
+
+Under the hood · Checks. Heading: The model suggests a number, and code checks it.
+The AI reads the earnings release and suggests a number with its line. Plain code then checks it. The line has to contain the number. The twelve-month math has to add up. EV has to equal market cap plus debt minus cash. Units have to match, thousands or millions. Where XBRL has the same number, the two have to agree. If any check fails, the cell becomes Needs you. A set of tables I'd check by hand would measure how often a filled number is right and how many blanks the builder leaves.
+
+Under the hood · First. Heading: I'd build the trace first, with no AI.
+The first version would only use XBRL numbers for one set of peers, with records and the source panel. No model would fill anything. That proves the part people have to trust, and every number can be checked from day one. Then the AI comes in to read earnings releases, under the checks.
+
 ## Sources
 
 - Wall Street Prep on calendarization: https://wallstreetprep.com/knowledge/calendarization
