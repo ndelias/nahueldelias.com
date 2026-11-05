@@ -48,7 +48,7 @@ const pieces = entries.map((entry, i) => {
               <span class="mono muted">{code}</span>
               <h2 id={`${entry.id}-title`}>{entry.data.title}</h2>
               <span class="tech mono muted">{entry.data.technique.join(' · ')} · <span data-size-of={src}>– KB</span></span>
-              <span class="badge mono"><StatusBadge entry={entry} /></span>
+              <span class="badge mono">{entry.data.from && <span class:list={['from', { vers1ons: entry.data.from === 'vers1ons' }]}>{entry.data.from}</span>}<StatusBadge entry={entry} /></span>
             </div>
             <p class="note muted">{entry.data.note}</p>
           </li>
@@ -130,6 +130,14 @@ const pieces = entries.map((entry, i) => {
   }
   .badge {
     font-size: var(--text-mono-sm);
+  }
+  /* Where a shipped piece shipped; vers1ons in its own color. */
+  .from {
+    margin-right: var(--space-8);
+    color: var(--muted);
+  }
+  .from.vers1ons {
+    color: var(--vers1ons);
   }
   .note {
     max-width: 52ch;
