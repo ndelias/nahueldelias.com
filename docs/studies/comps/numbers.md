@@ -13,6 +13,20 @@ price date for all five, the last close before the numbers go in (once
 Shift4 and Global Payments have filed), from a public market source noted
 here with the date.
 
+## Share prices
+
+Source, decided 2026-11-05: Nasdaq.com historical quotes, one page per
+ticker, https://www.nasdaq.com/market-activity/stocks/{ticker}/historical.
+Toast, Block, Global Payments, and Shift4 trade on the NYSE; Fiserv trades
+on Nasdaq as FISV.
+
+Date: the close on 2026-11-05. Shift4 and Global Payments released and
+filed that day, so it's the first close that reflects all five companies'
+Q3 numbers. On the evening of 2026-11-05 the historical pages only went to
+11-04 (the quote pages showed the 11-05 close, but they change daily, so
+they can't be cited). The prices go in once the 11-05 row is on the
+historical pages.
+
 ## Toast (TOST, CIK 1650164)
 
 | Number | Value | Source |
@@ -52,7 +66,7 @@ Adjusted EBITDA 640 / 470.
 | Total debt, 2026-09-30 | 5,723.0 | 10-Q Q3 2026, LongTermDebt |
 | Shares outstanding, 2026-10-30 | 604.5 (544.5 Class A + 60.0 Class B), in millions | 10-Q Q3 2026 cover |
 
-## Fiserv (FI, CIK 798354)
+## Fiserv (FISV, CIK 798354)
 
 | Number | Value | Source |
 |---|---|---|

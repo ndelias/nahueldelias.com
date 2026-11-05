@@ -138,7 +138,7 @@ const company = (name: string, ticker: string, cap: number, ev: number, revenue:
 export const COMPANIES: Company[] = [
   company('Toast', 'TOST', 20, 18.5, 6, 0.6, true),
   company('Block', 'XYZ', 40, 38, 24, 3.4),
-  company('Fiserv', 'FI', 80, 110, 21, null),
+  company('Fiserv', 'FISV', 80, 110, 21, null),
   company('Global Payments', 'GPN', 20, 36, 9, 4.5),
   company('Shift4', 'FOUR', 7, 10, 4, 1),
 ];
