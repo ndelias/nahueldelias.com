@@ -6,9 +6,8 @@ Adjusted figures are read from each company's earnings release (8-K,
 Exhibit 99.1), which isn't XBRL-tagged. Dollar figures in millions unless
 marked. LTM = FY2025 + nine months 2026 − nine months 2025, to 2026-09-30.
 
-Still to come: Shift4's and Global Payments' GAAP numbers (their Q3 2026
-10-Qs weren't filed as of 2026-11-05; their earnings releases were, and the
-adjusted figures below come from those), and share prices (not in any
+All five companies' Q3 2026 filings are in (Shift4's and Global Payments'
+10-Qs were filed 2026-11-05). Still to come: share prices (not in any
 filing). Decided 2026-11-05: one
 price date for all five, the last close before the numbers go in (once
 Shift4 and Global Payments have filed), from a public market source noted
@@ -73,25 +72,51 @@ Adjusted EBITDA 640 / 470.
 ## Shift4 (FOUR, CIK 1794669)
 
 Adjusted figures from the Q3 2026 release (8-K 0001794669-26-000049, filed
-2026-11-05, Ex. 99.1). GAAP numbers wait for the Q3 2026 10-Q.
+2026-11-05, Ex. 99.1). GAAP figures from the Q3 2026 10-Q
+(0001794669-26-000051, filed 2026-11-05) and the FY2025 10-K
+(0001794669-26-000010).
 
 | Number | Value | Source |
 |---|---|---|
+| Revenue FY2025 | 4,180 | 10-K FY2025, RevenueFromContractWithCustomerExcludingAssessedTax |
+| Revenue 9M 2026 | 3,735 | 10-Q Q3 2026 |
+| Revenue 9M 2025 | 2,991 | same, prior-year column |
+| **Revenue LTM** | **4,924** | Gross revenue, as reported. |
 | Adj. EBITDA Q4 2025 | 304 | Q3 2026 release, "Reconciliations of Net Income to Adjusted EBITDA", Three Months Ended Dec 31, 2025 |
 | Adj. EBITDA Q1 2026 | 234 | same table, Mar 31, 2026 |
 | Adj. EBITDA Q2 2026 | 284 | same table, Jun 30, 2026 |
 | Adj. EBITDA Q3 2026 | 310 | same table, Sep 30, 2026 |
 | **Adj. EBITDA LTM** | **1,132** | Sum of the four quarters. The release shows five quarters side by side and no nine-month column for this table, so the build here is four quarters, not FY + 9M − 9M. |
+| Cash and cash equivalents, 2026-09-30 | 1,242 | 10-Q Q3 2026, balance sheet |
+| Total debt, 2026-09-30 | 5,483 (650 current + 4,833 long-term) | 10-Q Q3 2026, balance sheet "Current portion of debt" + "Long-term debt"; XBRL LongTermDebt 5,483 |
+| Shares outstanding, 2026-10-31 | 74.9 (74,943,944 Class A), in millions | 10-Q Q3 2026 cover. The only class on the cover now (the release mentions the "Simplification Transactions" in Q1 2026). |
+| Preferred stock, 2026-09-30 | 10,253,296 shares, liquidation preference about 1,000 | 10-Q Q3 2026, "Preferred Stock Obligations". 6.00% mandatory convertible. Not in debt or shares above. |
 
 Note for the definitions: Shift4 reports gross revenue and leans on gross
 revenue less network fees (GRLNF) as its key measure. Its Adjusted EBITDA
-margin is over GRLNF, not revenue. Which revenue goes in the table is a
-question for when the 10-Q is in.
+margin is over GRLNF, not revenue. Which revenue goes in the table is still
+open. The table uses reported revenue, like the other four.
+
+Note for EV: Shift4's roughly $1.0 billion of mandatory convertible
+preferred is a claim ahead of common shareholders, and EV usually adds it.
+Left out of debt for now, to decide when EV is built.
 
 ## Global Payments (GPN, CIK 1123360)
 
+GAAP figures from the Q3 2026 10-Q (0001123360-26-000093, filed 2026-11-05)
+and the FY2025 10-K (0001123360-26-000008). Global Payments reports in
+thousands; figures here are converted to millions.
+
 | Number | Value | Source |
 |---|---|---|
+| Revenue FY2025 | 7,705.9 | 10-K FY2025, RevenueFromContractWithCustomerExcludingAssessedTax ($7,705,878 thousand) |
+| Revenue 9M 2026 | 9,596.8 | 10-Q Q3 2026 ($9,596,757 thousand) |
+| Revenue 9M 2025 | 5,809.1 | same, prior-year column ($5,809,114 thousand). Recast: the Q3 2025 10-Q said 5,773.1. The recast figure ties to the 10-K (5,809.1 + Q4 2025 revenue 1,896.8 from the Q4 2025 release = 7,705.9), so the LTM sits on one basis. |
+| **Revenue LTM** | **11,493.5** | |
+| Cash and cash equivalents, 2026-09-30 | 5,570.3 | 10-Q Q3 2026 ($5,570,261 thousand) |
+| Total debt, 2026-09-30 | 22,536.2 (1,455.3 current + 21,080.8 long-term) | 10-Q Q3 2026, balance sheet; XBRL LongTermDebtAndCapitalLeaseObligationsIncludingCurrentMaturities |
+| Settlement lines of credit, 2026-09-30 | 1,167.9 | Balance sheet. Short-term lines that fund merchant settlement, not counted as debt here. |
+| Shares outstanding, 2026-10-30 | 264.6 (264,635,810), in millions | 10-Q Q3 2026 cover |
 | Adj. EBITDA | **not reported** | Neither the Q3 2026 release (8-K 0001123360-26-000091, filed 2026-11-05) nor the Q4 2025 release (8-K 0001123360-26-000004) mentions EBITDA at all. Both report adjusted operating income. A second real Needs you, like Fiserv. |
 | Adj. operating income FY2025 | 4,116.3 | Q4 2025 release, Ex. 99.1, Year Ended Dec 31, 2025 (reported as $4,116,287 thousand) |
 | Adj. operating income 9M 2026 | 3,819.5 | Q3 2026 release, Ex. 99.1, Nine Months Ended Sep 30, 2026 ($3,819,474 thousand) |
@@ -106,7 +131,7 @@ Notes for the definitions:
   divested businesses. Its "normalized" comparisons use pro forma figures
   from Exhibit 99.2 of the 8-K filed 2026-08-05. An LTM built from reported
   periods mixes before and after the deal. Whether to note it or use those
-  pro forma figures is a question for when the 10-Q is in.
+  pro forma figures is still open.
 
 ## Links
 
@@ -121,4 +146,6 @@ Notes for the definitions:
 - Shift4 Q3 2026 release: https://www.sec.gov/Archives/edgar/data/1794669/000179466926000049/ex991q3.htm
 - Global Payments Q3 2026 release: https://www.sec.gov/Archives/edgar/data/1123360/000112336026000091/exhibit99120260930.htm
 - Global Payments Q4 2025 release: https://www.sec.gov/Archives/edgar/data/1123360/000112336026000004/exhibit99120251231.htm
+- Shift4 Q3 2026 10-Q: https://www.sec.gov/Archives/edgar/data/1794669/000179466926000051/four-20260930.htm
+- Global Payments Q3 2026 10-Q: https://www.sec.gov/Archives/edgar/data/1123360/000112336026000093/gpn-20260930.htm
 - Fiserv Q4 2025 release: https://www.sec.gov/Archives/edgar/data/798354/000079835426000006/fisv4q25earningsrelease.htm
