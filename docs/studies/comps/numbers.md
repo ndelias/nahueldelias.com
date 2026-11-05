@@ -7,7 +7,10 @@ Exhibit 99.1), which isn't XBRL-tagged. Dollar figures in millions unless
 marked. LTM = FY2025 + nine months 2026 − nine months 2025, to 2026-09-30.
 
 Still to come: Shift4 and Global Payments (Q3 2026 10-Qs not filed as of
-2026-11-05), and share prices (not in any filing; source and date to decide).
+2026-11-05), and share prices (not in any filing). Decided 2026-11-05: one
+price date for all five, the last close before the numbers go in (once
+Shift4 and Global Payments have filed), from a public market source noted
+here with the date.
 
 ## Toast (TOST, CIK 1650164)
 
