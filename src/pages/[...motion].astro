@@ -1,0 +1,136 @@
+---
+// /motion: small pieces of interaction and motion, each running live on its
+// own stage. One content entry per piece (src/content/motion/), one folder
+// per piece's code (src/motion/<id>/: Stage.astro is the markup it starts
+// from, rendered into the page, so it's complete before any script; piece.ts
+// is what makes it move, loaded by src/scripts/motion.ts when the stage
+// nears the viewport). Each label's size is that script, gzipped, measured
+// after the build (scripts/motion-sizes.mjs), so it can't drift.
+//
+// Too many pieces for one page's HTML budget, so they're split
+// (src/lib/motion.ts): /motion has the first screen, /motion/2/ onward the
+// rest. With JS the following pages are fetched and appended as the end
+// nears, so it reads as one page; without, they're linked.
+//
+// A dynamic route also so the page doesn't exist without pieces (sections
+// render only when they have entries); the Frame's nav follows the same rule.
+import type { GetStaticPaths } from 'astro';
+import AfterLoad from '../components/AfterLoad.astro';
+import Frame from '../components/Frame.astro';
+import Icon from '../components/Icon.astro';
+import MotionPiece from '../components/MotionPiece.astro';
+import Base from '../layouts/Base.astro';
+import { motionPieces, pageHref, paginate } from '../lib/motion';
+import loader from '../scripts/motion.ts?worker&url';
+
+export const getStaticPaths = (async () => {
+  const pages = paginate(await motionPieces());
+  if (!pages[0].length) return [];
+  return pages.map((pieces, i) => ({ params: { motion: i ? `motion/${i + 1}` : 'motion' }, props: { pieces, page: i + 1, pages: pages.length } }));
+}) satisfies GetStaticPaths;
+
+const { pieces, page, pages } = Astro.props;
+const first = page === 1;
+const range = `M${String(pieces[0].data.number).padStart(2, '0')}–M${String(pieces.at(-1)!.data.number).padStart(2, '0')}`;
+---
+<Base
+  title={first ? "Motion — Nahuel D'Elias" : `Motion, ${range} — Nahuel D'Elias`}
+  description="Interaction and motion by Nahuel D'Elias, a product engineer: small pieces that run live, each labeled with how it's built and how much code it loads."
+  noindex={!first}
+  preload={['sans-500', 'mono-400']}
+>
+  <Frame>
+    <main class="motion container">
+      {first ? (
+        <header class="head">
+          <p class="kicker mono muted">Nahuel D'Elias · Motion</p>
+          <h1>This is how I make things move.</h1>
+          <p class="lead muted">Each piece runs live on this page. Its label says how it's built and how much code it loads.</p>
+        </header>
+      ) : (
+        <header class="head">
+          <p class="kicker mono muted">Nahuel D'Elias · Motion · {page} of {pages}</p>
+          <h1 class="range">{range}</h1>
+        </header>
+      )}
+
+      <ol class="pieces grid" data-pieces>
+        {pieces.map((piece) => <MotionPiece piece={piece} />)}
+      </ol>
+
+      {pages > 1 && (
+        <nav class="more mono" aria-label="More pieces" data-motion-more>
+          {page > 1 && <a href={pageHref(page - 1)} rel="prev"><Icon name="arrow-left" /> Previous</a>}
+          {page < pages && <a href={pageHref(page + 1)} rel="next">More pieces <Icon name="arrow-right" /></a>}
+        </nav>
+      )}
+    </main>
+  </Frame>
+  <AfterLoad src={loader} />
+</Base>
+
+<style>
+  .motion {
+    /* The frame's header sits over the page on desktop. */
+    padding-top: 152px;
+    padding-bottom: var(--space-160);
+  }
+  .head {
+    max-width: 40rem;
+  }
+  .kicker {
+    margin: 0;
+  }
+  h1 {
+    margin: var(--space-16) 0 0;
+    font-size: var(--text-display);
+    line-height: var(--leading-display);
+    letter-spacing: var(--tracking-display);
+    text-wrap: balance;
+  }
+  .lead {
+    margin: var(--space-24) 0 0;
+    font-size: var(--text-lead);
+    line-height: var(--leading-lead);
+    text-wrap: pretty;
+  }
+
+  .range {
+    font-size: var(--text-h2);
+    line-height: var(--leading-h2);
+    letter-spacing: var(--tracking-h2);
+  }
+  .pieces {
+    margin: var(--space-96) 0 0;
+    padding: 0;
+    list-style: none;
+    row-gap: var(--space-64);
+  }
+  @media (max-width: 639.98px) {
+    .motion {
+      padding-top: var(--space-48);
+      padding-bottom: var(--space-96);
+    }
+    .pieces {
+      margin-top: var(--space-64);
+      row-gap: var(--space-48);
+    }
+  }
+
+  .more {
+    display: flex;
+    justify-content: space-between;
+    margin-top: var(--space-96);
+    font-size: var(--text-mono-lg);
+  }
+  .more a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-8);
+    min-height: 44px;
+    color: var(--accent);
+  }
+  .more [rel='next'] {
+    margin-left: auto;
+  }
+</style>

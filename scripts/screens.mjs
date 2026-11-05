@@ -251,8 +251,15 @@ async function shoot(browser, origin, { viewport, colorScheme, view, next = 0, p
     );
     await page.setViewportSize({ width: viewport.width, height });
     await settle(page);
-    // /motion's pieces mount once their stage is near; all are, now.
-    await page.waitForFunction(() => !document.querySelector('[data-piece]:not(.is-live)'), null, { timeout: 10_000 }).catch(() => {});
+    // /motion appends its following pages as the end nears (all at once in
+    // a viewport this tall), and its pieces mount once their stage is near.
+    await page
+      .waitForFunction(
+        () => !document.querySelector('[data-pieces]') || (document.documentElement.hasAttribute('data-motion-done') && !document.querySelector('[data-piece]:not(.is-live)')),
+        null,
+        { timeout: 15_000 },
+      )
+      .catch(() => {});
     await settle(page);
     const png = await page.screenshot();
     await ctx.close();

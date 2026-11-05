@@ -278,7 +278,8 @@ test("parts: they don't count toward the weight 1 cap and are never a homepage e
 
 // /motion pieces: frontmatter in src/content/motion/, code in src/motion/<id>/.
 const piece = (overrides = {}) => ({
-  number: 9,
+  // Past any real piece's number, so it never collides with one.
+  number: 99,
   title: 'A piece',
   note: 'What to try.',
   technique: ['TS'],

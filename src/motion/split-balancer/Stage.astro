@@ -1,0 +1,33 @@
+---
+// M06, the split balancer, rebuilt from Sheets' split step (piece.ts): one
+// side's contributors, each a slider that can't push the side past 100%, a
+// donut with an explicit Unallocated slice, and Split evenly. Roles stand in
+// for people. Without JS the sliders move but nothing clamps or redraws.
+const PARTIES = [
+  { id: 'writer', name: 'Songwriter', value: 50 },
+  { id: 'producer', name: 'Producer', value: 30 },
+  { id: 'feature', name: 'Featured artist', value: 0 },
+];
+const R = 15.9155; // circumference 100, so a share's length is its percent
+---
+<div class="balancer" data-balancer>
+  <div class="donut">
+    <svg viewBox="0 0 42 42" aria-hidden="true">
+      <circle class="track" cx="21" cy="21" r={R} />
+      {PARTIES.map((p, i) => <circle class={`slice s${i}`} cx="21" cy="21" r={R} data-slice={p.id} />)}
+    </svg>
+    <p class="total"><span data-total>80</span><span class="of mono">of 100%</span></p>
+  </div>
+  <div class="rows">
+    <p class="side mono">Composition</p>
+    {PARTIES.map((p, i) => (
+      <label class={`row s${i}`}>
+        <span class="name"><span class="dot" aria-hidden="true"></span>{p.name}</span>
+        <span class="pct mono" data-pct={p.id}>{p.value}%</span>
+        <input type="range" min="0" max="100" step="1" value={p.value} data-party={p.id} aria-valuetext={`${p.value}%`} />
+      </label>
+    ))}
+    <p class="left mono" data-left>20% unallocated</p>
+    <button type="button" class="even mono" data-even>Split evenly</button>
+  </div>
+</div>
