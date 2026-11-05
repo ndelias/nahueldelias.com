@@ -37,14 +37,16 @@ The site has one job with three parts: survive an eight-second skim, get a cold 
                       distribution. Each is a full case study with its own decision
 /studies/[slug]       Product studies — consumer reasoning, labeled concepts
 /data/[slug]          Data projects — hypothesis → evidence → decision
-/play                 Creative work: p5.js sketches, the toy, paper projects
+/motion               Interaction and motion pieces, live: UI, springs, Canvas,
+                      WebGL (added 2026-11-05)
+/play                 Creative work: the toy, paper projects
 /writing              Essay index
 /writing/[slug]       Essays
 /log                  Dated build log (linked from the homepage frame)
 /404                  Easter-egg toy (see §10)
 ```
 
-**Five sections, deliberately unequal:**
+**Six sections, deliberately unequal** (Motion added 2026-11-05; it took the code-driven sketches that were planned for Play):
 
 | Section | Weight | Contains | Purpose |
 |---|---|---|---|
@@ -52,6 +54,7 @@ The site has one job with three parts: survive an eight-second skim, get a cold 
 | **Studies** | 2 | Consumer/product studies, app teardowns | Product reasoning independent of employer |
 | **Data** | 2 | Hypothesis-driven analysis, dashboards | The analytical signal — see §4 |
 | **Play** | 3 | p5.js, toys, paper | Craft and appetite. Rewards exploring. |
+| **Motion** | 2 | Live interaction and motion pieces, each labeled with how it's built and its measured size | The design-engineering signal: motion in code, not in recordings |
 | **Writing** | 2 | Essays | Judgment and articulated taste |
 
 **Sections render only when populated.** The site must ship with two sections live and the rest absent — not visible-but-empty, not "coming soon." Empty states on a portfolio are worse than missing sections.

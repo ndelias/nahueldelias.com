@@ -89,6 +89,12 @@ const SITE = [
   { name: 'part-1440-dark', viewport: DESKTOP, colorScheme: 'dark', path: '/work/vers1ons/distribution/' },
   { name: 'part-390-light', viewport: PHONE, colorScheme: 'light', path: '/work/vers1ons/distribution/' },
   { name: 'part-390-dark', viewport: PHONE, colorScheme: 'dark', path: '/work/vers1ons/distribution/' },
+  // /motion, full length, under reduced motion: the pieces hold still (no
+  // autoplay, the shader's one fixed frame), so the shot is the same every run.
+  { name: 'motion-1440-light', viewport: DESKTOP, colorScheme: 'light', path: '/motion/', reducedMotion: 'reduce' },
+  { name: 'motion-1440-dark', viewport: DESKTOP, colorScheme: 'dark', path: '/motion/', reducedMotion: 'reduce' },
+  { name: 'motion-390-light', viewport: PHONE, colorScheme: 'light', path: '/motion/', reducedMotion: 'reduce' },
+  { name: 'motion-390-dark', viewport: PHONE, colorScheme: 'dark', path: '/motion/', reducedMotion: 'reduce' },
 ];
 
 // Case study pages against their canvas mocks, block by block: [name, site
@@ -172,8 +178,8 @@ async function loadAll(page) {
 }
 
 /** Load a page in a fresh context and put it in the given state. */
-async function shoot(browser, origin, { viewport, colorScheme, view, next = 0, path }) {
-  const ctx = await browser.newContext({ viewport, deviceScaleFactor: 1, colorScheme });
+async function shoot(browser, origin, { viewport, colorScheme, view, next = 0, path, reducedMotion = 'no-preference' }) {
+  const ctx = await browser.newContext({ viewport, deviceScaleFactor: 1, colorScheme, reducedMotion });
   // Every visit lands in light; dark is the toggle's choice, saved before
   // the page loads, as a returning visitor's would be.
   if (colorScheme === 'dark') await ctx.addInitScript(() => localStorage.setItem('theme', 'dark'));
@@ -244,6 +250,9 @@ async function shoot(browser, origin, { viewport, colorScheme, view, next = 0, p
       ),
     );
     await page.setViewportSize({ width: viewport.width, height });
+    await settle(page);
+    // /motion's pieces mount once their stage is near; all are, now.
+    await page.waitForFunction(() => !document.querySelector('[data-piece]:not(.is-live)'), null, { timeout: 10_000 }).catch(() => {});
     await settle(page);
     const png = await page.screenshot();
     await ctx.close();

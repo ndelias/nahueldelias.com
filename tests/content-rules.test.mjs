@@ -16,7 +16,7 @@ import { join, resolve } from 'node:path';
 
 const ROOT = resolve(import.meta.dirname, '..');
 const SECTIONS = ['work', 'studies', 'data', 'play', 'writing'];
-const COPY = ['src', 'public', 'astro.config.mjs', 'tsconfig.json', 'package.json'];
+const COPY = ['src', 'public', 'astro.config.mjs', 'scripts/motion-sizes.mjs', 'tsconfig.json', 'package.json'];
 
 const DECISION = { chose: 'A', rejected: 'B', cost: 'C' };
 const HYPOTHESIS = { claim: 'A', evidence: 'B', outcome: 'C' };
@@ -274,4 +274,34 @@ test("parts: they don't count toward the weight 1 cap and are never a homepage e
   } finally {
     await result.cleanup();
   }
+});
+
+// /motion pieces: frontmatter in src/content/motion/, code in src/motion/<id>/.
+const piece = (overrides = {}) => ({
+  number: 9,
+  title: 'A piece',
+  note: 'What to try.',
+  technique: ['TS'],
+  status: 'concept',
+  ...overrides,
+});
+// The rest of the site has to build for the /motion page to be reached.
+const site = () => ({
+  'work/first': entry({ weight: 1, decision: DECISION }),
+  'work/second': entry({ weight: 1, decision: DECISION }),
+});
+
+test('motion: a shipped piece must say where it shipped', async () => {
+  const result = await build({ 'motion/shipped': piece({ status: 'shipped' }) });
+  await assertFails(result, 'A shipped piece says where it shipped', 'src/content/motion/shipped.mdx');
+});
+
+test('motion: an entry with no piece code fails the build and names it', async () => {
+  const result = await build({ ...site(), 'motion/missing': piece() });
+  await assertFails(result, '/motion: "missing" has no piece. Add src/motion/missing/Stage.astro and piece.ts.');
+});
+
+test('motion: two pieces with one number fail the build', async () => {
+  const result = await build({ ...site(), 'motion/spring-toggle': piece({ number: 1 }), 'motion/hold-to-confirm': piece({ number: 1 }) });
+  await assertFails(result, 'are both number 1');
 });
