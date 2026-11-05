@@ -68,7 +68,9 @@ define('number-ticker', (stage, { reduce }) => {
     num.style.width = `${from}px`;
     num.getBoundingClientRect(); // commit the old width before easing
     num.style.width = `${to}px`;
-    requestAnimationFrame(() => requestAnimationFrame(() => roll(formatted)));
+    // Two frames on, roll to whatever the value is by then (another click
+    // may have come in).
+    requestAnimationFrame(() => requestAnimationFrame(() => roll(format(value))));
   };
   num.addEventListener('transitionend', (e) => {
     if (e.target === num) num.style.width = '';

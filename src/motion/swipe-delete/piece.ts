@@ -5,9 +5,10 @@
 // letting go now will delete. Released past the line (or flicked), the front
 // slides off and the row's height closes (a grid track from 1fr to 0fr), so
 // the rows below rise into its place; short of it, it springs back. An undo
-// bar then waits 5s: Undo reopens the row and slides the front back in.
-// Delete or Backspace on a focused row does the same as a swipe. When every
-// row is gone, one button brings them all back. Reduced motion: no slide or
+// bar then waits 5s: Undo reopens the latest row and slides the front back
+// in, and deleting several in a row lets Undo bring them back one by one.
+// Delete or Backspace on a focused row does the same as a swipe. Once the
+// undo bar has gone, one button brings back whatever is still deleted. Reduced motion: no slide or
 // close, the row simply goes and comes back.
 
 import { define } from '../runtime';
@@ -28,9 +29,11 @@ define('swipe-delete', (stage, { reduce }) => {
     behind: li.querySelector<HTMLElement>('.behind')!,
     x: new Spring(0, 240),
     gone: false,
+    closing: 0,
   }));
   type Item = (typeof items)[number];
-  let last: Item | null = null;
+  // Deleted rows, latest last: Undo brings back one at a time, newest first.
+  const deleted: Item[] = [];
   let timer = 0;
   const title = (it: Item) => it.front.querySelector('.title')!.textContent;
 
@@ -58,21 +61,35 @@ define('swipe-delete', (stage, { reduce }) => {
     it.x.target = -it.front.offsetWidth - 20;
     if (reduce) it.x.snap();
     anim.start();
-    // Close the gap once the front is mostly off.
-    setTimeout(() => it.li.classList.add('gone'), reduce ? 0 : 160);
+    // Close the gap once the front is mostly off (cancelled if undone first).
+    it.closing = window.setTimeout(() => it.li.classList.add('gone'), reduce ? 0 : 160);
     it.front.tabIndex = -1;
-    last = it;
-    undoText.textContent = `${title(it)} deleted`;
-    undo.hidden = false;
+    deleted.push(it);
     said.textContent = `${title(it)} deleted. Undo is available.`;
-    clearTimeout(timer);
-    timer = window.setTimeout(() => (undo.hidden = true), UNDO_MS);
-    restore.hidden = items.some((i) => !i.gone);
+    offer();
     // Keep focus in the list: the next row, or the one before.
     const next = items.find((i, k) => k > items.indexOf(it) && !i.gone) ?? [...items].reverse().find((i) => !i.gone);
     if (document.activeElement === it.front) (next?.front ?? undo.querySelector('button')!).focus();
   };
+  // The undo bar names the latest deletion and lasts 5s from it; after
+  // that, anything still gone can come back with the button below.
+  const offer = () => {
+    clearTimeout(timer);
+    const it = deleted.at(-1);
+    undo.hidden = !it;
+    if (it) {
+      const more = deleted.length - 1;
+      undoText.textContent = `${title(it)} deleted${more ? ` (and ${more} more)` : ''}`;
+      timer = window.setTimeout(() => {
+        deleted.length = 0;
+        undo.hidden = true;
+        restore.hidden = !items.some((i) => i.gone);
+      }, UNDO_MS);
+    }
+    restore.hidden = !undo.hidden || !items.some((i) => i.gone);
+  };
   const bring = (it: Item) => {
+    clearTimeout(it.closing);
     it.gone = false;
     it.li.classList.remove('gone');
     it.front.tabIndex = 0;
@@ -84,18 +101,17 @@ define('swipe-delete', (stage, { reduce }) => {
   };
 
   root.querySelector('[data-undo-button]')!.addEventListener('click', () => {
-    if (!last) return;
-    bring(last);
-    last.front.focus();
-    said.textContent = `${title(last)} restored.`;
-    last = null;
-    undo.hidden = true;
-    restore.hidden = true;
+    const it = deleted.pop();
+    if (!it) return;
+    bring(it);
+    it.front.focus();
+    said.textContent = `${title(it)} restored.`;
+    offer();
   });
   restore.addEventListener('click', () => {
-    items.forEach(bring);
-    restore.hidden = true;
-    undo.hidden = true;
+    items.filter((i) => i.gone).forEach(bring);
+    deleted.length = 0;
+    offer();
     items[0].front.focus();
   });
 

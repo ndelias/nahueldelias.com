@@ -427,6 +427,15 @@ test('swipe to delete: Delete removes a row, Undo brings it back, a swipe delete
   await page.click(`${p} [data-undo-button]`);
   await page.waitForTimeout(600);
   assert.equal(await page.$$eval(`${p} .item.gone`, (els) => els.length), 0);
+  // Two quick deletes: Undo brings both back, newest first.
+  await page.focus(`${p} [data-front]`);
+  await page.keyboard.press('Delete');
+  await page.keyboard.press('Delete');
+  assert.equal(await page.$eval(`${p} [data-undo-text]`, (e) => e.textContent), 'Static Bloom, split sheet deleted (and 1 more)');
+  await page.click(`${p} [data-undo-button]`);
+  await page.click(`${p} [data-undo-button]`);
+  await page.waitForTimeout(600);
+  assert.equal(await page.$$eval(`${p} .item.gone`, (els) => els.length), 0, 'a quick second delete lost the first undo');
   const row = await page.locator(`${p} [data-front]`).nth(1).boundingBox();
   await page.mouse.move(row.x + row.width - 20, row.y + row.height / 2);
   await page.mouse.down();
