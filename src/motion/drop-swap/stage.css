@@ -77,10 +77,13 @@
 .cue {
   position: absolute;
   left: 50%;
-  bottom: 6px;
+  bottom: 5px;
   translate: -50% 0;
-  font-size: var(--text-mono-sm);
-  color: var(--muted);
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
   animation: cue 2.2s ease-in-out infinite;
 }
 @keyframes cue {

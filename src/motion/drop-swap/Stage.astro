@@ -14,7 +14,9 @@
         <p class="sub">Open for licensing until Friday</p>
         <button type="button" class="cta" data-to="detail">License details</button>
       </div>
-      <span class="cue mono" aria-hidden="true">Scroll</span>
+      {/* A chevron, not a word: it pulses down to 30%, which text couldn't do
+          and stay readable (WCAG AA). */}
+      <svg class="cue" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M4 6l4 4 4-4" /></svg>
     </section>
     <section class="detail" data-detail>
       <p class="mono kicker">License details</p>

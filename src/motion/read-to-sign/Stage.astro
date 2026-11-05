@@ -29,7 +29,9 @@ const SECTIONS = [
       <p class="title">Licence agreement <span class="mono muted">Sample</span></p>
       {SECTIONS.map(({ id, title, text }) => (
         <section data-section={id}>
-          <h3>{id}. {title}</h3>
+          {/* Not a heading: the piece's own h2 comes after its stage, so an h3
+              here would skip a level in the page's outline. */}
+          <p class="clause">{id}. {title}</p>
           {text.map((line) => <p>{line}</p>)}
         </section>
       ))}

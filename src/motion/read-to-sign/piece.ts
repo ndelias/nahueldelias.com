@@ -47,7 +47,7 @@ define('read-to-sign', (stage, { reduce }) => {
       if (offset < box.clientHeight * 0.75) jumps.get(s.dataset.section!)?.classList.add('seen');
     }
     const id = at.dataset.section!;
-    current.textContent = `${id} · ${at.querySelector('h3')!.textContent!.replace(/^\d+\. /, '')}`;
+    current.textContent = `${id} · ${at.querySelector('.clause')!.textContent!.replace(/^\d+\. /, '')}`;
     jumps.forEach((b, key) => b.setAttribute('aria-current', String(key === id)));
     const max = box.scrollHeight - box.clientHeight;
     bar.style.setProperty('--read', (max <= 0 ? 1 : Math.min(1, box.scrollTop / max)).toFixed(3));

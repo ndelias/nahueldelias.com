@@ -108,12 +108,12 @@ section.flash {
   background: color-mix(in srgb, var(--vers1ons) 12%, transparent);
   transition-duration: 0ms;
 }
-h3 {
+.clause {
   margin: 0 0 2px;
   font-size: var(--text-caption);
   font-weight: var(--weight-medium);
 }
-section p {
+section p:not(.clause) {
   margin: 0 0 4px;
   color: var(--muted);
 }
