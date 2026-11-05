@@ -40,7 +40,11 @@
   .hold.held {
     transform: scale(0.97);
   }
+  /* Positioned with explicit layers: the fill's clip-path would otherwise
+     paint it over "Signed" whenever that's at full opacity (an element at
+     opacity 1 drops back to ordinary paint order, under the clipped fill). */
   .face {
+    position: relative;
     grid-area: 1 / 1;
     display: flex;
     align-items: center;
@@ -54,9 +58,11 @@
     color: var(--bg);
   }
   .fill {
+    z-index: 1;
     clip-path: inset(0 calc(100% - var(--p, 0) * 100%) 0 0);
   }
   .done {
+    z-index: 2;
     opacity: 0;
     transition: opacity 240ms var(--ease);
   }
@@ -67,9 +73,11 @@
     stroke-linecap: round;
     stroke-linejoin: round;
   }
+  /* Undrawn again only once "Signed" has faded out, not under it. */
   .done path {
     stroke-dasharray: 1;
     stroke-dashoffset: 1;
+    transition: stroke-dashoffset 0s linear 240ms;
   }
   .hold.is-done .done {
     opacity: 1;

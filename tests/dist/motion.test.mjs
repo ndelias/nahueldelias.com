@@ -93,9 +93,15 @@ test('holding fills and signs; letting go early drains it back', async () => {
   await page.keyboard.up(' ');
   assert.ok(await page.$eval('[data-hold]', (b) => b.classList.contains('is-done')), 'a full hold signs');
   assert.equal(await page.$eval('[data-piece="hold-to-confirm"] [data-stage] [data-status]', (s) => s.textContent), 'Signed');
-  // Full while "Signed" shows: draining under it reads as a flicker.
+  // Full while "Signed" shows: draining under it reads as a flicker. And
+  // "Signed" is what's on top, after its fade has finished too.
   await page.waitForTimeout(500);
   assert.equal(await p(), 1, 'it drains under "Signed"');
+  const top = await page.$eval('[data-hold]', (b) => {
+    const r = b.getBoundingClientRect();
+    return document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2)?.closest('.face')?.classList.contains('done');
+  });
+  assert.ok(top, '"Signed" is painted under the fill');
   // Then back to the label, and only then empty.
   await page.waitForTimeout(2200);
   assert.ok(!(await page.$eval('[data-hold]', (b) => b.classList.contains('is-done'))), 'it resets');
