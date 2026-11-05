@@ -6,8 +6,10 @@ Adjusted figures are read from each company's earnings release (8-K,
 Exhibit 99.1), which isn't XBRL-tagged. Dollar figures in millions unless
 marked. LTM = FY2025 + nine months 2026 − nine months 2025, to 2026-09-30.
 
-Still to come: Shift4 and Global Payments (Q3 2026 10-Qs not filed as of
-2026-11-05), and share prices (not in any filing). Decided 2026-11-05: one
+Still to come: Shift4's and Global Payments' GAAP numbers (their Q3 2026
+10-Qs weren't filed as of 2026-11-05; their earnings releases were, and the
+adjusted figures below come from those), and share prices (not in any
+filing). Decided 2026-11-05: one
 price date for all five, the last close before the numbers go in (once
 Shift4 and Global Payments have filed), from a public market source noted
 here with the date.
@@ -68,6 +70,44 @@ Adjusted EBITDA 640 / 470.
 | Total debt, 2026-09-30 | 27,063 (1,254 current + 25,809 long-term) | 10-Q Q3 2026, DebtCurrent + LongTermDebtAndCapitalLeaseObligations |
 | Shares outstanding, 2026-10-30 | 532.0, in millions | 10-Q Q3 2026 cover |
 
+## Shift4 (FOUR, CIK 1794669)
+
+Adjusted figures from the Q3 2026 release (8-K 0001794669-26-000049, filed
+2026-11-05, Ex. 99.1). GAAP numbers wait for the Q3 2026 10-Q.
+
+| Number | Value | Source |
+|---|---|---|
+| Adj. EBITDA Q4 2025 | 304 | Q3 2026 release, "Reconciliations of Net Income to Adjusted EBITDA", Three Months Ended Dec 31, 2025 |
+| Adj. EBITDA Q1 2026 | 234 | same table, Mar 31, 2026 |
+| Adj. EBITDA Q2 2026 | 284 | same table, Jun 30, 2026 |
+| Adj. EBITDA Q3 2026 | 310 | same table, Sep 30, 2026 |
+| **Adj. EBITDA LTM** | **1,132** | Sum of the four quarters. The release shows five quarters side by side and no nine-month column for this table, so the build here is four quarters, not FY + 9M − 9M. |
+
+Note for the definitions: Shift4 reports gross revenue and leans on gross
+revenue less network fees (GRLNF) as its key measure. Its Adjusted EBITDA
+margin is over GRLNF, not revenue. Which revenue goes in the table is a
+question for when the 10-Q is in.
+
+## Global Payments (GPN, CIK 1123360)
+
+| Number | Value | Source |
+|---|---|---|
+| Adj. EBITDA | **not reported** | Neither the Q3 2026 release (8-K 0001123360-26-000091, filed 2026-11-05) nor the Q4 2025 release (8-K 0001123360-26-000004) mentions EBITDA at all. Both report adjusted operating income. A second real Needs you, like Fiserv. |
+| Adj. operating income FY2025 | 4,116.3 | Q4 2025 release, Ex. 99.1, Year Ended Dec 31, 2025 (reported as $4,116,287 thousand) |
+| Adj. operating income 9M 2026 | 3,819.5 | Q3 2026 release, Ex. 99.1, Nine Months Ended Sep 30, 2026 ($3,819,474 thousand) |
+| Adj. operating income 9M 2025 | 3,079.5 | same, 2025 column ($3,079,466 thousand) |
+| Adj. operating income LTM | 4,856.3 | shown in the panel for the analyst, not used as EBITDA |
+
+Notes for the definitions:
+- Global Payments reports in thousands. The others report in millions. This
+  is the units check from the study's Checks section, for real.
+- Adjusted net revenue grew 31% in Q3 2026 against Q3 2025. The release
+  says why: it now includes Worldpay and excludes Issuer Solutions and other
+  divested businesses. Its "normalized" comparisons use pro forma figures
+  from Exhibit 99.2 of the 8-K filed 2026-08-05. An LTM built from reported
+  periods mixes before and after the deal. Whether to note it or use those
+  pro forma figures is a question for when the 10-Q is in.
+
 ## Links
 
 - Toast Q3 2026 10-Q: https://www.sec.gov/Archives/edgar/data/1650164/000165016426000216/tost-20260930.htm
@@ -78,4 +118,7 @@ Adjusted EBITDA 640 / 470.
 - Block Q4 2025 letter: https://www.sec.gov/Archives/edgar/data/1512673/000119312526076557/d108590dex991.htm
 - Fiserv Q3 2026 10-Q: https://www.sec.gov/Archives/edgar/data/798354/000079835426000042/fisv-20260930.htm
 - Fiserv Q3 2026 release: https://www.sec.gov/Archives/edgar/data/798354/000079835426000039/fisvq326earningsrelease.htm
+- Shift4 Q3 2026 release: https://www.sec.gov/Archives/edgar/data/1794669/000179466926000049/ex991q3.htm
+- Global Payments Q3 2026 release: https://www.sec.gov/Archives/edgar/data/1123360/000112336026000091/exhibit99120260930.htm
+- Global Payments Q4 2025 release: https://www.sec.gov/Archives/edgar/data/1123360/000112336026000004/exhibit99120251231.htm
 - Fiserv Q4 2025 release: https://www.sec.gov/Archives/edgar/data/798354/000079835426000006/fisv4q25earningsrelease.htm
