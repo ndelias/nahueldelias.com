@@ -13,8 +13,8 @@
 //
 // One easing for all of it, the site's. Under reduced motion nothing moves
 // or counts: values are simply there.
-import { useEffect, useRef, useState } from 'preact/hooks';
-import { Fragment, type JSX } from 'preact';
+import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
+import { Fragment } from 'preact';
 import { AnimatePresence, LazyMotion, animate, domAnimation, m, useInView, useReducedMotion, type Transition } from 'framer-motion';
 import { COLUMNS, COMPANIES, INPUTS, SAMPLE, type Cell, type Input } from './data';
 
@@ -56,12 +56,15 @@ const notesOf = (rows: Rows) =>
 const STATE_TEXT = { sourced: 'sourced from a filing', adjusted: 'adjusted', needs: 'needs you, no line found', yours: 'set by you' };
 
 /** A number that counts from where it was to where it is. It mounts at its
- *  value, unless `from` says where to count from. */
+ *  value, unless `from` says where to count from. The text is only ever
+ *  written here, never re-rendered by Preact, so the two can't disagree; a
+ *  layout effect, so a jump (reduced motion, no change) lands before paint. */
 function Count({ value, digits, suffix = '', from, reduce }: { value: number | null; digits: number; suffix?: string; from?: number; reduce: boolean }) {
   const ref = useRef<HTMLSpanElement>(null);
-  const last = useRef<number | null>(from ?? value);
   const text = (v: number | null) => (v === null ? '—' : fmt(v, digits) + suffix);
-  useEffect(() => {
+  const first = useRef(text(from ?? value));
+  const last = useRef<number | null>(from ?? value);
+  useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
     const start = last.current ?? 0;
@@ -73,7 +76,7 @@ function Count({ value, digits, suffix = '', from, reduce }: { value: number | n
     const run = animate(start, value, { duration: 0.5, ease: EASE, onUpdate: (v) => (el.textContent = text(v)) });
     return () => run.stop();
   }, [value, reduce]);
-  return <span ref={ref}>{text(from ?? value)}</span>;
+  return <span ref={ref}>{first.current}</span>;
 }
 
 /** A light tint over a cell that just changed, fading over 1.2s. */
@@ -164,7 +167,7 @@ export default function CompsBuilder({ piece }: { piece: Piece }) {
     setFocus({ row, col });
     buttons.current[row][col]?.focus();
   };
-  const onKey = (e: JSX.TargetedKeyboardEvent<HTMLElement>) => {
+  const onKey = (e: KeyboardEvent) => {
     const steps: Record<string, Pos> = {
       ArrowUp: { row: focus.row - 1, col: focus.col },
       ArrowDown: { row: focus.row + 1, col: focus.col },
@@ -189,12 +192,11 @@ export default function CompsBuilder({ piece }: { piece: Piece }) {
     setSel(null);
     buttons.current[back.row][back.col]?.focus();
   };
-  useEffect(() => {
-    if (!sel) return;
-    const esc = (e: KeyboardEvent) => e.key === 'Escape' && close();
-    addEventListener('keydown', esc);
-    return () => removeEventListener('keydown', esc);
-  }, [sel]);
+  // Escape closes the source from anywhere in the piece (an entry's own
+  // Escape only cancels the entry).
+  const onEscape = (e: KeyboardEvent) => {
+    if (e.key === 'Escape' && sel) close();
+  };
 
   // A fix: the number takes the analyst's value, the multiples, median and
   // mean recount, and one message says what moved.
@@ -296,7 +298,7 @@ export default function CompsBuilder({ piece }: { piece: Piece }) {
 
   return (
     <LazyMotion features={domAnimation} strict>
-      <section ref={root} class={`comps comps-${piece}`} aria-label={piece === 'fill' ? 'The builder filling the table' : piece === 'trace' ? 'Tracing a number to its filing' : 'Correcting a number'}>
+      <section ref={root} onKeyDown={live ? onEscape : undefined} class={`comps comps-${piece}`} aria-label={piece === 'fill' ? 'The builder filling the table' : piece === 'trace' ? 'Tracing a number to its filing' : 'Correcting a number'}>
         <div class="app">
           <div class="main">
             <div class="head">
