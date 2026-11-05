@@ -208,3 +208,121 @@ test('the tape: dragging pulls it to a step, it stops at its wall, double-click 
   assert.deepEqual(errors, []);
   await ctx.close();
 });
+
+// The pieces past the first screen come from /motion/2/ onward; open() lands
+// on /motion, so scroll each into view and wait for it.
+async function reach(page, id) {
+  await page.waitForFunction(
+    async (id) => {
+      const el = document.querySelector(`[data-piece="${id}"]`);
+      if (el) return (el.scrollIntoView({ block: 'center' }), true);
+      scrollTo(0, document.body.scrollHeight);
+      return false;
+    },
+    id,
+    { timeout: 10_000, polling: 200 },
+  );
+  await live(page, id);
+}
+
+test('the following pages are appended, each piece once, in order, with its styles', async () => {
+  const { ctx, page, errors } = await open();
+  await page.evaluate(() => scrollTo(0, document.body.scrollHeight));
+  await page.waitForFunction(() => document.documentElement.hasAttribute('data-motion-done'), null, { timeout: 10_000 });
+  const ids = await page.$$eval('[data-pieces] > [data-piece]', (els) => els.map((e) => e.dataset.piece));
+  assert.equal(new Set(ids).size, ids.length, 'a piece appended twice');
+  const codes = await page.$$eval('[data-pieces] .caption > .mono:first-child', (els) => els.map((e) => e.textContent));
+  assert.deepEqual(codes, [...codes].sort(), 'pieces out of order');
+  // An appended stage is styled (its inline styles came with it).
+  assert.equal(await page.$eval('[data-piece="read-to-sign"] .reader', (e) => getComputedStyle(e).display), 'grid');
+  assert.equal(await page.$('[data-motion-more]'), null, 'the More link stays after the last page');
+  assert.deepEqual(errors, []);
+  await ctx.close();
+});
+
+test('every page of pieces is in the HTML budget and links on without JS', async () => {
+  const first = await readFile(join(DIST, 'motion/index.html'), 'utf8');
+  assert.match(first, /<a href="\/motion\/2\/" rel="next"/);
+  const second = await readFile(join(DIST, 'motion/2/index.html'), 'utf8');
+  assert.match(second, /<meta name="robots" content="noindex"/);
+  assert.match(second, /<a href="\/motion\/" rel="prev"/);
+});
+
+test('read to sign: signing unlocks only at the end, and the contents follow', async () => {
+  const { ctx, page, errors } = await open();
+  await reach(page, 'read-to-sign');
+  const p = '[data-piece="read-to-sign"]';
+  assert.equal(await page.$eval(`${p} [data-ack]`, (i) => i.disabled), true, 'unlocked before reading');
+  await page.click(`${p} [data-jump="4"]`);
+  await page.waitForTimeout(900);
+  assert.match(await page.$eval(`${p} [data-current]`, (e) => e.textContent), /^4 · Fees/);
+  assert.equal(await page.$eval(`${p} [data-ack]`, (i) => i.disabled), true, 'a jump mid-way unlocked it');
+  await page.$eval(`${p} [data-scroll]`, (b) => b.scrollTo(0, b.scrollHeight));
+  await page.waitForTimeout(300);
+  assert.equal(await page.$eval(`${p} [data-ack]`, (i) => i.disabled), false, 'still locked at the end');
+  assert.equal(await page.$eval(`${p} [data-read-status]`, (e) => e.textContent), "You've reached the end");
+  assert.equal(await page.$$eval(`${p} .seen`, (els) => els.length), 6, 'every section ticked');
+  await page.check(`${p} [data-ack]`);
+  assert.equal(await page.$eval(`${p} [data-sign]`, (b) => b.disabled), false);
+  assert.deepEqual(errors, []);
+  await ctx.close();
+});
+
+test('split balancer: a share stops where the others begin; split evenly is to the cent', async () => {
+  const { ctx, page, errors } = await open();
+  await reach(page, 'split-balancer');
+  const p = '[data-piece="split-balancer"]';
+  // 50 + 30 taken: the third can have at most 20.
+  await page.$eval(`${p} [data-party="feature"]`, (i) => ((i.value = '90'), i.dispatchEvent(new Event('input', { bubbles: true }))));
+  assert.equal(await page.$eval(`${p} [data-party="feature"]`, (i) => i.value), '20');
+  assert.equal(await page.$eval(`${p} [data-left]`, (e) => e.textContent), 'Fully allocated');
+  await page.click(`${p} [data-even]`);
+  assert.deepEqual(await page.$$eval(`${p} [data-pct]`, (els) => els.map((e) => e.textContent)), ['33.34%', '33.33%', '33.33%']);
+  assert.deepEqual(errors, []);
+  await ctx.close();
+});
+
+test('drop screen swap: one wheel tick swaps to the details, one up swaps back', async () => {
+  const { ctx, page, errors } = await open();
+  await reach(page, 'drop-swap');
+  const p = '[data-piece="drop-swap"]';
+  // Hover first: the page may still be settling from the appended pieces.
+  await page.waitForTimeout(300);
+  await page.locator(`${p} [data-box]`).hover();
+  await page.mouse.wheel(0, 10);
+  await page.waitForTimeout(1400);
+  const seam = await page.$eval(`${p} [data-detail]`, (d) => d.offsetTop);
+  const top = await page.$eval(`${p} [data-box]`, (b) => b.scrollTop);
+  assert.ok(Math.abs(top - seam) <= 1, `not at the details (${top} of ${seam})`);
+  await page.mouse.wheel(0, -10);
+  await page.waitForTimeout(1400);
+  assert.equal(await page.$eval(`${p} [data-box]`, (b) => b.scrollTop), 0, 'not back at the hero');
+  // Back at the top, scrolling up moves the page, not the box.
+  const y = await page.evaluate(() => scrollY);
+  await page.mouse.wheel(0, -200);
+  await page.waitForTimeout(400);
+  assert.ok((await page.evaluate(() => scrollY)) < y, 'the box kept the page from scrolling up');
+  assert.deepEqual(errors, []);
+  await ctx.close();
+});
+
+test('scramble: the portrait settles when it comes into view; orbit springs: the dials redraw the curve', async () => {
+  const { ctx, page, errors } = await open();
+  await reach(page, 'scramble');
+  await page.waitForTimeout(3000);
+  const inked = await page.$eval('[data-piece="scramble"] canvas', (c) => {
+    const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
+    let n = 0;
+    for (let i = 3; i < d.length; i += 4) if (d[i]) n++;
+    return n;
+  });
+  assert.ok(inked > 1000, `the portrait didn't draw (${inked})`);
+  await reach(page, 'orbit-springs');
+  const p = '[data-piece="orbit-springs"]';
+  const before = await page.$eval(`${p} [data-curve]`, (e) => e.getAttribute('d'));
+  await page.$eval(`${p} [data-z]`, (i) => ((i.value = '0.3'), i.dispatchEvent(new Event('input', { bubbles: true }))));
+  assert.notEqual(await page.$eval(`${p} [data-curve]`, (e) => e.getAttribute('d')), before);
+  assert.match(await page.$eval(`${p} [data-z-out]`, (e) => e.textContent), /under/);
+  assert.deepEqual(errors, []);
+  await ctx.close();
+});

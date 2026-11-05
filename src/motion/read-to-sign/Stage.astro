@@ -1,0 +1,51 @@
+---
+// M05, read to sign, rebuilt from vers1ons' agreement reader (piece.ts):
+// a contents rail, a sticky header with the section under it and a reading
+// bar, the text, and an end marker that unlocks signing. The text is a
+// short sample. Without JS it reads as a plain scrolling agreement.
+const SECTIONS = [
+  { id: '1', title: 'Parties', text: ['This licence is between the rightsholder of the song and you, the licensee.', 'Each of you warrants that you can enter into it, and that no one else needs to agree for it to hold.'] },
+  { id: '2', title: 'Grant of rights', text: ['The rightsholder grants you a non-exclusive right to use the master and the composition in the one production named in the deal schedule.', 'Any use outside that production needs a licence of its own.'] },
+  { id: '3', title: 'Territory and term', text: ['The licence covers the territory and runs for the term in the deal schedule.', 'Uses released before it ends stay licensed after it ends. New uses after that need a renewal.'] },
+  { id: '4', title: 'Fees and royalties', text: ['You pay the fee at checkout.', 'Royalties from the production are split among the song’s contributors as their split sheet records, and paid to each of them directly.'] },
+  { id: '5', title: 'Credit', text: ['Credit the song, its writers and its performers wherever the production lists credits, in the form the deal schedule gives.'] },
+  { id: '6', title: 'Ending the licence', text: ['If a payment fails or a use goes beyond the grant, the rightsholder can end the licence after notice and a chance to put it right.', 'Ending it doesn’t undo what you’ve already paid for.'] },
+];
+---
+<div class="reader" data-reader>
+  <nav class="toc" aria-label="Sections">
+    <ol>
+      {SECTIONS.map(({ id, title }) => (
+        <li><button type="button" data-jump={id}><span class="tick" aria-hidden="true"></span><span>{id}. {title}</span></button></li>
+      ))}
+    </ol>
+  </nav>
+  <div class="doc">
+    <div class="head mono" aria-hidden="true">
+      <span data-current>1 · Parties</span>
+      <span class="bar"><span data-progress></span></span>
+    </div>
+    <div class="scroll" tabindex="0" aria-label="Sample licence agreement" data-scroll>
+      <p class="title">Licence agreement <span class="mono muted">Sample</span></p>
+      {SECTIONS.map(({ id, title, text }) => (
+        <section data-section={id}>
+          {/* Not a heading: the piece's own h2 comes after its stage, so an h3
+              here would skip a level in the page's outline. */}
+          <p class="clause">{id}. {title}</p>
+          {text.map((line) => <p>{line}</p>)}
+        </section>
+      ))}
+      <div class="end" data-end>
+        <span class="seal" aria-hidden="true">
+          <svg class="lock" viewBox="0 0 16 16" width="16" height="16"><rect x="3.5" y="7" width="9" height="6.5" rx="1.5" /><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" /></svg>
+          <svg class="check" viewBox="0 0 16 16" width="16" height="16"><path d="M3.5 8.5l3 3 6-7" /></svg>
+        </span>
+        <p role="status" data-read-status>Keep reading to sign</p>
+      </div>
+    </div>
+    <div class="sign">
+      <label><input type="checkbox" disabled data-ack /> I've read it</label>
+      <button type="button" disabled data-sign>Sign</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,96 @@
+.lab {
+  display: grid;
+  gap: 20px;
+  width: min(100%, 520px);
+}
+.row {
+  position: relative;
+  height: 120px;
+}
+.card {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 64px;
+  height: 84px;
+  margin: -42px 0 0 -32px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: var(--c);
+  cursor: pointer;
+  will-change: transform;
+}
+.c0 {
+  --c: color-mix(in srgb, var(--ink) 85%, var(--surface));
+}
+.c1 {
+  --c: var(--vers1ons);
+}
+.c2 {
+  --c: var(--accent);
+}
+.c3 {
+  --c: var(--money);
+}
+.c4 {
+  --c: color-mix(in srgb, var(--muted) 70%, var(--surface));
+}
+.panel {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  column-gap: 16px;
+  row-gap: 8px;
+  align-items: center;
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--bg);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.curve {
+  grid-row: 1 / 3;
+  width: 120px;
+  height: 48px;
+  overflow: visible;
+}
+.curve path {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+.target {
+  stroke: var(--line);
+  stroke-dasharray: 2 2;
+  vector-effect: non-scaling-stroke;
+}
+.dial {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr) 7rem;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--text-mono-sm);
+  color: var(--muted);
+}
+.dial input {
+  width: 100%;
+  margin: 0;
+  accent-color: var(--ink);
+}
+.dial output {
+  color: var(--ink);
+  text-align: right;
+}
+@media (max-width: 639.98px) {
+  .panel {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .curve {
+    grid-row: auto;
+    width: 100%;
+  }
+  .dial {
+    grid-template-columns: 4.5rem minmax(0, 1fr) 6rem;
+  }
+}

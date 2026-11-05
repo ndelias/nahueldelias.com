@@ -1,0 +1,211 @@
+/* Pinned to the stage, so the text scrolls inside it (and the gate has
+   something to read) rather than growing past the stage's edge. */
+.reader {
+  position: absolute;
+  inset: var(--space-24);
+  display: grid;
+  grid-template-columns: 9.5rem minmax(0, 1fr);
+  gap: 12px;
+  font-size: var(--text-caption);
+  line-height: 1.5;
+}
+.toc ol {
+  margin: 0;
+  padding: 36px 0 0;
+  list-style: none;
+}
+.toc button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 5px 6px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--muted);
+  text-align: left;
+  cursor: pointer;
+  transition: color 200ms var(--ease), background-color 200ms var(--ease);
+}
+.toc button:hover {
+  color: var(--ink);
+}
+.toc button[aria-current='true'] {
+  background: var(--bg);
+  color: var(--ink);
+}
+/* A ring, filled once its section has been read. */
+.tick {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  transition: background-color 300ms var(--ease), border-color 300ms var(--ease);
+}
+.seen .tick {
+  border-color: var(--vers1ons);
+  background: var(--vers1ons);
+}
+.doc {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  min-height: 0;
+  border-radius: 10px;
+  background: var(--bg);
+  box-shadow: inset 0 0 0 1px var(--line);
+  overflow: hidden;
+}
+.head {
+  display: grid;
+  gap: 8px;
+  padding: 10px 14px 0;
+  color: var(--muted);
+  font-size: var(--text-mono-sm);
+}
+/* Scaled, not sized: the bar moves without laying anything out. */
+.bar {
+  height: 2px;
+  background: var(--line);
+}
+.bar span {
+  display: block;
+  height: 100%;
+  background: var(--vers1ons);
+  transform: scaleX(var(--read, 0));
+  transform-origin: left;
+  transition: background-color 400ms var(--ease);
+}
+.done .bar span {
+  background: var(--money);
+}
+.scroll {
+  overflow: auto;
+  padding: 12px 14px 16px;
+  scrollbar-width: thin;
+}
+.scroll:focus-visible {
+  outline-offset: -2px;
+}
+.title {
+  margin: 0 0 8px;
+  font-size: var(--text-small);
+  font-weight: var(--weight-medium);
+}
+.title .mono {
+  margin-left: 6px;
+  font-size: var(--text-mono-sm);
+}
+section {
+  padding: 6px 0;
+  border-radius: 4px;
+  transition: background-color 600ms var(--ease);
+}
+/* A jump's landing, flashed. */
+section.flash {
+  background: color-mix(in srgb, var(--vers1ons) 12%, transparent);
+  transition-duration: 0ms;
+}
+.clause {
+  margin: 0 0 2px;
+  font-size: var(--text-caption);
+  font-weight: var(--weight-medium);
+}
+section p:not(.clause) {
+  margin: 0 0 4px;
+  color: var(--muted);
+}
+.end {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  margin-top: 16px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  text-align: center;
+  transition: border-color 600ms var(--ease), background-color 600ms var(--ease);
+}
+.end p {
+  margin: 0;
+  color: var(--muted);
+}
+.seal {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  color: var(--muted);
+  transition: color 600ms var(--ease), border-color 600ms var(--ease);
+}
+.seal svg {
+  grid-area: 1 / 1;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: opacity 300ms var(--ease), transform 300ms var(--ease);
+}
+.check {
+  opacity: 0;
+  transform: scale(0.6);
+}
+.done .end {
+  border-color: color-mix(in srgb, var(--money) 40%, transparent);
+  background: color-mix(in srgb, var(--money) 8%, transparent);
+}
+.done .seal {
+  border-color: var(--money);
+  color: var(--money);
+}
+.done .lock {
+  opacity: 0;
+  transform: scale(0.6);
+}
+.done .check {
+  opacity: 1;
+  transform: none;
+}
+.done .end p {
+  color: var(--ink);
+}
+.sign {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px 8px 14px;
+  border-top: 1px solid var(--line);
+}
+.sign label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+}
+.sign button {
+  padding: 6px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--bg);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  transition: opacity 300ms var(--ease);
+}
+.sign button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+@media (max-width: 639.98px) {
+  .reader {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .toc {
+    display: none;
+  }
+}
