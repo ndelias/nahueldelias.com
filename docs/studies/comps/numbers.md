@@ -137,7 +137,17 @@ Notes for the definitions:
   divested businesses. Its "normalized" comparisons use pro forma figures
   from Exhibit 99.2 of the 8-K filed 2026-08-05. An LTM built from reported
   periods mixes before and after the deal. Whether to note it or use those
-  pro forma figures is still open.
+  pro forma figures was decided 2026-11-05: reported revenue, footnoted.
+  Every cell stays a number from a filing line. The pro forma figures are
+  management's own build, in a different exhibit, and stop before Q3 2026.
+  The 10-Q (Note 2, Acquisition) says the deal closed January 9, 2026, so
+  the LTM has Worldpay for the last three quarters only, not Q4 2025.
+  Issuer Solutions is in discontinued operations throughout, so it isn't in
+  any of the revenue figures.
+
+  Footnote draft, for Nahuel to edit: "Global Payments' revenue includes
+  Worldpay from January 9, 2026, when the deal closed. The three months
+  before that don't."
 
 ## Links
 
