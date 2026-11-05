@@ -1,0 +1,71 @@
+/* The whole piece is CSS. interpolate-size lets block-size animate to and
+   from auto (the answer's own height); ::details-content is the part of a
+   <details> that opens, and content-visibility is transitioned with
+   allow-discrete so it stays visible until the close has finished. Browsers
+   without these open and close at once, which is fine. */
+.faq {
+  width: min(100%, 420px);
+  border-radius: 12px;
+  background: var(--bg);
+  box-shadow: inset 0 0 0 1px var(--line);
+  interpolate-size: allow-keywords;
+}
+details + details {
+  border-top: 1px solid var(--line);
+}
+details::details-content {
+  block-size: 0;
+  overflow: hidden;
+  transition:
+    block-size 360ms var(--ease),
+    content-visibility 360ms allow-discrete;
+}
+details[open]::details-content {
+  block-size: auto;
+}
+summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  font-size: var(--text-small);
+  font-weight: var(--weight-medium);
+  list-style: none;
+  cursor: pointer;
+}
+summary::-webkit-details-marker {
+  display: none;
+}
+summary:focus-visible {
+  outline-offset: -2px;
+  border-radius: 10px;
+}
+summary svg {
+  flex: none;
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 360ms var(--ease);
+}
+details[open] summary svg {
+  transform: rotate(180deg);
+}
+p {
+  margin: 0;
+  padding: 0 16px 14px;
+  font-size: var(--text-small);
+  color: var(--muted);
+  /* The answer settles in as its space opens. */
+  opacity: 0;
+  translate: 0 -4px;
+  transition:
+    opacity 300ms var(--ease) 60ms,
+    translate 360ms var(--ease);
+}
+details[open] p {
+  opacity: 1;
+  translate: 0;
+}

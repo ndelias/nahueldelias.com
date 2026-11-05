@@ -26,7 +26,9 @@ if (!Stage || !src) throw new Error(`/motion: "${id}" has no piece. Add src/moti
 const code = `M${String(data.number).padStart(2, '0')}`;
 ---
 <li class:list={['piece', { wide: data.wide }]} data-piece={id} data-src={src} aria-labelledby={`${id}-title`}>
-  {css && <style is:inline set:html={scopeCss(css, `[data-piece='${id}']`)} />}
+  {/* Scoped to the stage, not the whole piece, so a stage's bare selectors
+      (p, h3, button) can't reach the caption under it. */}
+  {css && <style is:inline set:html={scopeCss(css, `[data-piece='${id}'] [data-stage]`)} />}
   <div class="stage" data-stage><Stage /></div>
   <div class="caption">
     <span class="mono muted">{code}</span>

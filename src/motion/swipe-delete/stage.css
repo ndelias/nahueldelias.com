@@ -1,0 +1,111 @@
+.drafts {
+  display: grid;
+  gap: 10px;
+  width: min(100%, 360px);
+}
+.list {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--bg);
+  box-shadow: inset 0 0 0 1px var(--line);
+  list-style: none;
+}
+/* Collapsing: the row's track goes from its height to nothing (grid rows
+   animate between 1fr and 0fr), so the rows below close up smoothly. */
+.item {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 320ms var(--ease);
+}
+.item.gone {
+  grid-template-rows: 0fr;
+}
+.clip {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+}
+.item + .item .clip {
+  border-top: 1px solid var(--line);
+}
+.behind {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+  padding-right: 16px;
+  background: var(--warn);
+  color: var(--bg);
+  font-size: var(--text-caption);
+  font-weight: var(--weight-medium);
+}
+.behind svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transform: scale(var(--arm, 0.7));
+  transition: transform 200ms var(--ease);
+}
+.front {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--bg);
+  font-size: var(--text-small);
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grab;
+  will-change: transform;
+}
+.front:focus-visible {
+  outline-offset: -2px;
+}
+.when {
+  flex: none;
+  font-size: var(--text-mono-sm);
+  color: var(--muted);
+}
+.undo[hidden] {
+  display: none;
+}
+.undo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 8px 8px 14px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--bg);
+  font-size: var(--text-caption);
+  animation: rise 300ms var(--ease);
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+.undo button,
+.restore {
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: var(--text-mono-sm);
+  cursor: pointer;
+}
+.restore {
+  justify-self: center;
+  border: 1px solid var(--line);
+}

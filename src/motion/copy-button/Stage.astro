@@ -1,0 +1,15 @@
+---
+// M11, the copy button (piece.ts): a share link with a copy button whose
+// icon turns into a check. Without JS the link is there to select.
+---
+<div class="share" data-share>
+  <span class="url mono" data-url>nahueldelias.com/motion</span>
+  <button type="button" class="copy" data-copy aria-label="Copy link">
+    <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+      <g class="pages"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5" /><path d="M3.5 10.5h-.5a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h6.5a1 1 0 0 1 1 1v.5" /></g>
+      <path class="tick" d="M3.5 8.5l3 3 6-7" pathLength="1" />
+    </svg>
+    <span class="word"><span class="idle">Copy</span><span class="done">Copied</span><span class="fail">Selected</span></span>
+  </button>
+  <p class="visually-hidden" aria-live="polite" data-said></p>
+</div>

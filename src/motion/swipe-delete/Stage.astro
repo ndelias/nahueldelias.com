@@ -1,0 +1,35 @@
+---
+// M14, swipe to delete (piece.ts): a list of drafts whose rows swipe away,
+// with an undo bar. Without JS it's a plain list.
+const DRAFTS = [
+  ['Night Swim, sync request', 'Edited 2h ago'],
+  ['Static Bloom, split sheet', 'Edited yesterday'],
+  ['Overpass, license terms', 'Edited Mon'],
+  ['Last Train, release notes', 'Edited Oct 28'],
+];
+---
+<div class="drafts" data-drafts>
+  <p class="visually-hidden" id="swipe-help">Press Delete to remove a draft.</p>
+  <ul class="list" aria-label="Drafts" data-list>
+    {DRAFTS.map(([title, when]) => (
+      <li class="item" data-item>
+        <div class="clip">
+          <div class="behind" aria-hidden="true">
+            <svg viewBox="0 0 16 16" width="16" height="16"><path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.6 8.5h5.8l.6-8.5" /></svg>
+            Delete
+          </div>
+          <div class="front" tabindex="0" aria-describedby="swipe-help" data-front>
+            <span class="title">{title}</span>
+            <span class="when mono">{when}</span>
+          </div>
+        </div>
+      </li>
+    ))}
+  </ul>
+  <div class="undo" data-undo hidden>
+    <span data-undo-text>Draft deleted</span>
+    <button type="button" class="mono" data-undo-button>Undo</button>
+  </div>
+  <button type="button" class="restore mono" data-restore hidden>Bring back the deleted</button>
+  <p class="visually-hidden" aria-live="polite" data-said></p>
+</div>

@@ -212,8 +212,10 @@ test('the tape: dragging pulls it to a step, it stops at its wall, double-click 
 // The pieces past the first screen come from /motion/2/ onward; open() lands
 // on /motion, so scroll each into view and wait for it.
 async function reach(page, id) {
+  // Not async: an async predicate returns a promise, which counts as truthy
+  // at once.
   await page.waitForFunction(
-    async (id) => {
+    (id) => {
       const el = document.querySelector(`[data-piece="${id}"]`);
       if (el) return (el.scrollIntoView({ block: 'center' }), true);
       scrollTo(0, document.body.scrollHeight);
@@ -227,8 +229,11 @@ async function reach(page, id) {
 
 test('the following pages are appended, each piece once, in order, with its styles', async () => {
   const { ctx, page, errors } = await open();
-  await page.evaluate(() => scrollTo(0, document.body.scrollHeight));
-  await page.waitForFunction(() => document.documentElement.hasAttribute('data-motion-done'), null, { timeout: 10_000 });
+  // Keep going to the end as each page is appended, until there are none left.
+  await page.waitForFunction(() => (scrollTo(0, document.body.scrollHeight), document.documentElement.hasAttribute('data-motion-done')), null, {
+    timeout: 15_000,
+    polling: 300,
+  });
   const ids = await page.$$eval('[data-pieces] > [data-piece]', (els) => els.map((e) => e.dataset.piece));
   assert.equal(new Set(ids).size, ids.length, 'a piece appended twice');
   const codes = await page.$$eval('[data-pieces] .caption > .mono:first-child', (els) => els.map((e) => e.textContent));
@@ -323,6 +328,133 @@ test('scramble: the portrait settles when it comes into view; orbit springs: the
   await page.$eval(`${p} [data-z]`, (i) => ((i.value = '0.3'), i.dispatchEvent(new Event('input', { bubbles: true }))));
   assert.notEqual(await page.$eval(`${p} [data-curve]`, (e) => e.getAttribute('d')), before);
   assert.match(await page.$eval(`${p} [data-z-out]`, (e) => e.textContent), /under/);
+  assert.deepEqual(errors, []);
+  await ctx.close();
+});
+
+test('number ticker: digits roll to each new total; a new digit count rebuilds', async () => {
+  const { ctx, page, errors } = await open();
+  await reach(page, 'number-ticker');
+  const p = '[data-piece="number-ticker"]';
+  await page.click(`${p} [data-add="240"]`);
+  assert.equal(await page.$eval(`${p} [data-text]`, (e) => e.textContent), '$12,720');
+  await page.waitForTimeout(900);
+  // Each column is moved up by its digit, in lines.
+  const shown = await page.$$eval(`${p} .col`, (cols) => cols.map((c) => Math.abs(Math.round(new DOMMatrix(getComputedStyle(c).transform).m42 / c.firstElementChild.offsetHeight))));
+  assert.deepEqual(shown, [1, 2, 7, 2, 0]);
+  await page.click(`${p} [data-add="-100000"]`);
+  await page.waitForTimeout(900);
+  assert.equal(await page.$$eval(`${p} .col`, (cols) => cols.length), 1);
+  assert.equal(await page.$eval(`${p} [data-said]`, (e) => e.textContent), 'Royalties paid, $0');
+  assert.deepEqual(errors, []);
+  await ctx.close();
+});
+
+test('copy button: copies the link and says so, then turns back', async () => {
+  const { ctx, page, errors } = await open({ permissions: ['clipboard-read', 'clipboard-write'] });
+  await reach(page, 'copy-button');
+  const p = '[data-piece="copy-button"]';
+  await page.click(`${p} [data-copy]`);
+  assert.equal(await page.evaluate(() => navigator.clipboard.readText()), 'https://nahueldelias.com/motion');
+  assert.ok(await page.$eval(`${p} [data-copy]`, (b) => b.classList.contains('copied')));
+  assert.equal(await page.$eval(`${p} [data-said]`, (e) => e.textContent), 'Link copied');
+  await page.waitForTimeout(1900);
+  assert.ok(!(await page.$eval(`${p} [data-copy]`, (b) => b.classList.contains('copied'))), "it didn't turn back");
+  assert.deepEqual(errors, []);
+  await ctx.close();
+});
+
+test('toast stack: stacks, spreads on hover, dismisses on ×, and times out', async () => {
+  const { ctx, page, errors } = await open();
+  await reach(page, 'toast-stack');
+  const p = '[data-piece="toast-stack"]';
+  for (let i = 0; i < 3; i++) await page.click(`${p} [data-raise]`);
+  assert.equal(await page.$$eval(`${p} .toast`, (els) => els.length), 3);
+  await page.waitForTimeout(700);
+  const tops = () => page.$$eval(`${p} .toast`, (els) => els.map((e) => e.getBoundingClientRect().top));
+  const tucked = await tops();
+  assert.ok(tucked[0] - tucked[2] < 30, 'not stacked');
+  await page.hover(`${p} .toast`);
+  await page.waitForTimeout(700);
+  const spread = await tops();
+  assert.ok(spread[0] - spread[2] > 80, 'not spread');
+  await page.click(`${p} .toast .close`);
+  await page.waitForTimeout(900);
+  assert.equal(await page.$$eval(`${p} .toast`, (els) => els.length), 2);
+  await page.mouse.move(0, 0);
+  await page.waitForTimeout(4800);
+  assert.equal(await page.$$eval(`${p} .toast`, (els) => els.length), 0, "they didn't time out");
+  assert.deepEqual(errors, []);
+  await ctx.close();
+});
+
+test('drag to reorder: from the keyboard and with the pointer', async () => {
+  const { ctx, page, errors } = await open();
+  await reach(page, 'drag-reorder');
+  const p = '[data-piece="drag-reorder"]';
+  const order = () =>
+    page.$$eval(`${p} [data-row]`, (rows) => rows.sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top).map((r) => r.querySelector('.title').textContent));
+  await page.focus(`${p} [data-row]`);
+  await page.keyboard.press('Space');
+  await page.keyboard.press('ArrowDown');
+  await page.keyboard.press('ArrowDown');
+  await page.keyboard.press('Space');
+  await page.waitForTimeout(700);
+  assert.deepEqual(await order(), ['Night Swim', 'Static Bloom', 'Intro', 'Overpass', 'Last Train']);
+  assert.match(await page.$eval(`${p} [data-said]`, (e) => e.textContent), /Intro dropped at position 3 of 5/);
+  // Drag the bottom row to the top.
+  const last = await page.locator(`${p} [data-row]`, { hasText: 'Last Train' }).boundingBox();
+  await page.mouse.move(last.x + 120, last.y + last.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(last.x + 120, last.y - 4 * 46 + last.height / 2, { steps: 12 });
+  await page.mouse.up();
+  await page.waitForTimeout(700);
+  assert.equal((await order())[0], 'Last Train');
+  assert.deepEqual(errors, []);
+  await ctx.close();
+});
+
+test('swipe to delete: Delete removes a row, Undo brings it back, a swipe deletes', async () => {
+  const { ctx, page, errors } = await open();
+  await reach(page, 'swipe-delete');
+  const p = '[data-piece="swipe-delete"]';
+  assert.equal(await page.$eval(`${p} [data-undo]`, (e) => getComputedStyle(e).display), 'none', 'the undo bar shows before anything is deleted');
+  await page.focus(`${p} [data-front]`);
+  await page.keyboard.press('Delete');
+  await page.waitForTimeout(600);
+  assert.equal(await page.$$eval(`${p} .item.gone`, (els) => els.length), 1);
+  assert.equal(await page.$eval(`${p} [data-undo-text]`, (e) => e.textContent), 'Night Swim, sync request deleted');
+  await page.click(`${p} [data-undo-button]`);
+  await page.waitForTimeout(600);
+  assert.equal(await page.$$eval(`${p} .item.gone`, (els) => els.length), 0);
+  // Two quick deletes: Undo brings both back, newest first.
+  await page.focus(`${p} [data-front]`);
+  await page.keyboard.press('Delete');
+  await page.keyboard.press('Delete');
+  assert.equal(await page.$eval(`${p} [data-undo-text]`, (e) => e.textContent), 'Static Bloom, split sheet deleted (and 1 more)');
+  await page.click(`${p} [data-undo-button]`);
+  await page.click(`${p} [data-undo-button]`);
+  await page.waitForTimeout(600);
+  assert.equal(await page.$$eval(`${p} .item.gone`, (els) => els.length), 0, 'a quick second delete lost the first undo');
+  const row = await page.locator(`${p} [data-front]`).nth(1).boundingBox();
+  await page.mouse.move(row.x + row.width - 20, row.y + row.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(row.x + row.width - 20 - row.width * 0.6, row.y + row.height / 2, { steps: 10 });
+  await page.mouse.up();
+  await page.waitForTimeout(600);
+  assert.equal(await page.$$eval(`${p} .item.gone`, (els) => els.length), 1);
+  assert.deepEqual(errors, []);
+  await ctx.close();
+});
+
+test('accordion: one open at a time, and the stage styles leave the caption alone', async () => {
+  const { ctx, page, errors } = await open();
+  await reach(page, 'accordion');
+  const p = '[data-piece="accordion"]';
+  await page.click(`${p} details:nth-of-type(2) summary`);
+  await page.waitForTimeout(500);
+  assert.deepEqual(await page.$$eval(`${p} details`, (ds) => ds.map((d) => d.open)), [false, true, false]);
+  assert.equal(await page.$eval(`${p} .note`, (e) => getComputedStyle(e).opacity), '1');
   assert.deepEqual(errors, []);
   await ctx.close();
 });
