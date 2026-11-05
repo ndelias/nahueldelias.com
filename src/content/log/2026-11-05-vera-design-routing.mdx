@@ -1,0 +1,10 @@
+---
+date: 2026-11-05
+entrySlug: vera
+---
+
+Vera stopped asking me for a design sign-off on build-log pull requests (v0.5.1).
+
+- **What went wrong:** on all six of this site's log-entry pull requests, Vera thought a new entry might be a design decision and asked for design, though this site's `.vera.yml` names no designer for the log.
+- **The fix:** when Vera isn't sure, and no designer covers the areas a change touches, it now says so under How Vera decided instead of asking. When it's sure, it still asks.
+- **Next:** teaching the model itself that a new log entry isn't a design decision, scored on Vera's own reviews, as part of questions for designers.
