@@ -10,7 +10,6 @@
   position: relative;
   height: 100%;
   overflow: auto;
-  overscroll-behavior: contain;
   border-radius: 16px;
   background: var(--bg);
   scrollbar-width: none;

@@ -297,6 +297,11 @@ test('drop screen swap: one wheel tick swaps to the details, one up swaps back',
   await page.mouse.wheel(0, -10);
   await page.waitForTimeout(1400);
   assert.equal(await page.$eval(`${p} [data-box]`, (b) => b.scrollTop), 0, 'not back at the hero');
+  // Back at the top, scrolling up moves the page, not the box.
+  const y = await page.evaluate(() => scrollY);
+  await page.mouse.wheel(0, -200);
+  await page.waitForTimeout(400);
+  assert.ok((await page.evaluate(() => scrollY)) < y, 'the box kept the page from scrolling up');
   assert.deepEqual(errors, []);
   await ctx.close();
 });

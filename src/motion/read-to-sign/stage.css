@@ -82,7 +82,6 @@
 }
 .scroll {
   overflow: auto;
-  overscroll-behavior: contain;
   padding: 12px 14px 16px;
   scrollbar-width: thin;
 }

@@ -9,6 +9,9 @@
 // the direction it was going. As the details rise, the hero's content
 // recedes with the scroll (in vers1ons a CSS scroll timeline; here the
 // scroll position, so it runs everywhere). Reduced motion: the swaps jump.
+// On /motion the box sits in a longer page, so its edges give the scroll
+// back: up at the top of the hero, and down at the end of the details, the
+// page moves instead.
 
 import { define } from '../runtime';
 
@@ -61,6 +64,8 @@ define('drop-swap', (stage, { reduce }) => {
         if (box.scrollTop <= seam() + 1) e.preventDefault();
         return;
       }
+      // At the very top, scrolling up belongs to the page around the box.
+      if (box.scrollTop <= 0 && dy < 0) return;
       if (onHero()) {
         e.preventDefault();
         if (dy > MIN_WHEEL) go('detail');
@@ -82,6 +87,7 @@ define('drop-swap', (stage, { reduce }) => {
     'touchmove',
     (e) => {
       const dy = startY - e.touches[0].clientY;
+      if (box.scrollTop <= 0 && dy < 0) return;
       if (busy || onHero() || (atSeam() && dy < 0)) e.preventDefault();
     },
     { passive: false },
