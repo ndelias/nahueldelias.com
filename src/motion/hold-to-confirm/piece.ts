@@ -2,7 +2,8 @@
 // drains it three times faster than it filled, so a slip costs little and
 // an accidental tap barely shows. Space and Enter hold it too. At full, it
 // says "Signed" (to screen readers as well), a short buzz where the device
-// has one, then resets after a beat. Reduced motion keeps the fill (it's
+// has one, then holds full until it resets: "Signed" fades back to the
+// label, then the fill drains. Reduced motion keeps the fill (it's
 // the feedback) and drops the flourish.
 
 import { define } from '../runtime';
@@ -11,6 +12,7 @@ import { loop } from '../spring';
 const HOLD = 1.2; // seconds to fill
 const DRAIN = 3; // times faster than filling
 const RESET_MS = 2200;
+const FADE_MS = 240; // the .done fade in Stage.astro
 
 define('hold-to-confirm', (stage) => {
   const button = stage.querySelector<HTMLButtonElement>('[data-hold]')!;
@@ -23,7 +25,10 @@ define('hold-to-confirm', (stage) => {
   const anim = loop((dt) => {
     p = Math.min(1, Math.max(0, p + (holding ? dt / HOLD : (-dt * DRAIN) / HOLD)));
     draw();
-    if (holding && p === 1) finish();
+    if (holding && p === 1) {
+      finish();
+      return false; // full until the reset: nothing drains under "Signed"
+    }
     return holding ? p < 1 : p > 0;
   });
 
@@ -34,11 +39,14 @@ define('hold-to-confirm', (stage) => {
     button.classList.add('is-done');
     status.textContent = 'Signed';
     navigator.vibrate?.(12);
+    // "Signed" fades back to the full label first, then it drains.
     setTimeout(() => {
-      done = false;
       button.classList.remove('is-done');
       status.textContent = '';
-      anim.start(); // drains back to the start
+      setTimeout(() => {
+        done = false;
+        anim.start();
+      }, FADE_MS);
     }, RESET_MS);
   };
   const press = () => {
