@@ -1,0 +1,11 @@
+---
+date: 2026-11-06
+entrySlug: vera
+---
+
+Vera can now reach reviewers in Slack (v0.7.0).
+
+- **Messages:** each person Vera asks gets their part of the review as a direct message: their roles, where to look, and their questions. Pushes and sign-offs update the same message instead of sending another.
+- **Replies:** they can write back. Vera reads the pull request, its diff, and its own review, and answers in the thread. Its first real answers, about its own Slack server, pointed at two weak spots in that code, and the next pull request fixed both.
+- **No database:** the conversation lives in the Slack thread and the review in Vera's comment. The server is a few plain request handlers on Vercel, and the part that knows it's on Vercel is one small file.
+- **Next:** answering Vera's questions and signing off from Slack.
