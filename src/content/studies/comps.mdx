@@ -1,10 +1,10 @@
 ---
 # DRAFT (2026-11-05): the fintech concept study, built with Nahuel phase by
-# phase (docs/studies/comps/draft.md). Unlisted while the live pieces run on
-# sample numbers (src/components/comps/data.ts). Bracketed text waits for
-# Nahuel. The cover is a stand-in from the fixtures until the real one.
-# Listed in My work before Bespoke (decided 2026-11-05) once the real
-# numbers, poster, and recording are in: then drop unlisted and set order 9.
+# phase (docs/studies/comps/draft.md). The live pieces run on the real
+# numbers (src/components/comps/data.ts, docs/studies/comps/numbers.md).
+# Bracketed text waits for Nahuel. The cover is a stand-in from the fixtures
+# until the real one. Listed in My work before Bespoke (decided 2026-11-05)
+# once the poster and recording are in: then drop unlisted and set order 9.
 # Until then it sorts after Bespoke, so Bespoke keeps its number (S01).
 title: 'Comps you can check'
 tagline: 'A comps builder where every number opens the filing line it came from.'
@@ -50,9 +50,8 @@ import CompsBuilder from '../../components/comps/CompsBuilder';
 
 <CompsBuilder client:visible piece="trace" />
 
-{/* Fiserv: check against its Q3 2026 release when the real numbers go in. */}
 <BodySection label="The correction" heading="Fixing a number updates everything that depends on it.">
-  Fiserv's earnings release reports adjusted operating income, not adjusted EBITDA, so the builder left it blank. Pick another line or enter a number. The multiples, the median, and the mean count to their new values, and a footnote records that you set it.
+  Fiserv and Global Payments report adjusted operating income, not adjusted EBITDA, so the builder left both blank. Pick another line or enter a number. The multiples, the median, and the mean count to their new values, and a footnote records that you set it.
 </BodySection>
 
 <CompsBuilder client:visible piece="correct" />

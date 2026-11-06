@@ -16,7 +16,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import { Fragment } from 'preact';
 import { AnimatePresence, LazyMotion, animate, domAnimation, m, useInView, useReducedMotion, type Transition } from 'framer-motion';
-import { COLUMNS, COMPANIES, INPUTS, SAMPLE, type Cell, type Input } from './data';
+import { COLUMNS, COMPANIES, INPUTS, PRICE_DATE, SAMPLE, type Cell, type Input } from './data';
 
 type Piece = 'fill' | 'trace' | 'correct';
 type Pos = { row: number; col: number };
@@ -30,6 +30,10 @@ const MULTIPLES = [
 
 const keyOf = (row: number, col: string) => `${row}.${col}`;
 const fmt = (v: number, digits: number) => v.toFixed(digits);
+// The panel's lines, as filed: thousands grouped, decimals only where the
+// number has them (or the line says how many).
+const filed = (v: number, digits?: number) =>
+  v.toLocaleString('en-US', { minimumFractionDigits: digits ?? (Math.abs(v - Math.round(v)) < 1e-6 ? 0 : 1), maximumFractionDigits: digits ?? 1 });
 const times = (v: number | null) => (v === null ? '—' : `${fmt(v, 1)}x`);
 const ratio = (num: number | null, den: number | null) => (num === null || den === null || den <= 0 ? null : num / den);
 const peers = (rows: Rows) => rows.filter((_, i) => !COMPANIES[i].target);
@@ -304,7 +308,7 @@ export default function CompsBuilder({ piece }: { piece: Piece }) {
             <div class="head">
               <div>
                 <p class="eyebrow">
-                  Trading comps · LTM to Sep 30, 2026 · prices as of [date]
+                  Trading comps · LTM to Sep 30, 2026 · prices as of {PRICE_DATE}
                   {SAMPLE && <span class="sample"> · sample numbers, not real</span>}
                 </p>
                 <p class="title">Toast, Inc. and four peers</p>
@@ -410,7 +414,7 @@ export default function CompsBuilder({ piece }: { piece: Piece }) {
             <div class="foot">
               <ul class="legend">
                 <li><span class="mono">12.3</span> sourced from a filing</li>
-                <li><span class="mono">12.3<sup>1</sup></span> adjusted or set by you, footnoted</li>
+                <li><span class="mono">12.3<sup>1</sup></span> has a footnote</li>
                 <li><span class="needs">Needs you</span> no line found, left blank</li>
               </ul>
               {piece === 'fill' && (
@@ -427,7 +431,7 @@ export default function CompsBuilder({ piece }: { piece: Piece }) {
               <AnimatePresence mode="wait" initial={false}>
                 {panel || (
                   <m.p key="empty" class="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={t(0.12)}>
-                    {piece === 'correct' ? "Pick a number to check or fix it. Fiserv's adjusted EBITDA needs you." : 'Pick a number to see where it came from.'}
+                    {piece === 'correct' ? "Pick a number to check or fix it. Fiserv's and Global Payments' adjusted EBITDA need you." : 'Pick a number to see where it came from.'}
                   </m.p>
                 )}
               </AnimatePresence>
@@ -491,16 +495,16 @@ function Panel({ pos, rows, noteNo, piece, fromEmpty, reduce, t, onFix, onClose 
       <div class="doc">
         <p class="eyebrow">{source.doc}</p>
         {source.lines.map((line, i) => {
-          const hit = source.hit === i;
+          const hit = Array.isArray(source.hit) ? source.hit.includes(i) : source.hit === i;
           const inner = (
             <>
               {hit && <m.span class="hl" aria-hidden="true" initial={reduce ? false : { scaleX: 0 }} animate={{ scaleX: 1 }} transition={t(0.36, 0.12)} />}
               <span>{line.label}</span>
-              <span class="mono">{fmt(line.value, 2)}</span>
+              <span class="mono">{filed(line.value, line.digits)}</span>
             </>
           );
           return mode === 'line' && piece === 'correct' ? (
-            <button type="button" class={`line pickable${hit ? ' hit' : ''}`} key={line.label} onClick={() => (onFix(pos, line.value, { line: i }), setMode('look'))} aria-label={`Use ${line.label}, ${fmt(line.value, 2)}`}>
+            <button type="button" class={`line pickable${hit ? ' hit' : ''}`} key={line.label} onClick={() => (onFix(pos, line.value / 1000, { line: i }), setMode('look'))} aria-label={`Use ${line.label}, ${filed(line.value, line.digits)} million`}>
               {inner}
             </button>
           ) : (
@@ -517,7 +521,7 @@ function Panel({ pos, rows, noteNo, piece, fromEmpty, reduce, t, onFix, onClose 
             {source.build.map((b, i) => (
               <m.div key={b.label} class={i === source.build!.length - 1 ? 'total' : undefined} initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={t(0.2, 0.12 + i * 0.06)}>
                 <span>{b.label}</span>
-                <span class="mono">{fmt(b.value, 2)}</span>
+                <span class="mono">{filed(b.value, b.digits)}</span>
               </m.div>
             ))}
           </div>

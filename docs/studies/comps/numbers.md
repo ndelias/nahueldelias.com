@@ -50,17 +50,17 @@ EV = market cap + debt + preferred − cash and cash equivalents.
 | Global Payments | 25,135.1 | 22,536.2 | 0 | 5,570.3 | 42,101.0 |
 | Shift4 | 3,206.9 | 5,483 | 1,000 | 1,242 | 8,447.9 |
 
-Multiples these give (the table works them out itself; here as a check):
+Multiples these give (the table works them out itself from unrounded inputs; here as a check):
 
 | Company | EV / revenue | EV / EBITDA |
 |---|---|---|
 | Toast (target) | 2.69x | 23.9x |
-| Block | 1.90x | 11.2x |
+| Block | 1.90x | 11.22x |
 | Fiserv | 2.88x | blank, Needs you |
 | Global Payments | 3.66x | blank, Needs you |
-| Shift4 | 1.72x | 7.5x |
-| Peer median | 2.39x | 9.4x (Block and Shift4 only) |
-| Peer mean | 2.54x | 9.4x |
+| Shift4 | 1.72x | 7.46x |
+| Peer median | 2.39x | 9.3x (Block and Shift4 only) |
+| Peer mean | 2.54x | 9.3x |
 
 ## Toast (TOST, CIK 1650164)
 
