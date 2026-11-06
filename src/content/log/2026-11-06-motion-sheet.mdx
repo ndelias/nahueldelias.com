@@ -9,3 +9,4 @@ date: 2026-11-06
 - **Rows have to fill:** the build places the tiles the way the grid does and fails on a gap, naming the piece after it. Only the last row may be short.
 - **The portrait doesn't happen just once:** it settles again each time it comes back into view, and the cells under the pointer scramble and settle back.
 - **Tablet and phone:** two columns, then one, with heights from the stage. On a phone a one-row piece gets a shorter stage.
+- **Hold to sign follows the clock:** with the field now playing beside it on the first screen, a slow machine drew fewer frames and the fill moved by frames, so a 1.2s hold could take longer. It moves by elapsed time now, and letting go counts the time since the last frame.
