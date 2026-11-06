@@ -78,6 +78,7 @@ test('My work: a card for every project, in order, each to its page; then All wo
     cards: [
       ['vers1ons', '/work/vers1ons/'],
       ['Vera', '/work/vera/'],
+      ['Comps you can check', '/studies/comps/'],
       ['Bespoke', '/studies/bespoke/'],
     ],
     all: '/work',
@@ -92,7 +93,7 @@ test('My work: pointing at a card plays its recording over the cover, muted; lea
   await page.waitForFunction(() => document.querySelector('[data-tree][data-ready]'));
   assert.equal(await page.locator('[data-work] video').count(), 0, 'a recording before anything was pointed at');
   const cards = page.locator('[data-work] .card a');
-  for (const [i, src] of ['/media/vers1ons/reel.mp4', '/media/vera/reel.mp4', '/media/bespoke/v2-flow.mp4'].entries()) {
+  for (const [i, src] of ['/media/vers1ons/reel.mp4', '/media/vera/reel.mp4', '/media/comps/reel.mp4', '/media/bespoke/v2-flow.mp4'].entries()) {
     await cards.nth(i).hover();
     const state = await page.evaluate(() => {
       const v = document.querySelector('[data-work] video');
