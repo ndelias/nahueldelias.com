@@ -80,32 +80,40 @@ test('holding fills and signs; letting go early drains it back', async () => {
   const { ctx, page, errors } = await open();
   await live(page, 'hold-to-confirm');
   const p = () => page.$eval('[data-hold]', (b) => Number(b.style.getPropertyValue('--p') || 0));
+  // The fill follows the clock, so the test owns it: time moves only in
+  // runFor(). Real sleeps let a loaded runner drain the fill between the
+  // release and the read (0.12 once on CI, for a 0.33 hold).
+  await page.clock.install();
+  await page.clock.pauseAt((await page.evaluate(() => Date.now())) + 1000);
   await page.focus('[data-hold]');
   await page.keyboard.down(' ');
-  await page.waitForTimeout(400);
+  await page.clock.runFor(400);
   await page.keyboard.up(' ');
   const partial = await p();
-  assert.ok(partial > 0.15 && partial < 0.6, `a short hold should part-fill (${partial})`);
-  await page.waitForTimeout(400);
+  // 0.4s of a 1.2s fill.
+  assert.ok(Math.abs(partial - 0.4 / 1.2) < 0.01, `a short hold should part-fill a third (${partial})`);
+  await page.clock.runFor(400);
   assert.equal(await p(), 0, 'it drains back');
   await page.keyboard.down(' ');
-  await page.waitForTimeout(1500);
+  await page.clock.runFor(1500);
   await page.keyboard.up(' ');
   assert.ok(await page.$eval('[data-hold]', (b) => b.classList.contains('is-done')), 'a full hold signs');
   assert.equal(await page.$eval('[data-piece="hold-to-confirm"] [data-stage] [data-status]', (s) => s.textContent), 'Signed');
   // Full while "Signed" shows: draining under it reads as a flicker. And
-  // "Signed" is what's on top, after its fade has finished too.
-  await page.waitForTimeout(500);
+  // "Signed" is what's on top, after its fade has finished too (a CSS
+  // transition, on real time).
+  await page.clock.runFor(500);
   assert.equal(await p(), 1, 'it drains under "Signed"');
+  await page.waitForFunction(() => getComputedStyle(document.querySelector('[data-hold] .done')).opacity === '1');
   const top = await page.$eval('[data-hold]', (b) => {
     const r = b.getBoundingClientRect();
     return document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2)?.closest('.face')?.classList.contains('done');
   });
   assert.ok(top, '"Signed" is painted under the fill');
   // Then back to the label, and only then empty.
-  await page.waitForTimeout(2200);
+  await page.clock.runFor(2200);
   assert.ok(!(await page.$eval('[data-hold]', (b) => b.classList.contains('is-done'))), 'it resets');
-  await page.waitForTimeout(900);
+  await page.clock.runFor(900);
   assert.equal(await p(), 0, 'it drains after the reset');
   assert.deepEqual(errors, []);
   await ctx.close();
