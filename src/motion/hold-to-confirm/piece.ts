@@ -4,7 +4,9 @@
 // says "Signed" (to screen readers as well), a short buzz where the device
 // has one, then holds full until it resets: "Signed" fades back to the
 // label, then the fill drains. Reduced motion keeps the fill (it's
-// the feedback) and drops the flourish.
+// the feedback) and drops the flourish. The fill follows the clock, not the
+// frame count, so a slow device signs after 1.2s too, and letting go counts
+// the time since the last frame.
 
 import { define } from '../runtime';
 import { loop } from '../spring';
@@ -22,15 +24,31 @@ define('hold-to-confirm', (stage) => {
   let done = false;
 
   const draw = () => button.style.setProperty('--p', p.toFixed(4));
-  const anim = loop((dt) => {
+  // Moves the fill on to now. A long gap (a hidden tab) counts as a frame.
+  let last = 0;
+  const advance = () => {
+    const now = performance.now();
+    const dt = last ? Math.min(0.25, (now - last) / 1000) : 1 / 60;
+    last = now;
     p = Math.min(1, Math.max(0, p + (holding ? dt / HOLD : (-dt * DRAIN) / HOLD)));
+  };
+  const anim = loop(() => {
+    advance();
     draw();
     if (holding && p === 1) {
       finish();
+      last = 0;
       return false; // full until the reset: nothing drains under "Signed"
     }
-    return holding ? p < 1 : p > 0;
+    const more = holding ? p < 1 : p > 0;
+    if (!more) last = 0;
+    return more;
   });
+  // Starts the fill moving from now (it may already be moving).
+  const run = () => {
+    if (!last) last = performance.now();
+    anim.start();
+  };
 
   const finish = () => {
     holding = false;
@@ -45,7 +63,7 @@ define('hold-to-confirm', (stage) => {
       status.textContent = '';
       setTimeout(() => {
         done = false;
-        anim.start();
+        run();
       }, FADE_MS);
     }, RESET_MS);
   };
@@ -53,13 +71,21 @@ define('hold-to-confirm', (stage) => {
     if (done || holding) return;
     holding = true;
     button.classList.add('held');
-    anim.start();
+    run();
   };
   const release = () => {
     if (!holding) return;
+    advance();
+    draw();
+    // Full by the time it was let go: that's a full hold.
+    if (p === 1) {
+      anim.stop();
+      last = 0;
+      return finish();
+    }
     holding = false;
     button.classList.remove('held');
-    anim.start();
+    run();
   };
 
   button.addEventListener('pointerdown', (e) => {
