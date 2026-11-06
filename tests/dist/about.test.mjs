@@ -120,7 +120,7 @@ test('without JS: the steps, the statement, the experience and the links read pl
     h1: 'This is how I think about product.',
     steps: 5,
     statement: true,
-    roles: 6,
+    roles: 5,
     links: ['/nahuel-delias-resume.pdf', '/nahuel-delias-resume.pdf', 'https://www.linkedin.com/in/nahuel-d-elias', 'mailto:njdelias@gmail.com', 'https://github.com/ndelias'],
     portrait: false,
   });
