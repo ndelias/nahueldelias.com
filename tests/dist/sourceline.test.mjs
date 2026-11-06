@@ -1,4 +1,4 @@
-// /studies/comps, in Chrome against the shipped build (dist/): the page and
+// /studies/sourceline (the comps study), in Chrome against the shipped build (dist/): the page and
 // its three tables read without JS; the fill lands every number, the blank
 // that needs the analyst last, without moving the page below; the trace
 // opens a number's source from the keyboard and Escape puts focus back; the
@@ -17,7 +17,7 @@ import { join, resolve } from 'node:path';
 import { launch, serve } from '../../scripts/lib/browser.mjs';
 
 const DIST = join(resolve(import.meta.dirname, '../..'), 'dist');
-const PATH = '/studies/comps/';
+const PATH = '/studies/sourceline/';
 
 let server;
 let browser;
