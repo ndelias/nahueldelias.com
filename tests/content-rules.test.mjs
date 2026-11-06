@@ -284,6 +284,8 @@ const piece = (overrides = {}) => ({
   note: 'What to try.',
   technique: ['TS'],
   status: 'concept',
+  // The whole last row, which may be short.
+  size: '12x1',
   ...overrides,
 });
 // The rest of the site has to build for the /motion page to be reached.
@@ -305,4 +307,9 @@ test('motion: an entry with no piece code fails the build and names it', async (
 test('motion: two pieces with one number fail the build', async () => {
   const result = await build({ ...site(), 'motion/spring-toggle': piece({ number: 1 }), 'motion/hold-to-confirm': piece({ number: 1 }) });
   await assertFails(result, 'are both number 1');
+});
+
+test("motion: sizes that leave a gap in the sheet fail the build and name where", async () => {
+  const result = await build({ ...site(), 'motion/spring-toggle': piece({ number: 1, size: '5x1' }) });
+  await assertFails(result, '/motion: the sheet leaves row 1, column 12, empty before "hold-to-confirm".');
 });

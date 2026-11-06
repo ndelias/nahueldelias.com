@@ -131,7 +131,8 @@ test('the field draws, keeps drawing while on screen, and stops off it', async (
       window.__frames++;
       return draw.apply(this, args);
     };
-    scrollTo(0, 0);
+    // Past it: it's on the first screen, so the top of the page won't do.
+    scrollTo(0, document.querySelector('[data-piece="dither-field"]').getBoundingClientRect().bottom + scrollY + 10);
   });
   await page.waitForTimeout(300);
   await page.evaluate(() => (window.__frames = 0));
@@ -311,7 +312,7 @@ test('drop screen swap: one wheel tick swaps to the details, one up swaps back',
   await ctx.close();
 });
 
-test('scramble: the portrait settles when it comes into view; orbit springs: the dials redraw the curve', async () => {
+test('scramble: the portrait settles each time it comes into view, and the pointer stirs it; orbit springs: the dials redraw the curve', async () => {
   const { ctx, page, errors } = await open();
   await reach(page, 'scramble');
   await page.waitForTimeout(3000);
@@ -322,6 +323,22 @@ test('scramble: the portrait settles when it comes into view; orbit springs: the
     return n;
   });
   assert.ok(inked > 1000, `the portrait didn't draw (${inked})`);
+  // The pointer stirs it, and it settles back.
+  const frame = () => page.$eval('[data-piece="scramble"] canvas', (c) => c.toDataURL());
+  const settled = await frame();
+  const box = await (await page.$('[data-piece="scramble"] canvas')).boundingBox();
+  await page.mouse.move(box.x + box.width * 0.3, box.y + box.height * 0.4);
+  await page.mouse.move(box.x + box.width * 0.7, box.y + box.height * 0.4, { steps: 8 });
+  assert.notEqual(await frame(), settled, "the pointer didn't stir the portrait");
+  await page.mouse.move(0, 0);
+  await page.waitForTimeout(1200);
+  assert.equal(await frame(), settled, "the stirred cells didn't settle back");
+  // Out of view and back: it plays again, so it's not settled yet.
+  await page.evaluate(() => scrollTo(0, 0));
+  await page.waitForTimeout(300);
+  await reach(page, 'scramble');
+  await page.waitForTimeout(200);
+  assert.notEqual(await frame(), settled, "the portrait didn't play again on the way back");
   await reach(page, 'orbit-springs');
   const p = '[data-piece="orbit-springs"]';
   const before = await page.$eval(`${p} [data-curve]`, (e) => e.getAttribute('d'));
@@ -455,6 +472,38 @@ test('accordion: one open at a time, and the stage styles leave the caption alon
   await page.waitForTimeout(500);
   assert.deepEqual(await page.$$eval(`${p} details`, (ds) => ds.map((d) => d.open)), [false, true, false]);
   assert.equal(await page.$eval(`${p} .note`, (e) => getComputedStyle(e).opacity), '1');
+  assert.deepEqual(errors, []);
+  await ctx.close();
+});
+
+test('the sheet: the header is its top left tile, rows line up, and phones get one column', async () => {
+  const { ctx, page, errors } = await open();
+  await page.waitForFunction(() => {
+    scrollTo(0, document.body.scrollHeight);
+    return document.documentElement.hasAttribute('data-motion-done');
+  }, null, { timeout: 15_000, polling: 300 });
+  const tiles = await page.$$eval('.head, [data-piece]', (els) =>
+    els.map((e) => {
+      const r = e.getBoundingClientRect();
+      return { id: e.dataset.piece ?? 'head', x: Math.round(r.left), y: Math.round(r.top + scrollY), w: Math.round(r.width), h: Math.round(r.height) };
+    }),
+  );
+  const [head, toggle, hold] = tiles;
+  assert.equal(head.x, toggle.x - head.w - 12, 'the header sits left of the first piece');
+  assert.equal(head.y, toggle.y, 'the header starts level with the first piece');
+  assert.equal(head.h, hold.y + hold.h - toggle.y, 'the header is as tall as the two pieces beside it');
+  // Every tile starts on a row line, and every row's tiles fill it edge to edge.
+  const rows = new Map();
+  for (const t of tiles.slice(1)) rows.set(t.y, [...(rows.get(t.y) ?? []), t]);
+  const right = Math.max(...tiles.map((t) => t.x + t.w));
+  for (const [y, row] of [...rows].slice(0, -1)) {
+    const reach = Math.max(...row.map((t) => t.x + t.w));
+    // A row of one-row tiles beside a taller tile above still ends at the right edge.
+    assert.ok(reach === right || tiles.some((t) => t.y < y && t.y + t.h > y && t.x + t.w === right), `the row at ${y} stops short (${reach} of ${right})`);
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
+  const xs = await page.$$eval('[data-piece]', (els) => new Set(els.map((e) => Math.round(e.getBoundingClientRect().left))).size);
+  assert.equal(xs, 1, 'phones stack the pieces in one column');
   assert.deepEqual(errors, []);
   await ctx.close();
 });

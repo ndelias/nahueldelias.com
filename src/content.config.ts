@@ -2,6 +2,7 @@ import { defineCollection, type SchemaContext } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 import { DISCIPLINES, ESSAY_STATUSES, FRAMES, STATUSES, TECHNIQUES, type Section } from './lib/model';
+import { SIZE } from './lib/sheet';
 
 // §3 content model. Each entry section is its own collection; the section is the
 // collection name and the slug is the filename, so neither is repeated in
@@ -316,8 +317,9 @@ const motion = defineCollection({
       status: z.enum(STATUSES),
       // Where it shipped: "vers1ons". Required when status is shipped.
       from: z.string().min(1).optional(),
-      // Spans the whole row instead of half.
-      wide: z.boolean().default(false),
+      // Its tile on the 12-column sheet, columns x rows: "4x2". Sized to
+      // what the piece holds; src/lib/sheet.ts checks the rows fill.
+      size: z.string().regex(SIZE, 'A size is columns x rows on the 12-column sheet, like "4x2": 3 to 12 columns, 1 or 2 rows.'),
     })
     .superRefine((piece, issues) => {
       if (piece.status === 'shipped' && !piece.from) {

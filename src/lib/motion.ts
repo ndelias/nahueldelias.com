@@ -4,6 +4,7 @@
 // next page as its end nears and appends its pieces (src/scripts/motion.ts);
 // without, the pages are linked.
 import { getCollection, type CollectionEntry } from 'astro:content';
+import { HEADER, pack, parseSize } from './sheet';
 
 export type Piece = CollectionEntry<'motion'>;
 
@@ -12,11 +13,27 @@ export const FIRST = 4;
 /** Pieces per following page. */
 export const PER_PAGE = 6;
 
+// Which pieces have code: src/motion/<id>/ with its Stage.astro and piece.ts.
+const stages = Object.keys(import.meta.glob('../motion/*/Stage.astro'));
+const scripts = Object.keys(import.meta.glob('../motion/*/piece.ts'));
+
 export async function motionPieces(): Promise<Piece[]> {
   const pieces = (await getCollection('motion')).sort((a, b) => a.data.number - b.data.number);
+  for (const { id } of pieces) {
+    if (!stages.includes(`../motion/${id}/Stage.astro`) || !scripts.includes(`../motion/${id}/piece.ts`)) {
+      throw new Error(`/motion: "${id}" has no piece. Add src/motion/${id}/Stage.astro and piece.ts.`);
+    }
+  }
   pieces.forEach((p, i) => {
     if (pieces[i - 1]?.data.number === p.data.number) throw new Error(`/motion: "${pieces[i - 1].id}" and "${p.id}" are both number ${p.data.number}.`);
   });
+  // The sheet's rows have to fill (src/lib/sheet.ts): a gap is a size to fix.
+  const [gap] = pack([HEADER, ...pieces.map((p) => parseSize(p.data.size))]);
+  if (gap) {
+    const next = pieces[gap.before - 1];
+    const cols = gap.from === gap.to ? `column ${gap.from}` : `columns ${gap.from}–${gap.to}`;
+    throw new Error(`/motion: the sheet leaves row ${gap.row}, ${cols}, empty before "${next.id}". Change the sizes around it so the row fills.`);
+  }
   return pieces;
 }
 
