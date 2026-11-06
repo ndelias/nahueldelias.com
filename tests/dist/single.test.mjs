@@ -1,5 +1,5 @@
 // The shipped /work page with its real entries (dist/, no fixtures):
-// vers1ons (W01), Vera (W02), Comps (S01) and Bespoke (S02) side by side, nothing
+// vers1ons (W01), Vera (W02), Sourceline (S01) and Bespoke (S02) side by side, nothing
 // unbuilt in sight. The
 // ring itself is tested against the fixture build in filmstrip.test.mjs.
 
@@ -45,7 +45,7 @@ test('no fixture is built or linked', async () => {
   assert.ok(/class="next[^>]*>[\s\S]*?href="\/work\/vera\/"/.test(hub) || hub.includes('href="/work/vera/"'), 'the vers1ons hub does not lead on to Vera');
 });
 
-test('vers1ons, Vera, Comps and Bespoke side by side, the same size, in order; four Index rows', async () => {
+test('vers1ons, Vera, Sourceline and Bespoke side by side, the same size, in order; four Index rows', async () => {
   const { ctx, page } = await open();
   await page.waitForTimeout(300);
   const shape = await page.evaluate(() => {

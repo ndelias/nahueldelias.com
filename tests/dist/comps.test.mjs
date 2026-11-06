@@ -59,7 +59,7 @@ test('without JS: every section and all three tables read', async () => {
     tables: [...document.querySelectorAll('.comps table')].map((t) => t.querySelectorAll('tbody th').length),
     traced: [...document.querySelectorAll('.comps-trace tbody .face')].length,
   }));
-  assert.equal(state.h1, 'Comps you can check');
+  assert.equal(state.h1, 'Sourceline');
   assert.deepEqual(state.tables, [5, 5, 5]);
   assert.ok(state.traced >= 15, 'the trace table has no numbers without JS');
   await ctx.close();

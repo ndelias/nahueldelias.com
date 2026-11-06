@@ -78,7 +78,7 @@ test('My work: a card for every project, in order, each to its page; then All wo
     cards: [
       ['vers1ons', '/work/vers1ons/'],
       ['Vera', '/work/vera/'],
-      ['Comps you can check', '/studies/comps/'],
+      ['Sourceline', '/studies/comps/'],
       ['Bespoke', '/studies/bespoke/'],
     ],
     all: '/work',
