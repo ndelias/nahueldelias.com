@@ -32,7 +32,7 @@ define('hold-to-confirm', (stage) => {
     last = now;
     p = Math.min(1, Math.max(0, p + (holding ? dt / HOLD : (-dt * DRAIN) / HOLD)));
   };
-  const loopOn = loop(() => {
+  const anim = loop(() => {
     advance();
     draw();
     if (holding && p === 1) {
@@ -44,11 +44,10 @@ define('hold-to-confirm', (stage) => {
     if (!more) last = 0;
     return more;
   });
-  const anim = {
-    start() {
-      if (!last) last = performance.now();
-      loopOn.start();
-    },
+  // Starts the fill moving from now (it may already be moving).
+  const run = () => {
+    if (!last) last = performance.now();
+    anim.start();
   };
 
   const finish = () => {
@@ -64,7 +63,7 @@ define('hold-to-confirm', (stage) => {
       status.textContent = '';
       setTimeout(() => {
         done = false;
-        anim.start();
+        run();
       }, FADE_MS);
     }, RESET_MS);
   };
@@ -72,7 +71,7 @@ define('hold-to-confirm', (stage) => {
     if (done || holding) return;
     holding = true;
     button.classList.add('held');
-    anim.start();
+    run();
   };
   const release = () => {
     if (!holding) return;
@@ -80,13 +79,13 @@ define('hold-to-confirm', (stage) => {
     draw();
     // Full by the time it was let go: that's a full hold.
     if (p === 1) {
-      loopOn.stop();
+      anim.stop();
       last = 0;
       return finish();
     }
     holding = false;
     button.classList.remove('held');
-    anim.start();
+    run();
   };
 
   button.addEventListener('pointerdown', (e) => {

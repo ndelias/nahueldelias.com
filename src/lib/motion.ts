@@ -30,9 +30,11 @@ export async function motionPieces(): Promise<Piece[]> {
   // The sheet's rows have to fill (src/lib/sheet.ts): a gap is a size to fix.
   const [gap] = pack([HEADER, ...pieces.map((p) => parseSize(p.data.size))]);
   if (gap) {
+    // A gap is always above some piece (gaps in the last row don't count);
+    // item 0 is the header, so piece i is item i + 1.
     const next = pieces[gap.before - 1];
     const cols = gap.from === gap.to ? `column ${gap.from}` : `columns ${gap.from}–${gap.to}`;
-    throw new Error(`/motion: the sheet leaves row ${gap.row}, ${cols}, empty before "${next.id}". Change the sizes around it so the row fills.`);
+    throw new Error(`/motion: the sheet leaves row ${gap.row}, ${cols}, empty${next ? ` before "${next.id}"` : ''}. Change the sizes around it so the row fills.`);
   }
   return pieces;
 }

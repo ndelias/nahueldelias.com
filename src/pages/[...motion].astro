@@ -125,7 +125,8 @@ const range = `M${String(pieces[0].data.number).padStart(2, '0')}–M${String(pi
   }
   /* On the first page the header is the sheet's top left tile: six columns,
      two rows, the kicker at the top and the headline down at the bottom,
-     level with the tiles beside it. The grid keeps that space empty. */
+     level with the tiles beside it. The grid keeps that space empty. Its
+     size is HEADER in src/lib/sheet.ts, which the build packs against. */
   @media (min-width: 1024px) {
     .first .head {
       position: absolute;
