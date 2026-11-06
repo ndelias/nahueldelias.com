@@ -24,8 +24,43 @@ Date: the close on 2026-11-05. Shift4 and Global Payments released and
 filed that day, so it's the first close that reflects all five companies'
 Q3 numbers. On the evening of 2026-11-05 the historical pages only went to
 11-04 (the quote pages showed the 11-05 close, but they change daily, so
-they can't be cited). The prices go in once the 11-05 row is on the
-historical pages.
+they can't be cited). Read 2026-11-06 from the historical pages, once
+the 11-05 row was up (checked on the rendered TOST page, not just the data
+behind it).
+
+| Ticker | Close 2026-11-05 | Shares, millions (10-Q cover) | Market cap |
+|---|---|---|---|
+| TOST | 35.16 | 581 (519 A + 62 B, as of 10-30; the cover itself rounds to millions) | 20,428.0 |
+| XYZ | 84.04 | 604.522 (544,546 A + 59,976 B thousand, as of 10-30) | 50,804.0 |
+| FISV | 62.74 | 532.048 (532,047,720, as of 10-30) | 33,380.7 |
+| GPN | 94.98 | 264.636 (264,635,810, as of 10-30) | 25,135.1 |
+| FOUR | 42.79 | 74.944 (74,943,944 Class A, as of 10-31) | 3,206.9 |
+
+Shares are basic shares from each cover, not diluted.
+
+## Enterprise value
+
+EV = market cap + debt + preferred − cash and cash equivalents.
+
+| Company | Market cap | + Debt | + Preferred | − Cash | EV |
+|---|---|---|---|---|---|
+| Toast | 20,428.0 | 0 | 0 | 1,203 | 19,225.0 |
+| Block | 50,804.0 | 5,723.0 | 0 | 7,859.3 | 48,667.7 |
+| Fiserv | 33,380.7 | 27,063 | 0 | 545 | 59,898.7 |
+| Global Payments | 25,135.1 | 22,536.2 | 0 | 5,570.3 | 42,101.0 |
+| Shift4 | 3,206.9 | 5,483 | 1,000 | 1,242 | 8,447.9 |
+
+Multiples these give (the table works them out itself; here as a check):
+
+| Company | EV / revenue | EV / EBITDA |
+|---|---|---|
+| Toast (target) | 2.69x | 23.9x |
+| Block | 1.90x | 11.2x |
+| Fiserv | 2.88x | blank, Needs you |
+| Global Payments | 3.66x | blank, Needs you |
+| Shift4 | 1.72x | 7.5x |
+| Peer median | 2.39x | 9.4x (Block and Shift4 only) |
+| Peer mean | 2.54x | 9.4x |
 
 ## Toast (TOST, CIK 1650164)
 
