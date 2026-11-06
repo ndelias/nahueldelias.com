@@ -1,7 +1,8 @@
 import { defineCollection, type SchemaContext } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
-import { DISCIPLINES, ESSAY_STATUSES, FRAMES, STATUSES, type Section } from './lib/model';
+import { DISCIPLINES, ESSAY_STATUSES, FRAMES, STATUSES, TECHNIQUES, type Section } from './lib/model';
+import { SIZE } from './lib/sheet';
 
 // §3 content model. Each entry section is its own collection; the section is the
 // collection name and the slug is the filename, so neither is repeated in
@@ -300,6 +301,33 @@ const log = defineCollection({
   }),
 });
 
+// /motion: one entry per piece. The piece itself lives in src/motion/<id>/
+// (Stage.astro, the markup it starts from, and piece.ts, what makes it move);
+// the page fails the build when an entry has no piece or two share a number.
+const motion = defineCollection({
+  loader: glob({ pattern: '*.mdx', base: './src/content/motion' }),
+  schema: z
+    .object({
+      // M01, M02…: the order on the page.
+      number: z.number().int().positive(),
+      title: z.string().min(1).max(40, 'A piece title is a few words: 40 characters at most.'),
+      // What to try, or the one thing to notice, in a sentence or two.
+      note: z.string().min(1).max(160, 'A note is a sentence or two: 160 characters at most.'),
+      technique: z.array(z.enum(TECHNIQUES)).min(1),
+      status: z.enum(STATUSES),
+      // Where it shipped: "vers1ons". Required when status is shipped.
+      from: z.string().min(1).optional(),
+      // Its tile on the 12-column sheet, columns x rows: "4x2". Sized to
+      // what the piece holds; src/lib/sheet.ts checks the rows fill.
+      size: z.string().regex(SIZE, 'A size is columns x rows on the 12-column sheet, like "4x2": 3 to 12 columns, 1 or 2 rows.'),
+    })
+    .superRefine((piece, issues) => {
+      if (piece.status === 'shipped' && !piece.from) {
+        issues.addIssue({ code: 'custom', path: ['from'], message: 'A shipped piece says where it shipped: add from: "<product>".' });
+      }
+    }),
+});
+
 export const collections = {
   work: defineCollection({ loader: entries('work'), schema: entrySchema }),
   studies: defineCollection({ loader: entries('studies'), schema: entrySchema }),
@@ -320,4 +348,5 @@ export const collections = {
   play: defineCollection({ loader: entries('play'), schema: entrySchema }),
   writing,
   log,
+  motion,
 };

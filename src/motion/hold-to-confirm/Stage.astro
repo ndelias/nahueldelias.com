@@ -1,0 +1,15 @@
+---
+// M02, hold to sign: a press-and-hold confirm (piece.ts). The fill is a
+// second, inverted copy of the label clipped to the progress, so the words
+// turn over as the ink passes them. Once it's done, the label gives way to
+// "Signed" and a check that draws itself, then it resets.
+---
+<button type="button" class="hold" data-hold>
+  <span class="face">Hold to sign</span>
+  <span class="face fill" aria-hidden="true">Hold to sign</span>
+  <span class="face done" aria-hidden="true">
+    <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5" pathLength="1" /></svg>
+    Signed
+  </span>
+</button>
+<p class="visually-hidden" aria-live="polite" data-status></p>

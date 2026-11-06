@@ -1,0 +1,11 @@
+---
+date: 2026-11-05
+---
+
+/motion has its first shipped piece, the tape slider from vers1ons' audio player.
+
+- **What it is:** speed, pitch, and gain, each a ruler of ticks pulled under a fixed playhead. A red wall marks each end of the range, and the tape stops there. Double-click resets.
+- **Faithful:** the ranges, steps, tick spacing, falloff, and walls are the product's. Varispeed takes pitch out of play, as it does in the app.
+- **New here:** arrow keys and a screen-reader slider, and the tape rolls onto a step instead of jumping.
+- **A fix found on the way:** the catch on 100% speed never fired, because 1.05 − 1 comes out a hair over 0.05 in floating point. The rebuild compares with a tolerance. The product has the same bug.
+- A shipped piece now shows where it shipped, next to its badge.

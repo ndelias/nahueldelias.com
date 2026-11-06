@@ -1,0 +1,16 @@
+---
+// M01, the spring toggle: a segmented control whose filled pill moves on
+// two springs, one per edge (piece.ts). The pill is a second, inverted copy
+// of the labels clipped to the pill's edges, so the text under it turns
+// over exactly where the pill is, mid-flight too. Until the piece mounts
+// (and without JS), the chosen option is simply filled.
+const OPTIONS = ['Original', 'Instrumental', 'Vocals', 'Stems'];
+---
+<div class="toggle" data-toggle>
+  <div class="row" role="radiogroup" aria-label="Version">
+    {OPTIONS.map((label, i) => (
+      <button type="button" role="radio" aria-checked={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1}>{label}</button>
+    ))}
+  </div>
+  <div class="row ink" aria-hidden="true">{OPTIONS.map((label) => <span>{label}</span>)}</div>
+</div>

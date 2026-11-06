@@ -1,0 +1,34 @@
+---
+// M07, the drop screen swap, rebuilt from vers1ons' drop page (piece.ts),
+// inside its own scrolling box: the hero pinned at the top, the details
+// screen that rises over it, and the controls that swap between them. The
+// drop is a sample. Without JS it's a plain scrolling box.
+---
+<div class="device" data-device>
+  <div class="box" tabindex="0" aria-label="Sample drop page" data-box>
+    <section class="hero" data-hero>
+      <div class="art" aria-hidden="true"></div>
+      <div class="copy">
+        <p class="mono kicker">Drop · Sample</p>
+        <p class="name">Night Swim</p>
+        <p class="sub">Open for licensing until Friday</p>
+        <button type="button" class="cta" data-to="detail">License details</button>
+      </div>
+      {/* A chevron, not a word: it pulses down to 30%, which text couldn't do
+          and stay readable (WCAG AA). */}
+      <svg class="cue" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M4 6l4 4 4-4" /></svg>
+    </section>
+    <section class="detail" data-detail>
+      <p class="mono kicker">License details</p>
+      <dl>
+        <div><dt>Use</dt><dd>One production</dd></div>
+        <div><dt>Territory</dt><dd>Worldwide</dd></div>
+        <div><dt>Term</dt><dd>Two years</dd></div>
+        <div><dt>Fee</dt><dd>$240</dd></div>
+        <div><dt>Credit</dt><dd>Writers and performers</dd></div>
+        <div><dt>Royalties</dt><dd>Split by the split sheet</dd></div>
+      </dl>
+      <button type="button" class="back mono" data-to="hero">Back to top</button>
+    </section>
+  </div>
+</div>

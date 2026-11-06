@@ -1,0 +1,151 @@
+---
+// One /motion piece, a tile on the sheet: its name and badge on top, its
+// stage (the markup it starts from, from src/motion/<id>/Stage.astro) in
+// the middle, its note and how it's built underneath. The tile's size is
+// the entry's (columns x rows, src/lib/sheet.ts). The script that makes it
+// move is named in data-src and loaded by src/scripts/motion.ts.
+import StatusBadge from './StatusBadge.astro';
+import type { Piece } from '../lib/motion';
+import { scopeCss } from '../lib/scope-css';
+import { parseSize } from '../lib/sheet';
+
+interface Props {
+  piece: Piece;
+}
+const { piece } = Astro.props;
+const { id, data } = piece;
+
+const stages = import.meta.glob<{ default: (props: object) => unknown }>('../motion/*/Stage.astro', { eager: true });
+const scripts = import.meta.glob<string>('../motion/*/piece.ts', { query: '?worker&url', import: 'default', eager: true });
+// Each stage's CSS (src/motion/<id>/stage.css) is inlined beside its markup,
+// scoped to the piece, so a page carries only the styles of the stages it
+// renders and a page appended by the loader brings its own. (Astro's scoped
+// <style> would bundle every stage's CSS into every /motion page.)
+const styles = import.meta.glob<string>('../motion/*/stage.css', { query: '?raw', import: 'default', eager: true });
+// Every piece has both; src/lib/motion.ts fails the build when one doesn't.
+const Stage = stages[`../motion/${id}/Stage.astro`].default;
+const src = scripts[`../motion/${id}/piece.ts`];
+const css = styles[`../motion/${id}/stage.css`];
+const code = `M${String(data.number).padStart(2, '0')}`;
+const { cols, rows } = parseSize(data.size);
+---
+<li class:list={['piece', { narrow: cols <= 4, broad: cols >= 7, short: rows === 1 }]} style={`--cols:${cols};--rows:${rows}`} data-piece={id} data-src={src} aria-labelledby={`${id}-title`}>
+  {/* Scoped to the stage, not the whole piece, so a stage's bare selectors
+      (p, h3, button) can't reach the caption under it. */}
+  {css && <style is:inline set:html={scopeCss(css, `[data-piece='${id}'] [data-stage]`)} />}
+  <div class="caption">
+    <span class="mono muted">{code}</span>
+    <h2 id={`${id}-title`}>{data.title}</h2>
+    <span class="badge mono">{data.from && <span class:list={['from', { vers1ons: data.from === 'vers1ons' }]}>{data.from}</span>}<StatusBadge entry={piece} /></span>
+  </div>
+  <div class="stage" data-stage><Stage /></div>
+  <div class="foot">
+    <p class="note muted">{data.note}</p>
+    <span class="tech mono muted">{data.technique.join(' · ')} · <span data-size-of={src}>– KB</span></span>
+  </div>
+</li>
+
+<style>
+  /* A tile: the piece's own ground, ink on surface. The stage's colors are
+     what the shader reads. */
+  .piece {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-column: span var(--cols);
+    grid-row: span var(--rows);
+    min-width: 0;
+    background: var(--surface);
+    color: var(--ink);
+  }
+
+  .caption {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: baseline;
+    column-gap: var(--space-12);
+    padding: var(--space-16) var(--space-16) var(--space-12);
+  }
+  h2 {
+    margin: 0;
+    font-size: var(--text-body);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-title);
+    letter-spacing: var(--tracking-title);
+  }
+  .badge {
+    font-size: var(--text-mono-sm);
+  }
+  /* Where a shipped piece shipped; vers1ons in its own color. */
+  .from {
+    margin-right: var(--space-8);
+    color: var(--muted);
+  }
+  .from.vers1ons {
+    color: var(--vers1ons);
+  }
+
+  .stage {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 0;
+    overflow: hidden;
+    padding: var(--space-16);
+    background: var(--surface);
+  }
+
+  .foot {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    column-gap: var(--space-16);
+    padding: var(--space-12) var(--space-16) var(--space-16);
+  }
+  .note {
+    max-width: 52ch;
+    margin: 0;
+    font-size: var(--text-caption);
+    line-height: var(--leading-small);
+    text-wrap: pretty;
+  }
+  .tech {
+    font-size: var(--text-mono-sm);
+    white-space: nowrap;
+  }
+  /* A narrow tile: how it's built goes under the note. */
+  .narrow .foot {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--space-8);
+  }
+
+  /* Tablet: two columns, a tile is half, or the whole row when it's seven
+     columns or more on the sheet (broad). Heights follow the stage. */
+  @media (max-width: 1023.98px) {
+    .piece {
+      grid-column: span 1;
+      grid-row: auto;
+    }
+    .broad {
+      grid-column: 1 / -1;
+    }
+    .stage {
+      aspect-ratio: 4 / 3;
+    }
+    .foot {
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: var(--space-8);
+    }
+  }
+  @media (max-width: 639.98px) {
+    .piece {
+      grid-column: 1 / -1;
+    }
+    .stage {
+      aspect-ratio: 1;
+    }
+    /* A one-row piece is a small thing: a shorter stage. */
+    .short .stage {
+      aspect-ratio: 3 / 2;
+    }
+  }
+</style>

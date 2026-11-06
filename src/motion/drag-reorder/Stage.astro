@@ -1,0 +1,25 @@
+---
+// M13, drag to reorder (piece.ts): a playlist whose rows can be dragged, or
+// picked up and moved from the keyboard. Without JS it's a plain list.
+const TRACKS = [
+  ['Intro', '0:48'],
+  ['Night Swim', '3:12'],
+  ['Static Bloom', '2:56'],
+  ['Overpass', '4:05'],
+  ['Last Train', '3:31'],
+];
+---
+<div class="playlist" data-playlist>
+  <p class="visually-hidden" id="reorder-help">Press Space to pick a track up, the arrow keys to move it, Space to drop it, Escape to cancel.</p>
+  <ol class="rows" aria-label="Playlist" data-rows>
+    {TRACKS.map(([title, time], i) => (
+      <li class="row" tabindex="0" aria-describedby="reorder-help" data-row>
+        <span class="grip" aria-hidden="true"></span>
+        <span class="n mono" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+        <span class="title">{title}</span>
+        <span class="time mono">{time}</span>
+      </li>
+    ))}
+  </ol>
+  <p class="visually-hidden" aria-live="assertive" data-said></p>
+</div>

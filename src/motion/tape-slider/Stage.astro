@@ -1,0 +1,25 @@
+---
+// M04, the tape slider, rebuilt from vers1ons' audio editor: speed, pitch
+// and gain, each a ruler of ticks pulled under a fixed playhead (piece.ts).
+// Values and ranges are the product's. Until the piece mounts (and without
+// JS), a still ruler stands in for each tape.
+const ROWS = [
+  { id: 'speed', label: 'Speed', value: '100%' },
+  { id: 'pitch', label: 'Pitch', value: '0 st' },
+  { id: 'gain', label: 'Gain', value: '0 dB' },
+];
+---
+<div class="editor" data-editor>
+  <div class="bar">
+    <button type="button" class="vari mono" aria-pressed="false" data-vari>Varispeed</button>
+    <button type="button" class="reset mono" data-reset>Reset</button>
+  </div>
+  {ROWS.map(({ id, label, value }) => (
+    <div class="row" data-row={id}>
+      <span class="label mono" id={`tape-${id}`}>{label}</span>
+      <div class="tape"><canvas aria-labelledby={`tape-${id}`}></canvas></div>
+      <span class="value mono" data-value>{value}</span>
+    </div>
+  ))}
+  <span class="wall-probe" aria-hidden="true"></span>
+</div>

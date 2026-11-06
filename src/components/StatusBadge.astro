@@ -3,11 +3,11 @@
 // than a status string, so the badge can't disagree with the entry or be
 // passed something optional. Every index, card and page header that shows an
 // entry renders one.
-import type { Entry } from '../lib/entries';
 import type { Status } from '../lib/model';
 
 interface Props {
-  entry: Entry;
+  /** An entry, or a /motion piece: anything with a status. */
+  entry: { data: { status: Status } };
 }
 
 const LABELS: Record<Status, string> = {
