@@ -87,6 +87,14 @@ const entrySchema = ({ image }: SchemaContext) => {
       // What changed because of it, in one line: shown with the facts at the
       // top of a part page, so a reader gets the result before scrolling.
       outcome: z.string().min(1).optional(),
+      // The two or three numbers that show what the work did, in a row under
+      // the header, so a reader gets the impact in the first few seconds.
+      // Firm figures Nahuel has confirmed, each with a short label.
+      impact: z
+        .array(z.object({ value: z.string().min(1).max(12), label: z.string().min(1).max(80) }))
+        .min(2)
+        .max(3)
+        .optional(),
       links: z
         .object({
           live: z.url().optional(),

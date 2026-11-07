@@ -1,0 +1,46 @@
+---
+// /work/[hub]/[part]/changes: a part's "What changed, and why" on its own,
+// for a part that places it with <Comparisons later /> (its HTML budget).
+// The part page fetches the section from here after the first paint
+// (src/scripts/later.ts); without JS, its link opens this page.
+import type { GetStaticPaths } from 'astro';
+import Base from '../../../../layouts/Base.astro';
+import Comparisons from '../../../../components/Comparisons.astro';
+import DeferredStyles from '../../../../components/DeferredStyles.astro';
+import Frame from '../../../../components/Frame.astro';
+import Icon from '../../../../components/Icon.astro';
+import { entriesIn, entryHref, partSlug, partsOf } from '../../../../lib/entries';
+
+export const getStaticPaths = (() =>
+  entriesIn('work').flatMap((hub) =>
+    partsOf(hub)
+      .filter((part) => /<Comparisons\s+later\b/.test(part.body ?? ''))
+      .map((part) => ({ params: { slug: hub.id, part: partSlug(part) }, props: { part, hub } })),
+  )) satisfies GetStaticPaths;
+
+const { part, hub } = Astro.props;
+const back = entryHref(part);
+---
+<Base title={`What changed — ${part.data.title} — ${hub.data.title} — Nahuel D'Elias`} description={part.data.tagline} noindex>
+  <DeferredStyles slot="head" />
+  <Frame>
+    <a slot="top-center" class="back" href={back}>(<Icon name="arrow-left" /> {part.data.title})</a>
+    <main class="case container part-page">
+      <article class="body">
+        <div data-later-content>
+          <Comparisons items={part.data.comparisons} />
+        </div>
+      </article>
+    </main>
+  </Frame>
+</Base>
+
+<style>
+  .case {
+    padding-block: calc(var(--frame-inset-block) + 14px + 56px);
+  }
+  .back {
+    color: inherit;
+    text-decoration: none;
+  }
+</style>

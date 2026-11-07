@@ -180,6 +180,15 @@
 
 /* Comparisons: what changed, and why */
 .comparisons {
+  /* <Comparisons later />: the link to the section's own page, for
+     without JS; with JS the section replaces it once fetched. */
+  .more {
+    align-self: start;
+    font-size: var(--text-mono-lg);
+  }
+  :root.js &.later .more {
+    visibility: hidden;
+  }
   .intro {
     display: flex;
     flex-direction: column;
