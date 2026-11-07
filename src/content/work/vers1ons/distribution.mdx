@@ -208,7 +208,7 @@ import { distribution } from '../../../components/diagrams/specs/distribution';
 </Row>
 
 <Row label="Under the hood · Stores" heading="Store blocking that follows each license." step={7}>
-  Some stores only travel together, so the picker groups them by delivery route. If the license excludes some stores, the job drops them, ships the rest and tells the artist. The stored store list matches what was delivered, so later edits and takedowns can't reach an excluded store.
+  It started with a contract that limited a license to TikTok while our data had no limit. Now a store limit holds in the agreement, the UI and delivery, and browser tests caught 3 defects the unit tests missed. Some stores only travel together, so the picker groups them by delivery route. If the license excludes some stores, the job drops them, ships the rest and tells the artist. The stored store list matches what was delivered, so later edits and takedowns can't reach an excluded store.
 </Row>
 
 <Row label="Under the hood · Royalties" heading="Nobody's share gets lost on the way." step={13}>
@@ -224,5 +224,5 @@ import { distribution } from '../../../components/diagrams/specs/distribution';
 <Comparisons later />
 
 <BodySection label="Reliability" heading="Every failure we've seen in production, we caught and fixed.">
-  Over 245 unit tests, tests that try to break the endpoints on purpose, metrics, tracing and a playbook. Test releases in production found real bugs, and we fixed each one. 116 PRs over about ten months.
+  Over 245 unit tests, tests that try to break the endpoints on purpose, metrics and tracing. Our first production canary found four bugs in the partner integration. I fixed all four, then added Prometheus monitoring and a playbook for support. 116 PRs over about ten months.
 </BodySection>

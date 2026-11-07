@@ -16,6 +16,7 @@ outcome: 'One product on one system, kept on brand by CI. Labels said it felt li
 impact:
   - { value: '40+', label: 'components in one system, enforced in CI' }
   - { value: '80%', label: 'less time on routine UI prototyping, with my Claude Code skills' }
+  - { value: '40%', label: 'more app usage after the 9-day mobile overhaul' }
 disciplines:
   led: [design, frontend]
   contributed: [product]
@@ -158,11 +159,15 @@ import { designSystem } from '../../../components/diagrams/specs/design-system';
 </Row>
 
 <Row label="Under the hood · Phones" heading="Touch sizes come from the components." step={7}>
-  The mobile spec lives in the shared components, so screens get it by default. Tap targets grew to 48px, the mobile chrome first, then Discover, then the rest, each checked in a browser. One shared focus ring serves every interactive component, and below 768px dialogs become real bottom sheets, switched in one place.
+  The mobile spec lives in the shared components, so screens get it by default. Tap targets grew to 48px, the mobile chrome first, then Discover, then the rest, each checked in a browser. One shared focus ring serves every interactive component, and below 768px dialogs become real bottom sheets, switched in one place. The overhaul took 9 days, and app usage went up 40% after it.
 </Row>
 
 <Steps label="Piece by piece" />
 
 <MobileDesign />
 
-<Comparisons />
+<Comparisons later />
+
+<BodySection label="Beyond the screens" heading="The same care reaches emails, testing and accessibility.">
+  I built a shared email frame that 56 of 59 transactional emails now use. Click-through on their calls to action went up 30%, and each template went from 250 lines to 80. With other engineers, I co-wrote a Claude Code skill that drives the app with Playwright before every UI pull request and reports UI and UX bugs. It finds 20% more issues before review. I also audited the app for accessibility and shipped the fixes.
+</BodySection>
