@@ -13,6 +13,9 @@ dates:
 stack: ['Next.js', 'Inngest', 'Postgres', 'Redis', 'Socket.IO', 'Object storage', 'ffmpeg']
 standing: 'In production'
 outcome: 'Live in production. A remix no longer has to leave vers1ons to reach the stores.'
+impact:
+  - { value: '100', label: 'releases shipped to Spotify, Apple Music and more' }
+  - { value: '50%', label: 'less time to release, after client feedback' }
 disciplines:
   led: [backend, product, frontend]
   contributed: []
@@ -218,7 +221,7 @@ import { distribution } from '../../../components/diagrams/specs/distribution';
 
 <Steps />
 
-<Comparisons />
+<Comparisons later />
 
 <BodySection label="Reliability" heading="Every failure we've seen in production, we caught and fixed.">
   Over 245 unit tests, tests that try to break the endpoints on purpose, metrics, tracing and a playbook. Test releases in production found real bugs, and we fixed each one. 116 PRs over about ten months.

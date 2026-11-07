@@ -41,8 +41,8 @@ const SRCSET = /\s(?:srcset|data-srcset|imagesrcset)\s*=\s*["']([^"']+)["']/gi;
 const CSS_URL = /url\(\s*["']?([^"')]+)["']?\s*\)/gi;
 // Quotes or backticks: Preact's island loader imports \`./signals…\` on demand.
 const IMPORT = /(?:\bimport\s*\(\s*|(?:^|[;\s}])(?:import|export)\s*(?:[\w$*{}\s,]*?\bfrom\s*)?)["'`]([^"'`]+)["'`]/g;
-// Scripts added after load (AfterLoad.astro): their URL is a string literal.
-const AFTER_LOAD = /\bsrc = "(\/_astro\/[^"]+\.js)"/g;
+// Scripts added after load (AfterLoad.astro): afterLoad("/_astro/….js").
+const AFTER_LOAD = /\bafterLoad\("(\/_astro\/[^"]+\.js)"\)/g;
 
 function refs(text, isHtml) {
   const out = [];

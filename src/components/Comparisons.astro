@@ -8,12 +8,19 @@
 // time, and the before screen fades into today's in the same frame, then the
 // next tab comes up. It holds while hovered or focused, and Pause stops it
 // (WCAG 2.2.2).
+//
+// <Comparisons later /> keeps the pairs out of the page's HTML (the HTML
+// budget): the page holds only the heading and a link to its own
+// /changes/ page (pages/work/[slug]/[part]/changes.astro), and
+// src/scripts/later.ts brings the section in from there after the first
+// paint. Without JS the link opens that page.
 import type { ImageMetadata } from 'astro';
 import type { FrameType } from '../lib/model';
 import EntryImage from './EntryImage.astro';
 import AfterLoad from './AfterLoad.astro';
 import Icon from './Icon.astro';
 import behaviour from '../scripts/comparisons.ts?worker&url';
+import laterBehaviour from '../scripts/later.ts?worker&url';
 
 export interface Comparison {
   title: string;
@@ -27,9 +34,11 @@ interface Props {
   items?: Comparison[];
   label?: string;
   intro?: string;
+  later?: boolean;
 }
 
-const { items = Astro.locals.comparisons ?? [], label = 'What changed, and why', intro = 'The same part of the product in an early build and today.' } = Astro.props;
+const { items = Astro.locals.comparisons ?? [], label = 'What changed, and why', intro = 'The same part of the product in an early build and today.', later = false } = Astro.props;
+const changes = `${Astro.url.pathname.replace(/\/?$/, '/')}changes/`;
 const meta = (src: ImageMetadata) => (src as ImageMetadata & { clone?: ImageMetadata }).clone ?? src;
 // One size per image: these are below the fold and every srcset entry is a
 // long hashed URL in the page's HTML (the HTML budget).
@@ -37,7 +46,18 @@ const one = (src: ImageMetadata, frame: FrameType) => Math.min(frame === 'phone'
 // Styles: src/styles/deferred.css (loaded after first paint; this
 // component only renders below the fold).
 ---
-{items.length > 0 && (
+{later && items.length > 0 && (
+  <section class="comparisons later grid" aria-labelledby="comparisons-label" data-later={changes}>
+    <div class="intro">
+      <h2 class="label mono muted" id="comparisons-label">{label}</h2>
+      <p class="muted">{intro}</p>
+      <a class="more mono" href={changes}>See what changed <Icon name="arrow-right" /></a>
+    </div>
+  </section>
+)}
+{later && items.length > 0 && <AfterLoad src={laterBehaviour} />}
+
+{!later && items.length > 0 && (
   <section class="comparisons grid" aria-labelledby="comparisons-label">
     <div class="intro">
       <h2 class="label mono muted" id="comparisons-label">{label}</h2>
@@ -75,4 +95,4 @@ const one = (src: ImageMetadata, frame: FrameType) => Math.min(frame === 'phone'
   </section>
 )}
 
-<AfterLoad src={behaviour} />
+{!later && <AfterLoad src={behaviour} />}

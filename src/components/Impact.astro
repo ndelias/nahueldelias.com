@@ -1,0 +1,34 @@
+---
+// The impact row under a case study's header: two or three numbers, each
+// read as one line with its label ("100 releases shipped to …"). Renders
+// only when the entry has them. Global styles with their own names, so the
+// row adds no scoping classes to pages that sit at the HTML budget.
+interface Props {
+  impact?: { value: string; label: string }[];
+}
+
+const { impact } = Astro.props;
+---
+{impact && <ul class="impact">{impact.map((i) => <li><b>{i.value}</b> {i.label}</li>)}</ul>}
+
+<style is:global>
+  .impact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-16) var(--grid-gutter);
+    margin: var(--space-48) 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--text-small);
+    color: var(--muted);
+  }
+  .impact li {
+    flex: 1 1 200px;
+  }
+  .impact b {
+    display: block;
+    margin-bottom: var(--space-8);
+    font: var(--weight-medium) var(--text-meta-title) / 1 var(--font-sans);
+    color: var(--ink);
+  }
+</style>

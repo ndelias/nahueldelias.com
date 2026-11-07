@@ -1,7 +1,9 @@
 ---
 // Manual theme switch. Every visit lands in light; this shows the theme it
 // switches to, "(Dark)" in light mode, and saves the choice;
-// Base.astro's inline script applies it before first paint on the next visit.
+// Base.astro's inline script applies it before first paint on the next visit,
+// and handles the click (one listener on the document, so it works from the
+// first paint without a script of its own).
 // CSS picks the visible label from the resolved theme, so it's right at first
 // paint and nothing shifts when the script runs. Without JS it can't work, so
 // it doesn't render.
@@ -9,29 +11,6 @@
 <button class="theme-toggle mono" type="button" aria-label="Switch to dark theme" data-theme-toggle>
   <span class="to-dark">(Dark)</span><span class="to-light">(Light)</span>
 </button>
-
-<script>
-  const root = document.documentElement;
-  const current = () => (root.dataset.theme === 'dark' ? 'dark' : 'light');
-  const other = () => (current() === 'dark' ? 'light' : 'dark');
-
-  const buttons = document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]');
-  const sync = () => buttons.forEach((b) => b.setAttribute('aria-label', `Switch to ${other()} theme`));
-
-  buttons.forEach((button) =>
-    button.addEventListener('click', () => {
-      const next = other();
-      root.dataset.theme = next;
-      try {
-        localStorage.setItem('theme', next);
-      } catch {
-        // Storage blocked: the switch still works for this page view.
-      }
-      sync();
-    }),
-  );
-  sync();
-</script>
 
 <style>
   .theme-toggle {

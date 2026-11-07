@@ -61,8 +61,16 @@ async function measurePage(PAGE, html) {
     if (href) (isLocal(href) ? entries.add(toPath(href, PAGE)) : external.push(href));
   }
   // Scripts added once the page has loaded (AfterLoad.astro): not in the way
-  // of the first paint, but loaded without user action, so they count.
-  for (const m of html.matchAll(/\bsrc = "(\/_astro\/[^"]+\.js)"/g)) entries.add(m[1]);
+  // of the first paint, but loaded without user action, so they count. So do
+  // those a section fetched after load brings in (<Comparisons later />).
+  const afterLoad = (text) => {
+    for (const m of text.matchAll(/\bafterLoad\("(\/_astro\/[^"]+\.js)"\)/g)) entries.add(m[1]);
+  };
+  afterLoad(html);
+  for (const m of html.matchAll(/\bdata-later="([^"]+)"/g)) {
+    const page = join(DIST, m[1], 'index.html');
+    if (existsSync(page)) afterLoad(await readFile(page, 'utf8'));
+  }
   for (const m of html.matchAll(/<astro-island\b[^>]*>/gi)) {
     for (const name of ['component-url', 'renderer-url', 'before-hydration-url']) {
       const url = attr(m[0], name);

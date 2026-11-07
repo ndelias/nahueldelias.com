@@ -8,6 +8,7 @@ import DecisionBlock from '../../components/DecisionBlock.astro';
 import DeferredStyles from '../../components/DeferredStyles.astro';
 import EntryHeader from '../../components/EntryHeader.astro';
 import Facts from '../../components/Facts.astro';
+import Impact from '../../components/Impact.astro';
 import Figure from '../../components/Figure.astro';
 import Frame from '../../components/Frame.astro';
 import Icon from '../../components/Icon.astro';
@@ -44,6 +45,8 @@ const heroMeta = hero?.video ? ['Walkthrough', 'muted', hero.duration].filter(Bo
       {isHub && <PartsNav hub={entry} />}
       {data.fixture && <p class="fixture mono muted">Fixture · a test entry for the templates, not real work</p>}
       {isHub ? <div class="header"><EntryHeader entry={entry} /></div> : <EntryHeader entry={entry} />}
+
+      <Impact impact={data.impact} />
 
       <Facts
         facts={[
