@@ -34,7 +34,7 @@ test('the row sits under the header, before the facts, with each number and its 
   assert.deepEqual(stats(row), ['100', '50%']);
   assert.ok(page.indexOf('data-entry-header') < page.indexOf('class="impact"'), 'the row is above the header');
   assert.ok(page.indexOf('class="impact"') < page.indexOf('class="facts'), 'the row is below the facts');
-  assert.deepEqual(stats((await html('/work/vera/')).match(/<ul class="impact">[\s\S]*?<\/ul>/)[0]), ['48 of 50', '1–2 cents', '40%']);
+  assert.deepEqual(stats((await html('/work/vera/')).match(/<ul class="impact">[\s\S]*?<\/ul>/)[0]), ['40%', '1–2 cents']);
 });
 
 test('a page without numbers has no row', async () => {
@@ -90,7 +90,7 @@ test("cards lead with the project's first number: About's My work, the orbit and
   const cards = [...about.matchAll(/<li class="card[^"]*">([\s\S]*?)<\/li>/g)].map((m) => m[1]);
   const impactOf = (title) => cards.find((c) => c.includes(`>${title}</span>`))?.match(/<span class="card-impact[^"]*"><b[^>]*>([^<]+)<\/b>/)?.[1];
   assert.equal(impactOf('vers1ons'), '200+');
-  assert.equal(impactOf('Vera'), '48 of 50');
+  assert.equal(impactOf('Vera'), '40%');
   assert.equal(impactOf('Bespoke'), undefined, 'a concept got a number');
   const work = await html('/work/');
   assert.match(work, /data-impact="200\+ beta users on vers1ons"/);
