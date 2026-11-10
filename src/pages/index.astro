@@ -16,7 +16,7 @@ import Frame from '../components/Frame.astro';
 import Icon from '../components/Icon.astro';
 import EntryImage from '../components/EntryImage.astro';
 import Base from '../layouts/Base.astro';
-import { SECTION_LABELS, entryHref, entryNumber, entryYears, homepageEntries } from '../lib/entries';
+import { SECTION_LABELS, cardImpact, entryHref, entryNumber, entryYears, homepageEntries } from '../lib/entries';
 import behaviour from '../scripts/about.ts?worker&url';
 
 const STEPS = [
@@ -91,6 +91,7 @@ const LINKS = [
                   <span class="card-kicker mono muted">{kicker}</span>
                   <span class="card-title">{entry.data.title}</span>
                   <span class="card-line muted">{entry.data.tagline}</span>
+                  {cardImpact(entry) && <span class="card-impact"><b>{cardImpact(entry)!.value}</b> {cardImpact(entry)!.label}</span>}
                 </a>
               </li>
             ))}
@@ -357,6 +358,14 @@ const LINKS = [
   .card-line {
     font-size: var(--text-small);
     line-height: var(--leading-small);
+  }
+  /* The number the project leads with, from its impact row. */
+  .card-impact {
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+  }
+  .card-impact b {
+    font-weight: var(--weight-medium);
   }
   .card a:hover .card-title {
     text-decoration: underline;

@@ -100,6 +100,13 @@ export const siblingsOf = (part: Entry): { prev: Entry; next: Entry } | undefine
 };
 
 /** The part's own slug: "distribution" for vers1ons/distribution. */
+// The number a card leads with: the first of the entry's impact row.
+export const cardImpact = (entry: Entry) => entry.data.impact?.[0];
+export const cardImpactText = (entry: Entry) => {
+  const i = cardImpact(entry);
+  return i && `${i.value} ${i.label}`;
+};
+
 export const partSlug = (part: Entry): string => part.id.slice(part.id.indexOf('/') + 1);
 
 export const entriesIn = <S extends Section>(section: S) =>

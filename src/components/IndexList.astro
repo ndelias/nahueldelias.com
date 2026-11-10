@@ -13,7 +13,7 @@
 // they're always there; with it they come down while the hub is the active
 // row (data-open, set by the island).
 import EntryImage from './EntryImage.astro';
-import { SECTION_LABELS, entryHref, entryNumber, entryYears, homepageEntries, partsOf } from '../lib/entries';
+import { SECTION_LABELS, cardImpact, entryHref, entryNumber, entryYears, homepageEntries, partsOf } from '../lib/entries';
 import StatusBadge from './StatusBadge.astro';
 
 const rows = homepageEntries().map((entry) => ({
@@ -51,7 +51,7 @@ const previewRules =
       <li class="row" data-row>
         <span class="no mono">{number}</span>
         <h2 class="title">{href ? <a href={href}>{entry.data.title}</a> : entry.data.title}</h2>
-        <p class="tagline">{entry.data.tagline}</p>
+        <p class="tagline">{entry.data.tagline}{cardImpact(entry) && <span class="impact"><b>{cardImpact(entry)!.value}</b> {cardImpact(entry)!.label}</span>}</p>
         <span class="section mono">{SECTION_LABELS[entry.collection]}</span>
         <span class="badge"><StatusBadge entry={entry} /></span>
         <span class="year mono">{years}</span>
@@ -184,6 +184,15 @@ const previewRules =
     margin: 0;
     font-size: var(--text-small);
     color: var(--muted);
+  }
+  /* The number the project leads with, from its impact row. */
+  .impact {
+    display: block;
+    margin-top: 2px;
+    color: var(--ink);
+  }
+  .impact b {
+    font-weight: var(--weight-medium);
   }
   .section {
     font-size: var(--text-mono-sm);

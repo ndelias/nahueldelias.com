@@ -161,7 +161,7 @@ export function initOrbit(root: HTMLElement) {
     caption.classList.remove('in', 'enter');
     if (!el) return;
     void caption.offsetWidth;
-    for (const key of ['no', 'kicker', 'title', 'line']) fields[key].textContent = el.dataset[key] ?? '';
+    for (const key of ['no', 'kicker', 'title', 'line', 'impact']) fields[key].textContent = el.dataset[key] ?? '';
     caption.classList.add('in', 'enter');
   }
 
