@@ -42,7 +42,7 @@ await page.setContent(html);
 await page.evaluate(async ({ cols, rows, cells }) => {
   await document.fonts.load('10px "DM Mono"');
   await document.fonts.ready;
-  // As src/scripts/about.ts draws it, settled.
+  // As src/scripts/portrait.ts draws it, settled.
   const canvas = document.querySelector('canvas');
   const w = canvas.clientWidth, h = canvas.clientHeight;
   canvas.width = w * 2; canvas.height = h * 2;

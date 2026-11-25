@@ -1,0 +1,238 @@
+---
+// /_lab: every layout of a page side by side, each as the real page in a
+// frame at desktop and phone width, with its idea and where it sits on the
+// variation dial. Pick one to open it full size.
+import Icon from '../components/Icon.astro';
+import ThemeToggle from '../components/ThemeToggle.astro';
+import { BASELINE, HOME_VARIANTS, type Variant } from './variants';
+
+const ROWS: Variant[] = [BASELINE, ...HOME_VARIANTS];
+const DESKTOP = { w: 1440, h: 900, scale: 0.5 };
+const PHONE = { w: 390, h: 844, scale: 0.535 };
+const dial = (v: number) => (v <= 20 ? 'close' : v >= 80 ? 'wide' : 'between');
+---
+<main class="lab">
+  <header class="head">
+    <div>
+      <p class="kicker mono muted">Design lab · Homepage · Round 3</p>
+      <h1>Homepage layouts</h1>
+      <p class="muted intro">Each round builds on the last; earlier rounds stay below for reference. The design system stays close and the layout varies. Each frame is the real page: scroll inside it, point at the cards, switch the theme.</p>
+    </div>
+    <ThemeToggle />
+  </header>
+
+  <ol class="variants">
+    {ROWS.map((v) => (
+      <li class="variant">
+        <div class="info">
+          {v.round && <p class="round mono muted">Round {v.round}</p>}
+          <h2>{v.name}</h2>
+          <p class="muted">{v.idea}</p>
+          <dl class="dial">
+            {(['system', 'layout'] as const).map((layer) => (
+              <div class="dial-row">
+                <dt class="mono muted">{layer}</dt>
+                <dd>
+                  <span class="track" style={`--at: ${v.dial[layer]}%`} role="img" aria-label={`${v.dial[layer]} of 100, ${dial(v.dial[layer])}`}></span>
+                  <span class="mono muted">{dial(v.dial[layer])}</span>
+                </dd>
+              </div>
+            ))}
+          </dl>
+          <a class="open mono" href={v.href}>Open <Icon name="arrow-up-right" /></a>
+        </div>
+        <div class="screens">
+          <div class="screen" style={`--w: ${DESKTOP.w}px; --h: ${DESKTOP.h}px; --s: ${DESKTOP.scale}`}>
+            <iframe src={v.href} title={`${v.name}, desktop`} loading="lazy" width={DESKTOP.w} height={DESKTOP.h}></iframe>
+          </div>
+          <div class="screen phone" style={`--w: ${PHONE.w}px; --h: ${PHONE.h}px; --s: ${PHONE.scale}`}>
+            <iframe src={v.href} title={`${v.name}, phone`} loading="lazy" width={PHONE.w} height={PHONE.h}></iframe>
+          </div>
+        </div>
+      </li>
+    ))}
+  </ol>
+</main>
+
+<script>
+  // The theme toggle above switches the frames too: they're same-origin
+  // pages, so set each one's theme directly (the live page has no listener).
+  // Astro's dev toolbar would sit over every frame: hide it in them.
+  for (const frame of document.querySelectorAll('iframe')) {
+    frame.addEventListener('load', () => {
+      const style = frame.contentDocument?.createElement('style');
+      if (!style) return;
+      style.textContent = 'astro-dev-toolbar{display:none!important}';
+      frame.contentDocument!.head.append(style);
+    });
+  }
+  addEventListener('click', (e) => {
+    if (!(e.target as Element).closest('[data-theme-toggle]')) return;
+    requestAnimationFrame(() => {
+      const theme = document.documentElement.dataset.theme;
+      for (const frame of document.querySelectorAll('iframe')) {
+        const root = frame.contentDocument?.documentElement;
+        if (root && theme) root.dataset.theme = theme;
+      }
+    });
+  });
+</script>
+
+<style>
+  .lab {
+    padding: var(--space-48) var(--grid-margin) var(--space-96);
+  }
+  .head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-24);
+    max-width: 1440px;
+    margin: 0 auto var(--space-48);
+  }
+  .kicker {
+    margin: 0;
+    font-size: var(--text-mono);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+  }
+  h1 {
+    margin: var(--space-12) 0 var(--space-8);
+    font-size: var(--text-h2);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-h2);
+    letter-spacing: var(--tracking-h2);
+  }
+  .intro {
+    margin: 0;
+    max-width: 60ch;
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+  }
+
+  .variants {
+    display: grid;
+    gap: var(--space-48);
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0;
+    list-style: none;
+  }
+  .variant {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: var(--space-32);
+    padding-top: var(--space-32);
+    border-top: 1px solid var(--line);
+  }
+  h2 {
+    margin: 0 0 var(--space-8);
+    font-size: var(--text-title);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-title);
+  }
+  .info .round {
+    margin: 0 0 var(--space-8);
+    font-size: var(--text-mono);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+  }
+  .info p {
+    margin: 0;
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+  }
+  .dial {
+    display: grid;
+    gap: var(--space-8);
+    margin: var(--space-24) 0;
+  }
+  .dial-row {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr);
+    align-items: center;
+    gap: var(--space-8);
+  }
+  .dial dt,
+  .dial dd .mono {
+    font-size: var(--text-mono);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+  }
+  .dial dd {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    margin: 0;
+  }
+  /* close ———●——— wide */
+  .track {
+    position: relative;
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+  }
+  .track::after {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: calc(var(--at) - 3.5px);
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--ink);
+  }
+  .open {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-8);
+    min-height: 44px;
+    color: var(--accent);
+    font-size: var(--text-mono-lg);
+    letter-spacing: var(--tracking-mono);
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+  .open:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .open:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-offset);
+  }
+
+  .screens {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-24);
+    overflow-x: auto;
+  }
+  /* The page at its real size, scaled down: the box takes the scaled size. */
+  .screen {
+    flex: none;
+    width: calc(var(--w) * var(--s));
+    height: calc(var(--h) * var(--s));
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--bg);
+    outline: 1px solid var(--line);
+  }
+  .screen.phone {
+    border-radius: 16px;
+  }
+  .screen iframe {
+    display: block;
+    width: var(--w);
+    height: var(--h);
+    border: 0;
+    transform: scale(var(--s));
+    transform-origin: 0 0;
+  }
+
+  @media (max-width: 899.98px) {
+    .variant {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

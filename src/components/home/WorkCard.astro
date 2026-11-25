@@ -1,0 +1,121 @@
+---
+// A project card that shows the product: a frame from its reel, which plays
+// in place while pointed at or focused (src/scripts/cards.ts), then its
+// kicker, title, line and the number it leads with. The cursor carries a
+// "Case study" tip.
+//
+// `later`: the frame arrives after the first paint (cards.ts, later()), so
+// it can't take bandwidth from the largest paint on a phone; Chrome starts
+// lazy images early when they're within a few screens. Without JS the
+// <noscript> copy shows.
+import { getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import EntryImage from '../EntryImage.astro';
+import { cardImpact, stillOf, type Entry } from '../../lib/entries';
+
+interface Props {
+  entry: Entry;
+  href?: string;
+  kicker: string;
+  /** Responsive sizes for the frame. */
+  sizes: string;
+  eager?: boolean;
+  later?: boolean;
+}
+
+const { entry, href, kicker, sizes, eager = false, later = false } = Astro.props;
+const still = stillOf(entry);
+const raster = ((still as ImageMetadata & { clone?: ImageMetadata }).clone ?? still).format !== 'svg';
+const deferred = later && raster ? await getImage({ src: still, format: 'avif', widths: [640, 1280], sizes }) : undefined;
+const impact = cardImpact(entry);
+const Tag = href ? 'a' : 'div';
+---
+<Tag class="wc" href={href} data-reel={entry.data.video} data-tip={href && 'Case study'}>
+  <span class="shot">
+    {deferred ? (
+      <>
+        <img data-later-src={deferred.src} data-later-srcset={deferred.srcSet.attribute} sizes={sizes} width={deferred.attributes.width} height={deferred.attributes.height} alt="" decoding="async" />
+        <noscript><EntryImage src={still} alt="" widths={[640, 1280]} sizes={sizes} output="avif" /></noscript>
+      </>
+    ) : (
+      <EntryImage src={still} alt="" widths={[640, 1280]} sizes={sizes} loading={eager ? 'eager' : 'lazy'} output="avif" />
+    )}
+  </span>
+  <span class="kicker mono muted">{kicker}</span>
+  <span class="title">{entry.data.title}</span>
+  <span class="line muted">{entry.data.tagline}</span>
+  {impact && <span class="impact"><b>{impact.value}</b> {impact.label}</span>}
+</Tag>
+
+<style>
+  .wc {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+    color: inherit;
+    text-decoration: none;
+  }
+  .shot {
+    position: relative;
+    display: block;
+    margin-bottom: var(--space-12);
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--surface);
+    outline: 1px solid color-mix(in srgb, var(--ink) 10%, transparent);
+    outline-offset: -1px;
+  }
+  .shot :global(img),
+  .shot :global(video) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .shot :global(video) {
+    position: absolute;
+    inset: 0;
+    animation: arrive 0.45s ease both;
+  }
+  @keyframes arrive {
+    from { opacity: 0; }
+  }
+  .kicker {
+    font-size: var(--text-mono);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+  }
+  .title {
+    font-size: var(--text-title);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-title);
+    line-height: var(--leading-title);
+  }
+  .line,
+  .impact {
+    max-width: 56ch;
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+  }
+  .impact b {
+    font-weight: var(--weight-medium);
+  }
+  a.wc:hover .title {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  a.wc:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-offset);
+    border-radius: 8px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .shot :global(img) {
+      transition: transform 0.6s var(--ease);
+    }
+    a.wc:hover .shot :global(img) {
+      transform: scale(1.015);
+    }
+  }
+</style>

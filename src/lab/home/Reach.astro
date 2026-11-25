@@ -1,0 +1,94 @@
+---
+// The close: the line and the ways to reach Nahuel, as on the live homepage.
+import Icon from '../../components/Icon.astro';
+import { LINKS, RESUME } from '../../lib/home';
+
+interface Props {
+  align?: 'center' | 'start';
+}
+const { align = 'center' } = Astro.props;
+---
+<section class:list={['reach', align]} aria-labelledby="reach-title">
+  <h2 class="reach-line" id="reach-title">Have an idea? Want to build something? Need a coffee? Let's talk.</h2>
+  <ul class="links">
+    <li class="pair">
+      <a href={RESUME} target="_blank" rel="noopener">Resume <Icon name="arrow-up-right" /></a>
+      <a class="download" href={RESUME} download="Nahuel D'Elias resume.pdf" aria-label="Download resume (PDF)"><Icon name="download" /></a>
+    </li>
+    {LINKS.map((l) => (
+      <li><a href={l.href} {...(l.href.startsWith('http') ? { target: '_blank', rel: 'noopener' } : {})}>{l.label} <Icon name="arrow-up-right" /></a></li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .reach {
+    display: flex;
+    flex-direction: column;
+  }
+  .center {
+    align-items: center;
+    text-align: center;
+  }
+  .reach-line {
+    margin: 0;
+    max-width: 24ch;
+    font-size: var(--text-h2);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-h2);
+    letter-spacing: var(--tracking-h2);
+    text-wrap: balance;
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-12) var(--space-32);
+    margin: var(--space-32) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .center .links {
+    justify-content: center;
+  }
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-8);
+    min-height: 44px;
+    color: var(--ink);
+    font-size: var(--text-lead);
+    font-weight: var(--weight-medium);
+    text-decoration: none;
+  }
+  .links a:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .links a:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-offset);
+  }
+  .links :global(.icon) {
+    color: var(--accent);
+  }
+  .pair {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+  .download {
+    justify-content: center;
+    min-width: 44px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .links :global(.icon) {
+      transition: transform 0.25s var(--ease);
+    }
+    .links a:hover :global(.icon) {
+      transform: translate(2px, -2px);
+    }
+    .links .download:hover :global(.icon) {
+      transform: translateY(2px);
+    }
+  }
+</style>

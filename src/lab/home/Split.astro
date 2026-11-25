@@ -1,0 +1,204 @@
+---
+// Layout 3, Split. Nahuel stays on screen the whole time: a column on the
+// left with his portrait, a line, how he thinks and the ways to reach him.
+// The work scrolls on the right, one big card at a time, then experience.
+// On a phone the column goes on top.
+import Icon from '../../components/Icon.astro';
+import { LINKS, RESUME, STEPS, work } from '../../lib/home';
+import { EDITABLES } from '../editables';
+import { settingsFor } from '../../lib/layout-settings';
+import Experience from '../../components/home/Experience.astro';
+import WorkCard from '../../components/home/WorkCard.astro';
+
+const WORK = work();
+const { style, text } = settingsFor('split', EDITABLES.split);
+---
+<main class="sp container" data-layout style={style}>
+  <aside class="side" aria-labelledby="side-title">
+    <div class="side-in">
+      <canvas class="portrait" data-lab-portrait role="img" aria-label="A portrait of Nahuel D'Elias drawn in characters"></canvas>
+      <h1 id="side-title">Nahuel D'Elias</h1>
+      <p class="role mono muted">Product engineer</p>
+      <p class="line" data-edit="line">{text.line}</p>
+      <ol class="steps" aria-label="How I think about product">
+        {STEPS.map((s, i) => (
+          <li><span class="mono muted">{String(i + 1).padStart(2, '0')}</span> {s.title}</li>
+        ))}
+      </ol>
+      <ul class="links">
+        <li class="pair">
+          <a href={RESUME} target="_blank" rel="noopener">Resume <Icon name="arrow-up-right" /></a>
+          <a class="download" href={RESUME} download="Nahuel D'Elias resume.pdf" aria-label="Download resume (PDF)"><Icon name="download" /></a>
+        </li>
+        {LINKS.map((l) => (
+          <li><a href={l.href} {...(l.href.startsWith('http') ? { target: '_blank', rel: 'noopener' } : {})}>{l.label} <Icon name="arrow-up-right" /></a></li>
+        ))}
+      </ul>
+    </div>
+  </aside>
+
+  <div class="flow">
+    <section class="part" data-section="work" aria-labelledby="work-title">
+      <h2 class="label mono muted" id="work-title">My work</h2>
+      <ul class="cards">
+        {WORK.map(({ entry, href, kicker }, i) => (
+          <li><WorkCard entry={entry} href={href} kicker={kicker} sizes="(max-width: 899px) 100vw, 60vw" eager={i === 0} /></li>
+        ))}
+      </ul>
+    </section>
+    <div class="part" data-section="experience"><Experience narrow /></div>
+  </div>
+</main>
+
+<style>
+  .sp {
+    display: grid;
+    grid-template-columns: calc((100% - var(--space-64)) * var(--side) / 12) minmax(0, 1fr);
+    gap: var(--space-64);
+    align-items: start;
+    padding-top: 72px;
+    padding-bottom: var(--space-160);
+  }
+
+  /* The column stays put while the work scrolls past it. */
+  .side {
+    position: sticky;
+    top: 72px;
+  }
+  .side-in {
+    display: flex;
+    flex-direction: column;
+    padding-top: var(--space-48);
+  }
+  .portrait {
+    display: block;
+    width: var(--portrait);
+    max-width: 100%;
+    aspect-ratio: 400 / 480;
+    margin-bottom: var(--space-24);
+  }
+  :global(:root:not(.js)) .portrait {
+    display: none;
+  }
+  h1 {
+    margin: 0;
+    font-size: var(--name-size);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-meta-title);
+    letter-spacing: var(--tracking-meta-title);
+  }
+  .role {
+    margin: var(--space-8) 0 0;
+    font-size: var(--text-mono-lg);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+  }
+  .line {
+    margin: var(--space-24) 0 0;
+    max-width: 36ch;
+    font-size: var(--line-size);
+    line-height: var(--leading-body);
+  }
+  .steps {
+    display: grid;
+    gap: var(--space-4);
+    margin: var(--space-24) 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--text-small);
+  }
+  .steps .mono {
+    margin-right: var(--space-8);
+    font-size: var(--text-mono);
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--space-24);
+    margin: var(--space-24) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-8);
+    min-height: 44px;
+    color: var(--ink);
+    font-weight: var(--weight-medium);
+    text-decoration: none;
+  }
+  .links a:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .links a:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-offset);
+  }
+  .links :global(.icon) {
+    color: var(--accent);
+  }
+  .pair {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+  .download {
+    justify-content: center;
+    min-width: 44px;
+  }
+
+  .flow {
+    display: flex;
+    flex-direction: column;
+    gap: var(--section-gap);
+    padding-top: var(--space-48);
+  }
+  .part[data-section='work'] { order: var(--order-work); }
+  .part[data-section='experience'] { order: var(--order-experience); }
+  .label {
+    margin: 0 0 var(--space-24);
+    font-size: var(--text-mono);
+    font-weight: var(--weight-regular);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+  }
+  .cards {
+    display: grid;
+    gap: var(--card-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (max-width: 899.98px) {
+    .sp {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-64);
+    }
+    .side {
+      position: static;
+    }
+  }
+  @media (max-width: 639.98px) {
+    .sp {
+      padding-top: var(--space-48);
+    }
+    .portrait {
+      width: 160px;
+    }
+    h1 {
+      font-size: var(--text-meta-title);
+    }
+    .line {
+      font-size: var(--text-body);
+    }
+    .cards {
+      gap: var(--space-64);
+    }
+    .flow {
+      gap: var(--space-96);
+    }
+  }
+</style>

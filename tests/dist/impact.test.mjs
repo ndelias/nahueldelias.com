@@ -85,11 +85,12 @@ test('phone: the row reads one number per line, nothing off the side', async () 
   await ctx.close();
 });
 
-test("cards lead with the project's first number: About's My work, the orbit and the Index", async () => {
-  const about = await html('/');
-  const cards = [...about.matchAll(/<li class="card[^"]*">([\s\S]*?)<\/li>/g)].map((m) => m[1]);
-  const impactOf = (title) => cards.find((c) => c.includes(`>${title}</span>`))?.match(/<span class="card-impact[^"]*"><b[^>]*>([^<]+)<\/b>/)?.[1];
-  assert.equal(impactOf('vers1ons'), '200+');
+test("the homepage leads with vers1ons' numbers and each card's first; the orbit and the Index too", async () => {
+  const home = await html('/');
+  const feature = home.match(/<article class="feature[\s\S]*?<\/article>/)?.[0] ?? '';
+  assert.deepEqual([...feature.matchAll(/<li[^>]*><b[^>]*>([^<]+)<\/b>/g)].map((m) => m[1]), ['200+', '2,000+', '329']);
+  const cards = [...home.matchAll(/<a class="wc[^"]*"[\s\S]*?<\/a>/g)].map((m) => m[0]);
+  const impactOf = (title) => cards.find((c) => c.includes(`>${title}</span>`))?.match(/<span class="impact[^"]*"><b[^>]*>([^<]+)<\/b>/)?.[1];
   assert.equal(impactOf('Vera'), '21');
   assert.equal(impactOf('Bespoke'), undefined, 'a concept got a number');
   const work = await html('/work/');

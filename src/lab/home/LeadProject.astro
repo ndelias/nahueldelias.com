@@ -1,0 +1,290 @@
+---
+// Layout 2, Lead project. A short intro with the ways to reach Nahuel up
+// front, then vers1ons as a big feature with every number and part, the
+// rest of the work as a compact list, then him and his experience.
+import EntryImage from '../../components/EntryImage.astro';
+import Icon from '../../components/Icon.astro';
+import { cardImpact, stillOf } from '../../lib/entries';
+import { LINKS, RESUME, work } from '../../lib/home';
+import { EDITABLES } from '../editables';
+import { settingsFor } from '../../lib/layout-settings';
+import Experience from '../../components/home/Experience.astro';
+import LeadFeature from '../../components/home/LeadFeature.astro';
+import Reach from './Reach.astro';
+
+const [lead, ...rest] = work();
+const { style, text } = settingsFor('lead-project', EDITABLES['lead-project']);
+---
+<main class="lp" data-layout style={style}>
+  <section class="intro container" aria-labelledby="intro-title">
+    <p class="kicker mono muted">Nahuel D'Elias · Product engineer</p>
+    <h1 id="intro-title"><span data-edit="headline">{text.headline}</span> <span class="muted" data-edit="headline-tail">{text['headline-tail']}</span></h1>
+    <ul class="quick">
+      <li><a href={RESUME} target="_blank" rel="noopener">Resume <Icon name="arrow-up-right" /></a></li>
+      {LINKS.map((l) => (
+        <li><a href={l.href} {...(l.href.startsWith('http') ? { target: '_blank', rel: 'noopener' } : {})}>{l.label} <Icon name="arrow-up-right" /></a></li>
+      ))}
+    </ul>
+  </section>
+
+  <div class="flow">
+  <section class="part feature container" data-section="feature" aria-label="Lead project">
+    <LeadFeature entry={lead.entry} href={lead.href} kicker={lead.kicker} />
+  </section>
+
+  <section class="part more container" data-section="more" aria-labelledby="more-title">
+    <h2 class="label mono muted" id="more-title">More work</h2>
+    <ul class="list">
+      {rest.map(({ entry, href, kicker }) => {
+        const impact = cardImpact(entry);
+        return (
+          <li>
+            <a class="item" href={href} data-reel={entry.data.video} data-tip="Case study">
+              <span class="shot thumb">
+                <EntryImage src={stillOf(entry)} alt="" widths={[400, 800]} sizes="(max-width: 639px) 100vw, 280px" />
+              </span>
+              <span class="item-text">
+                <span class="kicker mono muted">{kicker}</span>
+                <span class="item-title">{entry.data.title}</span>
+                <span class="item-line muted">{entry.data.tagline}</span>
+              </span>
+              <span class="item-impact">{impact && <><b>{impact.value}</b> <span class="muted">{impact.label}</span></>}</span>
+              <Icon name="arrow-right" />
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+  </section>
+
+  <section class="part me container" data-section="me" aria-labelledby="me-title">
+    <canvas class="portrait" data-lab-portrait role="img" aria-label="A portrait of Nahuel D'Elias drawn in characters"></canvas>
+    <div>
+      <h2 class="label mono muted" id="me-title">About me</h2>
+      <p class="statement" data-edit="statement">{text.statement}</p>
+      <p class="statement muted" data-edit="closer">{text.closer}</p>
+    </div>
+  </section>
+
+  <div class="part container" data-section="experience"><Experience /></div>
+  <div class="part container" data-section="reach"><Reach /></div>
+  </div>
+</main>
+
+<style>
+  .lp {
+    padding-top: 72px;
+    padding-bottom: var(--space-160);
+  }
+  .kicker {
+    margin: 0;
+    font-size: var(--text-mono);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+  }
+  .label {
+    margin: 0 0 var(--space-16);
+    font-size: var(--text-mono);
+    font-weight: var(--weight-regular);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+  }
+
+  .intro {
+    padding-top: var(--space-96);
+  }
+  /* The sections, in the order the editor set. */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    gap: var(--section-gap);
+    margin-top: var(--space-64);
+  }
+  .part[data-section='feature'] { order: var(--order-feature); }
+  .part[data-section='more'] { order: var(--order-more); }
+  .part[data-section='me'] { order: var(--order-me); }
+  .part[data-section='experience'] { order: var(--order-experience); }
+  .part[data-section='reach'] { order: var(--order-reach); }
+  h1 {
+    margin: var(--space-16) 0 0;
+    max-width: calc(var(--headline-width) * 1ch);
+    font-size: var(--headline);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-h2);
+    letter-spacing: var(--tracking-h2);
+    text-wrap: balance;
+  }
+  .quick {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--space-24);
+    margin: var(--space-24) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .quick a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-8);
+    min-height: 44px;
+    color: var(--ink);
+    font-weight: var(--weight-medium);
+    text-decoration: none;
+  }
+  .quick :global(.icon) {
+    color: var(--accent);
+  }
+  .quick a:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .shot {
+    position: relative;
+    display: block;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--surface);
+    outline: 1px solid color-mix(in srgb, var(--ink) 10%, transparent);
+    outline-offset: -1px;
+  }
+  .shot :global(img),
+  .shot :global(video) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .shot :global(video) {
+    position: absolute;
+    inset: 0;
+    animation: arrive 0.45s ease both;
+  }
+  @keyframes arrive {
+    from { opacity: 0; }
+  }
+
+  /* The rest: one row each, the product small beside what it is. */
+  .list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .item {
+    display: grid;
+    grid-template-columns: var(--thumb) minmax(0, 1fr) minmax(0, 0.8fr) 16px;
+    align-items: center;
+    gap: var(--space-32);
+    padding: var(--space-24) 0;
+    border-top: 1px solid var(--line);
+    color: inherit;
+    text-decoration: none;
+  }
+  .list li:last-child .item {
+    border-bottom: 1px solid var(--line);
+  }
+  .item-text {
+    display: grid;
+    gap: var(--space-8);
+  }
+  .item-title {
+    font-size: var(--text-title);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-title);
+  }
+  .item-line,
+  .item-impact {
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+  }
+  .item-impact b {
+    font-weight: var(--weight-medium);
+  }
+  .item :global(.icon) {
+    color: var(--accent);
+  }
+  .item:hover .item-title {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .me {
+    display: grid;
+    grid-template-columns: var(--portrait) minmax(0, 1fr);
+    gap: var(--space-48);
+    align-items: center;
+  }
+  .portrait {
+    display: block;
+    width: 100%;
+    aspect-ratio: 400 / 480;
+  }
+  :global(:root:not(.js)) .portrait {
+    display: none;
+  }
+  .statement {
+    margin: 0 0 var(--space-16);
+    max-width: 56ch;
+    font-size: var(--text-lead);
+    line-height: var(--leading-lead);
+  }
+
+
+  a:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-offset);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .item :global(.icon) {
+      transition: transform 0.25s var(--ease);
+    }
+    .item:hover :global(.icon) {
+      transform: translateX(3px);
+    }
+  }
+
+  @media (max-width: 899.98px) {
+    .item {
+      grid-template-columns: min(var(--thumb), 200px) minmax(0, 1fr) 16px;
+    }
+    .item-impact {
+      display: none;
+    }
+  }
+  @media (max-width: 639.98px) {
+    .lp {
+      padding-top: var(--space-16);
+    }
+    .intro {
+      padding-top: var(--space-64);
+    }
+    .item {
+      grid-template-columns: minmax(0, 1fr) 16px;
+      gap: var(--space-16);
+    }
+    .thumb {
+      grid-column: 1 / -1;
+    }
+    .item-impact {
+      display: block;
+      grid-column: 1;
+    }
+    .item :global(.icon) {
+      grid-column: 2;
+      grid-row: 2;
+    }
+    .me {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .portrait {
+      max-width: 240px;
+    }
+    h1 {
+      font-size: var(--text-h2);
+    }
+    .flow {
+      gap: var(--space-96);
+    }
+  }
+</style>

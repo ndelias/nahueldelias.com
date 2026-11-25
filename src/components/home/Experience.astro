@@ -1,0 +1,137 @@
+---
+// Experience, education and leadership as rows, the same rows as the live
+// homepage, shared by the lab's layouts.
+import Icon from '../Icon.astro';
+import { EDUCATION, EXPERIENCE, LEADERSHIP } from '../../lib/home';
+
+interface Props {
+  /** Narrow column: the date goes over the role, not beside it. */
+  narrow?: boolean;
+}
+const { narrow = false } = Astro.props;
+---
+<section class:list={['exp', { narrow }]} aria-labelledby="exp-title">
+  <h2 class="label mono muted" id="exp-title">Experience</h2>
+  <ol class="rows">
+    {EXPERIENCE.map((e) => {
+      const Tag = e.href ? 'a' : 'div';
+      return (
+        <li>
+          <Tag class="row" href={e.href}>
+            <span class="when mono muted">{e.when}</span>
+            <span class="role">{e.role}<span class="role-line muted">{e.line}</span></span>
+            <span class="where muted">{e.where}</span>
+            {e.href && <Icon name="arrow-up-right" />}
+          </Tag>
+        </li>
+      );
+    })}
+  </ol>
+  <h2 class="label mono muted edu">Education</h2>
+  <div class="row last">
+    <span class="when"></span>
+    <span class="role">{EDUCATION.role}</span>
+    <span class="where muted">{EDUCATION.where}</span>
+  </div>
+  <h2 class="label mono muted edu">Leadership</h2>
+  <div class="row last">
+    <span class="when mono muted">{LEADERSHIP.when}</span>
+    <span class="role">{LEADERSHIP.role}<span class="role-line muted">{LEADERSHIP.line}</span></span>
+    <span class="where muted">{LEADERSHIP.where}</span>
+  </div>
+</section>
+
+<style>
+  .label {
+    margin: 0 0 var(--space-16);
+    font-size: var(--text-mono);
+    font-weight: var(--weight-regular);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+  }
+  .edu {
+    margin-top: var(--space-64);
+  }
+  .rows {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: 140px minmax(0, 2fr) minmax(0, 1fr) 16px;
+    align-items: baseline;
+    gap: var(--space-16);
+    padding: 18px 0;
+    border-top: 1px solid var(--line);
+    color: inherit;
+    text-decoration: none;
+  }
+  .rows li:last-child .row,
+  .row.last {
+    border-bottom: 1px solid var(--line);
+  }
+  .when {
+    font-size: var(--text-mono);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+  }
+  .role {
+    font-size: var(--text-row-title);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-row-title);
+  }
+  .role-line {
+    display: block;
+    margin-top: var(--space-4);
+    font-size: var(--text-caption);
+    font-weight: var(--weight-regular);
+    letter-spacing: 0;
+    line-height: 1.45;
+  }
+  a.row:hover .role {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  a.row:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-offset);
+  }
+  a.row :global(.icon) {
+    justify-self: end;
+    color: var(--accent);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    a.row :global(.icon) {
+      transition: transform 0.25s var(--ease);
+    }
+    a.row:hover :global(.icon) {
+      transform: translate(2px, -2px);
+    }
+  }
+
+  /* A narrow column, or a phone: the date over the role. */
+  .narrow .row {
+    grid-template-columns: minmax(0, 1fr) auto 16px;
+    gap: var(--space-4) var(--space-16);
+  }
+  .narrow .when {
+    grid-column: 1 / -1;
+  }
+  @media (max-width: 639.98px) {
+    .row,
+    .narrow .row {
+      grid-template-columns: minmax(0, 1fr) 16px;
+      gap: var(--space-4) var(--space-16);
+    }
+    .when,
+    .role,
+    .where {
+      grid-column: 1;
+    }
+    a.row :global(.icon) {
+      grid-column: 2;
+      grid-row: 1;
+    }
+  }
+</style>

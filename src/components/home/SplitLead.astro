@@ -1,0 +1,356 @@
+---
+// The homepage's layout, Split with vers1ons first (round 3 of the design
+// lab, src/lab/). Nahuel's column stays on the left while the work scrolls
+// on the right: his photo, name, a line about how he works, and his links on
+// one row. vers1ons leads the work, bigger than the rest, with all its
+// numbers and parts. On a phone he's a compact row at the top, the work
+// comes right after, and the links close the page. Everything the lab's
+// editor can change comes from settingsFor(): sizes and section order as
+// custom properties on the root, text through data-edit.
+import { Image } from 'astro:assets';
+import photo from '../../assets/about/photo.webp';
+import Icon from '../Icon.astro';
+import { LINKS, RESUME, STEPS, work } from '../../lib/home';
+import { settingsFor } from '../../lib/layout-settings';
+import Experience from './Experience.astro';
+import LeadFeature from './LeadFeature.astro';
+import WorkCard from './WorkCard.astro';
+import { SPLIT_LEAD } from './split-lead';
+
+const { style, text } = settingsFor('split-lead', SPLIT_LEAD);
+const [lead, ...rest] = work();
+---
+<main class="sl container" data-layout style={style}>
+  <aside class="side" aria-labelledby="side-title">
+    <div class="side-in">
+      <div class="portrait" data-photo>
+        <Image src={photo} alt="Nahuel D'Elias" widths={[144, 216, 431]} sizes="(max-width: 1023px) 72px, 216px" format="avif" loading="eager" fetchpriority="low" />
+        <canvas aria-hidden="true"></canvas>
+      </div>
+      <div class="who">
+        <h1 id="side-title">Nahuel D'Elias</h1>
+        <p class="role mono muted">Product engineer</p>
+      </div>
+      <p class="line" data-edit="line">{text.line}</p>
+      <ul class="links">
+        <li class="pair">
+          <a href={RESUME} target="_blank" rel="noopener">Resume <Icon name="arrow-up-right" /></a>
+          <a class="download" href={RESUME} download="Nahuel D'Elias resume.pdf" aria-label="Download resume (PDF)"><Icon name="download" /></a>
+        </li>
+        {LINKS.map((l) => (
+          <li><a href={l.href} {...(l.href.startsWith('http') ? { target: '_blank', rel: 'noopener' } : {})}>{l.label} <Icon name="arrow-up-right" /></a></li>
+        ))}
+      </ul>
+    </div>
+  </aside>
+
+  <div class="flow">
+    <section class="part" data-section="work" aria-labelledby="work-title">
+      <h2 class="label mono muted" id="work-title">My work</h2>
+      <LeadFeature entry={lead.entry} href={lead.href} kicker={lead.kicker} level="h3" stacked />
+      <ul class="rest">
+        {rest.map(({ entry, href, kicker }) => (
+          <li><WorkCard entry={entry} href={href} kicker={kicker} sizes="(max-width: 1023px) 100vw, 30vw" later /></li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="part" data-section="about" aria-labelledby="about-title">
+      <h2 class="label mono muted" id="about-title">About me</h2>
+      <p class="statement" data-edit="statement">{text.statement}</p>
+      <h3 class="label mono muted think">How I think about product</h3>
+      <ol class="short">
+        {STEPS.map((s, i) => (
+          <li><span class="mono muted">{String(i + 1).padStart(2, '0')}</span> {s.title}</li>
+        ))}
+      </ol>
+    </section>
+
+    <div class="part" data-section="experience">
+      <Experience narrow />
+    </div>
+
+    {/* Phone only: the ways to reach him, at the end instead of the top. */}
+    <section class="part end" aria-label="Contact">
+      <ul class="links">
+        <li class="pair">
+          <a href={RESUME} target="_blank" rel="noopener">Resume <Icon name="arrow-up-right" /></a>
+          <a class="download" href={RESUME} download="Nahuel D'Elias resume.pdf" aria-label="Download resume (PDF)"><Icon name="download" /></a>
+        </li>
+        {LINKS.map((l) => (
+          <li><a href={l.href} {...(l.href.startsWith('http') ? { target: '_blank', rel: 'noopener' } : {})}>{l.label} <Icon name="arrow-up-right" /></a></li>
+        ))}
+      </ul>
+    </section>
+  </div>
+</main>
+
+<style>
+  .sl {
+    display: grid;
+    grid-template-columns: calc((100% - var(--space-64)) * var(--side) / 12) minmax(0, 1fr);
+    gap: var(--space-64);
+    align-items: start;
+    padding-top: 72px;
+    padding-bottom: var(--space-160);
+  }
+
+  /* His column stays put while the work scrolls past it. */
+  .side {
+    position: sticky;
+    top: 72px;
+  }
+  /* The column is size-aware: the name and links scale with its width, and
+     when it's narrow the links drop their arrows to stay on one row. */
+  .side-in {
+    display: flex;
+    flex-direction: column;
+    padding-top: var(--space-48);
+    container-type: inline-size;
+  }
+  /* The photo, and the characters it arrives as (src/scripts/photo.ts),
+     in the grid's shape (400×480, scripts/portrait.mjs). */
+  .portrait {
+    position: relative;
+    width: var(--portrait);
+    max-width: 100%;
+    aspect-ratio: 400 / 480;
+    margin-bottom: var(--space-24);
+    overflow: hidden;
+    border-radius: 8px;
+  }
+  .portrait img,
+  .portrait canvas {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .portrait img {
+    object-fit: cover;
+  }
+  .portrait canvas {
+    opacity: 0;
+    pointer-events: none;
+  }
+  /* With JS, where the characters can be read: hidden until they've
+     settled, or after 3s whatever happens. */
+  @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+    :global(.js) .portrait img {
+      opacity: 0;
+      animation: photo-in 0.5s var(--ease) 1.5s forwards;
+    }
+    .portrait[data-settling] img {
+      animation: none;
+    }
+    .portrait[data-settling] canvas {
+      opacity: 1;
+    }
+    .portrait[data-done] img {
+      opacity: 1;
+      transition: opacity 0.4s var(--ease);
+    }
+    .portrait[data-done] canvas {
+      opacity: 0;
+      transition: opacity 0.4s var(--ease);
+    }
+  }
+  @keyframes photo-in {
+    to {
+      opacity: 1;
+    }
+  }
+  h1 {
+    margin: 0;
+    font-size: min(var(--name-size), 12cqi);
+    font-weight: var(--weight-medium);
+    line-height: 1.04;
+    letter-spacing: -0.022em;
+  }
+  .role {
+    margin: var(--space-8) 0 0;
+    font-size: var(--text-mono-lg);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+  }
+  .line {
+    margin: var(--space-24) 0 0;
+    max-width: 40ch;
+    font-size: var(--line-size);
+    line-height: 1.55;
+  }
+  /* The links on one row. */
+  .links {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0 var(--space-16);
+    white-space: nowrap;
+    margin: var(--space-24) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-4);
+    min-height: 44px;
+    color: var(--ink);
+    font-size: clamp(0.75rem, 3.8cqi, var(--text-meta));
+    font-weight: var(--weight-medium);
+    text-decoration: none;
+  }
+  .links a:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .links a:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-offset);
+  }
+  .links :global(.icon) {
+    color: var(--accent);
+  }
+  .pair {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+  .download {
+    justify-content: center;
+    min-width: 32px;
+  }
+  @container (max-width: 350px) {
+    .links {
+      gap: 0 var(--space-12);
+    }
+    .links a:not(.download) :global(.icon) {
+      display: none;
+    }
+  }
+  @container (max-width: 300px) {
+    .download {
+      display: none !important;
+    }
+  }
+
+  /* The tip that follows the cursor over a card (src/scripts/cards.ts). */
+  :global(.cursor-tip) {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--bg);
+    font-family: var(--font-mono);
+    font-size: var(--text-mono);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s var(--ease);
+  }
+  :global(.cursor-tip.on) {
+    opacity: 1;
+  }
+
+  /* The flow: sections in the order the editor set. */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    gap: var(--section-gap);
+    padding-top: var(--space-48);
+  }
+  .part[data-section='work'] { order: var(--order-work); }
+  .part[data-section='about'] { order: var(--order-about); }
+  .part[data-section='experience'] { order: var(--order-experience); }
+  .end {
+    display: none;
+    order: 99;
+  }
+  .label {
+    margin: 0 0 var(--space-24);
+    font-size: var(--text-mono);
+    font-weight: var(--weight-regular);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+  }
+  .rest {
+    display: grid;
+    grid-template-columns: repeat(var(--rest-cols), minmax(0, 1fr));
+    gap: var(--card-gap) var(--space-32);
+    margin: var(--card-gap) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .statement {
+    margin: 0;
+    max-width: 56ch;
+    font-size: var(--text-lead);
+    line-height: var(--leading-lead);
+  }
+  .think {
+    margin-top: var(--space-48);
+  }
+  .short {
+    display: grid;
+    gap: var(--space-8);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--text-lead);
+  }
+  .short .mono {
+    margin-right: var(--space-12);
+    font-size: var(--text-mono);
+  }
+
+  @media (max-width: 1023.98px) {
+    .sl {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-48);
+    }
+    .side {
+      position: static;
+    }
+    /* A compact row: small portrait beside the name, the line under it.
+       The links move to the end of the page. */
+    .side-in {
+      display: grid;
+      grid-template-columns: 72px minmax(0, 1fr);
+      align-items: center;
+      column-gap: var(--space-16);
+      padding-top: var(--space-24);
+    }
+    .portrait {
+      width: 72px;
+      margin: 0;
+    }
+    h1 {
+      font-size: var(--text-title);
+    }
+    .line {
+      grid-column: 1 / -1;
+      margin-top: var(--space-16);
+      font-size: var(--text-body);
+    }
+    .side .links {
+      display: none;
+    }
+    .flow {
+      gap: var(--space-96);
+      padding-top: 0;
+    }
+    .end {
+      display: block;
+    }
+    .rest {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-48);
+      margin-top: var(--space-48);
+    }
+  }
+</style>

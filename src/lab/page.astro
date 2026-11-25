@@ -1,0 +1,81 @@
+---
+// The design lab: /_lab compares every layout of the homepage side by
+// side, and /_lab/home/<layout> is each one as a real page. In development
+// only: src/lab/integration.mjs adds this route when the dev server starts,
+// so a production build never sees it and nothing of the lab ships
+// (tests/dist/lab.test.mjs).
+import type { GetStaticPaths } from 'astro';
+import Frame from '../components/Frame.astro';
+import Base from '../layouts/Base.astro';
+import Compare from './Compare.astro';
+import LeadProject from './home/LeadProject.astro';
+import Split from './home/Split.astro';
+import SplitLead from '../components/home/SplitLead.astro';
+import WorkFirst from './home/WorkFirst.astro';
+import { EDITABLES } from './editables';
+import { settingsFor } from '../lib/layout-settings';
+import { HOME_VARIANTS } from './variants';
+
+export const getStaticPaths = (() => [
+  { params: { path: undefined }, props: { view: 'compare' } },
+  ...HOME_VARIANTS.map((v) => ({ params: { path: `home/${v.id}` }, props: { view: v.id } })),
+]) satisfies GetStaticPaths;
+
+const { view } = Astro.props as { view: string };
+const LAYOUTS: Record<string, typeof WorkFirst> = { 'work-first': WorkFirst, 'lead-project': LeadProject, split: Split, combined: WorkFirst, 'split-lead': SplitLead };
+const Layout = LAYOUTS[view];
+const variant = HOME_VARIANTS.find((v) => v.id === view);
+
+// The editor's setup (src/lab/editor/): the layouts to switch between and,
+// for a layout that can be edited, what it can change and its saved state.
+const editable = EDITABLES[view];
+const current = editable && settingsFor(view, editable);
+const setup = view !== 'compare' && {
+  id: view,
+  variants: HOME_VARIANTS.map(({ id, name, href }) => ({ id, name, href })),
+  editable,
+  current: current && { order: current.order, values: current.values, text: current.text },
+};
+---
+{view === 'compare' ? (
+  <Base title="Design lab" description="Homepage layouts side by side." noindex>
+    <Compare />
+  </Base>
+) : (
+  <Base title={`${variant?.name} · Design lab`} description={variant?.idea ?? ''} noindex preload={['sans-500', 'mono-400']}>
+    <Frame>
+      <Layout combined={view === 'combined'} />
+    </Frame>
+    <script is:inline type="application/json" id="lab-edit" set:html={JSON.stringify(setup).replace(/</g, '\\u003c')} />
+  </Base>
+)}
+
+<script>
+  import './home/lab.ts';
+  import './editor/editor.ts';
+</script>
+
+<style is:global>
+  /* The cursor tip (src/scripts/cards.ts), for the layouts that don't carry it. */
+  .cursor-tip {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--bg);
+    font-family: var(--font-mono);
+    font-size: var(--text-mono);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s var(--ease);
+  }
+  .cursor-tip.on {
+    opacity: 1;
+  }
+</style>
