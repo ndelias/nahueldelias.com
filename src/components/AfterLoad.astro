@@ -5,17 +5,9 @@
 // '../scripts/x.ts?worker&url': a self-contained bundle with no imports;
 // "worker" is only the build mode, it runs on the page). The tag added here
 // is the only reference to it.
-//
-// Under `astro dev` Vite doesn't bundle it: the URL serves an ES module with
-// import statements, which a classic <script src> can't run. So in dev the
-// tag is added as type="module" instead, by a variant written out here
-// rather than in Base.astro's head script, which is in every page's HTML.
-// The build emits only the afterLoad call.
 interface Props {
   src: string;
 }
 const { src } = Astro.props;
-const url = JSON.stringify(src);
-const dev = `afterPaint(function(){var u=${url};if(!document.querySelector('script[src="'+u+'"]')){var s=document.createElement("script");s.type="module";s.src=u;document.head.append(s)}})`;
 ---
-{import.meta.env.DEV ? <script is:inline set:html={dev} /> : <script is:inline set:html={`afterLoad(${url})`} />}
+<script is:inline set:html={`afterLoad(${JSON.stringify(src)})`} />
