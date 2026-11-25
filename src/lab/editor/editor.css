@@ -1,0 +1,217 @@
+/* The lab's editor panel (editor.ts): the site's own tokens, quiet, fixed
+   in the bottom-right corner over the page. */
+
+.lab-ed {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--text-small);
+}
+.lab-ed .mono {
+  font-family: var(--font-mono);
+  font-size: var(--text-mono);
+  letter-spacing: var(--tracking-mono);
+  text-transform: uppercase;
+}
+.lab-ed button,
+.lab-ed select {
+  min-height: 32px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+.lab-ed button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.lab-ed button:focus-visible,
+.lab-ed select:focus-visible,
+.lab-ed input:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.lab-ed-toggle {
+  min-width: 72px;
+  min-height: 40px !important;
+  padding: 0 16px;
+  border-radius: 999px !important;
+  background: var(--ink) !important;
+  color: var(--bg) !important;
+  border-color: var(--ink) !important;
+  box-shadow: 0 8px 24px -12px color-mix(in srgb, var(--ink) 50%, transparent);
+}
+
+.lab-ed-panel {
+  width: 300px;
+  max-height: min(78vh, 760px);
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: 0 16px 48px -24px color-mix(in srgb, var(--ink) 45%, transparent);
+}
+.lab-ed-panel[hidden] {
+  display: none;
+}
+.lab-ed-head {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 14px 16px 10px;
+  background: var(--surface);
+}
+.lab-ed-head p {
+  margin: 0;
+}
+.lab-ed-status {
+  color: var(--muted);
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
+
+.lab-ed-group {
+  padding: 12px 16px 16px;
+  border-top: 1px solid var(--line);
+}
+.lab-ed-group h2 {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-weight: var(--weight-regular);
+}
+.lab-ed-group select {
+  width: 100%;
+  padding: 0 8px;
+}
+.lab-ed-note {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: var(--text-caption);
+  line-height: 1.4;
+}
+.lab-ed > .lab-ed-panel > .lab-ed-note {
+  padding: 0 16px 16px;
+}
+
+.lab-ed-seg {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+.lab-ed-seg [aria-pressed='true'],
+.lab-ed-wide[aria-pressed='true'] {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--bg);
+}
+.lab-ed-wide {
+  width: 100%;
+}
+
+.lab-ed-sections {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.lab-ed-sections li {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) 32px 32px;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 2px 2px 6px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg);
+  cursor: grab;
+}
+.lab-ed-sections li.dragging {
+  opacity: 0.5;
+}
+.lab-ed-sections .grip {
+  display: flex;
+  color: var(--muted);
+}
+.lab-ed svg {
+  width: 14px;
+  height: 14px;
+}
+.lab-ed-sections button {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border-color: transparent;
+}
+
+.lab-ed-sliders {
+  display: grid;
+  gap: 12px;
+}
+.lab-ed-sliders label {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 8px;
+}
+.lab-ed-sliders output {
+  color: var(--muted);
+}
+.lab-ed-sliders input {
+  grid-column: 1 / -1;
+  width: 100%;
+  accent-color: var(--ink);
+}
+
+.lab-ed-foot {
+  position: sticky;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+}
+.lab-ed-foot .primary {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--bg);
+}
+
+/* Text that can be rewritten, while editing text. */
+.lab-ed-editing [data-edit] {
+  outline: 1px dashed var(--accent);
+  outline-offset: 4px;
+  border-radius: 2px;
+  cursor: text;
+}
+.lab-ed-editing [data-edit]:focus {
+  outline-style: solid;
+}
+
+/* The phone preview: the page at 390px wide, beside the editor. */
+.lab-ed-phone {
+  position: fixed;
+  right: 332px;
+  bottom: 16px;
+  z-index: 199;
+  width: 390px;
+  height: min(844px, calc(100vh - 32px));
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--bg);
+  box-shadow: 0 16px 48px -24px color-mix(in srgb, var(--ink) 45%, transparent);
+}

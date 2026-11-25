@@ -10,7 +10,10 @@ import Base from '../layouts/Base.astro';
 import Compare from './Compare.astro';
 import LeadProject from './home/LeadProject.astro';
 import Split from './home/Split.astro';
+import SplitLead from './home/SplitLead.astro';
 import WorkFirst from './home/WorkFirst.astro';
+import { settingsFor, type Editable } from './settings';
+import { SPLIT_LEAD } from './home/split-lead';
 import { HOME_VARIANTS } from './variants';
 
 export const getStaticPaths = (() => [
@@ -19,9 +22,21 @@ export const getStaticPaths = (() => [
 ]) satisfies GetStaticPaths;
 
 const { view } = Astro.props as { view: string };
-const LAYOUTS: Record<string, typeof WorkFirst> = { 'work-first': WorkFirst, 'lead-project': LeadProject, split: Split, combined: WorkFirst };
+const LAYOUTS: Record<string, typeof WorkFirst> = { 'work-first': WorkFirst, 'lead-project': LeadProject, split: Split, combined: WorkFirst, 'split-lead': SplitLead };
 const Layout = LAYOUTS[view];
 const variant = HOME_VARIANTS.find((v) => v.id === view);
+
+// The editor's setup (src/lab/editor/): the layouts to switch between and,
+// for a layout that can be edited, what it can change and its saved state.
+const EDITABLE: Record<string, Editable> = { 'split-lead': SPLIT_LEAD };
+const editable = EDITABLE[view];
+const current = editable && settingsFor(view, editable);
+const setup = view !== 'compare' && {
+  id: view,
+  variants: HOME_VARIANTS.map(({ id, name, href }) => ({ id, name, href })),
+  editable,
+  current: current && { order: current.order, values: current.values, text: current.text },
+};
 ---
 {view === 'compare' ? (
   <Base title="Design lab" description="Homepage layouts side by side." noindex>
@@ -32,11 +47,13 @@ const variant = HOME_VARIANTS.find((v) => v.id === view);
     <Frame>
       <Layout combined={view === 'combined'} />
     </Frame>
+    <script is:inline type="application/json" id="lab-edit" set:html={JSON.stringify(setup).replace(/</g, '\\u003c')} />
   </Base>
 )}
 
 <script>
   import './home/lab.ts';
+  import './editor/editor.ts';
 </script>
 
 <style is:global>

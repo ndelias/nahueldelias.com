@@ -13,15 +13,17 @@ interface Props {
   kicker: string;
   /** The title's level: h2 on its own, h3 under a "My work" heading. */
   level?: 'h2' | 'h3';
+  /** For a narrow column: the product on top, the facts and parts under it, side by side. */
+  stacked?: boolean;
 }
 
-const { entry, href, kicker, level = 'h2' } = Astro.props;
+const { entry, href, kicker, level = 'h2', stacked = false } = Astro.props;
 const frame = frameOf(entry.id);
 const parts = partsOf(entry);
 const Title = level;
 const id = `lead-${entry.id}`;
 ---
-<article class="feature" aria-labelledby={id}>
+<article class:list={['feature', { stacked }]} aria-labelledby={id}>
   <a class="lead-shot" href={href} data-reel={entry.data.video} data-tip="Case study" tabindex="-1" aria-hidden="true">
     <span class="shot">
       {frame && <Image src={frame} alt="" widths={[800, 1600]} sizes="(max-width: 899px) 100vw, 66vw" loading="eager" />}
@@ -176,10 +178,47 @@ const id = `lead-${entry.id}`;
       transform: translateX(3px);
     }
   }
+  /* Stacked: the product full width; under it the facts on the left, the
+     numbers in a row, and the parts on the right. */
+  .stacked {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-32);
+  }
+  .stacked .side {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: var(--space-48);
+    align-content: start;
+  }
+  .stacked .side > :not(.parts) {
+    grid-column: 1;
+  }
+  .stacked .parts {
+    grid-column: 2;
+    grid-row: 1 / span 5;
+    margin-top: 0;
+  }
+  .stacked .numbers {
+    grid-template-columns: repeat(3, auto);
+    justify-content: start;
+    column-gap: var(--space-32);
+  }
+
   @media (max-width: 899.98px) {
     .feature {
       grid-template-columns: minmax(0, 1fr);
       gap: var(--space-24);
+    }
+    .stacked .side {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .stacked .parts {
+      grid-column: 1;
+      grid-row: auto;
+      margin-top: var(--space-32);
+    }
+    .stacked .numbers {
+      grid-template-columns: minmax(0, 1fr);
     }
   }
 </style>

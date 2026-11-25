@@ -2,7 +2,8 @@
 // only (/_lab). Each variant records where it sits on the variation dial,
 // per layer: 0 is a close refinement of what's live, 100 an all-new
 // direction. Round 1 (homepage) keeps the design system close and varies
-// the layout. Round 2 combines the parts Nahuel picked from round 1.
+// the layout. Round 2 combines the parts Nahuel picked from round 1, and
+// round 3 builds on Split, his pick after seeing round 2.
 
 export interface Dial {
   /** Tokens: color, type, spacing, radius, motion. */
@@ -34,6 +35,14 @@ export const BASELINE: Variant = {
 };
 
 export const HOME_VARIANTS: Variant[] = [
+  {
+    id: 'split-lead',
+    name: 'Split, vers1ons first',
+    idea: 'Split as the base, with vers1ons leading the work and bigger than the rest, a compact row for me on a phone, and a description that starts with the people I build for.',
+    dial: { system: 10, layout: 70 },
+    href: '/_lab/home/split-lead/',
+    round: 3,
+  },
   {
     id: 'combined',
     name: 'Work first, combined',
