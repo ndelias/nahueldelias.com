@@ -47,6 +47,13 @@ const phone = await phoneStill(work()[0].entry);
     width: 100%;
     height: min(48vh, 440px);
     image-rendering: pixelated;
+    /* The sky fades into the page, so the hills rise out of it instead of
+       the scene starting at a hard edge. */
+    mask-image: linear-gradient(to bottom, transparent 0%, #000 55%);
+  }
+  /* In the dark theme the scene is dimmed, as if at dusk. */
+  :global(:root[data-theme='dark']) .meadow {
+    filter: brightness(0.62) saturate(0.85);
   }
   :global(:root:not(.js)) .meadow {
     background: linear-gradient(#e3eaea 0 40%, #a3b3c0 40% 44%, #a3bb4c 44% 56%, #82bf44 56% 82%, #2f6b44 82%);

@@ -291,8 +291,9 @@ export function meadow(canvas: HTMLCanvasElement, anchor: 'top' | 'bottom' = 'to
     }
 
     g.drawImage(bush.c, 0, Math.round(bushTop - sy * 0.1));
-    // The canopy, its lower rows swaying a pixel in the wind.
-    for (let y = 0; y < can.h; y += 3) {
+    // The canopy, its lower rows swaying a pixel in the wind. It hangs from
+    // the top of the page, so a footer meadow goes without it.
+    if (anchor === 'top') for (let y = 0; y < can.h; y += 3) {
       const amp = Math.max(0, y / can.h - 0.25) * 1.6;
       const off = reduce ? 0 : Math.round(Math.sin(t * 0.9 + y * 0.09) * amp);
       g.drawImage(can.c, 0, y, PW, 3, off, Math.round(y - sy * 0.25), PW, 3);
