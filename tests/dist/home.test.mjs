@@ -140,7 +140,15 @@ test('without JS: the photo, the line, the work, about, experience and the links
 test('the photo arrives as characters that settle, then the photo itself', async () => {
   const { ctx, page } = await open();
   await page.waitForFunction(() => document.querySelector('[data-photo][data-settling]'));
-  assert.ok((await inked(page, '[data-photo] canvas')) > 1000, 'no characters');
+  // The first frames are mostly scramble; wait for the characters to fill in.
+  await page.waitForFunction(() => {
+    const c = document.querySelector('[data-photo] canvas');
+    if (!c.width) return false;
+    const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
+    let n = 0;
+    for (let i = 3; i < d.length; i += 4) if (d[i]) n++;
+    return n > 1000;
+  }, null, { timeout: 3000 });
   await page.waitForFunction(() => document.querySelector('[data-photo][data-done]'), null, { timeout: 5000 });
   await page.waitForFunction(() => getComputedStyle(document.querySelector('[data-photo] img')).opacity === '1', null, { timeout: 3000 });
   await ctx.close();
