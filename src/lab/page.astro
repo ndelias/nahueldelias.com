@@ -27,7 +27,15 @@ const { view } = Astro.props as { view: string };
 const LAYOUTS: Record<string, any> = { 'work-first': WorkFirst, 'lead-project': LeadProject, split: Split, combined: WorkFirst, 'split-lead': SplitLead };
 const Layout = LAYOUTS[view];
 // Round 4: the homepage with a line treatment (src/lab/lines.ts).
-const LINES: Record<string, 'thread' | 'tree' | 'connector'> = { 'lines-thread': 'thread', 'lines-tree': 'tree', 'lines-connector': 'connector' };
+// Round 5: the five steps, three ways, with the thread.
+const LINES: Record<string, { lines: string; steps?: 'list' | 'reveal' | 'columns' }> = {
+  'lines-thread': { lines: 'thread' },
+  'lines-tree': { lines: 'tree' },
+  'lines-connector': { lines: 'connector' },
+  'steps-branch': { lines: 'thread branch' },
+  'steps-reveal': { lines: 'thread tree', steps: 'reveal' },
+  'steps-columns': { lines: 'thread fan', steps: 'columns' },
+};
 const variant = HOME_VARIANTS.find((v) => v.id === view);
 
 // The editor's setup (src/lab/editor/): the layouts to switch between and,
@@ -50,7 +58,7 @@ const setup = view !== 'compare' && {
     <Frame>
       {LINES[view] ? (
         <>
-          <SplitLead id={view} lines={LINES[view]} />
+          <SplitLead id={view} lines={LINES[view].lines} steps={LINES[view].steps} />
           <Meadow />
         </>
       ) : (

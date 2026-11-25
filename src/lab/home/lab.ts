@@ -4,7 +4,7 @@
 // motion).
 import { later, reels, tip } from '../../scripts/cards';
 import { meadow } from '../../scripts/meadow';
-import { connector, thread, tree } from '../lines';
+import { branch, connector, fan, thread, tree } from '../lines';
 import { photo } from '../../scripts/photo';
 import { portrait } from '../../scripts/portrait';
 
@@ -57,5 +57,5 @@ if (footer) {
   io.observe(footer);
 }
 const lined = document.querySelector<HTMLElement>('[data-lines]');
-const LINES = { thread, tree, connector };
+const LINES = { thread, tree, connector, branch, fan };
 for (const kind of lined?.dataset.lines?.split(' ') ?? []) LINES[kind as keyof typeof LINES]?.(lined!);

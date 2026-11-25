@@ -17,7 +17,7 @@ export function el<K extends keyof SVGElementTagNameMap>(tag: K, attrs: Record<s
 }
 
 /** An SVG over the whole document (page coordinates). */
-function pageLayer() {
+export function pageLayer() {
   const svg = el('svg', { class: 'lines', 'aria-hidden': 'true' });
   Object.assign(svg.style, { position: 'absolute', left: '0', top: '0', width: '100%', overflow: 'visible', pointerEvents: 'none' });
   document.body.append(svg);
@@ -27,13 +27,13 @@ function pageLayer() {
 }
 
 /** A rect in page coordinates. */
-const box = (e: Element) => {
+export const box = (e: Element) => {
   const r = e.getBoundingClientRect();
   return { left: r.left + scrollX, right: r.right + scrollX, top: r.top + scrollY, bottom: r.bottom + scrollY, width: r.width, height: r.height };
 };
 
 /** Redraw on layout changes: resizes, fonts, images arriving. */
-function onLayout(draw: () => void) {
+export function onLayout(draw: () => void) {
   let raf = 0;
   const again = () => {
     cancelAnimationFrame(raf);
@@ -118,14 +118,19 @@ export function tree(root: HTMLElement) {
     // Each step from its number to the end of its longest line, the lines
     // meeting it at its title.
     const spans = items.map((li) => {
+      // With the descriptions folded away (reveal), the lines meet the title
+      // alone, so the tree stays put when one opens.
       const range = document.createRange();
-      range.selectNodeContents(li);
+      range.selectNodeContents(list.classList.contains('reveal') ? li.querySelector('summary') ?? li : li);
       const r = range.getBoundingClientRect();
       const t = (li.querySelector('.step-title') ?? li).getBoundingClientRect();
       return { left: r.left + scrollX, right: r.right + scrollX, y: t.top + scrollY + t.height / 2 };
     });
     const mid = (spans[0].y + spans[spans.length - 1].y) / 2;
-    const maxRight = Math.max(...spans.map((s) => s.right));
+    // Past the longest step, and past any description that's been opened
+    // (the lab's reveal), so no line crosses words.
+    const opened = [...list.querySelectorAll('details[open] .step-line')].map((d) => d.getBoundingClientRect().right + scrollX);
+    const maxRight = Math.max(...spans.map((s) => s.right), ...opened);
     // On a phone there's no room on the left: only the lines coming back
     // together are drawn, on the right.
     // On a wide screen the branches start on the thread, in the middle of
@@ -136,7 +141,7 @@ export function tree(root: HTMLElement) {
     outs = room ? spans.map((s) => el('path', { d: `M ${o.x} ${o.y} C ${o.x + 24} ${o.y}, ${s.left - 28} ${s.y}, ${s.left - 10} ${s.y}` })) : [];
     // Straight until past the longest step, then into the point: no line
     // crosses another step's words.
-    const clear = maxRight + 12;
+    const clear = Math.min(maxRight + 12, c.x - 24);
     const bend = Math.max(12, (c.x - clear) * 0.6);
     backs = spans.map((s) => el('path', { d: `M ${s.right + 12} ${s.y} H ${clear} C ${clear + bend} ${s.y}, ${c.x - bend} ${c.y}, ${c.x} ${c.y}` }));
     dots = (room ? [o, c] : [c]).map((p) => el('rect', { x: p.x - 3.5, y: p.y - 3.5, width: 7, height: 7, class: 'mark on' }));

@@ -24,8 +24,11 @@ interface Props {
   /** The line treatments, space-separated (src/scripts/lines.ts): the
       homepage has the thread and the tree; the lab tries others. */
   lines?: string;
+  /** How the five steps are laid out. The lab tries 'reveal' (titles, each
+      opening to its description) and 'columns' (side by side). */
+  steps?: 'list' | 'reveal' | 'columns';
 }
-const { id = 'split-lead', lines = 'thread tree' } = Astro.props;
+const { id = 'split-lead', lines = 'thread tree', steps = 'list' } = Astro.props;
 const { style, text } = settingsFor(id, SPLIT_LEAD);
 const [lead, ...rest] = work();
 ---
@@ -68,14 +71,26 @@ const [lead, ...rest] = work();
       <h2 class="label mono muted" id="about-title">About me</h2>
       <p class="statement" data-edit="statement">{text.statement}</p>
       <h3 class="label mono muted think">How I think about product</h3>
-      <ol class="steps">
-        {STEPS.map((s, i) => (
-          <li>
-            <span class="no mono muted">{String(i + 1).padStart(2, '0')}</span>
-            <span class="step-title">{s.title}</span>
-            <span class="step-line muted" data-edit={`step-${i + 1}`}>{text[`step-${i + 1}`]}</span>
-          </li>
-        ))}
+      <ol class:list={['steps', steps]}>
+        {STEPS.map((s, i) =>
+          steps === 'reveal' ? (
+            <li>
+              <details>
+                <summary>
+                  <span class="no mono muted">{String(i + 1).padStart(2, '0')}</span>
+                  <span class="step-title">{s.title}</span>
+                </summary>
+                <span class="step-line muted" data-edit={`step-${i + 1}`}>{text[`step-${i + 1}`]}</span>
+              </details>
+            </li>
+          ) : (
+            <li>
+              <span class="no mono muted">{String(i + 1).padStart(2, '0')}</span>
+              <span class="step-title">{s.title}</span>
+              <span class="step-line muted" data-edit={`step-${i + 1}`}>{text[`step-${i + 1}`]}</span>
+            </li>
+          ),
+        )}
       </ol>
     </section>
 
@@ -375,6 +390,82 @@ const [lead, ...rest] = work();
   .step-line {
     font-size: var(--text-small);
     line-height: var(--leading-small);
+  }
+
+  /* Reveal (lab): titles only, each opening to its description. */
+  .reveal {
+    gap: var(--space-12);
+  }
+  .reveal li {
+    display: block;
+  }
+  .reveal summary {
+    display: grid;
+    grid-template-columns: 32px auto auto;
+    justify-content: start;
+    align-items: baseline;
+    gap: var(--space-8);
+    cursor: pointer;
+    list-style: none;
+  }
+  .reveal summary::-webkit-details-marker {
+    display: none;
+  }
+  /* A small plus that turns to a minus when open. */
+  .reveal summary::after {
+    content: '';
+    width: 9px;
+    height: 9px;
+    margin-left: var(--space-4);
+    background:
+      linear-gradient(var(--muted), var(--muted)) center / 9px 1px no-repeat,
+      linear-gradient(var(--muted), var(--muted)) center / 1px 9px no-repeat;
+    align-self: center;
+  }
+  .reveal details[open] summary::after {
+    background: linear-gradient(var(--muted), var(--muted)) center / 9px 1px no-repeat;
+  }
+  .reveal summary:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-offset);
+  }
+  .reveal .step-line {
+    display: block;
+    max-width: 44ch;
+    margin: var(--space-8) 0 var(--space-8) 40px;
+  }
+  .reveal .no {
+    padding-top: 0;
+  }
+  /* On a phone the lines meet at the right edge: keep the words clear. */
+  @media (max-width: 1023.98px) {
+    .reveal .step-line {
+      margin-right: 56px;
+    }
+  }
+
+  /* Columns (lab): the five side by side on a wide screen. */
+  @media (min-width: 1024px) {
+    .columns {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: var(--space-24);
+      padding: 56px 0;
+    }
+    .columns li {
+      grid-template-columns: minmax(0, 1fr);
+      align-content: start;
+    }
+    .columns .no {
+      grid-row: auto;
+      padding-top: 0;
+    }
+    .columns .step-title {
+      font-size: var(--text-body);
+    }
+    .columns .step-line {
+      font-size: var(--text-caption);
+      line-height: 1.45;
+    }
   }
 
   @media (max-width: 1023.98px) {

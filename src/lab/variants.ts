@@ -4,7 +4,8 @@
 // direction. Round 1 (homepage) keeps the design system close and varies
 // the layout. Round 2 combines the parts Nahuel picked from round 1, and
 // round 3 builds on Split, his pick after seeing round 2. Round 4 tries
-// three ways the old homepage's lines could come back on the homepage.
+// three ways the old homepage's lines could come back on the homepage, and
+// round 5 three ways to lay out the five steps with them.
 
 export interface Dial {
   /** Tokens: color, type, spacing, radius, motion. */
@@ -35,6 +36,30 @@ export const BASELINE: Variant = {
 };
 
 export const HOME_VARIANTS: Variant[] = [
+  {
+    id: 'steps-branch',
+    name: 'Steps: branch',
+    idea: 'The thread sends a short elbow into each step, nothing rejoining, so the descriptions read clean.',
+    dial: { system: 10, layout: 10 },
+    href: '/_lab/home/steps-branch/',
+    round: 5,
+  },
+  {
+    id: 'steps-reveal',
+    name: 'Steps: reveal',
+    idea: 'The full tree on the titles alone; each step opens to its description.',
+    dial: { system: 10, layout: 15 },
+    href: '/_lab/home/steps-reveal/',
+    round: 5,
+  },
+  {
+    id: 'steps-columns',
+    name: 'Steps: columns',
+    idea: 'The five steps side by side, lines fanning from a point above and gathering below.',
+    dial: { system: 10, layout: 25 },
+    href: '/_lab/home/steps-columns/',
+    round: 5,
+  },
   {
     id: 'lines-thread',
     name: 'Lines: the thread',
