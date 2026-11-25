@@ -19,7 +19,7 @@ export const getStaticPaths = (() => [
 ]) satisfies GetStaticPaths;
 
 const { view } = Astro.props as { view: string };
-const LAYOUTS: Record<string, typeof WorkFirst> = { 'work-first': WorkFirst, 'lead-project': LeadProject, split: Split };
+const LAYOUTS: Record<string, typeof WorkFirst> = { 'work-first': WorkFirst, 'lead-project': LeadProject, split: Split, combined: WorkFirst };
 const Layout = LAYOUTS[view];
 const variant = HOME_VARIANTS.find((v) => v.id === view);
 ---
@@ -30,7 +30,7 @@ const variant = HOME_VARIANTS.find((v) => v.id === view);
 ) : (
   <Base title={`${variant?.name} · Design lab`} description={variant?.idea ?? ''} noindex preload={['sans-500', 'mono-400']}>
     <Frame>
-      <Layout />
+      <Layout combined={view === 'combined'} />
     </Frame>
   </Base>
 )}

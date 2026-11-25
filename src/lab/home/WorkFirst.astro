@@ -3,14 +3,25 @@
 // and the work already peeks up from its bottom edge. Then big two-column
 // cards that show the product, then him (portrait, how he thinks), his
 // experience, and the way to reach him.
+//
+// Combined (round 2): the same, with vers1ons leading My work as a feature
+// with all its numbers and parts (from Lead project), the rest in a row of
+// three, and the short list of how he thinks (from Split).
 import { Image } from 'astro:assets';
 import { CLOSER, STATEMENT, STEPS, work } from '../../lib/home';
 import Experience from './Experience.astro';
+import LeadFeature from './LeadFeature.astro';
 import Reach from './Reach.astro';
 import WorkCard from './WorkCard.astro';
 import { frameOf } from './frames';
 
+interface Props {
+  combined?: boolean;
+}
+const { combined = false } = Astro.props;
+
 const WORK = work();
+const [lead, ...rest] = WORK;
 ---
 <main class="wf">
   <section class="hello container" aria-labelledby="hello-title">
@@ -34,11 +45,22 @@ const WORK = work();
 
   <section class="work container" aria-labelledby="work-title">
     <h2 class="section-title" id="work-title">My work</h2>
-    <ul class="cards">
-      {WORK.map(({ entry, href, kicker }) => (
-        <li><WorkCard entry={entry} href={href} kicker={kicker} sizes="(max-width: 639px) 100vw, 50vw" /></li>
-      ))}
-    </ul>
+    {combined ? (
+      <>
+        <LeadFeature entry={lead.entry} href={lead.href} kicker={lead.kicker} level="h3" />
+        <ul class="cards three">
+          {rest.map(({ entry, href, kicker }) => (
+            <li><WorkCard entry={entry} href={href} kicker={kicker} sizes="(max-width: 639px) 100vw, 33vw" /></li>
+          ))}
+        </ul>
+      </>
+    ) : (
+      <ul class="cards">
+        {WORK.map(({ entry, href, kicker }) => (
+          <li><WorkCard entry={entry} href={href} kicker={kicker} sizes="(max-width: 639px) 100vw, 50vw" /></li>
+        ))}
+      </ul>
+    )}
   </section>
 
   <section class="me container" aria-labelledby="me-title">
@@ -50,15 +72,23 @@ const WORK = work();
       <p class="statement">{STATEMENT}</p>
       <p class="statement muted">{CLOSER}</p>
       <h3 class="label mono muted">How I think about product</h3>
-      <ol class="steps">
-        {STEPS.map((s, i) => (
-          <li>
-            <span class="no mono muted">{String(i + 1).padStart(2, '0')}</span>
-            <span class="step-title">{s.title}</span>
-            <span class="step-line muted">{s.line}</span>
-          </li>
-        ))}
-      </ol>
+      {combined ? (
+        <ol class="short">
+          {STEPS.map((s, i) => (
+            <li><span class="mono muted">{String(i + 1).padStart(2, '0')}</span> {s.title}</li>
+          ))}
+        </ol>
+      ) : (
+        <ol class="steps">
+          {STEPS.map((s, i) => (
+            <li>
+              <span class="no mono muted">{String(i + 1).padStart(2, '0')}</span>
+              <span class="step-title">{s.title}</span>
+              <span class="step-line muted">{s.line}</span>
+            </li>
+          ))}
+        </ol>
+      )}
     </div>
   </section>
 
@@ -166,6 +196,25 @@ const WORK = work();
     list-style: none;
   }
 
+  /* Combined: the rest of the work under the feature, three across. */
+  .cards.three {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-top: var(--space-96);
+  }
+  /* Combined: how he thinks, as five short lines. */
+  .short {
+    display: grid;
+    gap: var(--space-8);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--text-lead);
+  }
+  .short .mono {
+    margin-right: var(--space-12);
+    font-size: var(--text-mono);
+  }
+
   .me {
     display: grid;
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
@@ -236,6 +285,9 @@ const WORK = work();
     .me {
       grid-template-columns: minmax(0, 1fr);
     }
+    .cards.three {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
   @media (max-width: 639.98px) {
     .hello {
@@ -251,9 +303,13 @@ const WORK = work();
     .work {
       margin-top: calc(20vw + var(--space-96));
     }
-    .cards {
+    .cards,
+    .cards.three {
       grid-template-columns: minmax(0, 1fr);
       gap: var(--space-48);
+    }
+    .cards.three {
+      margin-top: var(--space-64);
     }
     .me,
     .below {

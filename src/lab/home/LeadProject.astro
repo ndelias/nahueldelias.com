@@ -4,15 +4,14 @@
 // rest of the work as a compact list, then him and his experience.
 import { Image } from 'astro:assets';
 import Icon from '../../components/Icon.astro';
-import { cardImpact, entryHref, entryNumber, partsOf } from '../../lib/entries';
+import { cardImpact } from '../../lib/entries';
 import { CLOSER, LINKS, RESUME, STATEMENT, work } from '../../lib/home';
 import Experience from './Experience.astro';
+import LeadFeature from './LeadFeature.astro';
 import Reach from './Reach.astro';
 import { frameOf } from './frames';
 
 const [lead, ...rest] = work();
-const leadFrame = frameOf(lead.entry.id);
-const parts = partsOf(lead.entry);
 ---
 <main class="lp">
   <section class="intro container" aria-labelledby="intro-title">
@@ -26,35 +25,8 @@ const parts = partsOf(lead.entry);
     </ul>
   </section>
 
-  <section class="feature container" aria-labelledby="lead-title">
-    <a class="lead-shot" href={lead.href} data-reel={lead.entry.data.video} data-tip="Case study">
-      <span class="shot">
-        {leadFrame && <Image src={leadFrame} alt="" widths={[800, 1600]} sizes="(max-width: 899px) 100vw, 66vw" loading="eager" />}
-      </span>
-    </a>
-    <div class="lead-side">
-      <p class="kicker mono muted">{lead.kicker}</p>
-      <h2 class="lead-title" id="lead-title"><a href={lead.href}>{lead.entry.data.title}</a></h2>
-      <p class="lead-line muted">{lead.entry.data.tagline}</p>
-      {lead.entry.data.impact && (
-        <ul class="numbers">
-          {lead.entry.data.impact.map((i) => <li><b>{i.value}</b><span class="muted">{i.label}</span></li>)}
-        </ul>
-      )}
-      {parts.length > 0 && (
-        <ol class="parts">
-          {parts.map((p) => (
-            <li>
-              <a href={entryHref(p)}>
-                <span class="mono muted">{entryNumber(p)}</span>
-                <span>{p.data.title}</span>
-                <Icon name="arrow-right" />
-              </a>
-            </li>
-          ))}
-        </ol>
-      )}
-    </div>
+  <section class="feature container" aria-label="Lead project">
+    <LeadFeature entry={lead.entry} href={lead.href} kicker={lead.kicker} />
   </section>
 
   <section class="more container" aria-labelledby="more-title">
@@ -154,13 +126,7 @@ const parts = partsOf(lead.entry);
     text-underline-offset: 4px;
   }
 
-  /* The lead project: the product big on the left, everything a recruiter
-     needs to judge it on the right. */
   .feature {
-    display: grid;
-    grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
-    gap: var(--space-48);
-    align-items: start;
     margin-top: var(--space-64);
   }
   .shot {
@@ -187,80 +153,6 @@ const parts = partsOf(lead.entry);
   }
   @keyframes arrive {
     from { opacity: 0; }
-  }
-  .lead-shot {
-    display: block;
-    border-radius: 8px;
-  }
-  .lead-title {
-    margin: var(--space-12) 0 var(--space-8);
-    font-size: var(--text-meta-title);
-    font-weight: var(--weight-medium);
-    line-height: var(--leading-meta-title);
-    letter-spacing: var(--tracking-meta-title);
-  }
-  .lead-title a {
-    color: inherit;
-    text-decoration: none;
-  }
-  .lead-title a:hover {
-    text-decoration: underline;
-    text-underline-offset: 5px;
-  }
-  .lead-line {
-    margin: 0;
-    font-size: var(--text-body);
-    line-height: var(--leading-body);
-  }
-  .numbers {
-    display: grid;
-    gap: var(--space-16);
-    margin: var(--space-32) 0 0;
-    padding: 0;
-    list-style: none;
-  }
-  .numbers li {
-    display: grid;
-    gap: var(--space-4);
-  }
-  .numbers b {
-    font-size: var(--text-title);
-    font-weight: var(--weight-medium);
-    letter-spacing: var(--tracking-title);
-  }
-  .numbers span {
-    font-size: var(--text-small);
-    line-height: var(--leading-small);
-  }
-  .parts {
-    margin: var(--space-32) 0 0;
-    padding: 0;
-    list-style: none;
-  }
-  .parts a {
-    display: grid;
-    grid-template-columns: 56px minmax(0, 1fr) 16px;
-    align-items: center;
-    gap: var(--space-12);
-    min-height: 44px;
-    border-top: 1px solid var(--line);
-    color: inherit;
-    font-size: var(--text-small);
-    text-decoration: none;
-  }
-  .parts li:last-child a {
-    border-bottom: 1px solid var(--line);
-  }
-  .parts .mono {
-    font-size: var(--text-mono);
-    letter-spacing: var(--tracking-mono);
-  }
-  .parts :global(.icon) {
-    color: var(--accent);
-  }
-  .parts a:hover span:nth-child(2) {
-    text-decoration: underline;
-    text-underline-offset: 3px;
   }
 
   /* The rest: one row each, the product small beside what it is. */
@@ -344,21 +236,15 @@ const parts = partsOf(lead.entry);
     outline-offset: var(--focus-offset);
   }
   @media (prefers-reduced-motion: no-preference) {
-    .parts :global(.icon),
     .item :global(.icon) {
       transition: transform 0.25s var(--ease);
     }
-    .parts a:hover :global(.icon),
     .item:hover :global(.icon) {
       transform: translateX(3px);
     }
   }
 
   @media (max-width: 899.98px) {
-    .feature {
-      grid-template-columns: minmax(0, 1fr);
-      gap: var(--space-24);
-    }
     .item {
       grid-template-columns: 200px minmax(0, 1fr) 16px;
     }

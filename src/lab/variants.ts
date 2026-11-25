@@ -2,7 +2,7 @@
 // only (/_lab). Each variant records where it sits on the variation dial,
 // per layer: 0 is a close refinement of what's live, 100 an all-new
 // direction. Round 1 (homepage) keeps the design system close and varies
-// the layout.
+// the layout. Round 2 combines the parts Nahuel picked from round 1.
 
 export interface Dial {
   /** Tokens: color, type, spacing, radius, motion. */
@@ -19,6 +19,8 @@ export interface Variant {
   dial: Dial;
   /** Where it renders. The baseline is the live site. */
   href: string;
+  /** The round it came from: 2 combines parts of round 1's layouts. */
+  round?: number;
 }
 
 export const BASELINE: Variant = {
@@ -33,11 +35,20 @@ export const BASELINE: Variant = {
 
 export const HOME_VARIANTS: Variant[] = [
   {
+    id: 'combined',
+    name: 'Work first, combined',
+    idea: 'Work first as the base, with vers1ons leading the work with all its numbers and parts (from Lead project) and the short list of how I think (from Split).',
+    dial: { system: 10, layout: 60 },
+    href: '/_lab/home/combined/',
+    round: 2,
+  },
+  {
     id: 'work-first',
     name: 'Work first',
     idea: 'One sentence about you with the work peeking up from the first screen, then big cards that show the product.',
     dial: { system: 10, layout: 60 },
     href: '/_lab/home/work-first/',
+    round: 1,
   },
   {
     id: 'lead-project',
@@ -45,6 +56,7 @@ export const HOME_VARIANTS: Variant[] = [
     idea: 'vers1ons as a big feature with all its numbers and parts, the rest as a compact list.',
     dial: { system: 10, layout: 55 },
     href: '/_lab/home/lead-project/',
+    round: 1,
   },
   {
     id: 'split',
@@ -52,5 +64,6 @@ export const HOME_VARIANTS: Variant[] = [
     idea: 'You on the left the whole time, the work and experience scrolling on the right.',
     dial: { system: 10, layout: 75 },
     href: '/_lab/home/split/',
+    round: 1,
   },
 ];

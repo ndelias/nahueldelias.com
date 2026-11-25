@@ -14,9 +14,9 @@ const dial = (v: number) => (v <= 20 ? 'close' : v >= 80 ? 'wide' : 'between');
 <main class="lab">
   <header class="head">
     <div>
-      <p class="kicker mono muted">Design lab · Round 1 · Homepage</p>
+      <p class="kicker mono muted">Design lab · Homepage · Round 2</p>
       <h1>Homepage layouts</h1>
-      <p class="muted intro">The design system stays close and the layout varies. Each frame is the real page: scroll inside it, point at the cards, switch the theme.</p>
+      <p class="muted intro">Round 2 combines the parts picked from round 1, which stays below for reference. The design system stays close and the layout varies. Each frame is the real page: scroll inside it, point at the cards, switch the theme.</p>
     </div>
     <ThemeToggle />
   </header>
@@ -25,6 +25,7 @@ const dial = (v: number) => (v <= 20 ? 'close' : v >= 80 ? 'wide' : 'between');
     {ROWS.map((v) => (
       <li class="variant">
         <div class="info">
+          {v.round && <p class="round mono muted">Round {v.round}</p>}
           <h2>{v.name}</h2>
           <p class="muted">{v.idea}</p>
           <dl class="dial">
@@ -129,6 +130,12 @@ const dial = (v: number) => (v <= 20 ? 'close' : v >= 80 ? 'wide' : 'between');
     font-size: var(--text-title);
     font-weight: var(--weight-medium);
     letter-spacing: var(--tracking-title);
+  }
+  .info .round {
+    margin: 0 0 var(--space-8);
+    font-size: var(--text-mono);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
   }
   .info p {
     margin: 0;
