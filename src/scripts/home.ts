@@ -4,7 +4,7 @@
 // brought in once a quarter of it is on screen. (The photo's characters,
 // photo.ts, load sooner: see index.astro.)
 import { later, reels, tip } from './cards';
-import { thread, tree } from './lines';
+import { branch, thread } from './lines';
 import { meadow } from './meadow';
 
 later();
@@ -24,10 +24,10 @@ if (footer) {
   io.observe(footer);
 }
 
-// The lines: the thread down the page and the tree in About me.
+// The lines: the thread down the page, branching into About me's steps.
 const lined = document.querySelector<HTMLElement>('[data-lines]');
 if (lined) {
   const kinds = (lined.dataset.lines ?? '').split(' ');
   if (kinds.includes('thread')) thread(lined);
-  if (kinds.includes('tree')) tree(lined);
+  if (kinds.includes('branch')) branch(lined);
 }

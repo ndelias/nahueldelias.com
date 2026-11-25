@@ -225,7 +225,7 @@ test('phone: a compact row on top, the work right after, the links at the end, n
   await ctx.close();
 });
 
-test('the lines: a thread with a mark at every heading, ending at the meadow; the tree branching to each step', async () => {
+test('the lines: a thread with a mark at every heading, ending at the meadow, branching into each step', async () => {
   const { ctx, page } = await open();
   await page.waitForFunction(() => document.querySelectorAll('svg.lines').length === 2);
   await page.evaluate(async () => {
@@ -237,7 +237,7 @@ test('the lines: a thread with a mark at every heading, ending at the meadow; th
   await page.waitForTimeout(600);
   const state = await page.evaluate(() => {
     const headings = [...document.querySelectorAll('.flow [data-section] h2, .flow [data-section] h3.label')].filter((h) => h.offsetParent).length;
-    const [thread, tree] = [...document.querySelectorAll('svg.lines')];
+    const [thread, branches] = [...document.querySelectorAll('svg.lines')];
     const meadow = document.querySelector('[data-meadow]').getBoundingClientRect();
     const head = thread.querySelector('polyline').getBoundingClientRect();
     return {
@@ -245,7 +245,7 @@ test('the lines: a thread with a mark at every heading, ending at the meadow; th
       marks: thread.querySelectorAll('.mark.on').length,
       drawn: Number(thread.querySelector('path').style.strokeDashoffset) < 1,
       headInMeadow: head.top > meadow.top && head.bottom < meadow.bottom,
-      branches: tree.querySelectorAll('path').length,
+      branches: branches.querySelectorAll('path').length,
       stepsShown: document.querySelectorAll('.steps li.in').length,
     };
   });
@@ -253,7 +253,7 @@ test('the lines: a thread with a mark at every heading, ending at the meadow; th
   assert.ok(state.headings >= 6, `only ${state.headings} headings`);
   assert.ok(state.drawn, 'the thread is not drawn whole at the end of the page');
   assert.ok(state.headInMeadow, 'the thread does not end in the meadow');
-  assert.equal(state.branches, 10, 'the tree is not five branches out and five back');
+  assert.equal(state.branches, 5, 'not a branch into each of the five steps');
   assert.equal(state.stepsShown, 5);
   await ctx.close();
 });

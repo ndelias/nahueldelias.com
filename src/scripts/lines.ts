@@ -1,9 +1,9 @@
 // The homepage's lines, from the old homepage (chosen in the design lab,
-// round 4): the thread, one line down the gutter between Nahuel's column
-// and the work, drawing as you scroll, a mark at every section heading, and
-// ending in an arrow at the meadow's path; and the tree, About me's five
-// steps, lines branching out of one point to each and coming back together
-// as the section scrolls in. A hairline in the page's ink at half strength,
+// rounds 4 and 5): the thread, one line down the gutter between Nahuel's
+// column and the work, drawing as you scroll, a mark at every section
+// heading, and ending in an arrow at the meadow's path; and the branch, an
+// elbow off the thread into each of About me's five steps. The tree (lines
+// out to each step and back together) stays for the lab. A hairline in the page's ink at half strength,
 // as the old thread was. Under reduced motion both are drawn whole.
 
 export const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -171,6 +171,57 @@ export function tree(root: HTMLElement) {
     });
     if (outs.length) dots[0]?.classList.toggle('on', out > 0);
     dots[dots.length - 1]?.classList.toggle('on', back >= 1);
+  };
+
+  onLayout(draw);
+  addEventListener('scroll', progress, { passive: true });
+}
+
+/* ---------- The branch ----------
+   Off the thread, a short elbow into each step's number as it scrolls in,
+   nothing rejoining, so the descriptions read clean (the lab's round 5).
+   On a phone the steps just show in turn. */
+export function branch(root: HTMLElement) {
+  const list = root.querySelector<HTMLElement>('.steps');
+  const side = root.querySelector('.side');
+  const flow = root.querySelector('.flow');
+  if (!list || !side || !flow) return;
+  const items = [...list.querySelectorAll<HTMLElement>('li')];
+  const { svg, size } = pageLayer();
+  let paths: SVGPathElement[] = [];
+  list.dataset.tree = '';
+
+  const draw = () => {
+    size();
+    paths.forEach((p) => p.remove());
+    const wide = innerWidth >= 1024;
+    // The thread's x, as the thread draws it.
+    const x = wide ? (box(side).right + box(flow).left) / 2 : 0;
+    paths = wide
+      ? items.map((li) => {
+          const n = box(li.querySelector('.no') ?? li);
+          const y = n.top + n.height / 2;
+          // Leaves the thread a little above the step and turns into it.
+          return el('path', { d: `M ${x} ${y - 28} C ${x} ${y - 6}, ${x + 8} ${y}, ${x + 24} ${y} H ${n.left - 10}` });
+        })
+      : [];
+    svg.append(...paths);
+    for (const p of paths) {
+      const len = p.getTotalLength();
+      p.dataset.len = String(len);
+      p.style.strokeDasharray = `${len}`;
+    }
+    progress();
+  };
+
+  const progress = () => {
+    items.forEach((li, i) => {
+      const top = li.getBoundingClientRect().top;
+      const k = reduce ? 1 : clamp((innerHeight * 0.85 - top) / (innerHeight * 0.15));
+      const p = paths[i];
+      if (p) p.style.strokeDashoffset = `${Number(p.dataset.len) * (1 - k)}`;
+      li.classList.toggle('in', k > 0.6);
+    });
   };
 
   onLayout(draw);
