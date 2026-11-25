@@ -2,7 +2,6 @@
 // lab): what the lab's editor can change on it, and the defaults. Saved
 // changes are in src/settings/split-lead.json.
 import type { Editable } from '../../lib/layout-settings';
-import { STATEMENT } from '../../lib/home';
 
 export const SPLIT_LEAD: Editable = {
   sections: [
@@ -25,6 +24,12 @@ export const SPLIT_LEAD: Editable = {
       // A first draft from Nahuel's two picks (2026-11-25). His to edit.
       value: "I work closely with users and clients. I start with the people I'm building for, and use today's tools to get them something better, faster.",
     },
-    statement: { label: 'About me', value: STATEMENT },
+    statement: {
+      label: 'About me',
+      // Plain facts, not process (2026-11-25): what he's built and where he
+      // comes from.
+      value:
+        "I'm a founding product engineer at vers1ons, where I've built everything from licensing to payouts to the mobile app. Before that I designed products and worked on client strategy at EY, and I studied design, business, and computer science at USC.",
+    },
   },
 };
