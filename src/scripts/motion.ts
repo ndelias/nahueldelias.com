@@ -43,6 +43,8 @@ const load = new IntersectionObserver(
       if (!e.isIntersecting) return;
       load.unobserve(e.target);
       const s = document.createElement('script');
+      // Under `astro dev` a piece is served unbundled, as an ES module.
+      if (import.meta.env.DEV) s.type = 'module';
       s.src = (e.target as HTMLElement).dataset.src!;
       document.head.append(s);
     }),
