@@ -2,7 +2,7 @@
 // the homepage, src/scripts/cards.ts), and the character portrait, which
 // scrambles and settles once it's on screen (drawn settled under reduced
 // motion).
-import { reels, tip } from '../../scripts/cards';
+import { later, reels, tip } from '../../scripts/cards';
 import { photo } from '../../scripts/photo';
 import { portrait } from '../../scripts/portrait';
 
@@ -32,6 +32,7 @@ function portraits() {
   }
 }
 
+later();
 reels();
 tip();
 document.fonts.ready.then(() => {

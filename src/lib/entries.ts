@@ -1,3 +1,5 @@
+import { getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { SECTIONS, type Section } from './model';
 
@@ -102,6 +104,17 @@ export const siblingsOf = (part: Entry): { prev: Entry; next: Entry } | undefine
 /** The part's own slug: "distribution" for vers1ons/distribution. */
 /** The homepage card's image: a frame of the product, or the cover. */
 export const stillOf = (entry: Entry) => entry.data.still ?? entry.data.cover.src;
+
+/** The lead project's frame for a phone, where it's the largest paint and the
+    page has to paint inside 1.2s on 4G (§6): 640px wide at a lower quality.
+    Undefined for an SVG cover (a fixture), served as is. The homepage
+    preloads it and LeadFeature shows it; getImage caches, so it's one file. */
+export async function phoneStill(entry: Entry) {
+  const still = stillOf(entry);
+  // Read from a clone: reading the import itself ships the original to dist/.
+  if (((still as ImageMetadata & { clone?: ImageMetadata }).clone ?? still).format === 'svg') return undefined;
+  return getImage({ src: still, format: 'avif', width: 640, quality: 40 });
+}
 
 // The number a card leads with: the first of the entry's impact row.
 export const cardImpact = (entry: Entry) => entry.data.impact?.[0];

@@ -87,9 +87,14 @@ test('My work: vers1ons first with its parts, then a card for every other projec
   await ctx.close();
 });
 
-test('the cards show the product, and pointing at one plays its recording in place, muted; leaving stops it', async () => {
+test('the cards show the product (the rest after the first paint); pointing at one plays its recording in place, muted', async () => {
+  // Only vers1ons' frame is in the HTML ready to load; the rest arrive after
+  // the first paint, so they can't slow the largest paint on a phone.
+  const html = await readFile(join(DIST, 'index.html'), 'utf8');
+  assert.equal((html.match(/<img data-later-src=/g) ?? []).length, 3);
   const { ctx, page } = await open();
-  const stills = await page.evaluate(() => [...document.querySelectorAll('[data-reel] .shot img')].map((i) => new URL(i.currentSrc || i.src).pathname));
+  await page.waitForFunction(() => !document.querySelector('img[data-later-src]'));
+  const stills = await page.evaluate(() => [...document.querySelectorAll('[data-reel] .shot img')].map((i) => new URL(i.currentSrc || i.src, location.href).pathname));
   assert.equal(stills.length, 4);
   assert.ok(stills.every((s) => /\/still\./.test(s)), `a card without a frame of its product: ${stills}`);
   await page.waitForFunction(() => document.querySelector('.cursor-tip'));

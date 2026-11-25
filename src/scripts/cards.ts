@@ -6,6 +6,15 @@
 
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+/** Frames held back until after the first paint (WorkCard's `later`). */
+export function later() {
+  for (const img of document.querySelectorAll<HTMLImageElement>('img[data-later-src]')) {
+    img.srcset = img.dataset.laterSrcset ?? '';
+    img.src = img.dataset.laterSrc!;
+    img.removeAttribute('data-later-src');
+  }
+}
+
 /** Cards marked data-reel play that recording inside their .shot. */
 export function reels() {
   if (reduce) return;

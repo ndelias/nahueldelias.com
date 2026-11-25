@@ -24,7 +24,7 @@ const [lead, ...rest] = work();
   <aside class="side" aria-labelledby="side-title">
     <div class="side-in">
       <div class="portrait" data-photo>
-        <Image src={photo} alt="Nahuel D'Elias" widths={[216, 431]} sizes="(max-width: 899px) 72px, 216px" format="avif" loading="eager" />
+        <Image src={photo} alt="Nahuel D'Elias" widths={[144, 216, 431]} sizes="(max-width: 1023px) 72px, 216px" format="avif" loading="eager" fetchpriority="low" />
         <canvas aria-hidden="true"></canvas>
       </div>
       <div class="who">
@@ -50,7 +50,7 @@ const [lead, ...rest] = work();
       <LeadFeature entry={lead.entry} href={lead.href} kicker={lead.kicker} level="h3" stacked />
       <ul class="rest">
         {rest.map(({ entry, href, kicker }) => (
-          <li><WorkCard entry={entry} href={href} kicker={kicker} sizes="(max-width: 899px) 100vw, 30vw" /></li>
+          <li><WorkCard entry={entry} href={href} kicker={kicker} sizes="(max-width: 1023px) 100vw, 30vw" later /></li>
         ))}
       </ul>
     </section>
@@ -100,10 +100,13 @@ const [lead, ...rest] = work();
     position: sticky;
     top: 72px;
   }
+  /* The column is size-aware: the name and links scale with its width, and
+     when it's narrow the links drop their arrows to stay on one row. */
   .side-in {
     display: flex;
     flex-direction: column;
     padding-top: var(--space-48);
+    container-type: inline-size;
   }
   /* The photo, and the characters it arrives as (src/scripts/photo.ts),
      in the grid's shape (400×480, scripts/portrait.mjs). */
@@ -133,10 +136,10 @@ const [lead, ...rest] = work();
   }
   /* With JS, where the characters can be read: hidden until they've
      settled, or after 3s whatever happens. */
-  @media (min-width: 900px) and (prefers-reduced-motion: no-preference) {
+  @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
     :global(.js) .portrait img {
       opacity: 0;
-      animation: photo-in 0.6s var(--ease) 3s forwards;
+      animation: photo-in 0.5s var(--ease) 1.5s forwards;
     }
     .portrait[data-settling] img {
       animation: none;
@@ -146,11 +149,11 @@ const [lead, ...rest] = work();
     }
     .portrait[data-done] img {
       opacity: 1;
-      transition: opacity 0.8s var(--ease);
+      transition: opacity 0.4s var(--ease);
     }
     .portrait[data-done] canvas {
       opacity: 0;
-      transition: opacity 0.8s var(--ease);
+      transition: opacity 0.4s var(--ease);
     }
   }
   @keyframes photo-in {
@@ -160,7 +163,7 @@ const [lead, ...rest] = work();
   }
   h1 {
     margin: 0;
-    font-size: var(--name-size);
+    font-size: min(var(--name-size), 12cqi);
     font-weight: var(--weight-medium);
     line-height: 1.04;
     letter-spacing: -0.022em;
@@ -193,7 +196,7 @@ const [lead, ...rest] = work();
     gap: var(--space-4);
     min-height: 44px;
     color: var(--ink);
-    font-size: var(--text-meta);
+    font-size: clamp(0.75rem, 3.8cqi, var(--text-meta));
     font-weight: var(--weight-medium);
     text-decoration: none;
   }
@@ -216,6 +219,19 @@ const [lead, ...rest] = work();
   .download {
     justify-content: center;
     min-width: 32px;
+  }
+  @container (max-width: 350px) {
+    .links {
+      gap: 0 var(--space-12);
+    }
+    .links a:not(.download) :global(.icon) {
+      display: none;
+    }
+  }
+  @container (max-width: 300px) {
+    .download {
+      display: none !important;
+    }
   }
 
   /* The tip that follows the cursor over a card (src/scripts/cards.ts). */
@@ -292,7 +308,7 @@ const [lead, ...rest] = work();
     font-size: var(--text-mono);
   }
 
-  @media (max-width: 899.98px) {
+  @media (max-width: 1023.98px) {
     .sl {
       grid-template-columns: minmax(0, 1fr);
       gap: var(--space-48);

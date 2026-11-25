@@ -4,7 +4,7 @@
 // judge it, with every number from its impact row and every part.
 import Icon from '../Icon.astro';
 import EntryImage from '../EntryImage.astro';
-import { entryHref, entryNumber, partsOf, stillOf, type Entry } from '../../lib/entries';
+import { entryHref, entryNumber, partsOf, phoneStill, stillOf, type Entry } from '../../lib/entries';
 
 interface Props {
   entry: Entry;
@@ -19,12 +19,20 @@ interface Props {
 const { entry, href, kicker, level = 'h2', stacked = false } = Astro.props;
 const parts = partsOf(entry);
 const Title = level;
+
+// The product frame is the largest paint on a phone: phones get a lighter
+// one (phoneStill), desktops the sharp ones.
+const still = stillOf(entry);
+const phone = await phoneStill(entry);
 const id = `lead-${entry.id}`;
 ---
 <article class:list={['feature', { stacked }]} aria-labelledby={id}>
   <a class="lead-shot" href={href} data-reel={entry.data.video} data-tip="Case study" tabindex="-1" aria-hidden="true">
     <span class="shot">
-      <EntryImage src={stillOf(entry)} alt="" widths={[400, 800, 1600]} sizes={stacked ? '(max-width: 899px) 100vw, 60vw' : '(max-width: 899px) 100vw, 66vw'} loading="eager" fetchpriority="high" output="avif" />
+      <picture>
+        {phone && <source media="(max-width: 1023px)" srcset={phone.src} type="image/avif" />}
+        <EntryImage src={still} alt="" widths={[800, 1344]} sizes={stacked ? '60vw' : '(max-width: 899px) 100vw, 66vw'} loading="eager" fetchpriority="high" output="avif" />
+      </picture>
     </span>
   </a>
   <div class="side">
@@ -72,6 +80,9 @@ const id = `lead-${entry.id}`;
     background: var(--surface);
     outline: 1px solid color-mix(in srgb, var(--ink) 10%, transparent);
     outline-offset: -1px;
+  }
+  .shot picture {
+    display: contents;
   }
   .shot :global(img),
   .shot :global(video) {

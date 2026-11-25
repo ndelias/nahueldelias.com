@@ -9,20 +9,34 @@
 // Server-rendered and readable without JS. src/scripts/home.ts, after the
 // first paint, plays a card's reel while it's pointed at, carries the
 // cursor tip, and draws the meadow once it's near the screen. Without JS
-// the meadow is a flat wash of its colors.
+// the meadow is a flat wash of its colors. On a wide screen the photo
+// arrives as characters (src/scripts/photo.ts), loaded with the page.
 import AfterLoad from '../components/AfterLoad.astro';
 import Frame from '../components/Frame.astro';
 import SplitLead from '../components/home/SplitLead.astro';
 import Base from '../layouts/Base.astro';
+import { phoneStill } from '../lib/entries';
+import { work } from '../lib/home';
 import behaviour from '../scripts/home.ts?worker&url';
+import photoRun from '../scripts/photo-run.ts?worker&url';
+
+// On a phone the lead project's frame is the largest paint: start it with
+// the head, as /work does its poster.
+const phone = await phoneStill(work()[0].entry);
 ---
-<Base title="Nahuel D'Elias — Product engineer" description="Nahuel D'Elias is a product engineer who works closely with users and clients. vers1ons, Vera, and the rest of his work." preload={['sans-500', 'mono-400']}>
+<Base title="Nahuel D'Elias — Product engineer" description="Nahuel D'Elias is a product engineer who works closely with users and clients. vers1ons, Vera, and the rest of his work." preload={['sans-500']}>
+  {phone && <link slot="head" rel="preload" as="image" fetchpriority="high" href={phone.src} type="image/avif" media="(max-width: 1023px)" />}
   <Frame>
     <SplitLead />
     <canvas class="meadow" data-meadow aria-hidden="true"></canvas>
   </Frame>
   <AfterLoad src={behaviour} />
+  {/* The photo arriving as characters starts with the page, not after its
+      first paint, and loads only where it plays: from 1024px wide, without
+      reduced motion. A phone fetches nothing. */}
+  <script is:inline set:html={`matchMedia("(min-width:1024px) and (prefers-reduced-motion:no-preference)").matches&&import(${JSON.stringify(photoRun)})`} />
 </Base>
+
 
 <style>
   /* The meadow, closing the page: a small canvas scaled up, pixels kept
