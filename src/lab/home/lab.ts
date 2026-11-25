@@ -58,4 +58,4 @@ if (footer) {
 }
 const lined = document.querySelector<HTMLElement>('[data-lines]');
 const LINES = { thread, tree, connector };
-if (lined) LINES[lined.dataset.lines as keyof typeof LINES]?.(lined);
+for (const kind of lined?.dataset.lines?.split(' ') ?? []) LINES[kind as keyof typeof LINES]?.(lined!);

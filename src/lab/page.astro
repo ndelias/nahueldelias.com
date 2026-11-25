@@ -90,42 +90,4 @@ const setup = view !== 'compare' && {
     opacity: 1;
   }
 
-  /* Round 4's lines (src/lab/lines.ts): a hairline in the page's ink, at
-     half strength, and square marks, as the old homepage drew them. */
-  .lab-lines path,
-  .lab-lines polyline {
-    fill: none;
-    stroke: var(--ink);
-    stroke-width: 1;
-    opacity: 0.5;
-  }
-  .lab-lines polyline {
-    transition: opacity 0.3s var(--ease);
-  }
-  .lab-lines .mark {
-    fill: var(--ink);
-    opacity: 0;
-    transform-box: fill-box;
-    transform-origin: center;
-    transform: scale(0.4);
-    transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
-  }
-  .lab-lines .mark.on {
-    opacity: 1;
-    transform: none;
-  }
-  /* The tree: each step shows as its line reaches it. */
-  [data-tree] li {
-    transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
-  }
-  [data-tree] li:not(.in) {
-    opacity: 0;
-    transform: translateX(-6px);
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .lab-lines .mark,
-    [data-tree] li {
-      transition: none;
-    }
-  }
 </style>
