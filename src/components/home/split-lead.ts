@@ -26,10 +26,10 @@ export const SPLIT_LEAD: Editable = {
     },
     statement: {
       label: 'About me',
-      // Plain facts, not process (2026-11-25): what he's built and where he
-      // comes from.
+      // What he's built, where he comes from, and how he thinks about product
+      // (his words, 2026-11-25).
       value:
-        "I'm a founding product engineer at vers1ons, where I've built everything from licensing to payouts to the mobile app. Before that I designed products and worked on client strategy at EY, and I studied design, business, and computer science at USC.",
+        "I'm a founding product engineer at vers1ons, where I've built everything from licensing to payouts to the mobile app. Before that I interned at Techstars, working with startups in their accelerator program, and did client strategy for EY wavespace through USC. Code is the easy part now. The products that win stay closest to the people using them, and understand and sell the problem better than anyone else.",
     },
   },
 };
