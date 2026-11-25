@@ -202,7 +202,7 @@ function editor(setup: Setup) {
   };
 
   if (!setup.editable || !state || !saved) {
-    panel.append(h('p', { class: 'lab-ed-note' }, 'This layout has no settings yet. Pick one marked with a round to edit it.'));
+    panel.append(h('p', { class: 'lab-ed-note' }, 'This layout has no settings yet.'));
   } else {
     const editable = setup.editable;
     const changed = () => {
@@ -265,7 +265,7 @@ function editor(setup: Setup) {
       });
       sliders.append(h('label', {}, h('span', {}, c.label), out, input));
     }
-    panel.append(group('Sizes', sliders));
+    panel.append(group('Sizes', sliders, h('p', { class: 'lab-ed-note' }, 'Sizes are for desktop. On a phone the layout keeps its own.')));
 
     // Text: write straight on the page.
     const edit = h('button', { type: 'button', class: 'lab-ed-wide', 'aria-pressed': 'false' }, 'Edit text on the page');

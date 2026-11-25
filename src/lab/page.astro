@@ -12,8 +12,8 @@ import LeadProject from './home/LeadProject.astro';
 import Split from './home/Split.astro';
 import SplitLead from './home/SplitLead.astro';
 import WorkFirst from './home/WorkFirst.astro';
-import { settingsFor, type Editable } from './settings';
-import { SPLIT_LEAD } from './home/split-lead';
+import { EDITABLES } from './editables';
+import { settingsFor } from './settings';
 import { HOME_VARIANTS } from './variants';
 
 export const getStaticPaths = (() => [
@@ -28,8 +28,7 @@ const variant = HOME_VARIANTS.find((v) => v.id === view);
 
 // The editor's setup (src/lab/editor/): the layouts to switch between and,
 // for a layout that can be edited, what it can change and its saved state.
-const EDITABLE: Record<string, Editable> = { 'split-lead': SPLIT_LEAD };
-const editable = EDITABLE[view];
+const editable = EDITABLES[view];
 const current = editable && settingsFor(view, editable);
 const setup = view !== 'compare' && {
   id: view,

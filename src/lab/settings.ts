@@ -14,8 +14,8 @@ export interface Control {
   min: number;
   max: number;
   step: number;
-  /** Appended to the value in CSS: '12px', or a bare number for counts. */
-  unit: 'px' | '';
+  /** Appended to the value in CSS: '12px', '3vw', or a bare number for counts. */
+  unit: 'px' | 'vw' | '';
   value: number;
 }
 

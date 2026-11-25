@@ -8,7 +8,9 @@
 // with all its numbers and parts (from Lead project), the rest in a row of
 // three, and the short list of how he thinks (from Split).
 import { Image } from 'astro:assets';
-import { CLOSER, STATEMENT, STEPS, work } from '../../lib/home';
+import { STEPS, work } from '../../lib/home';
+import { EDITABLES } from '../editables';
+import { settingsFor } from '../settings';
 import Experience from './Experience.astro';
 import LeadFeature from './LeadFeature.astro';
 import Reach from './Reach.astro';
@@ -22,12 +24,14 @@ const { combined = false } = Astro.props;
 
 const WORK = work();
 const [lead, ...rest] = WORK;
+const id = combined ? 'combined' : 'work-first';
+const { style, text } = settingsFor(id, EDITABLES[id]);
 ---
-<main class="wf">
+<main class="wf" data-lab-root style={style}>
   <section class="hello container" aria-labelledby="hello-title">
     <div class="say">
       <p class="kicker mono muted">Nahuel D'Elias · Product engineer</p>
-      <h1 id="hello-title">I'm Nahuel, a product engineer who thinks through the entire product, <span class="muted">from the first conversation to something people use without thinking.</span></h1>
+      <h1 id="hello-title"><span data-edit="headline">{text.headline}</span> <span class="muted" data-edit="headline-tail">{text['headline-tail']}</span></h1>
     </div>
     <ul class="peek" aria-label="Projects">
       {WORK.map(({ entry, href }, i) => {
@@ -43,7 +47,8 @@ const [lead, ...rest] = WORK;
     </ul>
   </section>
 
-  <section class="work container" aria-labelledby="work-title">
+  <div class="flow">
+  <section class="part work container" data-section="work" aria-labelledby="work-title">
     <h2 class="section-title" id="work-title">My work</h2>
     {combined ? (
       <>
@@ -63,14 +68,14 @@ const [lead, ...rest] = WORK;
     )}
   </section>
 
-  <section class="me container" aria-labelledby="me-title">
+  <section class="part me container" data-section="me" aria-labelledby="me-title">
     <div class="who">
       <canvas class="portrait" data-lab-portrait role="img" aria-label="A portrait of Nahuel D'Elias drawn in characters"></canvas>
     </div>
     <div class="about">
       <h2 class="section-title" id="me-title">About me</h2>
-      <p class="statement">{STATEMENT}</p>
-      <p class="statement muted">{CLOSER}</p>
+      <p class="statement" data-edit="statement">{text.statement}</p>
+      <p class="statement muted" data-edit="closer">{text.closer}</p>
       <h3 class="label mono muted">How I think about product</h3>
       {combined ? (
         <ol class="short">
@@ -92,9 +97,8 @@ const [lead, ...rest] = WORK;
     </div>
   </section>
 
-  <div class="container below">
-    <Experience />
-    <Reach />
+  <div class="part container" data-section="experience"><Experience /></div>
+  <div class="part container" data-section="reach"><Reach /></div>
   </div>
 </main>
 
@@ -128,8 +132,8 @@ const [lead, ...rest] = WORK;
   }
   h1 {
     margin: var(--space-24) 0 0;
-    max-width: 25ch;
-    font-size: var(--text-display);
+    max-width: calc(var(--headline-width) * 1ch);
+    font-size: var(--headline);
     font-weight: var(--weight-medium);
     line-height: 1.05;
     letter-spacing: var(--tracking-display);
@@ -139,7 +143,7 @@ const [lead, ...rest] = WORK;
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: var(--space-16);
-    margin: 0 0 -3vw;
+    margin: 0 0 calc(-1 * var(--peek));
     padding: 0;
     list-style: none;
   }
@@ -184,13 +188,21 @@ const [lead, ...rest] = WORK;
     line-height: var(--leading-h2);
     letter-spacing: var(--tracking-h2);
   }
-  .work {
-    margin-top: calc(3vw + var(--space-160));
+  /* The sections, in the order the editor set, below the work's peek. */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    gap: var(--section-gap);
+    margin-top: calc(var(--peek) + var(--section-gap));
   }
+  .part[data-section='work'] { order: var(--order-work); }
+  .part[data-section='me'] { order: var(--order-me); }
+  .part[data-section='experience'] { order: var(--order-experience); }
+  .part[data-section='reach'] { order: var(--order-reach); }
   .cards {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-64) var(--space-32);
+    grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+    gap: var(--card-gap) var(--space-32);
     margin: 0;
     padding: 0;
     list-style: none;
@@ -198,8 +210,8 @@ const [lead, ...rest] = WORK;
 
   /* Combined: the rest of the work under the feature, three across. */
   .cards.three {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    margin-top: var(--space-96);
+    /* A step more than between the cards: 96px at the default 64px. */
+    margin-top: calc(var(--card-gap) * 1.5);
   }
   /* Combined: how he thinks, as five short lines. */
   .short {
@@ -220,12 +232,11 @@ const [lead, ...rest] = WORK;
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
     gap: var(--space-64);
     align-items: start;
-    margin-top: var(--space-160);
   }
   .portrait {
     display: block;
     width: 100%;
-    max-width: 400px;
+    max-width: var(--portrait);
     aspect-ratio: 400 / 480;
   }
   :global(:root:not(.js)) .portrait {
@@ -274,19 +285,12 @@ const [lead, ...rest] = WORK;
     line-height: var(--leading-small);
   }
 
-  .below {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-160);
-    margin-top: var(--space-160);
-  }
-
   @media (max-width: 899.98px) {
     .me {
       grid-template-columns: minmax(0, 1fr);
     }
-    .cards.three {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+    .cards {
+      grid-template-columns: repeat(min(var(--cols), 2), minmax(0, 1fr));
     }
   }
   @media (max-width: 639.98px) {
@@ -300,7 +304,11 @@ const [lead, ...rest] = WORK;
     .peek li {
       transform: translateY(calc(var(--i) % 2 * 16px));
     }
-    .work {
+    h1 {
+      font-size: var(--text-display);
+    }
+    .flow {
+      gap: var(--space-96);
       margin-top: calc(20vw + var(--space-96));
     }
     .cards,
@@ -310,13 +318,6 @@ const [lead, ...rest] = WORK;
     }
     .cards.three {
       margin-top: var(--space-64);
-    }
-    .me,
-    .below {
-      margin-top: var(--space-96);
-    }
-    .below {
-      gap: var(--space-96);
     }
   }
 </style>

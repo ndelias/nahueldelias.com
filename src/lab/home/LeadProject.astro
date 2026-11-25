@@ -5,18 +5,21 @@
 import { Image } from 'astro:assets';
 import Icon from '../../components/Icon.astro';
 import { cardImpact } from '../../lib/entries';
-import { CLOSER, LINKS, RESUME, STATEMENT, work } from '../../lib/home';
+import { LINKS, RESUME, work } from '../../lib/home';
+import { EDITABLES } from '../editables';
+import { settingsFor } from '../settings';
 import Experience from './Experience.astro';
 import LeadFeature from './LeadFeature.astro';
 import Reach from './Reach.astro';
 import { frameOf } from './frames';
 
 const [lead, ...rest] = work();
+const { style, text } = settingsFor('lead-project', EDITABLES['lead-project']);
 ---
-<main class="lp">
+<main class="lp" data-lab-root style={style}>
   <section class="intro container" aria-labelledby="intro-title">
     <p class="kicker mono muted">Nahuel D'Elias · Product engineer</p>
-    <h1 id="intro-title">I'm Nahuel, a product engineer who thinks through the entire product, <span class="muted">from the first conversation to something people use without thinking.</span></h1>
+    <h1 id="intro-title"><span data-edit="headline">{text.headline}</span> <span class="muted" data-edit="headline-tail">{text['headline-tail']}</span></h1>
     <ul class="quick">
       <li><a href={RESUME} target="_blank" rel="noopener">Resume <Icon name="arrow-up-right" /></a></li>
       {LINKS.map((l) => (
@@ -25,11 +28,12 @@ const [lead, ...rest] = work();
     </ul>
   </section>
 
-  <section class="feature container" aria-label="Lead project">
+  <div class="flow">
+  <section class="part feature container" data-section="feature" aria-label="Lead project">
     <LeadFeature entry={lead.entry} href={lead.href} kicker={lead.kicker} />
   </section>
 
-  <section class="more container" aria-labelledby="more-title">
+  <section class="part more container" data-section="more" aria-labelledby="more-title">
     <h2 class="label mono muted" id="more-title">More work</h2>
     <ul class="list">
       {rest.map(({ entry, href, kicker }) => {
@@ -55,18 +59,17 @@ const [lead, ...rest] = work();
     </ul>
   </section>
 
-  <section class="me container" aria-labelledby="me-title">
+  <section class="part me container" data-section="me" aria-labelledby="me-title">
     <canvas class="portrait" data-lab-portrait role="img" aria-label="A portrait of Nahuel D'Elias drawn in characters"></canvas>
     <div>
       <h2 class="label mono muted" id="me-title">About me</h2>
-      <p class="statement">{STATEMENT}</p>
-      <p class="statement muted">{CLOSER}</p>
+      <p class="statement" data-edit="statement">{text.statement}</p>
+      <p class="statement muted" data-edit="closer">{text.closer}</p>
     </div>
   </section>
 
-  <div class="container below">
-    <Experience />
-    <Reach />
+  <div class="part container" data-section="experience"><Experience /></div>
+  <div class="part container" data-section="reach"><Reach /></div>
   </div>
 </main>
 
@@ -92,10 +95,22 @@ const [lead, ...rest] = work();
   .intro {
     padding-top: var(--space-96);
   }
+  /* The sections, in the order the editor set. */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    gap: var(--section-gap);
+    margin-top: var(--space-64);
+  }
+  .part[data-section='feature'] { order: var(--order-feature); }
+  .part[data-section='more'] { order: var(--order-more); }
+  .part[data-section='me'] { order: var(--order-me); }
+  .part[data-section='experience'] { order: var(--order-experience); }
+  .part[data-section='reach'] { order: var(--order-reach); }
   h1 {
     margin: var(--space-16) 0 0;
-    max-width: 30ch;
-    font-size: var(--text-h2);
+    max-width: calc(var(--headline-width) * 1ch);
+    font-size: var(--headline);
     font-weight: var(--weight-medium);
     line-height: var(--leading-h2);
     letter-spacing: var(--tracking-h2);
@@ -126,9 +141,6 @@ const [lead, ...rest] = work();
     text-underline-offset: 4px;
   }
 
-  .feature {
-    margin-top: var(--space-64);
-  }
   .shot {
     position: relative;
     display: block;
@@ -156,9 +168,6 @@ const [lead, ...rest] = work();
   }
 
   /* The rest: one row each, the product small beside what it is. */
-  .more {
-    margin-top: var(--space-160);
-  }
   .list {
     margin: 0;
     padding: 0;
@@ -166,7 +175,7 @@ const [lead, ...rest] = work();
   }
   .item {
     display: grid;
-    grid-template-columns: 280px minmax(0, 1fr) minmax(0, 0.8fr) 16px;
+    grid-template-columns: var(--thumb) minmax(0, 1fr) minmax(0, 0.8fr) 16px;
     align-items: center;
     gap: var(--space-32);
     padding: var(--space-24) 0;
@@ -204,10 +213,9 @@ const [lead, ...rest] = work();
 
   .me {
     display: grid;
-    grid-template-columns: 240px minmax(0, 1fr);
+    grid-template-columns: var(--portrait) minmax(0, 1fr);
     gap: var(--space-48);
     align-items: center;
-    margin-top: var(--space-160);
   }
   .portrait {
     display: block;
@@ -224,12 +232,6 @@ const [lead, ...rest] = work();
     line-height: var(--leading-lead);
   }
 
-  .below {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-160);
-    margin-top: var(--space-160);
-  }
 
   a:focus-visible {
     outline: var(--focus-ring);
@@ -246,7 +248,7 @@ const [lead, ...rest] = work();
 
   @media (max-width: 899.98px) {
     .item {
-      grid-template-columns: 200px minmax(0, 1fr) 16px;
+      grid-template-columns: min(var(--thumb), 200px) minmax(0, 1fr) 16px;
     }
     .item-impact {
       display: none;
@@ -280,12 +282,10 @@ const [lead, ...rest] = work();
     .portrait {
       max-width: 240px;
     }
-    .more,
-    .me,
-    .below {
-      margin-top: var(--space-96);
+    h1 {
+      font-size: var(--text-h2);
     }
-    .below {
+    .flow {
       gap: var(--space-96);
     }
   }
