@@ -16,38 +16,11 @@ import Frame from '../components/Frame.astro';
 import Icon from '../components/Icon.astro';
 import EntryImage from '../components/EntryImage.astro';
 import Base from '../layouts/Base.astro';
-import { SECTION_LABELS, cardImpact, entryHref, entryNumber, entryYears, homepageEntries } from '../lib/entries';
+import { cardImpact } from '../lib/entries';
+import { CLOSER, EDUCATION, EXPERIENCE, LEADERSHIP, LINKS, RESUME, STATEMENT, STEPS, work } from '../lib/home';
 import behaviour from '../scripts/about.ts?worker&url';
 
-const STEPS = [
-  { title: 'Be curious', line: "Have conversations with the people you're building for. Consider every potential customer's perspective." },
-  { title: 'Understand the problem', line: 'Fall in love with the problem, not the solution.' },
-  { title: 'Map the journey', line: 'Map out the product journey for each user.' },
-  { title: 'Know what the build needs', line: 'Understand every requirement. Work end to end, and know when to pull others in.' },
-  { title: 'Mindless when it works', line: 'When it works, people move through the product without thinking about it.' },
-];
-
-const EXPERIENCE = [
-  { when: '2025 – now', role: 'Founding Product Engineer', where: 'vers1ons', line: 'Product, design and code for music licensing and distribution.', href: '/work/vers1ons/' },
-  { when: '2025', role: 'Software Engineering Intern', where: 'vers1ons', line: 'Built the landing page and messaging UI, then moved into backend and API work.' },
-  { when: '2025', role: 'Design Strategist', where: 'EY', line: 'Client experience strategy for EY wavespace, a contract through USC Iovine and Young.' },
-  { when: '2025', role: 'Product Designer and UX Researcher', where: 'VideoDraft', line: 'Designed the flow and agent experience for an AI text-to-video app, at a Techstars startup.' },
-  { when: '2024', role: 'AI/LLM Evaluation', where: 'Outlier AI', line: 'Contract work refining prompts and flagging hallucinations.' },
-];
-
-// My work: every listed project, in the order /work shows them.
-const WORK = homepageEntries().map((entry) => ({
-  entry,
-  href: entryHref(entry),
-  kicker: [entryNumber(entry), SECTION_LABELS[entry.collection], entryYears(entry)].join(' · '),
-}));
-
-const RESUME = '/nahuel-delias-resume.pdf';
-const LINKS = [
-  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/nahuel-d-elias' },
-  { label: 'Email', href: 'mailto:njdelias@gmail.com' },
-  { label: 'GitHub', href: 'https://github.com/ndelias' },
-];
+const WORK = work();
 ---
 <Base title="Nahuel D'Elias — Product engineer" description="How Nahuel D'Elias, a product engineer, thinks about product: from the first conversation to a product people move through without thinking." preload={['sans-500', 'mono-400']}>
   <Frame>
@@ -74,8 +47,8 @@ const LINKS = [
         <div class="me">
           <canvas class="portrait" data-portrait role="img" aria-label="A portrait of Nahuel D'Elias drawn in characters"></canvas>
           <h2 class="name">Nahuel D'Elias</h2>
-          <p data-statement>As a builder in today's world, I'm responsible for all sides of a product. It has to be visually clean, and seamless enough that people forget they're on it, but still memorable and identifiable.</p>
-          <p>Anybody can have an idea. Not everybody can think through an entire product. That's what I do.</p>
+          <p data-statement set:html={STATEMENT} />
+          <p set:html={CLOSER} />
         </div>
       </section>
 
@@ -118,14 +91,14 @@ const LINKS = [
           <h2 class="label mono muted edu">Education</h2>
           <div class="row">
             <span class="when"></span>
-            <span class="role">M.S. Integrated Design, Business, and Computer Science</span>
-            <span class="where muted">USC Iovine and Young Academy</span>
+            <span class="role">{EDUCATION.role}</span>
+            <span class="where muted">{EDUCATION.where}</span>
           </div>
           <h2 class="label mono muted edu">Leadership</h2>
           <div class="row">
-            <span class="when mono muted">2024 – now</span>
-            <span class="role">Founder and Mentor<span class="role-line muted">A mentorship program that has helped 50+ high school students apply to college and careers.</span></span>
-            <span class="where muted">Ignite</span>
+            <span class="when mono muted">{LEADERSHIP.when}</span>
+            <span class="role">{LEADERSHIP.role}<span class="role-line muted">{LEADERSHIP.line}</span></span>
+            <span class="where muted">{LEADERSHIP.where}</span>
           </div>
         </section>
 
