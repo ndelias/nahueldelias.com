@@ -3,6 +3,7 @@ import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import preact from '@astrojs/preact';
 import motionSizes from './scripts/motion-sizes.mjs';
+import lab from './src/lab/integration.mjs';
 
 export default defineConfig({
   site: 'https://nahueldelias.com',
@@ -13,7 +14,8 @@ export default defineConfig({
   scopedStyleStrategy: 'class',
   // Preact with React compatibility, for the one island that runs Framer
   // Motion (the money page): ~38KB there, nothing anywhere else.
-  integrations: [mdx(), preact({ compat: true }), motionSizes()],
+  // The design lab (/_lab) exists only under `astro dev`.
+  integrations: [mdx(), preact({ compat: true }), motionSizes(), lab()],
   // About became the homepage: old links to /about land there.
   redirects: { '/about': '/' },
   // Inline all CSS. It's a few KB per page, and a separate stylesheet would
