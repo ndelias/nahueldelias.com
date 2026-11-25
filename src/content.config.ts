@@ -187,6 +187,9 @@ const entrySchema = ({ image }: SchemaContext) => {
       // The homepage strip's still, 16:10, at least 1040×650 (2x the focused
       // frame). Optionally a dark-theme variant. Falls back to the cover.
       poster: z.object({ src: image(), dark: image().optional() }).optional(),
+      // A frame of the product, 16:10, for the homepage's cards: the work,
+      // not its wordmark. Falls back to the cover.
+      still: image().optional(),
       // Muted screen recording that replaces the poster once the entry is
       // focused on the homepage strip. A path under public/ or a URL.
       video: z.string().min(1).optional(),

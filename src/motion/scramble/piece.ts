@@ -1,4 +1,4 @@
-// M08, scramble and settle: the About page's portrait (src/scripts/about.ts,
+// M08, scramble and settle: the earlier homepage's portrait (src/scripts/portrait.ts,
 // portrait()), drawn the same way. A grid of characters made from the photo
 // (scripts/portrait.mjs). Each cell has a moment, roughly top to bottom with
 // scatter; until a quarter before it, the cell is empty, then it flickers

@@ -4,7 +4,7 @@
 // the phone width beside it. Everything applies live; Save writes it to the
 // layout's settings file (src/lab/integration.mjs), which the layout renders
 // from. Reads its setup from <script id="lab-edit">, written by page.astro.
-import type { Editable } from '../settings';
+import type { Editable } from '../../lib/layout-settings';
 import './editor.css';
 
 interface Setup {
@@ -32,7 +32,7 @@ const same = (a: State, b: State) => JSON.stringify(a) === JSON.stringify(b);
 
 /** Put a state on a document: this page, or the phone preview's. */
 function apply(doc: Document, setup: Setup, state: State) {
-  const root = doc.querySelector<HTMLElement>('[data-lab-root]');
+  const root = doc.querySelector<HTMLElement>('[data-layout]');
   if (!root || !setup.editable) return;
   for (const c of setup.editable.controls) root.style.setProperty(`--${c.key}`, `${state.values[c.key]}${c.unit}`);
   state.order.forEach((k, i) => root.style.setProperty(`--order-${k}`, String(i)));

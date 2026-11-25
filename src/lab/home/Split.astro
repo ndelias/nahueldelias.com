@@ -6,14 +6,14 @@
 import Icon from '../../components/Icon.astro';
 import { LINKS, RESUME, STEPS, work } from '../../lib/home';
 import { EDITABLES } from '../editables';
-import { settingsFor } from '../settings';
-import Experience from './Experience.astro';
-import WorkCard from './WorkCard.astro';
+import { settingsFor } from '../../lib/layout-settings';
+import Experience from '../../components/home/Experience.astro';
+import WorkCard from '../../components/home/WorkCard.astro';
 
 const WORK = work();
 const { style, text } = settingsFor('split', EDITABLES.split);
 ---
-<main class="sp container" data-lab-root style={style}>
+<main class="sp container" data-layout style={style}>
   <aside class="side" aria-labelledby="side-title">
     <div class="side-in">
       <canvas class="portrait" data-lab-portrait role="img" aria-label="A portrait of Nahuel D'Elias drawn in characters"></canvas>

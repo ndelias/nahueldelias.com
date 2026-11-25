@@ -1,13 +1,8 @@
-// The About page's behaviours (src/pages/about.astro), loaded after the
-// first paint: the pixel meadow, the lines out of the headline and back into
-// the portrait, the portrait itself, and the thread down the experience to
-// the close. Nothing here takes the pointer.
-
-import { portrait } from './portrait';
+// The pixel meadow: a landscape from a fixed seed, drawn small and scaled
+// up square. It opened the old homepage; it now closes the new one, as its
+// footer (anchor 'bottom').
 
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const clamp = (v: number) => Math.min(1, Math.max(0, v));
-const SVG = 'http://www.w3.org/2000/svg';
 
 /* ---------- The meadow ----------
    A pixel landscape generated from a fixed seed, so it's the same every
@@ -19,7 +14,7 @@ const SVG = 'http://www.w3.org/2000/svg';
    canopy's lower leaves sway, cows graze and wander, birds pass. Scrolling
    moves the layers at different speeds (depth). The loop runs only while
    the meadow is on screen; under reduced motion it's one still frame. */
-function meadow(canvas: HTMLCanvasElement) {
+export function meadow(canvas: HTMLCanvasElement, anchor: 'top' | 'bottom' = 'top') {
   const g = canvas.getContext('2d')!;
   const PX = 4; // screen px per scene pixel
   const SEED = 11;
@@ -232,7 +227,10 @@ function meadow(canvas: HTMLCanvasElement) {
   let nextBird = 2;
 
   function frame(t: number, dt: number) {
-    const sy = scrollY / PX;
+    // How far the page is from the scene's resting place: scrolled down from
+    // the top (a meadow that opens the page), or still short of the meadow's
+    // bottom edge (a footer, at rest when the page ends).
+    const sy = (anchor === 'top' ? scrollY : Math.max(0, canvas.getBoundingClientRect().bottom - innerHeight)) / PX;
     g.clearRect(0, 0, PW, PH);
     // Sky and clouds move least on scroll; the canopy most.
     g.drawImage(sky.c, 0, Math.round(-EXTRA + sy * 0.35));
@@ -366,193 +364,6 @@ function meadow(canvas: HTMLCanvasElement) {
   };
   if (reduce) begin();
   else assemble(begin);
-  if (reduce) addEventListener('scroll', () => frame(0, 0), { passive: true });
+  if (reduce || anchor === 'bottom') addEventListener('scroll', () => !running && frame((performance.now() - start) / 1000, 0), { passive: true });
   addEventListener('resize', () => { build(); frame(0, 0); });
 }
-
-/* ---------- The tree ----------
-   Lines out of the mark under the headline to each step, then from each
-   step into the portrait, drawn as each reaches the middle of the screen. */
-function tree(root: HTMLElement, drawPortrait: (k: number) => void) {
-  const svg = root.querySelector<SVGSVGElement>('[data-lines]')!;
-  const origin = document.querySelector<HTMLElement>('[data-origin]')!;
-  const list = root.querySelector<HTMLElement>('[data-steps]')!;
-  const portraitEl = root.querySelector<HTMLElement>('[data-portrait]')!;
-  const steps = [...list.children] as HTMLElement[];
-  // A path draws with the branch it belongs to (out or back); on a narrow
-  // screen each segment draws on its own, as the screen reaches it (y0–y1).
-  let paths: { p: SVGPathElement; len: number; back: boolean; y0?: number; y1?: number }[] = [];
-
-  const layout = () => {
-    const T = root.getBoundingClientRect(), O = origin.getBoundingClientRect(), P = portraitEl.getBoundingClientRect();
-    const top = { x: O.left + O.width / 2 - T.left, y: O.bottom - T.top };
-    const bottom = { x: P.left + P.width / 2 - T.left, y: P.top - T.top };
-    svg.replaceChildren();
-    paths = [];
-    const add = (d: string, isBack: boolean, y0?: number, y1?: number) => {
-      const p = document.createElementNS(SVG, 'path');
-      p.setAttribute('d', d);
-      svg.append(p);
-      const len = p.getTotalLength();
-      p.style.strokeDasharray = String(len);
-      paths.push({ p, len, back: isBack, y0, y1 });
-    };
-    // Narrow, the steps in one column: a single line through the gaps
-    // between them, then down into the portrait.
-    if (getComputedStyle(list).gridTemplateColumns.split(' ').length === 1) {
-      let y = top.y;
-      for (const s of steps) {
-        const R = s.getBoundingClientRect();
-        add(`M${top.x},${y} L${top.x},${R.top - T.top - 12}`, false, y, R.top - T.top - 12);
-        y = R.bottom - T.top + 12;
-      }
-      add(`M${top.x},${y} L${bottom.x},${bottom.y}`, true, y, bottom.y);
-      progress();
-      return;
-    }
-    for (const s of steps) {
-      const R = s.getBoundingClientRect();
-      const x = R.left + R.width / 2 - T.left;
-      const out = `M${top.x},${top.y} C${top.x},${top.y + 130} ${x},${R.top - T.top - 130} ${x},${R.top - T.top - 10}`;
-      const back = `M${x},${R.bottom - T.top + 12} C${x},${R.bottom - T.top + 140} ${bottom.x},${bottom.y - 150} ${bottom.x},${bottom.y}`;
-      add(out, false);
-      add(back, true);
-    }
-    progress();
-  };
-  const progress = () => {
-    const vh = innerHeight;
-    const out = reduce ? 1 : clamp((vh * 0.95 - list.getBoundingClientRect().top) / (vh * 0.45));
-    const back = reduce ? 1 : clamp((vh * 0.95 - portraitEl.getBoundingClientRect().top) / (vh * 0.5));
-    const reached = vh * 0.85 - root.getBoundingClientRect().top;
-    for (const { p, len, back: isBack, y0, y1 } of paths) {
-      const k = reduce ? 1 : y0 !== undefined && y1 !== undefined ? clamp((reached - y0) / (y1 - y0)) : isBack ? back : out;
-      p.style.strokeDashoffset = String(len * (1 - k));
-    }
-    const narrow = paths.some((p) => p.y0 !== undefined);
-    steps.forEach((s) => s.classList.toggle('in', reduce || (narrow ? s.getBoundingClientRect().top < vh * 0.88 : out > 0.92)));
-    drawPortrait(back);
-  };
-  root.dataset.ready = '';
-  addEventListener('scroll', progress, { passive: true });
-  addEventListener('resize', layout);
-  layout();
-}
-
-/* ---------- The thread ----------
-   From the statement under the portrait into My work, then down the
-   experience, along its left side with a mark at each role, then back out
-   to the middle, ending in an arrow at the close. Drawn as you scroll; complete at the page end. */
-function thread(svg: SVGSVGElement) {
-  const box = svg.parentElement!;
-  const statement = document.querySelector<HTMLElement>('[data-statement]')!.parentElement!;
-  const work = document.querySelector<HTMLElement>('[data-work]');
-  const exp = document.querySelector<HTMLElement>('[data-exp]')!;
-  const reach = document.querySelector<HTMLElement>('[data-reach]')!;
-  // Two runs: the statement down into My work, then out of it, down the
-  // experience and on to the close. Each draws over its own stretch of page.
-  let runs: { p: SVGPathElement; len: number; y0: number; y1: number }[] = [];
-  let head: SVGPolylineElement;
-  let marks: { m: SVGRectElement; y: number }[] = [];
-
-  const layout = () => {
-    const M = box.getBoundingClientRect(), S = statement.getBoundingClientRect(), E = exp.getBoundingClientRect(), R = reach.getBoundingClientRect();
-    const W = work?.getBoundingClientRect();
-    const x0 = S.left + S.width / 2 - M.left, sy = S.bottom - M.top + 28;
-    const x1 = E.left - M.left + 8, ey = E.top - M.top + 10, eb = E.bottom - M.top + 24;
-    const x2 = R.left + R.width / 2 - M.left, end = R.top - M.top - 18;
-    svg.replaceChildren();
-    const run = (d: string, y0: number, y1: number) => {
-      const p = document.createElementNS(SVG, 'path');
-      p.setAttribute('d', d);
-      svg.append(p);
-      const len = p.getTotalLength();
-      p.style.strokeDasharray = String(len);
-      runs.push({ p, len, y0, y1 });
-    };
-    runs = [];
-    // From the statement, or from the bottom of My work once it's passed.
-    let from = sy;
-    if (W) {
-      const wt = W.top - M.top - 20;
-      run(`M${x0},${sy} L${x0},${wt}`, sy, wt);
-      from = W.bottom - M.top + 20;
-    }
-    run(`M${x0},${from} L${x0},${from + 20} C${x0},${ey - 60} ${x1},${from + 80} ${x1},${ey} L${x1},${eb} C${x1},${eb + 90} ${x2},${end - 110} ${x2},${end}`, from, end);
-    head = document.createElementNS(SVG, 'polyline');
-    head.setAttribute('points', `${x2 - 6},${end - 7} ${x2},${end} ${x2 + 6},${end - 7}`);
-    svg.append(head);
-    marks = [...exp.querySelectorAll('.row')].map((row) => {
-      const y = row.getBoundingClientRect().top - M.top + 22;
-      const m = document.createElementNS(SVG, 'rect');
-      for (const [k, v] of Object.entries({ x: x1 - 3, y: y - 3, width: 7, height: 7 })) m.setAttribute(k, String(v));
-      svg.append(m);
-      return { m, y };
-    });
-    progress();
-  };
-  const progress = () => {
-    const M = box.getBoundingClientRect();
-    const atEnd = innerHeight + scrollY >= document.documentElement.scrollHeight - 4;
-    const reached = reduce || atEnd ? Infinity : innerHeight * 0.8 - M.top;
-    let k = 0;
-    for (const r of runs) {
-      k = clamp((reached - r.y0) / (r.y1 - r.y0));
-      r.p.style.strokeDashoffset = String(r.len * (1 - k));
-    }
-    head.style.opacity = k >= 0.995 ? '' : '0';
-    for (const { m, y } of marks) m.style.opacity = reached > y ? '1' : '0';
-  };
-  addEventListener('scroll', progress, { passive: true });
-  addEventListener('resize', layout);
-  layout();
-}
-
-/* ---------- My work ----------
-   Pointing at a card (or focusing it) plays the project's recording over its
-   cover, muted and inline, as /work does; leaving stops it and drops its
-   source, so it stops downloading. Nothing loads until then, and nothing
-   plays under reduced motion. */
-function workCards(root: HTMLElement) {
-  if (reduce) return;
-  const video = document.createElement('video');
-  video.muted = true;
-  video.playsInline = true;
-  video.loop = true;
-  video.setAttribute('aria-hidden', 'true');
-  let on: HTMLElement | null = null;
-  const stop = () => {
-    video.pause();
-    video.removeAttribute('src');
-    video.load();
-    video.remove();
-    on = null;
-  };
-  video.addEventListener('error', () => video.hasAttribute('src') && stop());
-  const play = (card: HTMLElement) => {
-    if (on === card) return;
-    stop();
-    on = card;
-    video.src = card.dataset.video!;
-    card.querySelector('.cover')!.append(video);
-    video.play().catch(() => {});
-  };
-  for (const card of root.querySelectorAll<HTMLElement>('a[data-video]')) {
-    card.addEventListener('pointerenter', (e) => e.pointerType === 'mouse' && play(card));
-    card.addEventListener('pointerleave', (e) => e.pointerType === 'mouse' && on === card && stop());
-    card.addEventListener('focus', () => card.matches(':focus-visible') && play(card));
-    card.addEventListener('blur', () => on === card && stop());
-  }
-}
-
-const workEl = document.querySelector<HTMLElement>('[data-work]');
-if (workEl) workCards(workEl);
-const meadowEl = document.querySelector<HTMLCanvasElement>('[data-meadow]');
-if (meadowEl) meadow(meadowEl);
-document.fonts.ready.then(() => {
-  const treeEl = document.querySelector<HTMLElement>('[data-tree]');
-  const portraitEl = document.querySelector<HTMLCanvasElement>('[data-portrait]');
-  if (treeEl && portraitEl) tree(treeEl, portrait(portraitEl));
-  const threadEl = document.querySelector<SVGSVGElement>('[data-thread]');
-  if (threadEl) thread(threadEl);
-});

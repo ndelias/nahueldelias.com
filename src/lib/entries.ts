@@ -100,6 +100,9 @@ export const siblingsOf = (part: Entry): { prev: Entry; next: Entry } | undefine
 };
 
 /** The part's own slug: "distribution" for vers1ons/distribution. */
+/** The homepage card's image: a frame of the product, or the cover. */
+export const stillOf = (entry: Entry) => entry.data.still ?? entry.data.cover.src;
+
 // The number a card leads with: the first of the entry's impact row.
 export const cardImpact = (entry: Entry) => entry.data.impact?.[0];
 export const cardImpactText = (entry: Entry) => {

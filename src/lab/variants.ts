@@ -29,8 +29,7 @@ export const BASELINE: Variant = {
   name: 'Today',
   idea: 'The live homepage, for comparison.',
   dial: { system: 0, layout: 0 },
-  // The live site, not the dev server's /: under `astro dev` the homepage's
-  // behaviours (about.ts) don't run, so the meadow and portrait stay blank.
+  // The live site, not the dev server's /, which is now round 3 itself.
   href: 'https://nahueldelias.com/',
 };
 

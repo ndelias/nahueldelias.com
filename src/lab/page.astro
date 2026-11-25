@@ -10,10 +10,10 @@ import Base from '../layouts/Base.astro';
 import Compare from './Compare.astro';
 import LeadProject from './home/LeadProject.astro';
 import Split from './home/Split.astro';
-import SplitLead from './home/SplitLead.astro';
+import SplitLead from '../components/home/SplitLead.astro';
 import WorkFirst from './home/WorkFirst.astro';
 import { EDITABLES } from './editables';
-import { settingsFor } from './settings';
+import { settingsFor } from '../lib/layout-settings';
 import { HOME_VARIANTS } from './variants';
 
 export const getStaticPaths = (() => [
@@ -56,8 +56,8 @@ const setup = view !== 'compare' && {
 </script>
 
 <style is:global>
-  /* The cursor tip (src/lab/home/lab.ts). */
-  .lab-tip {
+  /* The cursor tip (src/scripts/cards.ts), for the layouts that don't carry it. */
+  .cursor-tip {
     position: fixed;
     top: 0;
     left: 0;
@@ -66,6 +66,7 @@ const setup = view !== 'compare' && {
     border-radius: 999px;
     background: var(--ink);
     color: var(--bg);
+    font-family: var(--font-mono);
     font-size: var(--text-mono);
     letter-spacing: var(--tracking-mono);
     text-transform: uppercase;
@@ -74,7 +75,7 @@ const setup = view !== 'compare' && {
     opacity: 0;
     transition: opacity 0.2s var(--ease);
   }
-  .lab-tip.on {
+  .cursor-tip.on {
     opacity: 1;
   }
 </style>

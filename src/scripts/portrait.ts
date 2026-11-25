@@ -1,5 +1,7 @@
-// The character portrait, shared by the homepage (about.ts) and the lab's
-// homepage layouts (src/lab/home/lab.ts).
+// The character portrait. The earlier homepage's grid is drawn by the lab's
+// layouts (src/lab/home/lab.ts), /motion's scramble piece and the link
+// preview (scripts/og-image.mjs); the homepage's photo arrives through its
+// own grid (src/scripts/photo.ts).
 
 import portraitGrid from '../assets/about/portrait.json';
 
@@ -10,8 +12,16 @@ import portraitGrid from '../assets/about/portrait.json';
    lands on its own character. In the dark theme the ramp flips (dense for
    light), so it reads as the photo, not its negative. Redrawn when the
    theme changes. */
-export function portrait(canvas: HTMLCanvasElement) {
-  const { cols: COLS, rows: ROWS, grid } = portraitGrid as { cols: number; rows: number; grid: string[] };
+export interface Grid {
+  cols: number;
+  rows: number;
+  grid: string[];
+}
+
+/** Draws a grid (by default the earlier homepage's) on the canvas; returns
+    draw(k), k from 0 (scrambled) to 1 (settled). */
+export function portrait(canvas: HTMLCanvasElement, data: Grid = portraitGrid as Grid) {
+  const { cols: COLS, rows: ROWS, grid } = data;
   const RAMP = ' .:-=+*xzYX%#'; // as in scripts/portrait.mjs
   const light = grid.join('');
   const dark = [...light].map((c) => { const i = RAMP.indexOf(c); return i > 0 ? RAMP[RAMP.length - i] : c; }).join('');

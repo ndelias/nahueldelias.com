@@ -3,7 +3,7 @@
 // scripts or images reach dist/.
 //
 // Two things: the route (/_lab), and the editor's Save (POST /__lab/save),
-// which writes a layout's settings to src/lab/home/settings/<layout>.json.
+// which writes a layout's settings to src/settings/<layout>.json.
 // The layout renders from that file, so what was on screen is now in the
 // code, and Vite reloads the page from it.
 import { mkdir, writeFile } from 'node:fs/promises';
@@ -42,7 +42,7 @@ export default function lab() {
         if (command === 'dev') injectRoute({ pattern: '/_lab/[...path]', entrypoint: './src/lab/page.astro' });
       },
       'astro:server:setup': ({ server }) => {
-        const dir = fileURLToPath(new URL('src/lab/home/settings/', root));
+        const dir = fileURLToPath(new URL('src/settings/', root));
         server.middlewares.use('/__lab/save', (req, res) => {
           const reply = (status, body) => {
             res.statusCode = status;
@@ -61,7 +61,7 @@ export default function lab() {
               if (!ID.test(body.id ?? '')) return reply(400, { error: 'bad layout id' });
               await mkdir(dir, { recursive: true });
               await writeFile(`${dir}${body.id}.json`, JSON.stringify(clean(body), null, 2) + '\n');
-              reply(200, { saved: `src/lab/home/settings/${body.id}.json` });
+              reply(200, { saved: `src/settings/${body.id}.json` });
             } catch (error) {
               reply(400, { error: String(error) });
             }

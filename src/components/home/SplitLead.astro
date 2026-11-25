@@ -1,12 +1,17 @@
 ---
-// Layout, round 3: Split, vers1ons first. Nahuel's column stays on the left
-// while the work scrolls on the right. vers1ons leads the work, bigger than
-// the rest, with all its numbers and parts. On a phone he's a compact row
-// at the top, the work comes right after, and the ways to reach him close
-// the page. Everything the editor can change comes from settingsFor().
-import Icon from '../../components/Icon.astro';
+// The homepage's layout, Split with vers1ons first (round 3 of the design
+// lab, src/lab/). Nahuel's column stays on the left while the work scrolls
+// on the right: his photo, name, a line about how he works, and his links on
+// one row. vers1ons leads the work, bigger than the rest, with all its
+// numbers and parts. On a phone he's a compact row at the top, the work
+// comes right after, and the links close the page. Everything the lab's
+// editor can change comes from settingsFor(): sizes and section order as
+// custom properties on the root, text through data-edit.
+import { Image } from 'astro:assets';
+import photo from '../../assets/about/photo.webp';
+import Icon from '../Icon.astro';
 import { LINKS, RESUME, STEPS, work } from '../../lib/home';
-import { settingsFor } from '../settings';
+import { settingsFor } from '../../lib/layout-settings';
 import Experience from './Experience.astro';
 import LeadFeature from './LeadFeature.astro';
 import WorkCard from './WorkCard.astro';
@@ -15,10 +20,13 @@ import { SPLIT_LEAD } from './split-lead';
 const { style, text } = settingsFor('split-lead', SPLIT_LEAD);
 const [lead, ...rest] = work();
 ---
-<main class="sl container" data-lab-root style={style}>
+<main class="sl container" data-layout style={style}>
   <aside class="side" aria-labelledby="side-title">
     <div class="side-in">
-      <canvas class="portrait" data-lab-portrait role="img" aria-label="A portrait of Nahuel D'Elias drawn in characters"></canvas>
+      <div class="portrait" data-photo>
+        <Image src={photo} alt="Nahuel D'Elias" widths={[216, 431]} sizes="(max-width: 899px) 72px, 216px" format="avif" loading="eager" />
+        <canvas aria-hidden="true"></canvas>
+      </div>
       <div class="who">
         <h1 id="side-title">Nahuel D'Elias</h1>
         <p class="role mono muted">Product engineer</p>
@@ -97,15 +105,58 @@ const [lead, ...rest] = work();
     flex-direction: column;
     padding-top: var(--space-48);
   }
+  /* The photo, and the characters it arrives as (src/scripts/photo.ts),
+     in the grid's shape (400×480, scripts/portrait.mjs). */
   .portrait {
-    display: block;
+    position: relative;
     width: var(--portrait);
     max-width: 100%;
     aspect-ratio: 400 / 480;
     margin-bottom: var(--space-24);
+    overflow: hidden;
+    border-radius: 8px;
   }
-  :global(:root:not(.js)) .portrait {
-    display: none;
+  .portrait img,
+  .portrait canvas {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .portrait img {
+    object-fit: cover;
+  }
+  .portrait canvas {
+    opacity: 0;
+    pointer-events: none;
+  }
+  /* With JS, where the characters can be read: hidden until they've
+     settled, or after 3s whatever happens. */
+  @media (min-width: 900px) and (prefers-reduced-motion: no-preference) {
+    :global(.js) .portrait img {
+      opacity: 0;
+      animation: photo-in 0.6s var(--ease) 3s forwards;
+    }
+    .portrait[data-settling] img {
+      animation: none;
+    }
+    .portrait[data-settling] canvas {
+      opacity: 1;
+    }
+    .portrait[data-done] img {
+      opacity: 1;
+      transition: opacity 0.8s var(--ease);
+    }
+    .portrait[data-done] canvas {
+      opacity: 0;
+      transition: opacity 0.8s var(--ease);
+    }
+  }
+  @keyframes photo-in {
+    to {
+      opacity: 1;
+    }
   }
   h1 {
     margin: 0;
@@ -126,10 +177,12 @@ const [lead, ...rest] = work();
     font-size: var(--line-size);
     line-height: 1.55;
   }
+  /* The links on one row. */
   .links {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0 var(--space-24);
+    flex-wrap: nowrap;
+    gap: 0 var(--space-16);
+    white-space: nowrap;
     margin: var(--space-24) 0 0;
     padding: 0;
     list-style: none;
@@ -137,9 +190,10 @@ const [lead, ...rest] = work();
   .links a {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-8);
+    gap: var(--space-4);
     min-height: 44px;
     color: var(--ink);
+    font-size: var(--text-meta);
     font-weight: var(--weight-medium);
     text-decoration: none;
   }
@@ -161,7 +215,30 @@ const [lead, ...rest] = work();
   }
   .download {
     justify-content: center;
-    min-width: 44px;
+    min-width: 32px;
+  }
+
+  /* The tip that follows the cursor over a card (src/scripts/cards.ts). */
+  :global(.cursor-tip) {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--bg);
+    font-family: var(--font-mono);
+    font-size: var(--text-mono);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s var(--ease);
+  }
+  :global(.cursor-tip.on) {
+    opacity: 1;
   }
 
   /* The flow: sections in the order the editor set. */

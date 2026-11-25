@@ -2,9 +2,8 @@
 // A project card that shows the product: a frame from its reel, which plays
 // in place while pointed at or focused (lab.ts), then its kicker, title,
 // line and the number it leads with. The cursor carries a "Case study" tip.
-import { Image } from 'astro:assets';
-import { cardImpact, type Entry } from '../../lib/entries';
-import { frameOf } from './frames';
+import EntryImage from '../EntryImage.astro';
+import { cardImpact, stillOf, type Entry } from '../../lib/entries';
 
 interface Props {
   entry: Entry;
@@ -16,13 +15,12 @@ interface Props {
 }
 
 const { entry, href, kicker, sizes, eager = false } = Astro.props;
-const frame = frameOf(entry.id);
 const impact = cardImpact(entry);
 const Tag = href ? 'a' : 'div';
 ---
 <Tag class="wc" href={href} data-reel={entry.data.video} data-tip={href && 'Case study'}>
   <span class="shot">
-    {frame && <Image src={frame} alt="" widths={[640, 1280]} sizes={sizes} loading={eager ? 'eager' : 'lazy'} />}
+    <EntryImage src={stillOf(entry)} alt="" widths={[640, 1280]} sizes={sizes} loading={eager ? 'eager' : 'lazy'} output="avif" />
   </span>
   <span class="kicker mono muted">{kicker}</span>
   <span class="title">{entry.data.title}</span>

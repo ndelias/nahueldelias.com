@@ -14,11 +14,11 @@ test('no lab pages in the build', () => {
   assert.equal(existsSync(join(DIST, '_lab')), false, 'dist/_lab exists');
 });
 
-test("no page links to the lab or carries its cursor tip", async () => {
+test("no page links to the lab or carries its editor", async () => {
   const pages = (await readdir(DIST, { recursive: true })).filter((f) => f.endsWith('.html'));
   for (const page of pages) {
     const html = await readFile(join(DIST, page), 'utf8');
     assert.doesNotMatch(html, /\/_lab\b/, `${page} links to the lab`);
-    assert.doesNotMatch(html, /lab-tip/, `${page} carries the lab's styles`);
+    assert.doesNotMatch(html, /lab-ed|__lab/, `${page} carries the lab's editor`);
   }
 });

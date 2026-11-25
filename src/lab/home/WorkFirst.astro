@@ -7,15 +7,15 @@
 // Combined (round 2): the same, with vers1ons leading My work as a feature
 // with all its numbers and parts (from Lead project), the rest in a row of
 // three, and the short list of how he thinks (from Split).
-import { Image } from 'astro:assets';
+import EntryImage from '../../components/EntryImage.astro';
+import { stillOf } from '../../lib/entries';
 import { STEPS, work } from '../../lib/home';
 import { EDITABLES } from '../editables';
-import { settingsFor } from '../settings';
-import Experience from './Experience.astro';
-import LeadFeature from './LeadFeature.astro';
+import { settingsFor } from '../../lib/layout-settings';
+import Experience from '../../components/home/Experience.astro';
+import LeadFeature from '../../components/home/LeadFeature.astro';
 import Reach from './Reach.astro';
-import WorkCard from './WorkCard.astro';
-import { frameOf } from './frames';
+import WorkCard from '../../components/home/WorkCard.astro';
 
 interface Props {
   combined?: boolean;
@@ -27,7 +27,7 @@ const [lead, ...rest] = WORK;
 const id = combined ? 'combined' : 'work-first';
 const { style, text } = settingsFor(id, EDITABLES[id]);
 ---
-<main class="wf" data-lab-root style={style}>
+<main class="wf" data-layout style={style}>
   <section class="hello container" aria-labelledby="hello-title">
     <div class="say">
       <p class="kicker mono muted">Nahuel D'Elias · Product engineer</p>
@@ -35,11 +35,10 @@ const { style, text } = settingsFor(id, EDITABLES[id]);
     </div>
     <ul class="peek" aria-label="Projects">
       {WORK.map(({ entry, href }, i) => {
-        const frame = frameOf(entry.id);
         return (
           <li style={`--i: ${i}`}>
             <a href={href} data-tip={entry.data.title} aria-label={entry.data.title}>
-              {frame && <Image src={frame} alt="" widths={[400, 800]} sizes="(max-width: 639px) 45vw, 22vw" loading="eager" />}
+              <EntryImage src={stillOf(entry)} alt="" widths={[400, 800]} sizes="(max-width: 639px) 45vw, 22vw" loading="eager" />
             </a>
           </li>
         );

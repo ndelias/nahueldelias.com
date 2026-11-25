@@ -1,8 +1,8 @@
 // What the editor can change on each layout, by layout id. The sliders set
 // desktop sizes: on a phone each layout keeps its own.
 import { CLOSER, STATEMENT } from '../lib/home';
-import type { Editable } from './settings';
-import { SPLIT_LEAD } from './home/split-lead';
+import type { Editable } from '../lib/layout-settings';
+import { SPLIT_LEAD } from '../components/home/split-lead';
 
 const HEADLINE = {
   headline: { label: 'Headline', value: "I'm Nahuel, a product engineer who thinks through the entire product," },

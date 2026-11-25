@@ -2,21 +2,20 @@
 // Layout 2, Lead project. A short intro with the ways to reach Nahuel up
 // front, then vers1ons as a big feature with every number and part, the
 // rest of the work as a compact list, then him and his experience.
-import { Image } from 'astro:assets';
+import EntryImage from '../../components/EntryImage.astro';
 import Icon from '../../components/Icon.astro';
-import { cardImpact } from '../../lib/entries';
+import { cardImpact, stillOf } from '../../lib/entries';
 import { LINKS, RESUME, work } from '../../lib/home';
 import { EDITABLES } from '../editables';
-import { settingsFor } from '../settings';
-import Experience from './Experience.astro';
-import LeadFeature from './LeadFeature.astro';
+import { settingsFor } from '../../lib/layout-settings';
+import Experience from '../../components/home/Experience.astro';
+import LeadFeature from '../../components/home/LeadFeature.astro';
 import Reach from './Reach.astro';
-import { frameOf } from './frames';
 
 const [lead, ...rest] = work();
 const { style, text } = settingsFor('lead-project', EDITABLES['lead-project']);
 ---
-<main class="lp" data-lab-root style={style}>
+<main class="lp" data-layout style={style}>
   <section class="intro container" aria-labelledby="intro-title">
     <p class="kicker mono muted">Nahuel D'Elias · Product engineer</p>
     <h1 id="intro-title"><span data-edit="headline">{text.headline}</span> <span class="muted" data-edit="headline-tail">{text['headline-tail']}</span></h1>
@@ -37,13 +36,12 @@ const { style, text } = settingsFor('lead-project', EDITABLES['lead-project']);
     <h2 class="label mono muted" id="more-title">More work</h2>
     <ul class="list">
       {rest.map(({ entry, href, kicker }) => {
-        const frame = frameOf(entry.id);
         const impact = cardImpact(entry);
         return (
           <li>
             <a class="item" href={href} data-reel={entry.data.video} data-tip="Case study">
               <span class="shot thumb">
-                {frame && <Image src={frame} alt="" widths={[400, 800]} sizes="(max-width: 639px) 100vw, 280px" />}
+                <EntryImage src={stillOf(entry)} alt="" widths={[400, 800]} sizes="(max-width: 639px) 100vw, 280px" />
               </span>
               <span class="item-text">
                 <span class="kicker mono muted">{kicker}</span>
