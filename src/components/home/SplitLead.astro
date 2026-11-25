@@ -17,10 +17,18 @@ import LeadFeature from './LeadFeature.astro';
 import WorkCard from './WorkCard.astro';
 import { SPLIT_LEAD } from './split-lead';
 
-const { style, text } = settingsFor('split-lead', SPLIT_LEAD);
+interface Props {
+  /** The settings file to read (src/settings/<id>.json). The lab's
+      variations of this layout keep their own. */
+  id?: string;
+  /** A line treatment the lab is trying on this layout (src/lab/lines.ts). */
+  lines?: 'thread' | 'tree' | 'connector';
+}
+const { id = 'split-lead', lines } = Astro.props;
+const { style, text } = settingsFor(id, SPLIT_LEAD);
 const [lead, ...rest] = work();
 ---
-<main class="sl container" data-layout style={style}>
+<main class="sl container" data-layout data-lines={lines} style={style}>
   <aside class="side" aria-labelledby="side-title">
     <div class="side-in">
       <div class="portrait" data-photo>

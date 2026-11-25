@@ -3,6 +3,8 @@
 // scrambles and settles once it's on screen (drawn settled under reduced
 // motion).
 import { later, reels, tip } from '../../scripts/cards';
+import { meadow } from '../../scripts/meadow';
+import { connector, thread, tree } from '../lines';
 import { photo } from '../../scripts/photo';
 import { portrait } from '../../scripts/portrait';
 
@@ -39,3 +41,21 @@ document.fonts.ready.then(() => {
   portraits();
   photo();
 });
+
+// Round 4: the meadow closing the page, and the line treatment marked on
+// the layout.
+const footer = document.querySelector<HTMLCanvasElement>('[data-meadow]');
+if (footer) {
+  const io = new IntersectionObserver(
+    ([e]) => {
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      meadow(footer, 'bottom');
+    },
+    { threshold: 0.25 },
+  );
+  io.observe(footer);
+}
+const lined = document.querySelector<HTMLElement>('[data-lines]');
+const LINES = { thread, tree, connector };
+if (lined) LINES[lined.dataset.lines as keyof typeof LINES]?.(lined);

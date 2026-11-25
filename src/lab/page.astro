@@ -10,6 +10,7 @@ import Base from '../layouts/Base.astro';
 import Compare from './Compare.astro';
 import LeadProject from './home/LeadProject.astro';
 import Split from './home/Split.astro';
+import Meadow from '../components/home/Meadow.astro';
 import SplitLead from '../components/home/SplitLead.astro';
 import WorkFirst from './home/WorkFirst.astro';
 import { EDITABLES } from './editables';
@@ -22,8 +23,11 @@ export const getStaticPaths = (() => [
 ]) satisfies GetStaticPaths;
 
 const { view } = Astro.props as { view: string };
-const LAYOUTS: Record<string, typeof WorkFirst> = { 'work-first': WorkFirst, 'lead-project': LeadProject, split: Split, combined: WorkFirst, 'split-lead': SplitLead };
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Astro components with different props
+const LAYOUTS: Record<string, any> = { 'work-first': WorkFirst, 'lead-project': LeadProject, split: Split, combined: WorkFirst, 'split-lead': SplitLead };
 const Layout = LAYOUTS[view];
+// Round 4: the homepage with a line treatment (src/lab/lines.ts).
+const LINES: Record<string, 'thread' | 'tree' | 'connector'> = { 'lines-thread': 'thread', 'lines-tree': 'tree', 'lines-connector': 'connector' };
 const variant = HOME_VARIANTS.find((v) => v.id === view);
 
 // The editor's setup (src/lab/editor/): the layouts to switch between and,
@@ -44,7 +48,14 @@ const setup = view !== 'compare' && {
 ) : (
   <Base title={`${variant?.name} · Design lab`} description={variant?.idea ?? ''} noindex preload={['sans-500', 'mono-400']}>
     <Frame>
-      <Layout combined={view === 'combined'} />
+      {LINES[view] ? (
+        <>
+          <SplitLead id={view} lines={LINES[view]} />
+          <Meadow />
+        </>
+      ) : (
+        <Layout combined={view === 'combined'} />
+      )}
     </Frame>
     <script is:inline type="application/json" id="lab-edit" set:html={JSON.stringify(setup).replace(/</g, '\\u003c')} />
   </Base>
@@ -77,5 +88,44 @@ const setup = view !== 'compare' && {
   }
   .cursor-tip.on {
     opacity: 1;
+  }
+
+  /* Round 4's lines (src/lab/lines.ts): a hairline in the page's ink, at
+     half strength, and square marks, as the old homepage drew them. */
+  .lab-lines path,
+  .lab-lines polyline {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 1;
+    opacity: 0.5;
+  }
+  .lab-lines polyline {
+    transition: opacity 0.3s var(--ease);
+  }
+  .lab-lines .mark {
+    fill: var(--ink);
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+    transform: scale(0.4);
+    transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
+  }
+  .lab-lines .mark.on {
+    opacity: 1;
+    transform: none;
+  }
+  /* The tree: each step shows as its line reaches it. */
+  [data-tree] li {
+    transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
+  }
+  [data-tree] li:not(.in) {
+    opacity: 0;
+    transform: translateX(-6px);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .lab-lines .mark,
+    [data-tree] li {
+      transition: none;
+    }
   }
 </style>
