@@ -3,13 +3,9 @@
 
 .lab-ed {
   position: fixed;
-  right: 16px;
-  bottom: 16px;
   z-index: 200;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
+  width: 44px;
+  height: 44px;
   color: var(--ink);
   font-family: var(--font-sans);
   font-size: var(--text-small);
@@ -41,18 +37,57 @@
   outline-offset: 2px;
 }
 
-.lab-ed-toggle {
-  min-width: 72px;
-  min-height: 40px !important;
-  padding: 0 16px;
-  border-radius: 999px !important;
+/* Minimized: one round button, floating, draggable. */
+.lab-ed-fab {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50% !important;
+  border-color: var(--ink) !important;
   background: var(--ink) !important;
   color: var(--bg) !important;
-  border-color: var(--ink) !important;
-  box-shadow: 0 8px 24px -12px color-mix(in srgb, var(--ink) 50%, transparent);
+  box-shadow: 0 8px 24px -10px color-mix(in srgb, var(--ink) 55%, transparent);
+  cursor: grab !important;
+  touch-action: none;
+}
+.lab-ed.dragging .lab-ed-fab {
+  cursor: grabbing !important;
+}
+.lab-ed-fab svg {
+  width: 18px;
+  height: 18px;
+}
+.lab-ed-dot {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 9px;
+  height: 9px;
+  border: 2px solid var(--bg);
+  border-radius: 50%;
+  background: var(--accent);
+}
+.lab-ed-dot[hidden] {
+  display: none;
+}
+.lab-ed-min {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  min-height: 28px !important;
+  padding: 0;
+  border-color: transparent !important;
+  background: none !important;
 }
 
+/* Open: the panel beside the button, toward the middle of the screen. */
 .lab-ed-panel {
+  position: absolute;
+  right: 0;
+  bottom: 52px;
   width: 300px;
   max-height: min(78vh, 760px);
   overflow-y: auto;
@@ -64,11 +99,20 @@
 .lab-ed-panel[hidden] {
   display: none;
 }
+.opens-right .lab-ed-panel {
+  right: auto;
+  left: 0;
+}
+.lab-ed:not(.opens-up) .lab-ed-panel {
+  top: 52px;
+  bottom: auto;
+}
 .lab-ed-head {
   position: sticky;
   top: 0;
+  z-index: 1;
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 8px;
   padding: 14px 16px 10px;
@@ -78,6 +122,7 @@
   margin: 0;
 }
 .lab-ed-status {
+  margin-left: auto;
   color: var(--muted);
   text-transform: none !important;
   letter-spacing: 0 !important;
@@ -202,10 +247,11 @@
   outline-style: solid;
 }
 
-/* The phone preview: the page at 390px wide, beside the editor. */
+/* The phone preview: the page at 390px wide, past the panel's far edge
+   (editor.ts places it); hidden while the editor is minimized. */
 .lab-ed-phone {
   position: fixed;
-  right: 332px;
+  right: 340px;
   bottom: 16px;
   z-index: 199;
   width: 390px;
@@ -214,4 +260,7 @@
   border-radius: 24px;
   background: var(--bg);
   box-shadow: 0 16px 48px -24px color-mix(in srgb, var(--ink) 45%, transparent);
+}
+.lab-ed-min-on .lab-ed-phone {
+  display: none;
 }

@@ -21,6 +21,7 @@ interface State {
 
 const OPEN = 'lab-editor-open';
 const VIEW = 'lab-editor-view';
+const POS = 'lab-editor-position';
 const store = {
   get: (k: string) => { try { return sessionStorage.getItem(k); } catch { return null; } },
   set: (k: string, v: string) => { try { sessionStorage.setItem(k, v); } catch {} },
@@ -52,6 +53,8 @@ const svg = (d: string) => {
 const UP = 'M8 13V3M3.5 7.5 8 3l4.5 4.5';
 const DOWN = 'M8 3v10M3.5 8.5 8 13l4.5-4.5';
 const GRIP = 'M6 4h.01M10 4h.01M6 8h.01M10 8h.01M6 12h.01M10 12h.01';
+const MINUS = 'M3.5 8h9';
+const SLIDERS = 'M3 4.5h5M11 4.5h2M3 11.5h2M8 11.5h5M9.5 3v3M6.5 10v3';
 
 function h<K extends keyof HTMLElementTagNameMap>(tag: K, attrs: Record<string, string> = {}, ...kids: (Node | string)[]) {
   const el = document.createElement(tag);
@@ -65,20 +68,95 @@ function editor(setup: Setup) {
   let state = saved ? copy(saved) : undefined;
   let phone: HTMLIFrameElement | null = null;
 
-  /* ---------- The panel ---------- */
+  /* ---------- The panel ----------
+     Open, it's the full panel; minimized, it's one small round button that
+     floats over the page and can be dragged anywhere (where it was is kept
+     for the session). Click it, or the panel's minimize, or press Escape,
+     to switch. The panel opens beside the button, toward the middle of the
+     screen; the phone preview hides with it. */
   const status = h('span', { class: 'lab-ed-status mono', role: 'status' });
-  const toggle = h('button', { class: 'lab-ed-toggle mono', type: 'button', 'aria-expanded': 'false' }, 'Edit');
+  const dot = h('span', { class: 'lab-ed-dot', hidden: '' });
+  const fab = h('button', { class: 'lab-ed-fab', type: 'button', 'aria-expanded': 'false', 'aria-label': 'Design lab editor', title: 'Design lab editor (drag to move)' }, svg(SLIDERS), dot);
+  const minimize = h('button', { class: 'lab-ed-min', type: 'button', 'aria-label': 'Minimize the editor', title: 'Minimize (Esc)' }, svg(MINUS));
   const panel = h('div', { class: 'lab-ed-panel', role: 'region', 'aria-label': 'Design lab editor', hidden: '' });
-  const wrap = h('div', { class: 'lab-ed' }, panel, toggle);
+  const wrap = h('div', { class: 'lab-ed' }, panel, fab);
   document.body.append(wrap);
+
+  const FAB = 44;
+  const place = (x: number, y: number) => {
+    x = Math.min(Math.max(8, x), innerWidth - FAB - 8);
+    y = Math.min(Math.max(8, y), innerHeight - FAB - 8);
+    wrap.style.left = `${x}px`;
+    wrap.style.top = `${y}px`;
+    // Open toward the middle of the screen.
+    const left = x + FAB / 2 < innerWidth / 2;
+    const up = y + FAB / 2 > innerHeight / 2;
+    wrap.classList.toggle('opens-right', left);
+    wrap.classList.toggle('opens-up', up);
+    panel.style.maxHeight = `${Math.min(760, (up ? y : innerHeight - y - FAB) - 24)}px`;
+    sidePhone(x, left);
+    return { x, y };
+  };
+  // The phone preview sits just past the panel's far edge, wherever it opens.
+  const PANEL = 300, GAP = 16;
+  const sidePhone = (x: number, left: boolean) => {
+    if (!phone) return;
+    if (left) {
+      phone.style.left = `${x + PANEL + GAP}px`;
+      phone.style.right = 'auto';
+    } else {
+      phone.style.right = `${innerWidth - (x + FAB - PANEL) + GAP}px`;
+      phone.style.left = 'auto';
+    }
+  };
+  let pos = (() => {
+    try { return JSON.parse(store.get(POS) ?? '') as { x: number; y: number }; } catch { return { x: innerWidth - FAB - 16, y: innerHeight - FAB - 16 }; }
+  })();
+  pos = place(pos.x, pos.y);
+  addEventListener('resize', () => (pos = place(pos.x, pos.y)));
 
   const open = (on: boolean) => {
     panel.hidden = !on;
-    toggle.textContent = on ? 'Close' : 'Edit';
-    toggle.setAttribute('aria-expanded', String(on));
+    fab.setAttribute('aria-expanded', String(on));
+    wrap.classList.toggle('is-open', on);
+    document.documentElement.classList.toggle('lab-ed-min-on', !on);
     store.set(OPEN, on ? '1' : '');
   };
-  toggle.addEventListener('click', () => open(panel.hidden === true));
+
+  // Drag the button; a press that doesn't move is a click.
+  let drag: { dx: number; dy: number; moved: boolean } | null = null;
+  fab.addEventListener('pointerdown', (e) => {
+    drag = { dx: e.clientX - pos.x, dy: e.clientY - pos.y, moved: false };
+    fab.setPointerCapture(e.pointerId);
+  });
+  fab.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    const x = e.clientX - drag.dx, y = e.clientY - drag.dy;
+    if (!drag.moved && Math.hypot(x - pos.x, y - pos.y) < 4) return;
+    drag.moved = true;
+    wrap.classList.add('dragging');
+    pos = place(x, y);
+  });
+  fab.addEventListener('pointerup', () => {
+    if (drag?.moved) store.set(POS, JSON.stringify(pos));
+    wrap.classList.remove('dragging');
+  });
+  fab.addEventListener('click', (e) => {
+    if (drag?.moved) e.preventDefault();
+    else open(panel.hidden === true);
+    drag = null;
+  });
+  minimize.addEventListener('click', () => {
+    open(false);
+    fab.focus();
+  });
+  addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape' || panel.hidden) return;
+    const el = document.activeElement as HTMLElement | null;
+    if (el?.isContentEditable) return el.blur();
+    open(false);
+    fab.focus();
+  });
 
   const group = (title: string, ...kids: Node[]) => h('section', { class: 'lab-ed-group' }, h('h2', { class: 'mono' }, title), ...kids);
 
@@ -90,7 +168,7 @@ function editor(setup: Setup) {
     select.append(o);
   }
   select.addEventListener('change', () => (location.href = select.value));
-  panel.append(h('header', { class: 'lab-ed-head' }, h('p', { class: 'mono' }, 'Design lab'), status), group('Layout', select));
+  panel.append(h('header', { class: 'lab-ed-head' }, h('p', { class: 'mono' }, 'Design lab'), status, minimize), group('Layout', select));
 
   // View: the phone width in a frame beside the page.
   const views = h('div', { class: 'lab-ed-seg', role: 'group', 'aria-label': 'View' });
@@ -115,6 +193,7 @@ function editor(setup: Setup) {
       });
       document.body.append(phone);
       document.documentElement.classList.add('lab-ed-phone-on');
+      place(pos.x, pos.y);
     } else if (v === 'desktop' && phone) {
       phone.remove();
       phone = null;
@@ -131,6 +210,7 @@ function editor(setup: Setup) {
       if (phone?.contentDocument) apply(phone.contentDocument, setup, state!);
       const dirty = !same(state!, saved);
       status.textContent = dirty ? 'Unsaved changes' : '';
+      dot.hidden = !dirty;
       save.disabled = reset.disabled = !dirty;
     };
 
@@ -236,6 +316,7 @@ function editor(setup: Setup) {
         if (!res.ok) throw new Error((await res.json()).error);
         Object.assign(saved, copy(state!));
         status.textContent = 'Saved to the code';
+        dot.hidden = true;
       } catch (error) {
         status.textContent = `Not saved: ${error instanceof Error ? error.message : error}`;
         save.disabled = false;
