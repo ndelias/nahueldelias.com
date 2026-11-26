@@ -30,6 +30,14 @@ const workFirst = (restCols: number): Editable => ({
 
 export const EDITABLES: Record<string, Editable> = {
   'split-lead': SPLIT_LEAD,
+  // Round 4: the homepage with lines, each with its own settings.
+  'lines-thread': SPLIT_LEAD,
+  'lines-tree': SPLIT_LEAD,
+  'lines-connector': SPLIT_LEAD,
+  // Round 5: the five steps, three ways.
+  'steps-branch': SPLIT_LEAD,
+  'steps-reveal': SPLIT_LEAD,
+  'steps-columns': SPLIT_LEAD,
   'work-first': workFirst(2),
   // Combined: the projects per row are the ones under the vers1ons feature.
   combined: workFirst(3),

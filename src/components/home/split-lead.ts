@@ -19,6 +19,28 @@ export const SPLIT_LEAD: Editable = {
     { key: 'section-gap', label: 'Space between sections', min: 64, max: 240, step: 8, unit: 'px', value: 160 },
   ],
   text: {
+    // How he thinks about product: each step's longer description, drafted
+    // from what he said about his work (2026-11-25). His to rewrite.
+    'step-1': {
+      label: 'Step 1, Be curious',
+      value: "Have conversations with the people you're building for, and listen more than you pitch. Consider every potential customer's perspective, not only the loudest one.",
+    },
+    'step-2': {
+      label: 'Step 2, Understand the problem',
+      value: 'Fall in love with the problem, not the solution. Know who has it, how often, and what it costs them, and back that up with data before deciding what to build.',
+    },
+    'step-3': {
+      label: 'Step 3, Map the journey',
+      value: 'Map out the product journey for each user, from the first time they hear about it to the day they rely on it. The gaps usually show up in the handoffs.',
+    },
+    'step-4': {
+      label: 'Step 4, Know what the build needs',
+      value: 'Understand every requirement before writing code. Work end to end, and know when to pull others in.',
+    },
+    'step-5': {
+      label: 'Step 5, Mindless when it works',
+      value: 'When it works, people move through the product without thinking about it. They remember what they got done, not how they did it.',
+    },
     line: {
       label: 'Description',
       // A first draft from Nahuel's two picks (2026-11-25). His to edit.

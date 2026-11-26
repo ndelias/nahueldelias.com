@@ -121,7 +121,7 @@ test('without JS: the photo, the line, the work, about, experience and the links
     photo: getComputedStyle(document.querySelector('[data-photo] img')).opacity,
     line: !!document.querySelector('[data-edit="line"]')?.textContent.trim(),
     statement: !!document.querySelector('[data-edit="statement"]')?.textContent.trim(),
-    steps: document.querySelectorAll('.short li').length,
+    steps: document.querySelectorAll('.steps li').length,
     roles: document.querySelectorAll('.exp .rows li').length,
     links: [...document.querySelectorAll('.side .links a')].map((a) => a.getAttribute('href')),
   }));
@@ -222,5 +222,38 @@ test('phone: a compact row on top, the work right after, the links at the end, n
   await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
   await page.waitForTimeout(300);
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), 390);
+  await ctx.close();
+});
+
+test('the lines: a thread with a mark at every heading, ending at the meadow, branching into each step', async () => {
+  const { ctx, page } = await open();
+  await page.waitForFunction(() => document.querySelectorAll('svg.lines').length === 2);
+  await page.evaluate(async () => {
+    for (let y = 0; y <= document.documentElement.scrollHeight; y += 400) {
+      scrollTo(0, y);
+      await new Promise((r) => requestAnimationFrame(r));
+    }
+  });
+  await page.waitForTimeout(600);
+  const state = await page.evaluate(() => {
+    const headings = [...document.querySelectorAll('.flow [data-section] h2, .flow [data-section] h3.label')].filter((h) => h.offsetParent).length;
+    const [thread, branches] = [...document.querySelectorAll('svg.lines')];
+    const meadow = document.querySelector('[data-meadow]').getBoundingClientRect();
+    const head = thread.querySelector('polyline').getBoundingClientRect();
+    return {
+      headings,
+      marks: thread.querySelectorAll('.mark.on').length,
+      drawn: Number(thread.querySelector('path').style.strokeDashoffset) < 1,
+      headInMeadow: head.top > meadow.top && head.bottom < meadow.bottom,
+      branches: branches.querySelectorAll('path').length,
+      stepsShown: document.querySelectorAll('.steps li.in').length,
+    };
+  });
+  assert.equal(state.marks, state.headings, 'a heading without its mark');
+  assert.ok(state.headings >= 6, `only ${state.headings} headings`);
+  assert.ok(state.drawn, 'the thread is not drawn whole at the end of the page');
+  assert.ok(state.headInMeadow, 'the thread does not end in the meadow');
+  assert.equal(state.branches, 5, 'not a branch into each of the five steps');
+  assert.equal(state.stepsShown, 5);
   await ctx.close();
 });

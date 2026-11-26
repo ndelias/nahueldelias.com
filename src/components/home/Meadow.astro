@@ -1,0 +1,31 @@
+---
+// The pixel meadow that closes the homepage (src/scripts/meadow.ts, as a
+// footer). The page's script draws it once a quarter of it is on screen.
+---
+<canvas class="meadow" data-meadow aria-hidden="true"></canvas>
+<style>
+  /* The meadow, closing the page: a small canvas scaled up, pixels kept
+     square. With JS it's drawn as it comes near; without, a flat wash of
+     its sky, hills and grass stands in. */
+  .meadow {
+    display: block;
+    width: 100%;
+    height: min(48vh, 440px);
+    image-rendering: pixelated;
+    /* The sky fades into the page, so the hills rise out of it instead of
+       the scene starting at a hard edge. */
+    mask-image: linear-gradient(to bottom, transparent 0%, #000 55%);
+  }
+  /* In the dark theme the scene is dimmed, as if at dusk. */
+  :global(:root[data-theme='dark']) .meadow {
+    filter: brightness(0.62) saturate(0.85);
+  }
+  :global(:root:not(.js)) .meadow {
+    background: linear-gradient(#e3eaea 0 40%, #a3b3c0 40% 44%, #a3bb4c 44% 56%, #82bf44 56% 82%, #2f6b44 82%);
+  }
+  @media (max-width: 639.98px) {
+    .meadow {
+      height: 34vh;
+    }
+  }
+</style>
