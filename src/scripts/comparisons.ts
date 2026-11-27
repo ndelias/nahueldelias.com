@@ -22,6 +22,7 @@ function init(scope: ParentNode = document) {
     tabs.forEach((tab, i) => {
       tab.setAttribute('role', 'tab');
       tab.id = `compare-tab-${i}`;
+      panels[i].id = `compare-${i}`;
       tab.setAttribute('aria-controls', panels[i].id);
       panels[i].setAttribute('role', 'tabpanel');
       panels[i].setAttribute('aria-labelledby', tab.id);

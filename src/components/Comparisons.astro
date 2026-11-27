@@ -3,7 +3,10 @@
 // today, for a few parts of the product, each with why it changed. Usable in
 // MDX; part pages place it with <Comparisons />.
 //
-// Without JS, or with reduced motion, each pair sits side by side. With JS
+// Without JS, or with reduced motion, each pair sits side by side. The
+// pairs are plain divs, not a list: with JS they become the tab panels
+// (role="tabpanel" isn't allowed on an <li>), and the script gives each its
+// id for the tab's aria-controls (kept out of the HTML budget). With JS
 // (src/scripts/comparisons.ts, after the first paint) they're tabs, one at a
 // time, and the before screen fades into today's in the same frame, then the
 // next tab comes up. It holds while hovered or focused, and Pause stops it
@@ -70,9 +73,9 @@ const one = (src: ImageMetadata, frame: FrameType) => Math.min(frame === 'phone'
         ))}
       </div>
     </div>
-    <ol class="items">
+    <div class="items">
       {items.map((c, i) => (
-        <li class:list={['item', c.frame]} id={`compare-${i}`} data-compare-panel={i}>
+        <div class:list={['item', c.frame]} data-compare-panel={i}>
           <h3 class="title">{c.title}</h3>
           {c.why && <p class="why">{c.why}</p>}
           <div class="pair">
@@ -89,9 +92,9 @@ const one = (src: ImageMetadata, frame: FrameType) => Math.min(frame === 'phone'
             ))}
             <span class="arrow" aria-hidden="true"><Icon name="arrow-right" /></span>
           </div>
-        </li>
+        </div>
       ))}
-    </ol>
+    </div>
   </section>
 )}
 
